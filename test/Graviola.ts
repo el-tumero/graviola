@@ -1,6 +1,7 @@
 import {
   loadFixture,
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
+import { expect } from "chai";
 import { ethers } from "hardhat";
 
 describe("Graviola", function () {
@@ -22,6 +23,13 @@ describe("Graviola", function () {
       const { graviola } = await loadFixture(deployLockFixture);
       console.log(await graviola.hello())
     });
+
+    it("Mint", async () => {
+      const { graviola, owner } = await loadFixture(deployLockFixture);
+      await graviola.mint()
+      expect(await graviola.ownerOf(0)).to.be.eq(owner.address)
+
+    })
   })
 
 });
