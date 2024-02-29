@@ -17,7 +17,8 @@ describe("Graviola", function () {
   }
 
   describe("Deployment", function () {
-    it("Should set the right unlockTime", async () => {
+    
+    it("Hello", async () => {
       const { graviola } = await loadFixture(deployLockFixture);
       console.log(await graviola.hello())
     });
