@@ -3,6 +3,7 @@ import {
 } from "@nomicfoundation/hardhat-toolbox/network-helpers";
 import { expect } from "chai";
 import { ethers } from "hardhat";
+import { AbiCoder, EventLog } from "ethers"
 
 describe("Graviola", function () {
   // We define a fixture to reuse the same setup in every test.
@@ -11,25 +12,54 @@ describe("Graviola", function () {
   // NOTE: Only for local tests
   async function deployLockFixture() {
     const [owner, otherAccount] = await ethers.getSigners()
-    const Graviola = await ethers.getContractFactory("Graviola")
-    const graviola = await Graviola.deploy()
 
-    return { graviola, owner, otherAccount };
+    const Coordinator = await ethers.getContractFactory("VRFCoordinatorV2Mock")
+    const BASEFEE = 100000000000000000n
+    const GASPRICELINK = 1000000000n
+    const KEYHASH = "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc"
+
+    const coordinator = await Coordinator.deploy(BASEFEE, GASPRICELINK)
+
+    const tx = await coordinator.createSubscription()
+    const recp = await tx.wait()
+    if(!recp) throw Error("Create sub tx failed")
+
+    const evt = recp.logs.find(evt => evt instanceof EventLog && evt.fragment.name === "SubscriptionCreated") as EventLog | undefined
+    if(!evt) throw Error("Create sub tx failed - no event")
+
+    const [subId] = evt.args as unknown as [bigint, string]
+    await (await coordinator.fundSubscription(subId, 1000000000000000000n)).wait()
+    
+
+    const Graviola = await ethers.getContractFactory("Graviola")
+    const graviola = await Graviola.deploy(subId, await coordinator.getAddress(), KEYHASH)
+
+    
+    await (await coordinator.addConsumer(subId, await graviola.getAddress())).wait()
+
+    return { graviola, coordinator, subId, owner, otherAccount };
   }
 
   describe("Deployment", function () {
-    
-    it("Hello", async () => {
-      const { graviola } = await loadFixture(deployLockFixture);
-      console.log(await graviola.hello())
-    });
 
-    it("Mint", async () => {
-      const { graviola, owner } = await loadFixture(deployLockFixture);
-      await graviola.mint()
-      expect(await graviola.ownerOf(0)).to.be.eq(owner.address)
+    it("VRF Mock test", async () => {
+      const {graviola, coordinator, subId, owner} = await deployLockFixture()
+
+
+      const reqTx = await graviola.requestMint()
+      const {logs} = (await reqTx.wait())!
+      const [requestId] = (logs.find(evt => evt instanceof EventLog && evt.fragment.name == "RequestSent") as EventLog).args as unknown as [bigint]
+
+
+      const fulTx = await coordinator.fulfillRandomWords(requestId, await graviola.getAddress())
+      await fulTx.wait()
+
+      const data = await graviola.getRequestStatus(requestId)
+      console.log(data)
 
     })
+
+
   })
 
 });
