@@ -70,6 +70,7 @@ contract GraviolaMetadata {
         );
     }
 
+    // NOTE: test
 
     function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(metadataStorage[tokenId].filled, "Metadata is empty!");
