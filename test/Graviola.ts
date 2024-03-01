@@ -43,19 +43,19 @@ describe("Graviola", function () {
   describe("Deployment", function () {
 
     it("VRF Mock test", async () => {
-      const {graviola, coordinator, subId, owner} = await deployLockFixture()
-
+      const {graviola, coordinator, owner} = await deployLockFixture()
 
       const reqTx = await graviola.requestMint()
-      const {logs} = (await reqTx.wait())!
-      const [requestId] = (logs.find(evt => evt instanceof EventLog && evt.fragment.name == "RequestSent") as EventLog).args as unknown as [bigint]
-
+      const {logs: logs0} = (await reqTx.wait())!
+      const [requestId] = (logs0.find(evt => evt instanceof EventLog && evt.fragment.name == "RequestSent") as EventLog).args as unknown as [bigint]
 
       const fulTx = await coordinator.fulfillRandomWords(requestId, await graviola.getAddress())
       await fulTx.wait()
 
-      const data = await graviola.getRequestStatus(requestId)
-      console.log(data)
+      const {randomWords} = await graviola.getRequestStatus(requestId)
+
+      expect(randomWords[0]).to.be.eql(78541660797044910968829902406342334108369226379826116161446442989268089806461n)
+      expect(await graviola.ownerOf(0)).to.be.eq(await owner.address)
 
     })
 

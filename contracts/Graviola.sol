@@ -6,7 +6,7 @@ import "./GraviolaRandom.sol";
 
 
 // Uncomment this line to use console.log
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 contract Graviola is ERC721, GraviolaRandom {
     uint256 private _nextTokenId;
@@ -30,11 +30,10 @@ contract Graviola is ERC721, GraviolaRandom {
         // console.log(randomWords[0]);
         
         // mints nft
-        // uint256 tokenId = _nextTokenId++;
-        // _safeMint(s_requests[requestId].requestor, tokenId);
-
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(s_requests[requestId].requestor, tokenId);
         // words well logic
-
+        
         // save to prompts mapping
 
         // metadata

@@ -11,7 +11,8 @@ abstract contract GraviolaRandom is VRFConsumerBaseV2{
     bytes32 immutable s_keyHash;
     uint64 immutable s_subscriptionId;
 
-    uint32 constant CALLBACK_GAS_LIMIT = 100000;
+    // TODO: set correct gas limit
+    uint32 constant CALLBACK_GAS_LIMIT = 1000000;
     uint16 constant REQUEST_CONFIRMATIONS = 3;
     uint32 constant NUM_WORDS = 1;
 
