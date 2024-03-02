@@ -6,11 +6,8 @@ import { ethers } from "hardhat";
 import { AbiCoder, EventLog } from "ethers"
 
 describe("Graviola", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
-  // NOTE: Only for local tests
-  async function deployLockFixture() {
+
+  async function deployFixture() {
     const [owner, otherAccount] = await ethers.getSigners()
 
     const Coordinator = await ethers.getContractFactory("VRFCoordinatorV2Mock")
@@ -43,7 +40,7 @@ describe("Graviola", function () {
   describe("Deployment", function () {
 
     it("VRF Mock test", async () => {
-      const {graviola, coordinator, owner} = await deployLockFixture()
+      const {graviola, coordinator, owner} = await deployFixture()
 
       const reqTx = await graviola.requestMint()
       const {logs: logs0} = (await reqTx.wait())!
