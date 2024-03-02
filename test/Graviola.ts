@@ -37,10 +37,10 @@ describe("Graviola", function () {
     return { graviola, coordinator, subId, owner, otherAccount };
   }
 
-  describe("Deployment", function () {
+  describe("Tests", function () {
 
     it("VRF Mock test", async () => {
-      const {graviola, coordinator, owner} = await deployFixture()
+      const {graviola, coordinator, owner} = await loadFixture(deployFixture)
 
       const reqTx = await graviola.requestMint()
       const {logs: logs0} = (await reqTx.wait())!
@@ -53,9 +53,45 @@ describe("Graviola", function () {
 
       expect(randomWords[0]).to.be.eql(78541660797044910968829902406342334108369226379826116161446442989268089806461n)
       expect(await graviola.ownerOf(0)).to.be.eq(await owner.address)
-
     })
 
+    it("Full local mint test", async () => {
+      const {graviola, coordinator, owner} = await loadFixture(deployFixture)
+      const reqTx = await graviola.requestMint()
+      const {logs: logs0} = (await reqTx.wait())!
+      const [requestId] = (logs0.find(evt => evt instanceof EventLog && evt.fragment.name == "RequestSent") as EventLog).args as unknown as [bigint]
+      const fulTx = await coordinator.fulfillRandomWords(requestId, await graviola.getAddress())
+      await fulTx.wait()
+
+      const [status0] = await graviola.checkUpkeep(Uint8Array.from([0]))
+      expect(status0).to.be.eq(false)
+
+      const oaoTx = await graviola.debugOAOCallback("ethereum logo", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ethereum_logo_2014.svg/1257px-Ethereum_logo_2014.svg.png")
+      await oaoTx.wait()
+
+      let [status1, id] = await graviola.checkUpkeep(Uint8Array.from([0]))
+      expect(status1).to.be.eq(true)
+      
+      const pTx = await graviola.performUpkeep(id)
+      await pTx.wait()
+
+      const uri = await graviola.tokenURI(0)
+      const obj = await (await fetch(uri)).json()
+
+      const expectedObj = {
+        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ethereum_logo_2014.svg/1257px-Ethereum_logo_2014.svg.png", 
+        description: "ethereum logo",
+        attributes: [
+          {
+            "trait_type": "Rarity",
+            "value": 25
+          }
+        ]
+      }
+
+      expect(obj).be.eql(expectedObj)
+      expect(graviola.tokenURI(1)).to.be.revertedWith("Metadata is empty!")
+    })
 
   })
 
