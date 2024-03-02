@@ -13,26 +13,33 @@ contract GraviolaWell {
 
     constructor() {
         // Init base keywords and rarity factors
+
+        // Simplified for probability testing
         WELL_OF_WORDS.push(Word("human", 1500));
-        WELL_OF_WORDS.push(Word("goblin", 200));
-        WELL_OF_WORDS.push(Word("alien", 100));
-        WELL_OF_WORDS.push(Word("elf", 50));
-        WELL_OF_WORDS.push(Word("cyborg", 10));
-        WELL_OF_WORDS.push(Word("android", 2));
-        WELL_OF_WORDS.push(Word("mage", 50));
-        WELL_OF_WORDS.push(Word("angry", 80));
-        WELL_OF_WORDS.push(Word("stunned", 90));
-        WELL_OF_WORDS.push(Word("monobrow", 1));
-        WELL_OF_WORDS.push(Word("piercing", 20));
-        WELL_OF_WORDS.push(Word("bald", 10));
-        WELL_OF_WORDS.push(Word("tattoo", 30));
-        WELL_OF_WORDS.push(Word("hairy", 5));
-        WELL_OF_WORDS.push(Word("white", 200));
-        WELL_OF_WORDS.push(Word("green", 200));
-        WELL_OF_WORDS.push(Word("black", 200));
-        WELL_OF_WORDS.push(Word("red", 200));
-        WELL_OF_WORDS.push(Word("blue", 200));
-        WELL_OF_WORDS.push(Word("yellow", 200));
+        WELL_OF_WORDS.push(Word("elf", 250));
+        WELL_OF_WORDS.push(Word("goblin", 150));
+        WELL_OF_WORDS.push(Word("android", 100));
+
+        // WELL_OF_WORDS.push(Word("human", 1500));
+        // WELL_OF_WORDS.push(Word("goblin", 200));
+        // WELL_OF_WORDS.push(Word("alien", 100));
+        // WELL_OF_WORDS.push(Word("elf", 50));
+        // WELL_OF_WORDS.push(Word("cyborg", 10));
+        // WELL_OF_WORDS.push(Word("android", 2));
+        // WELL_OF_WORDS.push(Word("mage", 50));
+        // WELL_OF_WORDS.push(Word("angry", 80));
+        // WELL_OF_WORDS.push(Word("stunned", 90));
+        // WELL_OF_WORDS.push(Word("monobrow", 1));
+        // WELL_OF_WORDS.push(Word("piercing", 20));
+        // WELL_OF_WORDS.push(Word("bald", 10));
+        // WELL_OF_WORDS.push(Word("tattoo", 30));
+        // WELL_OF_WORDS.push(Word("hairy", 5));
+        // WELL_OF_WORDS.push(Word("white", 200));
+        // WELL_OF_WORDS.push(Word("green", 200));
+        // WELL_OF_WORDS.push(Word("black", 200));
+        // WELL_OF_WORDS.push(Word("red", 200));
+        // WELL_OF_WORDS.push(Word("blue", 200));
+        // WELL_OF_WORDS.push(Word("yellow", 200));
     }
 
     function addWordToWell(string memory _keyword) public {
@@ -43,44 +50,45 @@ contract GraviolaWell {
         // Push to WELL_OF_WORDS
     }
 
-    function rollWord(uint256 _seed) external {
+    function rollWords(uint256 _seed) external {
         uint8 keywordAmount = 3;
         uint256 totalRarity = 0;
-        string memory result;
-        uint256 rarityProbability = 1e18; // Start with a scaled value of 1
+        string memory result = "";
+        uint256 resultRarity = 1;
 
-        // Normalize rarity factors
+        // Sum rarity of all WELL_OF_WORDS items.
         for (uint256 i = 0; i < WELL_OF_WORDS.length; i++) {
             totalRarity += WELL_OF_WORDS[i].rarityFactor;
         }
 
-        // Get 3 random numbers and select words
+        // Roll three keywords based on their probability.
         for (uint256 i = 0; i < keywordAmount; i++) {
-            uint256 randomSeed = uint256(keccak256(abi.encode(_seed, i)));
-            uint256 randomNumber = randomSeed % totalRarity;
-            uint256 cumulatedRarity = 0;
+            uint256 random = uint256(keccak256(abi.encodePacked(_seed, i))) %
+                totalRarity;
+            uint256 sum = 0;
 
             for (uint256 j = 0; j < WELL_OF_WORDS.length; j++) {
-                cumulatedRarity += WELL_OF_WORDS[j].rarityFactor;
-                if (randomNumber < cumulatedRarity) {
-                    // Append selected word to result string
+                sum += WELL_OF_WORDS[j].rarityFactor;
+                if (random < sum) {
                     result = string(
-                        abi.encodePacked(result, WELL_OF_WORDS[j].keyword, " ")
+                        abi.encodePacked(
+                            result,
+                            (i > 0 ? ", " : ""),
+                            WELL_OF_WORDS[j].keyword
+                        )
                     );
-                    // Update rarity probability
-                    rarityProbability =
-                        (rarityProbability * WELL_OF_WORDS[j].rarityFactor) /
-                        totalRarity;
-                    break;
+                    resultRarity *= WELL_OF_WORDS[j].rarityFactor;
+                    break; // Aaaaaa let meout
                 }
             }
         }
 
-        // Convert the scaled rarityProbability to a percentage
-        uint256 rarityVal = rarityProbability / 1e13; // Max val = 10000 (100%)
-        // Percentage = rarityVal / 100, prec = 2f
+        // Calc probability of this roll
+        // 100 000 = 100%, => (result probability / 100) = human-readable percnetage
+        uint256 probability = (resultRarity * 100000) /
+            totalRarity ** keywordAmount;
 
         // Emit the result and rarity as a percentage
-        emit RollResult(result, rarityVal);
+        emit RollResult(result, probability);
     }
 }
