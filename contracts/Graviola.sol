@@ -6,27 +6,29 @@ import { AutomationCompatibleInterface } from "@chainlink/contracts/src/v0.8/aut
 import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import "./GraviolaRandom.sol";
 import "./GraviolaMetadata.sol";
+import "./AIOracleCallbackReceiver.sol";
 
 
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompatibleInterface {
+contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompatibleInterface, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
+    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 5000000;
 
     uint256 private _nextTokenId;
 
     constructor(
         uint64 subscriptionId,
         address vrfCoordinator,
-        bytes32 keyHash
-    ) ERC721("Graviola", "GRV") GraviolaRandom(subscriptionId, vrfCoordinator, keyHash) {}
+        bytes32 keyHash,
+        address aiOracle
+    ) ERC721("Graviola", "GRV") GraviolaRandom(subscriptionId, vrfCoordinator, keyHash) AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
 
-    // OAORequests 
+
     DoubleEndedQueue.Bytes32Deque private OAORequests;
-    // mapping(uint256=>) 
 
     function requestMint() external {
         // TODO: fees mechanism
@@ -37,7 +39,6 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompati
         require(s_requests[requestId].exists, "request not found");
         s_requests[requestId].fulfilled = true;
         s_requests[requestId].randomWords = randomWords;
-        // console.log(randomWords[0]);
         
         // mints nft
         uint256 tokenId = _nextTokenId++;
@@ -53,12 +54,14 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompati
         addRarity(tokenId, rarity);
 
 
-        // request to opML oracle
+        // request to ai oracle 
+        aiOracle.requestCallback(1, bytes(testPrompt), address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
     }
 
-    function debugOAOCallback(string memory prompt, string memory response) external{
-        addPromptResponse(prompt, response);
-    } 
+    function receiveOAOCallback(uint256 /*modelId*/, bytes calldata input, bytes calldata output) external onlyAIOracleCallback {
+        addPromptResponse(string(input), string(output));
+    }
+
 
     function checkUpkeep(bytes calldata) external view override returns (bool upkeepNeeded, bytes memory performData) {
         uint256 id = uint256(OAORequests.front());

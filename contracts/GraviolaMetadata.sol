@@ -23,9 +23,9 @@ contract GraviolaMetadata {
     mapping(string=>PromptsResponse) private promptsStorage;
 
     // DEBUG function - must be removed after local tests
-    function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
-        metadataStorage[tokenId] = Metadata(image, prompt, 25, true);
-    }
+    // function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
+    //     metadataStorage[tokenId] = Metadata(image, prompt, 25, true);
+    // }
 
     // NOTE: addRarity() should be called after this func
     function addPrompt(uint256 tokenId, string memory prompt) internal {
@@ -95,7 +95,7 @@ contract GraviolaMetadata {
     }
 
     // NOTE: public only for local tests
-    function _tokenURI(uint256 tokenId) public view returns (string memory) {
+    function _tokenURI(uint256 tokenId) internal view returns (string memory) {
         require(metadataStorage[tokenId].filled, "Metadata is empty!");
         return convertToBase64URL(bytes(generateJSON(metadataStorage[tokenId].image, metadataStorage[tokenId].prompt, metadataStorage[tokenId].rarity)));
     }
