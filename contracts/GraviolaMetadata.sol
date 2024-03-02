@@ -14,7 +14,13 @@ contract GraviolaMetadata {
         bool filled;
     }
 
+    struct PromptsResponse {
+        string response;
+        bool exists;
+    }
+
     mapping(uint256 => Metadata) private metadataStorage;
+    mapping(string=>PromptsResponse) private promptsStorage;
 
     // DEBUG function - must be removed after local tests
     function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
@@ -25,27 +31,44 @@ contract GraviolaMetadata {
     function addPrompt(uint256 tokenId, string memory prompt) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].prompt = prompt;
+
+        // NOTE: low probability of failure of this mechanism
+        if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
     }
 
-    // NOTE: storeAIResult() should be called after this func
+    // NOTE: requestCallback() should be called after this func
     function addRarity(uint256 tokenId, uint8 rarity) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].rarity = rarity;
     }
 
-    function addImage(uint256 tokenId, string memory image) internal {
+    // NOTE: should be exec in OAO callback
+    function addPromptResponse(string memory prompt, string memory response) internal {
+        promptsStorage[prompt].response = response;
+        promptsStorage[prompt].exists = true;
+    }
+
+    // NOTE: should be exec in checkUpkeep
+    function hasPromptResponse(string memory prompt) internal view returns(bool) {
+        return promptsStorage[prompt].exists;
+    }
+
+    function addImage(uint256 tokenId, string memory image) private {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].image = image;
         metadataStorage[tokenId].filled = true;
     }
 
-    function getPrompt(uint256 tokenId) internal view returns (string memory) {
-        return metadataStorage[tokenId].prompt;
+    // NOTE: should be exec in performUpkeep
+    function savePromptResponseToMetadata(uint256 tokenId) internal {
+        string memory prompt = metadataStorage[tokenId].prompt;
+        require(promptsStorage[prompt].exists, "Prompt response does not exists!");
+        addImage(tokenId, promptsStorage[prompt].response);
     }
 
     // -- conversions --
 
-    function generateJSON(string memory image, string memory prompt, uint8 rarity) internal pure returns (string memory) {
+    function generateJSON(string memory image, string memory prompt, uint8 rarity) private pure returns (string memory) {
         JsonWriter.Json memory writer;
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("image", image);
@@ -61,7 +84,7 @@ contract GraviolaMetadata {
         return writer.value;
     }
 
-    function convertToBase64URL(bytes memory data) internal pure returns(string memory) {
+    function convertToBase64URL(bytes memory data) private pure returns(string memory) {
         return string(
             abi.encodePacked(
                 "data:application/json;base64,",
@@ -70,7 +93,6 @@ contract GraviolaMetadata {
         );
     }
 
-    // NOTE: test
 
     function tokenURI(uint256 tokenId) external view returns (string memory) {
         require(metadataStorage[tokenId].filled, "Metadata is empty!");
