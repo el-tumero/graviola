@@ -24,7 +24,7 @@ describe("Graviola Metadata", function () {
       "ethereum logo"
     )
     
-    const data = await graviolaMetadata.tokenURI(0)
+    const data = await graviolaMetadata._tokenURI(0)
     const dataObj = await (await fetch(data)).json()
     console.log(dataObj)
     const expectedObj = {

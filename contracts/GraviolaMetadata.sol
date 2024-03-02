@@ -49,7 +49,8 @@ contract GraviolaMetadata {
     }
 
     // NOTE: should be exec in checkUpkeep
-    function hasPromptResponse(string memory prompt) internal view returns(bool) {
+    function hasPromptResponse(uint256 tokenId) internal view returns(bool) {
+        string memory prompt = metadataStorage[tokenId].prompt;
         return promptsStorage[prompt].exists;
     }
 
@@ -93,8 +94,8 @@ contract GraviolaMetadata {
         );
     }
 
-
-    function tokenURI(uint256 tokenId) external view returns (string memory) {
+    // NOTE: public only for local tests
+    function _tokenURI(uint256 tokenId) public view returns (string memory) {
         require(metadataStorage[tokenId].filled, "Metadata is empty!");
         return convertToBase64URL(bytes(generateJSON(metadataStorage[tokenId].image, metadataStorage[tokenId].prompt, metadataStorage[tokenId].rarity)));
     }
