@@ -55,40 +55,40 @@ contract GraviolaWell {
         uint256 totalRarity = 0;
         string memory result = "";
         uint256 resultRarity = 1;
+        bool[] memory used = new bool[](WELL_OF_WORDS.length);
 
-        // Sum rarity of all WELL_OF_WORDS items.
         for (uint256 i = 0; i < WELL_OF_WORDS.length; i++) {
             totalRarity += WELL_OF_WORDS[i].rarityFactor;
         }
 
-        // Roll three keywords based on their probability.
         for (uint256 i = 0; i < keywordAmount; i++) {
             uint256 random = uint256(keccak256(abi.encodePacked(_seed, i))) %
                 totalRarity;
             uint256 sum = 0;
+            bool found = false;
 
-            for (uint256 j = 0; j < WELL_OF_WORDS.length; j++) {
-                sum += WELL_OF_WORDS[j].rarityFactor;
-                if (random < sum) {
-                    result = string(
-                        abi.encodePacked(
-                            result,
-                            (i > 0 ? ", " : ""),
-                            WELL_OF_WORDS[j].keyword
-                        )
-                    );
-                    resultRarity *= WELL_OF_WORDS[j].rarityFactor;
-                    break; // Aaaaaa let meout
+            for (uint256 j = 0; j < WELL_OF_WORDS.length && !found; j++) {
+                if (!used[j]) {
+                    sum += WELL_OF_WORDS[j].rarityFactor;
+                    if (random < sum) {
+                        result = string(
+                            abi.encodePacked(
+                                result,
+                                (i > 0 ? ", " : ""),
+                                WELL_OF_WORDS[j].keyword
+                            )
+                        );
+                        resultRarity *= WELL_OF_WORDS[j].rarityFactor;
+                        used[j] = true;
+                        found = true;
+                        totalRarity -= WELL_OF_WORDS[j].rarityFactor;
+                    }
                 }
             }
+            if (!found) i--;
         }
 
-        // Calc probability of this roll
-        // 100 000 = 100%, => (result probability / 100) = human-readable percnetage
-        uint256 probability = (resultRarity * 100000) /
-            totalRarity ** keywordAmount;
-
-        // Emit the result and rarity as a percentage
-        emit RollResult(result, probability);
+        // Emit the result and the combined rarity factor
+        emit RollResult(result, resultRarity);
     }
 }
