@@ -11,7 +11,7 @@ async function main() {
   const link = await ethers.getContractAt("LinkTokenInterface", "0x779877a7b0d9e8603169ddbd7836e478b4624789")
 
   // aiOracle
-  const aiOrable = await ethers.getContractAt("IAIOracle", "0xb880D47D3894D99157B52A7F869aB3B1E2D4349d")
+  const aiOracle = await ethers.getContractAt("IAIOracle", "0xb880D47D3894D99157B52A7F869aB3B1E2D4349d")
 
   // create vrf sub
   const vrfCoordinator = await ethers.getContractAt("VRFCoordinatorV2","0x8103b0a8a00be2ddc778e6e7eaa21791cd364625")
@@ -25,7 +25,7 @@ async function main() {
   await ltx.wait()
 
   const Graviola = await ethers.getContractFactory("Graviola")
-  const graviola = await Graviola.deploy(subId, await vrfCoordinator.getAddress(), KEYHASH, await aiOrable.getAddress())
+  const graviola = await Graviola.deploy(subId, await vrfCoordinator.getAddress(), KEYHASH, await aiOracle.getAddress())
 
   const acTx = await vrfCoordinator.addConsumer(subId, await graviola.getAddress())
   await acTx.wait()
