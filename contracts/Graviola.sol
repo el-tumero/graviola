@@ -7,13 +7,14 @@ import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import "./GraviolaRandom.sol";
 import "./GraviolaMetadata.sol";
 import "./AIOracleCallbackReceiver.sol";
+import "./GraviolaWell.sol";
 
 
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompatibleInterface, AIOracleCallbackReceiver {
+contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, GraviolaWell, AutomationCompatibleInterface, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
     uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 5000000;
@@ -25,7 +26,7 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompati
         address vrfCoordinator,
         bytes32 keyHash,
         address aiOracle
-    ) ERC721("Graviola", "GRV") GraviolaRandom(subscriptionId, vrfCoordinator, keyHash) AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
+    ) ERC721("Graviola", "GRV") GraviolaRandom(subscriptionId, vrfCoordinator, keyHash) GraviolaWell() AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
 
 
     DoubleEndedQueue.Bytes32Deque private OAORequests;
@@ -46,16 +47,17 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, AutomationCompati
         OAORequests.pushBack(bytes32(tokenId));
         
         // words well logic
-        string memory testPrompt = "ethereum logo";
+        // string memory testPrompt = "ethereum logo";
+        string memory prompt = rollWords(randomWords[0]);
         uint8 rarity = 25;
         
         // metadata
-        addPrompt(tokenId, testPrompt);
+        addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
 
 
         // request to ai oracle 
-        aiOracle.requestCallback(1, bytes(testPrompt), address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
+        aiOracle.requestCallback(1, bytes(prompt), address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
     }
 
     function receiveOAOCallback(uint256 /*modelId*/, bytes calldata input, bytes calldata output) external onlyAIOracleCallback {
