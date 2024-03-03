@@ -38,7 +38,7 @@ async function main() {
   // const registrar = await ethers.getContractAt("GraviolaRe", "0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976")
   const Registrar = await ethers.getContractFactory("GraviolaRegisterUpkeep")
   const registrar = await Registrar.deploy(await link.getAddress(), "0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976")
-
+  const registry = await ethers.getContractAt("IKeeperRegistry", "0x86EFBD0b6736Bed994962f9797049422A3A8E8Ad")
 
   // const addr = acc0.address
   const trTx = await link.transfer(await registrar.getAddress(), parseEther("0.5"))
@@ -61,9 +61,8 @@ async function main() {
   
   const upkeepId = (logs1.find((evt) => evt instanceof EventLog && evt.fragment.name == "UpkeepRegistered") as EventLog).args[0] as bigint
 
-  console.log(upkeepId)
-
-
+  // const data = await registry.getUpkeep(upkeepId)
+  // console.log(data)
 
 
   console.log("Deploy script")
