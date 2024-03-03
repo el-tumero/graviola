@@ -1,11 +1,9 @@
-import { AbiCoder, EventLog, parseEther } from "ethers";
+import { AbiCoder, Contract, EventLog, id, parseEther } from "ethers";
 import { ethers } from "hardhat";
 
 
 async function main() {
-
   const [acc0] = await ethers.getSigners()
-  // console.log(acc0)
 
   const KEYHASH = "0x474e34a077df58807dbe9c96d3c009b23b3c6d0cce433e59bbf5b34f823bc56c"
 
@@ -15,15 +13,13 @@ async function main() {
   // aiOracle
   const aiOrable = await ethers.getContractAt("IAIOracle", "0xb880D47D3894D99157B52A7F869aB3B1E2D4349d")
 
-
   // create vrf sub
   const vrfCoordinator = await ethers.getContractAt("VRFCoordinatorV2","0x8103b0a8a00be2ddc778e6e7eaa21791cd364625")
   const subTx = await vrfCoordinator.createSubscription()
-  const {logs} = (await subTx.wait())!
-  const [subId] = (logs.find(evt => evt instanceof EventLog && evt.fragment.name === "SubscriptionCreated") as EventLog).args as unknown as [bigint, string]
+  const {logs: logs0} = (await subTx.wait())!
+  const [subId] = (logs0.find(evt => evt instanceof EventLog && evt.fragment.name === "SubscriptionCreated") as EventLog).args as unknown as [bigint, string]
 
-  // console.log(subId)
-  // subId.
+
   const args = AbiCoder.defaultAbiCoder().encode(["uint256"], [subId])
   const ltx = await link.transferAndCall(await vrfCoordinator.getAddress(), ethers.parseEther("0.5"), args)
   await ltx.wait()
@@ -39,30 +35,34 @@ async function main() {
 
   // Sepolia Registry: 0x86EFBD0b6736Bed994962f9797049422A3A8E8Ad
   // Sepolia Registrar: 0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976
-  const registrar = await ethers.getContractAt("IAutomationRegistrar", "0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976")
+  // const registrar = await ethers.getContractAt("GraviolaRe", "0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976")
+  const Registrar = await ethers.getContractFactory("GraviolaRegisterUpkeep")
+  const registrar = await Registrar.deploy(await link.getAddress(), "0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976")
 
-  const aprvTx = await link.approve(await registrar.getAddress(), parseEther("0.5"))
-  await aprvTx.wait()
-  
-  const regTx = await registrar.registerUpkeep({
+
+  // const addr = acc0.address
+  const trTx = await link.transfer(await registrar.getAddress(), parseEther("0.5"))
+  await trTx.wait()
+
+
+  const regTx = await registrar.register({
     name: "test upkeep",
-    encryptedEmail: Uint8Array.from([0]),
+    encryptedEmail: "0x",
     upkeepContract: await graviola.getAddress(),
     gasLimit: 500000n,
     adminAddress: acc0.address,
     triggerType: 0n,
-    checkData: Uint8Array.from([0]),
-    triggerConfig: Uint8Array.from([0]),
-    offchainConfig: Uint8Array.from([0]),
+    checkData: "0x",
+    triggerConfig: "0x",
+    offchainConfig: "0x",
     amount: parseEther("0.5")
   })
-  await regTx.wait()
+  const {logs: logs1} = (await regTx.wait())!
+  
+  const upkeepId = (logs1.find((evt) => evt instanceof EventLog && evt.fragment.name == "UpkeepRegistered") as EventLog).args[0] as bigint
 
+  console.log(upkeepId)
 
-
-  // console.log(data)
-  // hexlify(subId.toString())
-  // console.log(logs)
 
 
 
