@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract GraviolaWell {
-
     struct Word {
         string keyword;
         uint256 lowerRange;
@@ -55,7 +54,14 @@ contract GraviolaWell {
         // Push to WELL_OF_WORDS
     }
 
-    function findNearestWordRange(uint256 _number) public view returns (uint256) {
+    // Converts a fraction to basis points uint256
+    function fractionToBasisPoints(uint256 numerator, uint256 denumerator) internal pure returns (uint256) {
+        return (numerator * 100) / denumerator;
+    }
+
+    function findNearestWordRangeIndex(
+        uint256 _number
+    ) public view returns (uint256) {
         require(_number < WELL_OF_WORDS_TOTAL_R);
         uint256 low = 0;
         uint256 high = WELL_OF_WORDS.length;
@@ -74,44 +80,56 @@ contract GraviolaWell {
         }
     }
 
-    // function 
+    function rollWords(uint256 _seed) external view returns (string memory, uint256, uint256) {
 
-    // function rollWords(uint256 _seed, uint256 _tokenId) external {
+        uint8 keywordAmount = 3;
+        uint256 totalProbability;
+        string memory result = "";
+        int256[3] memory usedRangeIndices = [int256(-1), -1, -1];
+        uint256[3] memory bpProbabilities;
+        uint256 totalRarity = WELL_OF_WORDS_TOTAL_R; // Static rarity sum of all keywords
+        uint256 dynamicRarity = WELL_OF_WORDS_TOTAL_R; // Dynamic rarity of each iteration
 
-    //     uint8 keywordAmount = 3;
-    //     string memory result = "";
-    //     mapping(uint256 => bool) memory usedWordIndices;
-    //     uint256 totalRarity = WELL_OF_WORDS_TOTAL_R;
-    //     uint256[] usedWordProbabilities = [];
+        uint256 i = 0;
+        uint256 j = 0;
 
-    //     for (uint256 i = 0; i < keywordAmount; i++) {
+        while (i < keywordAmount) {
 
+            j++;
+
+            uint256 randomNum = uint256(
+                keccak256(abi.encodePacked(_seed, uint256(i + j)))
+            ) % totalRarity; // Random number between [0 and totalRarity]
+            uint256 randomNumWordRangeIndex = findNearestWordRangeIndex(
+                randomNum
+            );
+
+            // If we rolled a word (range) that has been already used -> roll again.
+            if (
+                (usedRangeIndices[0] == int256(randomNumWordRangeIndex)) ||
+                (usedRangeIndices[1] == int256(randomNumWordRangeIndex)) ||
+                (usedRangeIndices[2] == int256(randomNumWordRangeIndex))
+            ) {
+                continue;
+            }
+
+            // Calculate probability factor of selected keyword & subtract from total probability.
+            uint256 selectedWordTotalRarity = WELL_OF_WORDS[
+                randomNumWordRangeIndex
+            ].upperRange - WELL_OF_WORDS[randomNumWordRangeIndex].lowerRange;
+
+            bpProbabilities[i] = (fractionToBasisPoints(selectedWordTotalRarity, dynamicRarity));
+            dynamicRarity -= selectedWordTotalRarity; // Update dynamic rarity
+
+            // // Add selected word's range to usedRangeIndices to prevent duplicates.
+            usedRangeIndices[i] = int256(randomNumWordRangeIndex);
+
+            result = string(abi.encodePacked(result, (i > 0 ? ", " : ""), WELL_OF_WORDS[randomNumWordRangeIndex].keyword));
             
+            i++;
+        }
 
-    //         uint256 r = uint256(keccak256(abi.encodePacked(_seed, uint256(1)))) % WELL_OF_WORDS.length;
-
-    //         if (usedWordIndices[r] == true) {
-    //             keywordAmount++;
-    //             continue;
-    //         }
-
-    //         Word selectedWord = WELL_OF_WORDS[r];
-    //         usedWordIndices[r] = true;
-
-    //         // Add word probability and WoW's total probability for later
-    //         usedWordProbabilities.push(selectedWord.rarityFactor);
-    //         usedWordProbabilities.push(totalRarity);
-
-    //         // Remove rarityFactor of just selected element from total
-    //         totalRarity -= selectedWord.rarityFactor;
-    //         result = string.concat(result, selectedWord.keyword + " ");
-
-    //     }
-
-
-        
-
-    //     // Emit the result and the combined rarity factor
-    //     emit RollResult(result, random);
-    // }
+        totalProbability = (bpProbabilities[0] * bpProbabilities[1] * bpProbabilities[2]);
+        return (result, totalRarity, totalProbability);
+    }
 }
