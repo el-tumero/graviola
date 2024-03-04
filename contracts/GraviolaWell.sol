@@ -80,14 +80,13 @@ contract GraviolaWell {
         }
     }
 
-    function rollWords(uint256 _seed) external view returns (string memory, uint256, uint256) {
+    function rollWords(uint256 _seed) external view returns (string memory, uint256) {
 
         uint8 keywordAmount = 3;
         uint256 totalProbability;
         string memory result = "";
         int256[3] memory usedRangeIndices = [int256(-1), -1, -1];
         uint256[3] memory bpProbabilities;
-        uint256 totalRarity = WELL_OF_WORDS_TOTAL_R; // Static rarity sum of all keywords
         uint256 dynamicRarity = WELL_OF_WORDS_TOTAL_R; // Dynamic rarity of each iteration
 
         uint256 i = 0;
@@ -99,7 +98,7 @@ contract GraviolaWell {
 
             uint256 randomNum = uint256(
                 keccak256(abi.encodePacked(_seed, uint256(i + j)))
-            ) % totalRarity; // Random number between [0 and totalRarity]
+            ) % WELL_OF_WORDS_TOTAL_R; // Random number between [0 and totalRarity]
             uint256 randomNumWordRangeIndex = findNearestWordRangeIndex(
                 randomNum
             );
@@ -130,6 +129,6 @@ contract GraviolaWell {
         }
 
         totalProbability = (bpProbabilities[0] * bpProbabilities[1] * bpProbabilities[2]);
-        return (result, totalRarity, totalProbability);
+        return (result, totalProbability);
     }
 }
