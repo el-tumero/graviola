@@ -19,31 +19,37 @@ contract GraviolaWell {
         // Init base keywords and rarity factors
 
         // Simplified for probability testing
+
         WELL_OF_WORDS.push(Word("human", 0, 999));
         WELL_OF_WORDS.push(Word("elf", 1000, 1749));
         WELL_OF_WORDS.push(Word("goblin", 1750, 1949));
         WELL_OF_WORDS.push(Word("android", 1950, 1999));
 
         // WELL_OF_WORDS.push(Word("human", 1500));
-        // WELL_OF_WORDS.push(Word("goblin", 200));
-        // WELL_OF_WORDS.push(Word("alien", 100));
-        // WELL_OF_WORDS.push(Word("elf", 50));
-        // WELL_OF_WORDS.push(Word("cyborg", 10));
-        // WELL_OF_WORDS.push(Word("android", 2));
-        // WELL_OF_WORDS.push(Word("mage", 50));
-        // WELL_OF_WORDS.push(Word("angry", 80));
-        // WELL_OF_WORDS.push(Word("stunned", 90));
-        // WELL_OF_WORDS.push(Word("monobrow", 1));
-        // WELL_OF_WORDS.push(Word("piercing", 20));
-        // WELL_OF_WORDS.push(Word("bald", 10));
-        // WELL_OF_WORDS.push(Word("tattoo", 30));
-        // WELL_OF_WORDS.push(Word("hairy", 5));
-        // WELL_OF_WORDS.push(Word("white", 200));
-        // WELL_OF_WORDS.push(Word("green", 200));
-        // WELL_OF_WORDS.push(Word("black", 200));
-        // WELL_OF_WORDS.push(Word("red", 200));
-        // WELL_OF_WORDS.push(Word("blue", 200));
-        // WELL_OF_WORDS.push(Word("yellow", 200));
+        // WELL_OF_WORDS.push(Word("elf", 250));
+        // WELL_OF_WORDS.push(Word("goblin", 150));
+        // WELL_OF_WORDS.push(Word("android", 100));
+
+        WELL_OF_WORDS.push(Word("human", 1500));
+        WELL_OF_WORDS.push(Word("goblin", 200));
+        WELL_OF_WORDS.push(Word("alien", 100));
+        WELL_OF_WORDS.push(Word("elf", 50));
+        WELL_OF_WORDS.push(Word("cyborg", 10));
+        WELL_OF_WORDS.push(Word("android", 2));
+        WELL_OF_WORDS.push(Word("mage", 50));
+        WELL_OF_WORDS.push(Word("angry", 80));
+        WELL_OF_WORDS.push(Word("stunned", 90));
+        WELL_OF_WORDS.push(Word("monobrow", 1));
+        WELL_OF_WORDS.push(Word("piercing", 20));
+        WELL_OF_WORDS.push(Word("bald", 10));
+        WELL_OF_WORDS.push(Word("tattoo", 30));
+        WELL_OF_WORDS.push(Word("hairy", 5));
+        WELL_OF_WORDS.push(Word("white", 200));
+        WELL_OF_WORDS.push(Word("green", 200));
+        WELL_OF_WORDS.push(Word("black", 200));
+        WELL_OF_WORDS.push(Word("red", 200));
+        WELL_OF_WORDS.push(Word("blue", 200));
+        WELL_OF_WORDS.push(Word("yellow", 200));
     }
 
     function addWordToWell(string memory _keyword) public {
@@ -53,6 +59,7 @@ contract GraviolaWell {
         // Create a Word struct
         // Push to WELL_OF_WORDS
     }
+
 
     // Converts a fraction to basis points uint256
     function fractionToBasisPoints(uint256 numerator, uint256 denumerator) internal pure returns (uint256) {
@@ -81,7 +88,6 @@ contract GraviolaWell {
     }
 
     function rollWords(uint256 _seed) external view returns (string memory, uint256) {
-
         uint8 keywordAmount = 3;
         uint256 totalProbability;
         string memory result = "";
@@ -130,5 +136,6 @@ contract GraviolaWell {
 
         totalProbability = (bpProbabilities[0] * bpProbabilities[1] * bpProbabilities[2]);
         return (result, totalProbability);
+
     }
 }
