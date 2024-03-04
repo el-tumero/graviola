@@ -20,9 +20,8 @@ describe("Graviola Well", function () {
         const input = ethers.toBigInt(bytes)
         console.log("rand input: ", input.toString())
         const res = await graviolaWell.rollWords(input)
-        const recp = await res.wait()
-        // @ts-ignore
-        console.log("res: ", recp?.logs[0].args)
+
+        console.log(res)
     })
 
 });

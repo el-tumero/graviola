@@ -10,7 +10,7 @@ contract GraviolaMetadata {
     struct Metadata {
         string image;
         string prompt;
-        uint8 rarity;
+        uint256 rarity;
         bool filled;
     }
 
@@ -37,7 +37,7 @@ contract GraviolaMetadata {
     }
 
     // NOTE: requestCallback() should be called after this func
-    function addRarity(uint256 tokenId, uint8 rarity) internal {
+    function addRarity(uint256 tokenId, uint256 rarity) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].rarity = rarity;
     }
@@ -69,7 +69,7 @@ contract GraviolaMetadata {
 
     // -- conversions --
 
-    function generateJSON(string memory image, string memory prompt, uint8 rarity) private pure returns (string memory) {
+    function generateJSON(string memory image, string memory prompt, uint256 rarity) private pure returns (string memory) {
         JsonWriter.Json memory writer;
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("image", image);

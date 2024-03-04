@@ -47,9 +47,10 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, GraviolaWell, Aut
         OAORequests.pushBack(bytes32(tokenId));
         
         // words well logic
-        // string memory testPrompt = "ethereum logo";
-        string memory prompt = rollWords(randomWords[0]);
-        uint8 rarity = 25;
+        string memory prompt;
+        uint256 rarity;
+        (prompt, rarity) = rollWords(randomWords[0]);
+
         
         // metadata
         addPrompt(tokenId, prompt);
