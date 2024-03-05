@@ -11,7 +11,8 @@ contract GraviolaWell {
     }
 
     Word[] public WELL_OF_WORDS;
-    uint256 public WELL_OF_WORDS_TOTAL_R = 2000;
+    uint256 public WELL_OF_WORDS_MIN_R = 10; // Minimum rarity for any keyword
+    uint256 public WELL_OF_WORDS_TOTAL_R = 2000; // Collective rarity of all keywords
 
     event RollResult(string result, uint256 rarity);
 
@@ -30,36 +31,52 @@ contract GraviolaWell {
         // WELL_OF_WORDS.push(Word("goblin", 150));
         // WELL_OF_WORDS.push(Word("android", 100));
 
-        WELL_OF_WORDS.push(Word("human", 1500));
-        WELL_OF_WORDS.push(Word("goblin", 200));
-        WELL_OF_WORDS.push(Word("alien", 100));
-        WELL_OF_WORDS.push(Word("elf", 50));
-        WELL_OF_WORDS.push(Word("cyborg", 10));
-        WELL_OF_WORDS.push(Word("android", 2));
-        WELL_OF_WORDS.push(Word("mage", 50));
-        WELL_OF_WORDS.push(Word("angry", 80));
-        WELL_OF_WORDS.push(Word("stunned", 90));
-        WELL_OF_WORDS.push(Word("monobrow", 1));
-        WELL_OF_WORDS.push(Word("piercing", 20));
-        WELL_OF_WORDS.push(Word("bald", 10));
-        WELL_OF_WORDS.push(Word("tattoo", 30));
-        WELL_OF_WORDS.push(Word("hairy", 5));
-        WELL_OF_WORDS.push(Word("white", 200));
-        WELL_OF_WORDS.push(Word("green", 200));
-        WELL_OF_WORDS.push(Word("black", 200));
-        WELL_OF_WORDS.push(Word("red", 200));
-        WELL_OF_WORDS.push(Word("blue", 200));
-        WELL_OF_WORDS.push(Word("yellow", 200));
+        // WELL_OF_WORDS.push(Word("human", 1500));
+        // WELL_OF_WORDS.push(Word("goblin", 200));
+        // WELL_OF_WORDS.push(Word("alien", 100));
+        // WELL_OF_WORDS.push(Word("elf", 50));
+        // WELL_OF_WORDS.push(Word("cyborg", 10));
+        // WELL_OF_WORDS.push(Word("android", 2));
+        // WELL_OF_WORDS.push(Word("mage", 50));
+        // WELL_OF_WORDS.push(Word("angry", 80));
+        // WELL_OF_WORDS.push(Word("stunned", 90));
+        // WELL_OF_WORDS.push(Word("monobrow", 1));
+        // WELL_OF_WORDS.push(Word("piercing", 20));
+        // WELL_OF_WORDS.push(Word("bald", 10));
+        // WELL_OF_WORDS.push(Word("tattoo", 30));
+        // WELL_OF_WORDS.push(Word("hairy", 5));
+        // WELL_OF_WORDS.push(Word("white", 200));
+        // WELL_OF_WORDS.push(Word("green", 200));
+        // WELL_OF_WORDS.push(Word("black", 200));
+        // WELL_OF_WORDS.push(Word("red", 200));
+        // WELL_OF_WORDS.push(Word("blue", 200));
+        // WELL_OF_WORDS.push(Word("yellow", 200));
     }
 
-    function addWordToWell(string memory _keyword) public {
+    function addWordToWell(string memory _keyword, uint256 _seed) public {
+
+        // TODO: replace _seed with VRF call
         // Reject if caller does not own at least one NFT
-        // Keyword should be below 12? 16? characters
-        // Roll rarity for new keyword using VRF
-        // Create a Word struct
-        // Push to WELL_OF_WORDS
+        // Keyword should be no longer than 12 characters
+        require(bytes(_keyword).length <= 12 && bytes(_keyword).length > 0);
+        
+        // Generate a (pseudorandom) probability for the new keyword
+        uint256 rand = uint256(keccak256(abi.encodePacked(_seed, msg.sender))); // CHANGE THIS TO VRF
+        uint256 newWordRange = ((rand % ((WELL_OF_WORDS_TOTAL_R - WELL_OF_WORDS_MIN_R) / 10 + 1)) * 10) + WELL_OF_WORDS_MIN_R;
+
+        // Add probability sum to totalRarity
+        WELL_OF_WORDS_TOTAL_R += newWordRange;
+
+        uint256 newWordLowerRange = WELL_OF_WORDS[WELL_OF_WORDS.length - 1].upperRange + 1;
+        uint256 newWordUpperRange = newWordLowerRange + newWordRange;
+
+        Word memory newWord = Word(_keyword, newWordLowerRange, newWordUpperRange);
+        WELL_OF_WORDS.push(newWord);
     }
 
+    function getAllWords() public view returns (Word[] memory) {
+        return WELL_OF_WORDS;
+    }
 
     // Converts a fraction to basis points uint256
     function fractionToBasisPoints(uint256 numerator, uint256 denumerator) internal pure returns (uint256) {
