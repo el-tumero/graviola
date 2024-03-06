@@ -1,13 +1,27 @@
-export interface BlockNFTProps {
+import { getRarityBorder } from "../../utils/getRarityBorder"
+import { RarityLevel } from "../../types/rarity"
+
+type BlockNFTPropsWithGlow = {
     src: string
-    id?: string
+    glow: true
+    rarityLevel: RarityLevel
     disableMargin?: boolean
     additionalClasses?: string
 }
-const BlockNFT = ({ src, id, disableMargin, additionalClasses }: BlockNFTProps) => {
+
+type BlockNFTPropsWithoutGlow = {
+    src: string
+    glow: false
+    disableMargin?: boolean
+    additionalClasses?: string
+}
+
+export type BlockNFTProps = BlockNFTPropsWithGlow | BlockNFTPropsWithoutGlow
+
+const BlockNFT = (props: BlockNFTProps) => {
     return (
-        <div id={id} className={`flex w-36 h-36 ${disableMargin ? "m-0" : "mx-4"} p-2 rounded-xl bg-light-bgPrimary dark:bg-dark-bgPrimary border-2 border-light-border dark:border-dark-border select-none ${additionalClasses}`}>
-            <img draggable={false} className="w-full h-full rounded-lg" src={src} />
+        <div style={props.glow ? props.rarityLevel ? getRarityBorder(props.rarityLevel) : {} : {}} className={`flex w-36 h-36 ${props.disableMargin ? "m-0" : "mx-4"} p-2 rounded-xl bg-light-bgPrimary dark:bg-dark-bgPrimary border-2 border-light-border dark:border-dark-border select-none ${props.additionalClasses}`}>
+            <img draggable={false} className="w-full h-full rounded-lg" src={props.src} />
         </div>
     )
 }
