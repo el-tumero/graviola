@@ -7,8 +7,9 @@ import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react'
 import HorizontalLine from './components/ui/HorizontalLine'
 import Button from './components/ui/Button'
 import BlockMarquee from './components/BlockMarquee'
-import BlockNFT from './components/ui/BlockNFT'
 import NFTDetails from './components/ui/NFTDetails'
+import { useNavigate } from 'react-router-dom'
+import { routerPaths } from './router'
 
 // 1. Get projectId
 const projectId = 'YOUR_PROJECT_ID'
@@ -75,6 +76,7 @@ const nftSources3 = [
 
 function App() {
 
+    const navigate = useNavigate()
     const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
 
     // Init NFT marquee opacity animation
@@ -97,7 +99,7 @@ function App() {
                     <HorizontalLine />
 
                     <div className='flex flex-col gap-4 w-1/3 m-auto my-10'>
-                        <Button text='Get yours now!' onClick={() => { }} />
+                        <Button text='Get yours now!' onClick={() => navigate(routerPaths.generate)} />
                         <Button text='Browse marketplace' onClick={() => { }} />
                     </div>
 
