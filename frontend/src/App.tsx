@@ -3,37 +3,42 @@ import FullscreenContainer from "./components/ui/FullscreenContainer"
 import { useEffect, useState } from 'react'
 import ContentContainer from "./components/ui/ContentContainer"
 import Navbar from "./components/Navbar"
-import { createWeb3Modal, defaultConfig } from '@web3modal/ethers5/react'
+import { createWeb3Modal, defaultConfig, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers5/react'
 import HorizontalLine from './components/ui/HorizontalLine'
 import Button from './components/ui/Button'
 import BlockMarquee from './components/BlockMarquee'
 import NFTDetails from './components/ui/NFTDetails'
 import { useNavigate } from 'react-router-dom'
 import { routerPaths } from './router'
+import { ethers } from 'ethers'
+// import { Graviola__factory } from '../../contracts/typechain-types/factories/Graviola__factory'
+import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Graviola.json"
+import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
+
 
 // 1. Get projectId
-const projectId = 'YOUR_PROJECT_ID'
+const projectId = 'a09890b34dc1551c2534337dbc22de8c'
 
 // 2. Set chains
-const mainnet = {
-    chainId: 1,
-    name: 'Ethereum',
+const sepolia = {
+    chainId: 11155111,
+    name: 'Sepolia testnet',
     currency: 'ETH',
-    explorerUrl: 'https://etherscan.io',
-    rpcUrl: 'https://cloudflare-eth.com'
+    explorerUrl: 'https://sepolia.etherscan.io/',
+    rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com'
 }
 
 // 3. Create modal
 const metadata = {
-    name: 'My Website',
-    description: 'My Website description',
+    name: 'Graviola NFT',
+    description: 'NFT generator powered by opML',
     url: 'https://mywebsite.com', // origin must match your domain & subdomain
     icons: ['https://avatars.mywebsite.com/']
 }
 
 createWeb3Modal({
     ethersConfig: defaultConfig({ metadata }),
-    chains: [mainnet],
+    chains: [sepolia],
     projectId,
     enableAnalytics: true // Optional - defaults to your Cloud configuration
 })
@@ -74,16 +79,40 @@ const nftSources3 = [
     "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
 ]
 
+const GRAVIOLA_CONTRACT_ADDRESS = "0x799eE17b920928c6FbdcbdF40DD2718717f9c87E"
+
+async function connectContract(walletProvider: ethers.providers.ExternalProvider):Promise<Graviola> {
+    const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
+    const signer = await ethersProvider.getSigner()
+    const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, signer)
+    return graviola as unknown as Graviola
+}
+
 function App() {
 
     const navigate = useNavigate()
     const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
+    const [graviola, setGraviola] = useState<Graviola>()
+    // const [isContractReady, setIsContractReady] = useState<boolean>(false)
 
     // Init NFT marquee opacity animation
     useEffect(() => {
         if (marqueeInit) return
         setMarqueeInit(true)
     })
+
+    const { isConnected } = useWeb3ModalAccount()
+    const { walletProvider } = useWeb3ModalProvider()
+    
+
+    useEffect(() => {
+        if(isConnected && walletProvider) {
+            connectContract(walletProvider).then(contract => setGraviola(contract))        }
+    }, [isConnected, walletProvider])
+
+    useEffect(() => {
+        if(graviola) graviola.tokenURI(0n).then(uri => console.log(uri))
+    }, [graviola])
 
     return (
         <FullscreenContainer>
