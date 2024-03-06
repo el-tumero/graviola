@@ -28,7 +28,7 @@ async function main() {
   const Registrar = await ethers.getContractFactory("GraviolaRegisterUpkeep")
   const registrar = await Registrar.deploy(await link.getAddress(), "0xb0E49c5D0d05cbc241d68c05BC5BA1d1B7B72976")
 
-  const trTx = await link.transfer(await registrar.getAddress(), parseEther("0.5"))
+  const trTx = await link.transfer(await registrar.getAddress(), parseEther("2"))
   await trTx.wait()
 
   const regTx = await registrar.register({
@@ -41,7 +41,7 @@ async function main() {
     checkData: "0x",
     triggerConfig: "0x",
     offchainConfig: "0x",
-    amount: parseEther("0.5")
+    amount: parseEther("2")
   })
   const {logs: logs1} = (await regTx.wait())!
   
