@@ -17,6 +17,7 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
     event RequestSent(uint256 refId);
+    event TokenReady(uint256 tokenId);
 
     uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 5000000;
 
@@ -97,6 +98,7 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
         if(op == 1) {
             savePromptResponseToMetadata(id);
             OAORequests.popFront();
+            emit TokenReady(id);
         }
     }
 
