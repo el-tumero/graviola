@@ -1,15 +1,18 @@
 import Link from "./Link"
 import Logo from "../assets/logo.webp"
 import useTheme from "../hooks/useTheme"
+import { useNavigate } from "react-router-dom"
+import { routerPaths } from "../router"
 
 const Navbar = () => {
 
+    const navigate = useNavigate()
     const [,toggleTheme] = useTheme()
 
     return (
         <div className="sticky z-[1000] bg-light-bgDark dark:bg-dark-bgDark border-b-2 border-light-border dark:border-dark-border top-0 bg-b w-screen py-4 flex justify-between items-center px-[10%] select-none font-content">
 
-            <div className="flex justify-center items-center gap-2">
+            <div className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => navigate(routerPaths.root)}>
                 <picture>
                     <img className="w-8" src={Logo} />
                 </picture>
