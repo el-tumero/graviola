@@ -8,13 +8,13 @@ import "./GraviolaRandom.sol";
 import "./GraviolaMetadata.sol";
 import "./AIOracleCallbackReceiver.sol";
 import "./GraviolaWell.sol";
-
+import "./VRFConsumer.sol";
 
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
-contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, GraviolaWell, AutomationCompatibleInterface, AIOracleCallbackReceiver {
+contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, AutomationCompatibleInterface, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
     uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 5000000;
@@ -22,40 +22,47 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, GraviolaWell, Aut
     uint256 private _nextTokenId;
 
     constructor(
-        uint64 subscriptionId,
-        address vrfCoordinator,
-        bytes32 keyHash,
-        address aiOracle
-    ) ERC721("Graviola", "GRV") GraviolaRandom(subscriptionId, vrfCoordinator, keyHash) GraviolaWell() AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
+        address aiOracle,
+        address vrfHost
+    ) ERC721("Graviola", "GRV") GraviolaWell() VRFConsumer(vrfHost) AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
 
 
     DoubleEndedQueue.Bytes32Deque private OAORequests;
+    DoubleEndedQueue.Bytes32Deque private VRFRequests;
+
+
+    struct VRFRequest {
+        address requestor;
+        bool done;
+    }
+    mapping(uint256 => VRFRequest) vrfRequests;
+
 
     function requestMint() external {
         // TODO: fees mechanism
-        requestRandomWords();
+        uint256 refId = saveRandomValue();
+        vrfRequests[refId] = VRFRequest(msg.sender, false);
+        VRFRequests.pushBack(bytes32(refId));
     }
 
-    function fulfillRandomWords(uint256 requestId, uint256[] memory randomWords) internal override {
-        require(s_requests[requestId].exists, "request not found");
-        s_requests[requestId].fulfilled = true;
-        s_requests[requestId].randomWords = randomWords;
+    function pasteRandomValue(uint256 refId) internal {
+        require(vrfRequests[refId].done, "request has already been processed");
+
+        uint256 randomValue = readRandomValue(refId);
         
         // mints nft
         uint256 tokenId = _nextTokenId++;
-        _safeMint(s_requests[requestId].requestor, tokenId);
+        _safeMint(vrfRequests[refId].requestor, tokenId);        
         OAORequests.pushBack(bytes32(tokenId));
         
         // words well logic
         string memory prompt;
         uint256 rarity;
-        (prompt, rarity) = rollWords(randomWords[0]);
+        (prompt, rarity) = rollWords(randomValue);
 
-        
         // metadata
         addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
-
 
         // request to ai oracle 
         aiOracle.requestCallback(1, bytes(prompt), address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
@@ -67,15 +74,26 @@ contract Graviola is ERC721, GraviolaRandom, GraviolaMetadata, GraviolaWell, Aut
 
 
     function checkUpkeep(bytes calldata) external view override returns (bool upkeepNeeded, bytes memory performData) {
-        uint256 id = uint256(OAORequests.front());
-        upkeepNeeded = hasPromptResponse(id);
-        performData = abi.encode(id);
+        if(!VRFRequests.empty()){
+            uint256 refId = uint256(VRFRequests.front());
+            return (isRandomValueReady(refId), abi.encode(uint8(0), refId));
+        }
+        if(!OAORequests.empty()){
+            uint256 id = uint256(OAORequests.front());
+            return(hasPromptResponse(id), abi.encode(uint8(1), id));
+        }
     }
 
     function performUpkeep(bytes calldata performData) external {
-        (uint256 id) = abi.decode(performData, (uint256));
-        savePromptResponseToMetadata(id);
-        OAORequests.popFront();
+        (uint8 op, uint256 id) = abi.decode(performData, (uint8, uint256));
+        if(op == 0) {
+            pasteRandomValue(id);
+            VRFRequests.popFront();
+        }
+        if(op == 1) {
+            savePromptResponseToMetadata(id);
+            OAORequests.popFront();
+        }
     }
 
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory){
