@@ -22,25 +22,35 @@ contract GraviolaWell {
         // Simplified for probability testing
 
         WELL_OF_WORDS.push(Word("human", 0, 999));
-        WELL_OF_WORDS.push(Word("elf", 1000, 1749));
-        WELL_OF_WORDS.push(Word("goblin", 1750, 1949));
-        WELL_OF_WORDS.push(Word("android", 1950, 1999));
+        WELL_OF_WORDS.push(Word("goblin", 1000, 1249));
+        WELL_OF_WORDS.push(Word("alien", 1250, 1749));
+        WELL_OF_WORDS.push(Word("elf", 1750, 2000));
+
+        // WELL_OF_WORDS.push(Word("human", 0, 999));
+        // WELL_OF_WORDS.push(Word("elf", 1000, 1249));
+        // WELL_OF_WORDS.push(Word("bald", 1250, 1349));
+        // WELL_OF_WORDS.push(Word("hairy", 1350, 1399));
+        // WELL_OF_WORDS.push(Word("tattoo", 1400, 1449));
+        // WELL_OF_WORDS.push(Word("green", 1450, 1499));
+        // WELL_OF_WORDS.push(Word("red", 1500, 1599));
+        // WELL_OF_WORDS.push(Word("blue", 1600, 1749));
+        // WELL_OF_WORDS.push(Word("goblin", 1750, 1949));
+        // WELL_OF_WORDS.push(Word("android", 1950, 1999));
+        // WELL_OF_WORDS.push(Word("cyborg", 2000, 2009));
+        // WELL_OF_WORDS.push(Word("android", 2010, 2012));
+        // WELL_OF_WORDS.push(Word("mage", 2013, 2062));
+        // WELL_OF_WORDS.push(Word("angry", 2063, 2115));
+        // WELL_OF_WORDS.push(Word("stunned", 2116, 2205));
+        // WELL_OF_WORDS.push(Word("monobrow", 2206, 2207));
 
         // WELL_OF_WORDS.push(Word("human", 1500));
         // WELL_OF_WORDS.push(Word("elf", 250));
         // WELL_OF_WORDS.push(Word("goblin", 150));
         // WELL_OF_WORDS.push(Word("android", 100));
 
-        // WELL_OF_WORDS.push(Word("human", 1500));
-        // WELL_OF_WORDS.push(Word("goblin", 200));
-        // WELL_OF_WORDS.push(Word("alien", 100));
-        // WELL_OF_WORDS.push(Word("elf", 50));
-        // WELL_OF_WORDS.push(Word("cyborg", 10));
-        // WELL_OF_WORDS.push(Word("android", 2));
-        // WELL_OF_WORDS.push(Word("mage", 50));
-        // WELL_OF_WORDS.push(Word("angry", 80));
-        // WELL_OF_WORDS.push(Word("stunned", 90));
-        // WELL_OF_WORDS.push(Word("monobrow", 1));
+
+       
+      
         // WELL_OF_WORDS.push(Word("piercing", 20));
         // WELL_OF_WORDS.push(Word("bald", 10));
         // WELL_OF_WORDS.push(Word("tattoo", 30));

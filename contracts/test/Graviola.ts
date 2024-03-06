@@ -73,7 +73,7 @@ describe("Graviola", function () {
       let performTx = await graviola.performUpkeep(checkData.performData)
       await performTx.wait()
 
-      const aioTx = await aiOracle.invokeCallback(0, ethers.toUtf8Bytes("https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Ethereum_logo_2014.svg/1257px-Ethereum_logo_2014.svg.png"))
+      const aioTx = await aiOracle.invokeCallback(0, ethers.toUtf8Bytes("image-url"))
       await aioTx.wait()
 
       checkData = await graviola.checkUpkeep(new Uint8Array([0]))
@@ -89,8 +89,37 @@ describe("Graviola", function () {
       const obj = await (await fetch(uri)).json()
       
       console.log(obj)
+    })
+
+    it.only("Mint 3 tokens", async () => {
+      const {graviola, vrfHost, aiOracle} = await loadFixture(deployFixture)
+      const [, otherAccount] = await ethers.getSigners()
+
+      for (let i = 0; i < 3; i++) {
+        const reqTx = await graviola.requestMint()
+        await reqTx.wait()
+        for (let j = 0; j < 3; j++) {
+          await(await vrfHost.addRound(ethers.toBigInt(randomBytes(32)))).wait()
+        }
+        let checkData = await graviola.checkUpkeep(new Uint8Array([0]))
+        let performTx = await graviola.performUpkeep(checkData.performData)
+        await performTx.wait()
+
+        const aioTx = await aiOracle.invokeCallback(i, ethers.toUtf8Bytes("image-url"+i))
+        await aioTx.wait()
+
+        checkData = await graviola.checkUpkeep(new Uint8Array([0]))
+        performTx = await graviola.performUpkeep(checkData.performData)
+        await performTx.wait()
+
+        const uri = await graviola.tokenURI(i)
+        const obj = await (await fetch(uri)).json()
+        console.log(obj)
+
+      }
 
     })
+
 
   })
 

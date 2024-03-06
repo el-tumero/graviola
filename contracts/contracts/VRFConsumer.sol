@@ -8,7 +8,7 @@ contract VRFConsumer{
     uint256 private height = 0;
     mapping(uint256 => uint32) internal refs; // id -> round
 
-    uint32 constant WAIT_ROUNDS = 2;
+    uint32 constant WAIT_ROUNDS = 1;
 
     constructor(address _VRFHostAddress){
         host = VRFHostConsumerInterface(_VRFHostAddress);

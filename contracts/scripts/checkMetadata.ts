@@ -1,14 +1,17 @@
 import { ethers } from "hardhat";
+import { GRAVIOLA_ADDRESS } from "./constants";
 
 async function main() {
   const [acc0] = await ethers.getSigners()
-  const graviolaAddress = "0x799eE17b920928c6FbdcbdF40DD2718717f9c87E"
-  const graviola = await ethers.getContractAt("Graviola", graviolaAddress)
+  const graviola = await ethers.getContractAt("Graviola", GRAVIOLA_ADDRESS)
   const tokenId = 0
 
-  const data = await graviola.tokenURI(tokenId)
-  const obj = await (await fetch(data)).json()
-  console.log(obj)
+  console.log("owner:", await graviola.ownerOf(tokenId))
+  const data = await graviola.getMetadata(tokenId)
+  console.log(data)
+  // const data = await graviola.tokenURI(tokenId)
+  // const obj = await (await fetch(data)).json()
+  // console.log(obj)
 
 }
 

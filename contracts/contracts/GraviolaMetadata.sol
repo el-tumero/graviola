@@ -67,6 +67,10 @@ contract GraviolaMetadata {
         addImage(tokenId, promptsStorage[prompt].response);
     }
 
+    function getMetadata(uint256 tokenId) external view returns(Metadata memory) {
+        return metadataStorage[tokenId];
+    }
+
     // -- conversions --
 
     function generateJSON(string memory image, string memory prompt, uint256 rarity) private pure returns (string memory) {
