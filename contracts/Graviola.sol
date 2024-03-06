@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { AutomationCompatibleInterface } from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
-import "./GraviolaRandom.sol";
 import "./GraviolaMetadata.sol";
 import "./AIOracleCallbackReceiver.sol";
 import "./GraviolaWell.sol";
@@ -16,6 +15,8 @@ import "./VRFConsumer.sol";
 
 contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, AutomationCompatibleInterface, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
+
+    event RequestSent(uint256 refId);
 
     uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 5000000;
 
@@ -43,12 +44,15 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
         uint256 refId = saveRandomValue();
         vrfRequests[refId] = VRFRequest(msg.sender, false);
         VRFRequests.pushBack(bytes32(refId));
+        emit RequestSent(refId);
     }
 
     function pasteRandomValue(uint256 refId) internal {
-        require(vrfRequests[refId].done, "request has already been processed");
+        require(!vrfRequests[refId].done, "request has already been processed");
 
         uint256 randomValue = readRandomValue(refId);
+        vrfRequests[refId].done = true;
+
         
         // mints nft
         uint256 tokenId = _nextTokenId++;
