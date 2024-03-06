@@ -8,13 +8,15 @@ import HorizontalLine from './components/ui/HorizontalLine'
 import Button from './components/ui/Button'
 import BlockMarquee from './components/BlockMarquee'
 import NFTDetails from './components/ui/NFTDetails'
+import { rarities } from './rarityData'
 import { useNavigate } from 'react-router-dom'
 import { routerPaths } from './router'
 import { ethers } from 'ethers'
-// import { Graviola__factory } from '../../contracts/typechain-types/factories/Graviola__factory'
 import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Graviola.json"
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
-
+import { RarityData, RarityLevel } from './types/rarity'
+import { getRarityBorder, getRarityColor } from './utils/getRarityBorder'
+import BlockNFT from './components/ui/BlockNFT'
 
 // 1. Get projectId
 const projectId = 'a09890b34dc1551c2534337dbc22de8c'
@@ -150,18 +152,25 @@ function App() {
                         <h1 className='font-bold text-2xl'>Inspect and see all the details.</h1>
                         <h2 className='font-bold text-xl opacity-85'>Some keywords are much rarer than others!</h2>
                         <HorizontalLine />
-
-                        <br />
                         <br />
 
                         <NFTDetails
                             nftProps={{
                                 src: "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
-                                id: "rare"
+                                glow: true,
+                                rarityLevel: RarityLevel.VeryRare,
                             }}
-                            upperBubbleChildren={<NFTDetailsUpper />}
+                            upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.VeryRare} />}
                             lowerBubbleChildren={<NFTDetailsLower />}
                         />
+
+                        <HorizontalLine />
+                        <br />
+
+                        <div className='flex gap-8 justify-center items-center my-20'>
+                            {Object.keys(rarities).map((rarityLevel) => <BlockNFT src='https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io' glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='w-24 h-24'/> )}
+                        </div>
+
 
                 </div>
 
@@ -171,9 +180,9 @@ function App() {
     )
 }
 
-const NFTDetailsUpper = () => {
+const NFTDetailsUpper = (props: {rarity: RarityLevel}) => {
     return (
-        <p className='font-semibold'>Rarity: <span className='text-purple-700 underline'>EPIC</span></p>
+        <p className='font-semibold'>Rarity: <span className='font-bold underline' style={getRarityColor(props.rarity)}>{rarities[props.rarity].name.toUpperCase()}</span></p>
     )
 }
 
@@ -186,7 +195,7 @@ const NFTDetailsLower = () => {
     }
 
     return (
-        <div className='font-semibold'>
+        <div className='font-semibold text-sm'>
             <pre className='whitespace-pre-wrap text-left overflow-x-auto'>
                 <span>{JSON.stringify(NFTMetadata, null, 2)}</span>
             </pre>
