@@ -19,8 +19,8 @@ const BlockMarquee = ({ nftSources }: BlockMarqueeProps) => {
                     ))}
                 </div>
         </div>
-    );
-};
+    )
+}
 
 
 

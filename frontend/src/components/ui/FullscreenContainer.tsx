@@ -1,20 +1,13 @@
 
 interface GenericContainerProps {
-    children: any
+    children: React.ReactNode
     additionalClasses?: string
 }
 
 const FullscreenContainer = ({ children, additionalClasses }: GenericContainerProps) => {
     return (
         <div
-            className={`
-                w-screen overflow-x-hidden h-screen
-                flex flex-col items-center
-                text-light-text dark:text-dark-text
-                bg-light-bgPrimary dark:bg-dark-bgPrimary
-                font-normal font-content
-                ${additionalClasses}
-            `}
+            className={`w-screen h-screen min-w-screen min-h-screen overflow-x-hidden flex flex-col items-center text-light-text dark:text-dark-text bg-light-bgPrimary dark:bg-dark-bgPrimary text-base ${additionalClasses}`}
         >
             {children}
         </div>

@@ -16,7 +16,7 @@ const Navbar = () => {
                 <picture>
                     <img className="w-8" src={Logo} />
                 </picture>
-                <p className="text-large font-bold">GraviolaNFT</p>
+                <p className="text-large font-bold hover:underline">GraviolaNFT</p>
             </div>
 
             <div className="flex justify-center items-center gap-4">
