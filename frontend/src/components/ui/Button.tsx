@@ -8,7 +8,7 @@ interface ButtonProps {
 
 const Button = ({ text, onClick, additionalClasses }: ButtonProps) => {
     return (
-        <button onClick={() => onClick()} className={`w-auto h-auto py-3 my-1 px-8 text-lg font-semibold rounded-xl active:opacity-60 hover:opacity-80 bg-light-bgLight dark:bg-dark-bgLight border-2 border-light-border dark:border-dark-border ${additionalClasses}`}>
+        <button onClick={() => onClick()} className={`w-fit min-w-[12em] h-auto py-3 my-1 px-2 text-md font-semibold rounded-xl active:opacity-60 hover:opacity-80 bg-light-bgLight dark:bg-dark-bgLight border-2 border-light-border dark:border-dark-border ${additionalClasses}`} tabIndex={0}>
             <span className="select-none">{text}</span>
         </button>
     )
