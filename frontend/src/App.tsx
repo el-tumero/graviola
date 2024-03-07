@@ -4,18 +4,17 @@ import { useEffect, useState } from 'react'
 import ContentContainer from "./components/ui/ContentContainer"
 import Navbar from "./components/Navbar"
 import { createWeb3Modal, defaultConfig, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers5/react'
-import HorizontalLine from './components/ui/HorizontalLine'
 import Button from './components/ui/Button'
 import BlockMarquee from './components/BlockMarquee'
 import NFTDetails from './components/ui/NFTDetails'
-import { rarities, rarityScale } from './rarityData'
-import { useNavigate } from 'react-router-dom'
+import { rarities } from './rarityData'
+import { Link, useNavigate } from 'react-router-dom'
 import { routerPaths } from './router'
 import { ethers } from 'ethers'
 import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Graviola.json"
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
-import { RarityData, RarityLevel } from './types/rarity'
-import { getRarityBorder, getRarityColor } from './utils/getRarityBorder'
+import { RarityLevel } from './types/rarity'
+import { getRarityColor } from './utils/getRarityBorder'
 import BlockNFT from './components/ui/BlockNFT'
 import { getRarityPercentageString } from './utils/getRarityPercentage'
 import SectionTitle from './components/ui/SectionTitle'
@@ -125,13 +124,19 @@ function App() {
             <Navbar />
 
 
-            <ContentContainer additionalClasses='gap-2 flex-col'>
-
+            <ContentContainer additionalClasses='flex-col'>
                 <div className='flex flex-col mt-16 p-4 gap-2'>
 
-                    <h1 className='font-bold text-3xl text-accent'>Your own dynamically generated NFT character portrait</h1>
-                    <h2 className='font-bold text-2xl opacity-85'>Roll a new one every 24h. Collect, share, sell, and more!</h2>
-                    <HorizontalLine />
+                    <SectionTitle
+                        mainText={{
+                            content: "Your own dynamically generated NFT character portrait",
+                            additionalClasses: "text-accent"
+                        }}
+                        secondaryText={{
+                            content: "Roll a new one every 24h. Collect, share, sell and more!",
+                            additionalClasses: "text-light-textSecondary dark:text-dark-textSecondary"
+                        }}
+                    />
 
                     <div className='flex flex-col mb-36'>
                         <div className='flex justify-center items-center gap-4 w-1/2 m-auto mt-4 mb-8'>
@@ -152,7 +157,15 @@ function App() {
                         </div>
                     </div>
 
-                    <SectionTitle title='Inspect and see all the details' secondaryText='Some keywords are much rarer than others!'/>
+                    <SectionTitle
+                        mainText={{
+                            content: "Inspect and see all the details",
+                        }}
+                        secondaryText={{
+                            content: "Some keywords are much rarer than others!",
+                            additionalClasses: "text-light-textSecondary dark:text-dark-textSecondary"
+                        }}
+                    />
                     <NFTDetails
                         nftProps={{
                             src: "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
@@ -163,7 +176,14 @@ function App() {
                         lowerBubbleChildren={<NFTDetailsLower />}
                     />
 
-                    <SectionTitle title='Feeling lucky?' secondaryText='Check out the chances for each rarity level'/>
+                    <SectionTitle
+                        mainText={{
+                            content: "Feeling lucky?"
+                        }}
+                        secondaryText={{
+                            content: "Check out the chances for each rarity level"
+                        }}
+                    />
                     <div className='xl:flex xl:justify-around sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
                         {Object.keys(rarities).map((rarityLevel) => (
                             <div className='flex flex-col gap-1 justify-center items-center'>
@@ -178,6 +198,29 @@ function App() {
                         ))}
                     </div>
 
+
+                    <SectionTitle
+                        mainText={{
+                            content: "Fully decentralized",
+                        }}
+                        secondaryText={{
+                            content: "We're using ora.io to generate our NFTs on the blockchain.",
+                            additionalClasses: "text-light-textSecondary dark:text-dark-textSecondary"
+                        }}
+                    />
+
+                    <div className='flex flex-col leading-6'>
+                        <p>
+                            <Link to={"https://www.ora.io/"}>
+                                Ora
+                            </Link>
+                            {" "} is an on-chain verifiable oracle protocol
+                        </p>
+                        <p>What does it mean?</p>
+                        <p>
+                            A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.
+                        </p>
+                    </div>
                 </div>
 
             </ContentContainer>

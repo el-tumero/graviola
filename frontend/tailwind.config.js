@@ -32,6 +32,7 @@ export default {
                 accent: "#21bf55",
                 light: {
                     "text": "#000",
+                    "textSecondary": "#1f1f1f",
                     "bgPrimary": "#cae8d4",
                     "bgLight": "#bce8ca",
                     "bgDark": "#afdbbe",
@@ -39,6 +40,7 @@ export default {
                 },
                 dark: {
                     "text": "#fff",
+                    "textSecondary": "#e3e3e3",
                     "bgPrimary": "#101713",
                     "bgLight": "#1f2b24",
                     "bgDark": "#080d0a",
