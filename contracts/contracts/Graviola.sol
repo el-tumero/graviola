@@ -11,15 +11,16 @@ import "./VRFConsumer.sol";
 
 
 // Uncomment this line to use console.log
-// import "hardhat/console.sol";
+import "hardhat/console.sol";
 
 contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, AutomationCompatibleInterface, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
     event RequestSent(uint256 refId);
     event TokenReady(uint256 tokenId);
+    event PromptResponse(string input, string output);
 
-    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 5000000;
+    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 30_000_000;
 
     uint256 private _nextTokenId;
 
@@ -64,17 +65,21 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
         string memory prompt;
         uint256 rarity;
         (prompt, rarity) = rollWords(randomValue);
+        
+        string memory fullPrompt = string.concat(promptBase, prompt);
 
         // metadata
-        addPrompt(tokenId, prompt);
+        addPrompt(tokenId, fullPrompt);
         addRarity(tokenId, rarity);
+        bytes memory input = bytes(fullPrompt);
 
         // request to ai oracle 
-        aiOracle.requestCallback(1, bytes(prompt), address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
+        aiOracle.requestCallback(1, input, address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
     }
 
     function receiveOAOCallback(uint256 /*modelId*/, bytes calldata input, bytes calldata output) external onlyAIOracleCallback {
         addPromptResponse(string(input), string(output));
+        emit PromptResponse(string(input), string(output));
     }
 
 

@@ -21,7 +21,7 @@ contract GraviolaMetadata {
 
     mapping(uint256 => Metadata) private metadataStorage;
     mapping(string=>PromptsResponse) private promptsStorage;
-    string constant private promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
+    string constant internal promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
     // DEBUG function - must be removed after local tests
     // function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
@@ -31,9 +31,7 @@ contract GraviolaMetadata {
     // NOTE: addRarity() should be called after this func
     function addPrompt(uint256 tokenId, string memory prompt) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
-        string memory fullPrompt = string.concat(promptBase, prompt);
-        metadataStorage[tokenId].prompt = fullPrompt;
-
+        metadataStorage[tokenId].prompt = prompt;
         // NOTE: low probability of failure of this mechanism
         if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
     }
@@ -67,6 +65,10 @@ contract GraviolaMetadata {
         string memory prompt = metadataStorage[tokenId].prompt;
         require(promptsStorage[prompt].exists, "Prompt response does not exists!");
         addImage(tokenId, promptsStorage[prompt].response);
+    }
+
+    function readPromptResponse(string calldata prompt) external view returns(string memory) {
+        return promptsStorage[prompt].response;
     }
 
     function getMetadata(uint256 tokenId) external view returns(Metadata memory) {

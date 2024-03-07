@@ -6,9 +6,17 @@ import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Gravio
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
 import { GraviolaContext } from "./contexts/GraviolaContext"
 
-const GRAVIOLA_CONTRACT_ADDRESS = "0xcf4CC45760234b1b9180bDA0E6FBBb4d2f7392Af"
+const GRAVIOLA_CONTRACT_ADDRESS = "0x8D49ECcD9589033621201d9C6EfC52ec4ABb0B9F"
 
-async function connectContract(walletProvider: ethers.providers.ExternalProvider): Promise<Graviola> {
+async function connectContract(): Promise<Graviola> {
+    // const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
+    const provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
+    // const signer = await ethersProvider.getSigner()
+    const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, provider)
+    return graviola as unknown as Graviola
+}
+
+async function connectContractWallet(walletProvider: ethers.providers.ExternalProvider): Promise<Graviola> {
     const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
     const signer = await ethersProvider.getSigner()
     const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, signer)
@@ -31,18 +39,26 @@ const App = (props: { children: ReactNode }) => {
         setLoading(false)
     }, [graviola, setGraviola])
 
+    // useEffect(() => {
+    //     if (walletProvider) {
+    //         console.log("123")
+    //         connectContract(walletProvider).then(contract => setGraviola(contract))
+    //     }
+    // }, [walletProvider])
+    
     useEffect(() => {
-        if (isConnected && walletProvider) {
-            connectContract(walletProvider).then(contract => setGraviola(contract))
-        }
+        if(!isConnected) connectContract().then(contract => setGraviola(contract))
+        if(isConnected && walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract))
     }, [isConnected, walletProvider])
 
-    // useEffect(() => {
-    //     if (graviola) graviola.tokenURI(0n).then(uri => console.log(uri))
-    // }, [graviola])
 
-    // 1. Get projectId
+    useEffect(() => {
+        if (graviola) graviola.tokenURI(0n).then(uri => console.log(uri))
+    }, [graviola])
+
+    
     const projectId = 'a09890b34dc1551c2534337dbc22de8c'
+    // 1. Get projectId
 
     // 2. Set chains
     const sepolia = {
@@ -67,6 +83,7 @@ const App = (props: { children: ReactNode }) => {
         projectId,
         enableAnalytics: true // Optional - defaults to your Cloud configuration
     })
+
 
 
     return (
