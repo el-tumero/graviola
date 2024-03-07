@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useContext } from "react"
 import GenerateContainer from "../components/GenerateContainer"
 import Navbar from "../components/Navbar"
 import Button from "../components/ui/Button"
@@ -7,6 +7,7 @@ import FullscreenContainer from "../components/ui/FullscreenContainer"
 import HorizontalLine from "../components/ui/HorizontalLine"
 import { routerPaths } from "../router"
 import { useNavigate } from "react-router"
+import { GraviolaContext } from "../contexts/GraviolaContext"
 
 const Generate = () => {
 
@@ -18,6 +19,9 @@ const Generate = () => {
 
 
     // TODO: Fetch keywords from contract on page load
+    const graviolaContext = useContext(GraviolaContext)
+    
+
     const keywords = ['human', 'elf', 'android', 'robot', 'angry', 'green', 'monster', 'nomad', 'pink', 'glasses']
 
 

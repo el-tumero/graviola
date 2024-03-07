@@ -10,11 +10,11 @@ export const routerPaths = {
 
 const router = createBrowserRouter([
     {
-        path: "/",
+        path: routerPaths.root,
         element: <Root />,
     },
     {
-        path: "/generate",
+        path: routerPaths.generate,
         element: <Generate />
     }
 ])

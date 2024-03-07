@@ -105,8 +105,8 @@ function Root() {
 
                     <div className='flex flex-col mb-36'>
                         <div className='flex justify-center items-center gap-4 w-1/2 m-auto mt-4 mb-8'>
-                            <Button text='Get yours now!' onClick={() => navigate(routerPaths.generate)} />
-                            <Button text='Browse marketplace' onClick={() => { }} />
+                            <Button enabled={true} text='Get yours now!' onClick={() => {navigate(routerPaths.generate)}} />
+                            <Button enabled={false} text='Browse marketplace (COMING SOON)' onClick={() => {}} />
                         </div>
                         <div className={`bg-light-bgDark/50 dark:bg-dark-bgDark/50
                             flex flex-col rounded-xl py-4 border-2 border-light-border dark:border-dark-border`}
