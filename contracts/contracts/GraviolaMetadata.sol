@@ -33,7 +33,7 @@ contract GraviolaMetadata {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].prompt = prompt;
         // NOTE: low probability of failure of this mechanism
-        if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
+        // if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
     }
 
     // NOTE: requestCallback() should be called after this func
@@ -54,6 +54,10 @@ contract GraviolaMetadata {
         return promptsStorage[prompt].exists;
     }
 
+    function hasPromptResponse2(string memory prompt) internal view returns(bool) {
+        return promptsStorage[prompt].exists;
+    } 
+
     function addImage(uint256 tokenId, string memory image) private {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].image = image;
@@ -71,7 +75,7 @@ contract GraviolaMetadata {
         return promptsStorage[prompt].response;
     }
 
-    function getMetadata(uint256 tokenId) external view returns(Metadata memory) {
+    function getMetadata(uint256 tokenId) public view returns(Metadata memory) {
         return metadataStorage[tokenId];
     }
 

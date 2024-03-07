@@ -6,7 +6,7 @@ import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Gravio
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
 import { GraviolaContext } from "./contexts/GraviolaContext"
 
-const GRAVIOLA_CONTRACT_ADDRESS = "0x8D49ECcD9589033621201d9C6EfC52ec4ABb0B9F"
+const GRAVIOLA_CONTRACT_ADDRESS = "0x8d7e1556f6480a295bbff6464537835978253488"
 
 async function connectContract(): Promise<Graviola> {
     // const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
@@ -39,12 +39,6 @@ const App = (props: { children: ReactNode }) => {
         setLoading(false)
     }, [graviola, setGraviola])
 
-    // useEffect(() => {
-    //     if (walletProvider) {
-    //         console.log("123")
-    //         connectContract(walletProvider).then(contract => setGraviola(contract))
-    //     }
-    // }, [walletProvider])
     
     useEffect(() => {
         if(!isConnected) connectContract().then(contract => setGraviola(contract))
@@ -52,11 +46,6 @@ const App = (props: { children: ReactNode }) => {
     }, [isConnected, walletProvider])
 
 
-    useEffect(() => {
-        if (graviola) graviola.tokenURI(0n).then(uri => console.log(uri))
-    }, [graviola])
-
-    
     const projectId = 'a09890b34dc1551c2534337dbc22de8c'
     // 1. Get projectId
 

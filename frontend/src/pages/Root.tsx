@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import FullscreenContainer from "../components/ui/FullscreenContainer"
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import ContentContainer from "../components/ui/ContentContainer"
 import Navbar from "../components/Navbar"
 import Button from '../components/ui/Button'
@@ -14,6 +14,7 @@ import BlockNFT from '../components/ui/BlockNFT'
 import { getRarityPercentageString } from '../utils/getRarityPercentage'
 import SectionTitle from '../components/ui/SectionTitle'
 import OraIoBanner from '../components/ui/OraIoBanner'
+import { GraviolaContext } from '../contexts/GraviolaContext'
 
 const nftSources1 = [
     "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
@@ -50,10 +51,31 @@ const nftSources3 = [
     "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
 ]
 
+const nftSources = []
+
+function convertToIfpsUrl(cid:string) {
+    return "https://ipfs.io/ipfs" + cid
+}
+
+
 function Root() {
 
     const navigate = useNavigate()
     const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
+
+    const graviolaContext = useContext(GraviolaContext)
+
+    useEffect(() => {
+        if (graviolaContext.contract) graviolaContext.contract.tokenURI(0n).then(async (uri) => {
+            const obj = await (await fetch(uri)).json()
+            const url = convertToIfpsUrl(obj.image)
+            console.log(url)
+            // @ts-ignore
+            // console.log(await graviolaContext.contract.totalSupply())
+            // console.log(obj)
+            
+        })
+    }, [graviolaContext.contract])
 
     // Init NFT marquee opacity animation
     useEffect(() => {

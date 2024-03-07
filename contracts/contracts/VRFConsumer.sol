@@ -8,7 +8,7 @@ contract VRFConsumer{
     uint256 private height = 0;
     mapping(uint256 => uint32) internal refs; // id -> round
 
-    uint32 constant WAIT_ROUNDS = 1;
+    uint32 constant WAIT_ROUNDS = 0;
 
     constructor(address _VRFHostAddress){
         host = VRFHostConsumerInterface(_VRFHostAddress);
@@ -32,7 +32,6 @@ contract VRFConsumer{
 
     
     function readRandomValue(uint256 refId) public view returns(uint256) {
-        require(refs[refId] != 0, "Empty ref!");
         VRFHostConsumerInterface.Round memory round = host.getRound(refs[refId]);
         require(round.state == VRFHostConsumerInterface.RoundState.FINAL, "Round not finalized!");
         return round.randomNumber;
