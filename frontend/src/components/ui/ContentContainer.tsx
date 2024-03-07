@@ -5,7 +5,7 @@ interface GenericContainerProps {
 
 const ContentContainer = ({children, additionalClasses,}: GenericContainerProps) => {
     return (
-        <div className={`flex w-full max-w-4xl sm:px-6 sm:py-2 lg:px-8 lg:py-4 ${additionalClasses}`}>
+        <div className={`flex w-full max-w-5xl sm:px-6 sm:py-2 lg:px-8 lg:py-4 ${additionalClasses}`}>
             {children}
         </div>
     )

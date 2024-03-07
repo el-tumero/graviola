@@ -29,6 +29,7 @@ export default {
             },
 
             colors: {
+                accent: "#21bf55",
                 light: {
                     "text": "#000",
                     "bgPrimary": "#cae8d4",
@@ -38,10 +39,10 @@ export default {
                 },
                 dark: {
                     "text": "#fff",
-                    "bgPrimary": "#19241e",
-                    "bgLight": "#2a3830",
-                    "bgDark": "#151f19",
-                    "border": "#414f47",
+                    "bgPrimary": "#101713",
+                    "bgLight": "#1f2b24",
+                    "bgDark": "#080d0a",
+                    "border": "#303632",
                 }
             }
 

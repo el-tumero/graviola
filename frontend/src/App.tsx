@@ -8,7 +8,7 @@ import HorizontalLine from './components/ui/HorizontalLine'
 import Button from './components/ui/Button'
 import BlockMarquee from './components/BlockMarquee'
 import NFTDetails from './components/ui/NFTDetails'
-import { rarities } from './rarityData'
+import { rarities, rarityScale } from './rarityData'
 import { useNavigate } from 'react-router-dom'
 import { routerPaths } from './router'
 import { ethers } from 'ethers'
@@ -17,6 +17,8 @@ import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
 import { RarityData, RarityLevel } from './types/rarity'
 import { getRarityBorder, getRarityColor } from './utils/getRarityBorder'
 import BlockNFT from './components/ui/BlockNFT'
+import { getRarityPercentageString } from './utils/getRarityPercentage'
+import SectionTitle from './components/ui/SectionTitle'
 
 // 1. Get projectId
 const projectId = 'a09890b34dc1551c2534337dbc22de8c'
@@ -83,7 +85,7 @@ const nftSources3 = [
 
 const GRAVIOLA_CONTRACT_ADDRESS = "0x799eE17b920928c6FbdcbdF40DD2718717f9c87E"
 
-async function connectContract(walletProvider: ethers.providers.ExternalProvider):Promise<Graviola> {
+async function connectContract(walletProvider: ethers.providers.ExternalProvider): Promise<Graviola> {
     const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
     const signer = await ethersProvider.getSigner()
     const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, signer)
@@ -105,15 +107,16 @@ function App() {
 
     const { isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
-    
+
 
     useEffect(() => {
-        if(isConnected && walletProvider) {
-            connectContract(walletProvider).then(contract => setGraviola(contract))        }
+        if (isConnected && walletProvider) {
+            connectContract(walletProvider).then(contract => setGraviola(contract))
+        }
     }, [isConnected, walletProvider])
 
     useEffect(() => {
-        if(graviola) graviola.tokenURI(0n).then(uri => console.log(uri))
+        if (graviola) graviola.tokenURI(0n).then(uri => console.log(uri))
     }, [graviola])
 
     return (
@@ -124,53 +127,56 @@ function App() {
 
             <ContentContainer additionalClasses='gap-2 flex-col'>
 
-                <div className='flex flex-col mt-28 p-4 gap-2'>
-                    <h1 className='font-bold text-2xl'>Your own dynamically generated NFT character portrait.</h1>
-                    <h2 className='font-bold text-xl opacity-85'>Roll a new one every 24h. Collect, Share, Sell, and more!</h2>
+                <div className='flex flex-col mt-16 p-4 gap-2'>
+
+                    <h1 className='font-bold text-3xl text-accent'>Your own dynamically generated NFT character portrait</h1>
+                    <h2 className='font-bold text-2xl opacity-85'>Roll a new one every 24h. Collect, share, sell, and more!</h2>
                     <HorizontalLine />
 
-                    <div className='flex flex-col gap-4 w-1/3 m-auto my-10'>
-                        <Button text='Get yours now!' onClick={() => navigate(routerPaths.generate)} />
-                        <Button text='Browse marketplace' onClick={() => { }} />
-                    </div>
-
-                    <div className={`bg-light-bgDark dark:bg-dark-bgDark
-                        flex flex-col rounded-xl py-4 border-2 border-light-border dark:border-dark-border`}
-                    >
-                        <div className={`flex flex-col
-                        transition-opacity duration-4000 ease-in-out
-                        ${marqueeInit ? "opacity-100" : "opacity-0"}
-                        `}>
-                            <BlockMarquee nftSources={nftSources1} />
-                            <BlockMarquee nftSources={nftSources2} />
-                            <BlockMarquee nftSources={nftSources3} />
+                    <div className='flex flex-col mb-36'>
+                        <div className='flex justify-center items-center gap-4 w-1/2 m-auto mt-4 mb-8'>
+                            <Button text='Get yours now!' onClick={() => navigate(routerPaths.generate)} />
+                            <Button text='Browse marketplace' onClick={() => { }} />
+                        </div>
+                        <div className={`bg-light-bgDark/50 dark:bg-dark-bgDark/50
+                            flex flex-col rounded-xl py-4 border-2 border-light-border dark:border-dark-border`}
+                        >
+                            <div className={`flex flex-col
+                            transition-opacity duration-4000 ease-in-out
+                            ${marqueeInit ? "opacity-100" : "opacity-0"}
+                            `}>
+                                <BlockMarquee nftSources={nftSources1} />
+                                <BlockMarquee nftSources={nftSources2} />
+                                <BlockMarquee nftSources={nftSources3} />
+                            </div>
                         </div>
                     </div>
 
-                    <div className='flex flex-col mt-14 p-4 gap-2'></div>
+                    <SectionTitle title='Inspect and see all the details' secondaryText='Some keywords are much rarer than others!'/>
+                    <NFTDetails
+                        nftProps={{
+                            src: "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
+                            glow: true,
+                            rarityLevel: RarityLevel.VeryRare,
+                        }}
+                        upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.VeryRare} />}
+                        lowerBubbleChildren={<NFTDetailsLower />}
+                    />
 
-                        <h1 className='font-bold text-2xl'>Inspect and see all the details.</h1>
-                        <h2 className='font-bold text-xl opacity-85'>Some keywords are much rarer than others!</h2>
-                        <HorizontalLine />
-                        <br />
-
-                        <NFTDetails
-                            nftProps={{
-                                src: "https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io",
-                                glow: true,
-                                rarityLevel: RarityLevel.VeryRare,
-                            }}
-                            upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.VeryRare} />}
-                            lowerBubbleChildren={<NFTDetailsLower />}
-                        />
-
-                        <HorizontalLine />
-                        <br />
-
-                        <div className='flex gap-8 justify-center items-center my-20'>
-                            {Object.keys(rarities).map((rarityLevel) => <BlockNFT src='https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io' glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='w-24 h-24'/> )}
-                        </div>
-
+                    <SectionTitle title='Feeling lucky?' secondaryText='Check out the chances for each rarity level'/>
+                    <div className='xl:flex xl:justify-around sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
+                        {Object.keys(rarities).map((rarityLevel) => (
+                            <div className='flex flex-col gap-1 justify-center items-center'>
+                                <BlockNFT src='https://ipfs.io/ipfs/QmQet2xjVySs6CgrZpwBbXGDacJbexG8Zp5VhMNZU8C5io' glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[10em] xl:h-[10em] sm:w-[12em] sm:h-[12em]' />
+                                <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
+                                    <p className='font-bold' style={getRarityColor(rarityLevel as RarityLevel)}>{rarities[rarityLevel as RarityLevel].name}</p>
+                                    <span className='font-bold'>
+                                        {getRarityPercentageString(rarityLevel as RarityLevel)}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
                 </div>
 
@@ -180,9 +186,9 @@ function App() {
     )
 }
 
-const NFTDetailsUpper = (props: {rarity: RarityLevel}) => {
+const NFTDetailsUpper = (props: { rarity: RarityLevel }) => {
     return (
-        <p className='font-semibold'>Rarity: <span className='font-bold underline' style={getRarityColor(props.rarity)}>{rarities[props.rarity].name.toUpperCase()}</span></p>
+        <p className='font-semibold'>Rarity: <span className='font-bold' style={getRarityColor(props.rarity)}>{rarities[props.rarity].name.toUpperCase()}</span></p>
     )
 }
 
