@@ -130,7 +130,7 @@ contract GraviolaWell {
             j++;
 
             uint256 randomNum = uint256(
-                keccak256(abi.encodePacked(_seed, uint256(i + j)))
+                keccak256(abi.encodePacked(_seed, uint256(i + j), msg.sender, block.timestamp))
             ) % WELL_OF_WORDS_TOTAL_R; // Random number between [0 and totalRarity]
             uint256 randomNumWordRangeIndex = findNearestWordRangeIndex(
                 randomNum
