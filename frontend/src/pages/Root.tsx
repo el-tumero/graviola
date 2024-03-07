@@ -13,6 +13,7 @@ import { getRarityColor } from '../utils/getRarityBorder'
 import BlockNFT from '../components/ui/BlockNFT'
 import { getRarityPercentageString } from '../utils/getRarityPercentage'
 import SectionTitle from '../components/ui/SectionTitle'
+import OraIoBanner from '../components/ui/OraIoBanner'
 import { GraviolaContext } from '../contexts/GraviolaContext'
 
 const nftSources1 = [
@@ -168,23 +169,22 @@ function Root() {
                             content: "Fully decentralized",
                         }}
                         secondaryText={{
-                            content: "We're using ora.io to generate our NFTs on the blockchain.",
+                            content: "We're using Stable Diffusion 2 to generate our NFTs on-chain",
                             additionalClasses: "text-light-textSecondary dark:text-dark-textSecondary"
                         }}
                     />
 
-                    <div className='flex flex-col leading-6'>
+                    <OraIoBanner>
                         <p>
                             <Link to={"https://www.ora.io/"}>
                                 Ora
                             </Link>
                             {" "} is an on-chain verifiable oracle protocol
                         </p>
-                        <p>What does it mean?</p>
-                        <p>
-                            A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.
-                        </p>
-                    </div>
+                        <p>A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.</p>
+                        <p>This means easy AI inference for the user and for the developer.</p>
+                    </OraIoBanner>
+
                 </div>
 
             </ContentContainer>
