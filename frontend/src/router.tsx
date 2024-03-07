@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 // pages
-import App from "./App";
+import Root from "./pages/Root";
 import Generate from "./pages/Generate";
 
 export const routerPaths = {
@@ -11,7 +11,7 @@ export const routerPaths = {
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <App />,
+        element: <Root />,
     },
     {
         path: "/generate",
