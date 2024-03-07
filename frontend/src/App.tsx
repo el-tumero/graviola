@@ -6,7 +6,7 @@ import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Gravio
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
 import { GraviolaContext } from "./contexts/GraviolaContext"
 
-const GRAVIOLA_CONTRACT_ADDRESS = "0x8d7e1556f6480a295bbff6464537835978253488"
+const GRAVIOLA_CONTRACT_ADDRESS = "0xf378b8be1b54CCaD85298e76E5ffDdA03ef1A89B"
 
 async function connectContract(): Promise<Graviola> {
     // const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
