@@ -5,7 +5,7 @@ export default function useWeb3(): [boolean] {
     const [web3, setWeb3] = useState<boolean>(true) // Default to 'true' in order to avoid flashing from "Loading..." to "Install metamask"
 
     useEffect(() => {
-        console.log(web3)
+        // console.log(web3)
         checkWeb3()
     }, [web3])
 
