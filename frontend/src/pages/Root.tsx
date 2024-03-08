@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import FullscreenContainer from "../components/ui/FullscreenContainer"
 import { useContext, useEffect, useState } from 'react'
 import ContentContainer from "../components/ui/ContentContainer"
@@ -10,12 +10,13 @@ import { rarities } from '../rarityData'
 import { routerPaths } from '../router'
 import { RarityLevel } from '../types/rarity'
 import { getRarityColor } from '../utils/getRarityBorder'
+import { GraviolaContext, NFT } from '../contexts/GraviolaContext'
+import { convertToIfpsURL } from '../utils/convertToIpfsURL'
 import BlockNFT from '../components/ui/BlockNFT'
 import { getRarityPercentageString } from '../utils/getRarityPercentage'
 import SectionTitle from '../components/ui/SectionTitle'
 import OraIoBanner from '../components/ui/OraIoBanner'
-import { GraviolaContext, NFT } from '../contexts/GraviolaContext'
-import { convertToIfpsURL } from '../utils/convertToIpfsURL'
+import Link from '../components/Link'
 
 function Root() {
 
@@ -105,7 +106,7 @@ function Root() {
                     <div className='xl:flex xl:justify-around sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
                         {Object.keys(rarities).map((rarityLevel, i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
-                                <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[10em] xl:h-[10em] sm:w-[12em] sm:h-[12em]' />
+                                <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
                                     <p className='font-bold' style={getRarityColor(rarityLevel as RarityLevel)}>{rarities[rarityLevel as RarityLevel].name}</p>
                                     <span className='font-bold'>
@@ -128,14 +129,14 @@ function Root() {
                     />
 
                     <OraIoBanner>
-                        <p>
-                            <Link to={"https://www.ora.io/"}>
-                                Ora
-                            </Link>
-                            {" "} is an on-chain verifiable oracle protocol
-                        </p>
-                        <p>A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.</p>
-                        <p>This means easy AI inference for the user and for the developer.</p>
+                        <div className='flex flex-col gap-2 mb-24 py-8'>
+                            <div className='flex'>
+                                <Link text='Ora' href={"https://www.ora.io/"} additionalClasses='font-bold' />
+                                <p>&nbsp;is an on-chain verifiable oracle protocol</p>
+                            </div>
+                            <p>A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.</p>
+                            <p>This means easy AI inference for the user and for the developer.</p>
+                        </div>
                     </OraIoBanner>
 
                 </div>
