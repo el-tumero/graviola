@@ -4,7 +4,7 @@ import { GRAVIOLA_ADDRESS } from "./constants";
 async function main() {
   const [acc0] = await ethers.getSigners()
   const graviola = await ethers.getContractAt("Graviola", GRAVIOLA_ADDRESS)
-  const totalSupply = 4
+  const totalSupply = 10
 
   for (let i = 0; i < totalSupply; i++) {
     // console.log("owner:", await graviola.ownerOf(i))
