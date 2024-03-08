@@ -54,6 +54,7 @@ const App = (props: { children: ReactNode }) => {
             })
     
             const collection = await Promise.all(promises)
+            console.log("fetched collection ", collection)
             setCollection(prev => [...prev, ...collection])
     
             setLoading(false)
@@ -64,7 +65,7 @@ const App = (props: { children: ReactNode }) => {
 
     // Load contract readonly mode
     useEffect(() => {
-        // console.log("wP ", walletProvider)
+        console.log("wP ", walletProvider)
         if (walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract))
     }, [walletProvider])
 
