@@ -5,6 +5,8 @@ import { ethers } from 'ethers'
 import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Graviola.json"
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
 import { GraviolaContext, NFT } from "./contexts/GraviolaContext"
+import Loading from "./pages/Loading"
+import useTheme from "./hooks/useTheme"
 
 export const GRAVIOLA_CONTRACT_ADDRESS = "0xf378b8be1b54CCaD85298e76E5ffDdA03ef1A89B"
 
@@ -27,6 +29,7 @@ async function connectContractWallet(walletProvider: ethers.providers.ExternalPr
 
 const App = (props: { children: ReactNode }) => {
 
+    const [,] = useTheme()
     const [graviola, setGraviola] = useState<Graviola | null>(null)
     const [collection, setCollection] = useState<NFT[]>([])
     const { isConnected } = useWeb3ModalAccount()
@@ -102,7 +105,7 @@ const App = (props: { children: ReactNode }) => {
 
     return (
         (loading) ? 
-            <>loading...</> // Change this to proper <LoadingPage> soon
+            <Loading />
         :
             <>
                 <GraviolaContext.Provider value={graviolaContextValue}>
