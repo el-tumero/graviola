@@ -18,13 +18,14 @@ import { GraviolaContext, NFT } from '../contexts/GraviolaContext'
 import { convertToIfpsURL } from '../utils/convertToIpfsURL'
 
 function Root() {
+
     const navigate = useNavigate()
     const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
 
     const graviolaContext = useContext(GraviolaContext)
     const nftSources = graviolaContext.collection as NFT[]
-    console.log(nftSources)
 
+    // Change this to 3 different-sized arrays once we have more data to work with
     const marqueeSources = nftSources.map((nft: NFT) => (
         convertToIfpsURL(nft.image)
     ))
@@ -85,7 +86,7 @@ function Root() {
                     />
                     <NFTDetails
                         nftProps={{
-                            src: convertToIfpsURL(nftSources[2].image),
+                            src: convertToIfpsURL(nftSources[3].image),
                             glow: true,
                             rarityLevel: RarityLevel.VeryRare,
                         }}
@@ -104,7 +105,7 @@ function Root() {
                     <div className='xl:flex xl:justify-around sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
                         {Object.keys(rarities).map((rarityLevel, i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
-                                <BlockNFT src={convertToIfpsURL(nftSources[2].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[10em] xl:h-[10em] sm:w-[12em] sm:h-[12em]' />
+                                <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[10em] xl:h-[10em] sm:w-[12em] sm:h-[12em]' />
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
                                     <p className='font-bold' style={getRarityColor(rarityLevel as RarityLevel)}>{rarities[rarityLevel as RarityLevel].name}</p>
                                     <span className='font-bold'>

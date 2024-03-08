@@ -17,9 +17,11 @@ async function connectContract(): Promise<Graviola> {
 }
 
 async function connectContractWallet(walletProvider: ethers.providers.ExternalProvider): Promise<Graviola> {
+    console.log("connecting to contract...")
     const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
     const signer = ethersProvider.getSigner()
     const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, signer)
+    console.log("connected")
     return graviola as unknown as Graviola
 }
 
@@ -36,26 +38,37 @@ const App = (props: { children: ReactNode }) => {
         collection: collection
     }
 
+    // Fetch NFT data for read-only site mode
     useEffect(() => {
-        if (!graviola) return
-        (async() => {
-            for (let i = 0; i < 4; i++) {
-                const uri = await graviola?.tokenURI(BigInt(i))
-                const obj = await (await fetch(uri)).json() as NFT
-                setCollection((prev) => [...prev, obj])
-            }
-        })()
+        if (!graviola) return;
+    
+        const fetchCollection = async () => {
+            const allKeywords = await graviola.getAllWords()
+            const promises = Array.from({ length: allKeywords.length }, async (_, i) => {
+                const uri = await graviola.tokenURI(BigInt(i))
+                const response = await fetch(uri)
+                return response.json()
+            })
+    
+            const collection = await Promise.all(promises)
+            setCollection(prev => [...prev, ...collection])
+    
+            setLoading(false)
+        }
+    
+        fetchCollection()
     }, [graviola])
 
-    // SO UGLY CHANGE THIS LATER (UGLY AF) (UGLY)
+    // Load contract readonly mode
     useEffect(() => {
-        if (collection.length < 3) return
-        setLoading(false)
-    }, [collection])
+        // console.log("wP ", walletProvider)
+        if (walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract))
+    }, [walletProvider])
 
-    useEffect(() => {
-        if(isConnected && walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract))
-    }, [isConnected, walletProvider])
+    // Load contract in wallet-connected mode
+    // useEffect(() => {
+    //     if(isConnected && walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract))
+    // }, [isConnected, walletProvider])
 
 
     const projectId = 'a09890b34dc1551c2534337dbc22de8c'
@@ -89,7 +102,7 @@ const App = (props: { children: ReactNode }) => {
 
     return (
         (loading) ? 
-            <>loading...</>
+            <>loading...</> // Change this to proper <LoadingPage> soon
         :
             <>
                 <GraviolaContext.Provider value={graviolaContextValue}>
