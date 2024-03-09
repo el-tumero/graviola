@@ -34,7 +34,6 @@ const NavRightList = (props: { theme: string, themeOnClick: () => void }) => {
                 <div className="flex justify-center items-center w-6 h-6 cursor-pointer" onClick={() => props.themeOnClick()}>
                     {props.theme === "dark" ? <LightThemeIcon /> : <DarkThemeIcon /> }
                 </div>
-
             </div>
             <w3m-button />
         </div>
