@@ -5,8 +5,8 @@ interface OraIoBannerProps {
 
 const OraIoBanner = ({ children }: OraIoBannerProps) => {
     return (
-        <div className="flex flex-col w-full h-fit my-2 p-4 gap-2 rounded-xl bg-light-bgDark/50 dark:bg-dark-bgDark/50 mb-36">
-            <div className="flex gap-2">
+        <div className="flex flex-col w-full h-fit my-2 p-6 gap-2 rounded-xl bg-light-bgDark/50 dark:bg-dark-bgDark/50 mb-36">
+            <div className="flex max-md:flex-col w-fit gap-2 p-4 rounded-xl">
                 <h1 className="text-3xl font-bold">Powered by</h1>
                 <div className="flex justify-center items-center">
                     <svg className="w-fit h-8" width="206" height="66" viewBox="0 0 206 66" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
