@@ -9,6 +9,7 @@ import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
 import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
 import { ethers } from "ethers"
+import SectionTitle from "../components/ui/SectionTitle"
 
 interface Keyword {
     name: string
@@ -25,6 +26,7 @@ const abi = [
 type ProgressState = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE" 
 
 const Generate = () => {
+
     const graviolaContext = useContext(GraviolaContext)
     const { isConnected } = useWeb3ModalAccount()
 
@@ -43,8 +45,14 @@ const Generate = () => {
         if(!walletProvider) return
         const provider = new ethers.providers.Web3Provider(walletProvider)
         const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
+        console.log(graviolaEvents)
         graviolaEvents.on("RequestSent", (requestId, event) => {
             console.log(event)
+        })
+
+        // This never occurs for some reason
+        graviolaEvents.on("Transfer", (arg1, arg2) => {
+            console.log("Tranfer ", arg1, arg2)
         })
 
     }
@@ -84,18 +92,22 @@ const Generate = () => {
                     }} />
                 </div>
 
-                <HorizontalLine />
-                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center mt-28 p-4">
+                <SectionTitle
+                    mainText={{
+                        content: "Keyword list"
+                    }}
+                />
+                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
                     {keywordsLoaded &&
                     <>
-                        <h2 className='font-bold text-xl mb-4'>Keyword list</h2>
                         <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
                             {keywords.map((keyword, index) => (
-                                <div key={index} className="bg-light-bgLight dark:bg-dark-bgLight border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
-                                    {keyword.name}
+                                <div key={index} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 p-4 rounded-xl text-center">
+                                    <span>{keyword.name}</span>
                                 </div>
                             ))}
                         </div>
+                        <Button text="Add one yourself" enabled={true} onClick={() => {}} />
                     </>}
                 </div>
 
