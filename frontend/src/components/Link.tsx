@@ -8,7 +8,7 @@ interface LinkProps {
 
 const Link = ({ text, href, openInNewTab, additionalClasses }: LinkProps) => {
     return (
-        <a target={openInNewTab ? "_blank" : ""} href={href} rel={openInNewTab ? "noopener noreferrer" : ""} tabIndex={0}>
+        <a className="flex w-min" target={openInNewTab ? "_blank" : ""} href={href} rel={openInNewTab ? "noopener noreferrer" : ""} tabIndex={0}>
             <p className={`hover:underline hover:cursor-pointer ${additionalClasses}`}>{text}</p>
         </a>
     )
