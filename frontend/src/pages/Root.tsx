@@ -58,7 +58,7 @@ function Root() {
                     />
 
                     <div className='flex flex-col mb-36'>
-                        <div className='flex justify-center items-center gap-4 w-1/2 m-auto mt-4 mb-8'>
+                        <div className='flex max-lg:flex-col justify-center items-center gap-4 w-full px-4 mt-4 mb-8'>
                             <Button enabled={true} text='Get yours now!' onClick={() => {navigate(routerPaths.generate)}} />
                             <Button enabled={false} text='Browse marketplace (COMING SOON)' onClick={() => {}} />
                         </div>
@@ -129,7 +129,7 @@ function Root() {
                     />
 
                     <OraIoBanner>
-                        <div className='flex flex-col gap-2 mb-24 py-8'>
+                        <div className='flex flex-col gap-2 mb-24 p-4'>
                             <div className='flex'>
                                 <Link text='Ora' href={"https://www.ora.io/"} additionalClasses='font-bold' />
                                 <p>&nbsp;is an on-chain verifiable oracle protocol</p>
