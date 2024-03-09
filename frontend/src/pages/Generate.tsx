@@ -109,7 +109,7 @@ const Generate = () => {
                     <>
                         <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
                             {keywords.map((keyword, index) => (
-                                <div key={index} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 p-4 rounded-xl text-center">
+                                <div key={index} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
                                     <span>{keyword.name}</span>
                                 </div>
                             ))}
