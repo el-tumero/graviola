@@ -17,7 +17,7 @@ const NFTDetails = ({ nftProps, upperBubbleChildren, lowerBubbleChildren }: NFTD
                 </div>
 
                 {lowerBubbleChildren &&
-                    <div className="absolute shadow-lg -bottom-[3.5em] -right-[12em] bg-light-bgPrimary dark:bg-dark-bgPrimary w-fit max-w-[24em] h-fit break-words p-4 rounded-lg border-2 border-light-border dark:border-dark-border">
+                    <div className="absolute shadow-lg -bottom-[3.5em] -right-[12em] bg-light-bgPrimary dark:bg-dark-bgPrimary min-w-[12em] w-fit max-w-[24em] h-fit break-words p-4 rounded-lg border-2 border-light-border dark:border-dark-border">
                         {lowerBubbleChildren}
                     </div>
                 }

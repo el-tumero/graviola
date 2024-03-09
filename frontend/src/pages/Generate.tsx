@@ -46,14 +46,21 @@ const Generate = () => {
         const provider = new ethers.providers.Web3Provider(walletProvider)
         const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
         console.log(graviolaEvents)
-        graviolaEvents.on("RequestSent", (requestId, event) => {
-            console.log(event)
-        })
 
-        // This never occurs for some reason
-        graviolaEvents.on("Transfer", (arg1, arg2) => {
-            console.log("Tranfer ", arg1, arg2)
-        })
+        // graviolaEvents.on("RequestSent", (requestId, event) => {
+        //     console.log(`rId: ${requestId},  event: ${event}`)
+        // })
+
+        // graviolaEvents.on("Transfer", (requestId, event) => {
+        //     console.log(event)
+        //     console.log(`rId: ${requestId},  event: ${event}`)
+        // })
+
+    
+        // graviolaEvents.on("PromptResponse", (requestId, event) => {
+        //     console.log(event)
+        //     console.log(`rId: ${requestId},  event: ${event}`)
+        // })
 
     }
 
