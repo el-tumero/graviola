@@ -109,7 +109,7 @@ const Generate = () => {
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
-                    <GenerateContainer imgSrc={nftImg} isPulsating={!isConnected} isGenerating={(progressState !== "NONE")} />
+                    <GenerateContainer imgSrc={nftImg} isPulsating={!isConnected} isGenerating={(progressState !== "NONE" && progressState !== "DONE")} />
                     <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border`}>
                         <div style={{ width: `0%` }} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
                     </div>
