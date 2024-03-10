@@ -16,8 +16,6 @@ import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { getRarityColor } from "../utils/getRarityBorder"
-import { RarityLevel } from "../types/Rarity"
-import { rarities } from "../rarityData"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
@@ -26,6 +24,14 @@ const abi = [
     "event TokenReady(uint256 tokenId)"
 ]
 
+const NftResultText = (props: { imgRarityPerc: number }) => {
+    const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
+    return (
+        <p>{`Congratulations! You rolled a `}
+            <span style={getRarityColor(rarityLevel)} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
+        </p>
+    )
+}
 
 const Generate = () => {
 
@@ -144,18 +150,6 @@ const Generate = () => {
 
         </FullscreenContainer>
 
-    )
-}
-
-// Tmp here
-const NftResultText = (props: { imgRarityPerc: number }) => {
-    const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
-    return (
-        // <div>
-        // </div>
-        <p>{`Congratulations! You rolled a `}
-            <span style={getRarityColor(rarityLevel)} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
-        </p>
     )
 }
 
