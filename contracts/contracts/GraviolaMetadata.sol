@@ -21,6 +21,7 @@ contract GraviolaMetadata {
 
     mapping(uint256 => Metadata) private metadataStorage;
     mapping(string=>PromptsResponse) private promptsStorage;
+    string constant internal promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
     // DEBUG function - must be removed after local tests
     // function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
@@ -31,9 +32,8 @@ contract GraviolaMetadata {
     function addPrompt(uint256 tokenId, string memory prompt) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].prompt = prompt;
-
         // NOTE: low probability of failure of this mechanism
-        if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
+        // if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
     }
 
     // NOTE: requestCallback() should be called after this func
@@ -54,6 +54,10 @@ contract GraviolaMetadata {
         return promptsStorage[prompt].exists;
     }
 
+    function hasPromptResponse2(string memory prompt) internal view returns(bool) {
+        return promptsStorage[prompt].exists;
+    } 
+
     function addImage(uint256 tokenId, string memory image) private {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].image = image;
@@ -65,6 +69,14 @@ contract GraviolaMetadata {
         string memory prompt = metadataStorage[tokenId].prompt;
         require(promptsStorage[prompt].exists, "Prompt response does not exists!");
         addImage(tokenId, promptsStorage[prompt].response);
+    }
+
+    function readPromptResponse(string calldata prompt) external view returns(string memory) {
+        return promptsStorage[prompt].response;
+    }
+
+    function getMetadata(uint256 tokenId) public view returns(Metadata memory) {
+        return metadataStorage[tokenId];
     }
 
     // -- conversions --
