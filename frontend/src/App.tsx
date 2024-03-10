@@ -75,7 +75,6 @@ const App = (props: { children: ReactNode }) => {
                 const keyword: Keyword = {
                     name: keywordData[0],
                 }
-                console.log(keyword) // valid keyword data
                 setKeywords(prev => [...prev, keyword])
             })
     

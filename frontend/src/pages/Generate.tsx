@@ -9,9 +9,15 @@ import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
 import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
+import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
+import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import { ethers } from "ethers"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
+import { convertToIfpsURL } from "../utils/convertToIpfsURL"
+import { getRarityColor } from "../utils/getRarityBorder"
+import { RarityLevel } from "../types/Rarity"
+import { rarities } from "../rarityData"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
@@ -22,7 +28,7 @@ const abi = [
 
 
 const Generate = () => {
-    
+
     const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
     const contractNFTs = graviolaContext.collection as NFT[]
@@ -30,14 +36,36 @@ const Generate = () => {
 
     const { isConnected } = useWeb3ModalAccount()
 
-    const [nftImg, setNftImg] = useState<string>()
+    const [nftImg, setNftImg] = useState<string>() // mock img 
+    const [nftImgR, setNftImgR] = useState<number>(0) // mock rar
+
+    // export type NFTCreationStatus = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE"
     const [progressState, setProgressState] = useState<NFTCreationStatus>("NONE")
+    const [progressMessage, setProgressMessage] = useState<string>(nftCreationStatusMessages["NONE"])
 
     const simulateGenerationProcess = async () => {
 
+        setProgressState("BEFORE_MINT")
+        await new Promise((resolve) => setTimeout(resolve, 4000))
+
+        setProgressState("MINTED")
+        await new Promise((resolve) => setTimeout(resolve, 4000))
+
+        setProgressState("WAIT_IMAGE")
+        await new Promise((resolve) => setTimeout(resolve, 4000))
+
+        setProgressState("DONE")
+        console.log("done ", contractNFTs[0].image)
+        setNftImg(convertToIfpsURL(contractNFTs[0].image))
+        setNftImgR(22)
     }
 
-    
+    // Progress Msg based on state updater
+    useEffect(() => {
+        setProgressMessage(nftCreationStatusMessages[progressState])
+    }, [progressState])
+
+
     // NOTE: Current listener is leaking somewhere, causes high CPU usage(!)
     // const progressListener = () => {
 
@@ -81,13 +109,18 @@ const Generate = () => {
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
-                    <GenerateContainer isPulsating={!isConnected} isGenerating={(progressState !== "NONE")} />
+                    <GenerateContainer imgSrc={nftImg} isPulsating={!isConnected} isGenerating={(progressState !== "NONE")} />
                     <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border`}>
-                        <div style={{ width: `0%`}} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
+                        <div style={{ width: `0%` }} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
                     </div>
-                    <p>State: {progressState.toString()}</p>
+                    {progressState === "DONE" ?
+                        <NftResultText imgRarityPerc={nftImgR} />
+                        :
+                        <span>{nftCreationStatusMessages[progressState]}</span>
+                    }
                     <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
-                        graviolaContext.contract?.requestMint()
+                        // graviolaContext.contract?.requestMint()
+                        simulateGenerationProcess()
                     }} />
                 </div>
 
@@ -111,6 +144,18 @@ const Generate = () => {
 
         </FullscreenContainer>
 
+    )
+}
+
+// Tmp here
+const NftResultText = (props: { imgRarityPerc: number }) => {
+    const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
+    return (
+        // <div>
+        // </div>
+        <p>{`Congratulations! You rolled a `}
+            <span style={getRarityColor(rarityLevel)} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
+        </p>
     )
 }
 
