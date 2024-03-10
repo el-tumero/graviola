@@ -38,6 +38,7 @@ const App = (props: { children: ReactNode }) => {
     const [loading, setLoading] = useState<boolean>(true)
 
     // Contract data    
+    const [dataFetched, setDataFetched] = useState<boolean>(false)
     const [collection, setCollection] = useState<NFT[]>([])
     const [keywords, setKeywords] = useState<Keyword[]>([])
 
@@ -53,7 +54,7 @@ const App = (props: { children: ReactNode }) => {
 
     // Fetch NFT data for read-only site mode
     useEffect(() => {
-        if (!graviola) return;
+        if (!graviola || dataFetched) return
     
         const fetchCollection = async () => {
 
@@ -82,6 +83,8 @@ const App = (props: { children: ReactNode }) => {
         }
 
         fetchCollection()
+        setDataFetched(true)
+
     }, [graviola])
 
     useEffect(() => {
