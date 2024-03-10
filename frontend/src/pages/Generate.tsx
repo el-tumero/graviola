@@ -116,7 +116,7 @@ const Generate = () => {
                     {progressState === "DONE" ?
                         <NftResultText imgRarityPerc={nftImgR} />
                         :
-                        <span>{nftCreationStatusMessages[progressState]}</span>
+                        <span>{progressMessage}</span>
                     }
                     <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
                         // graviolaContext.contract?.requestMint()
