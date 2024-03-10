@@ -15,7 +15,8 @@ import { ethers } from "ethers"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
-import { getRarityColor } from "../utils/getRarityBorder"
+import { getRarityBorder, getRarityColor } from "../utils/getRarityBorder"
+import { RarityLevel } from "../types/Rarity"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
@@ -48,19 +49,32 @@ const Generate = () => {
     // export type NFTCreationStatus = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE"
     const [progressState, setProgressState] = useState<NFTCreationStatus>("NONE")
     const [progressMessage, setProgressMessage] = useState<string>(nftCreationStatusMessages["NONE"])
+    const [progressBarVal, setProgressBarVal] = useState<number>(0)
 
     const simulateGenerationProcess = async () => {
 
+        const PROGRESS_BAR_CLEANUP_TIMEOUT_MS = 1500
+
         setProgressState("BEFORE_MINT")
+        setProgressBarVal(3)
         await new Promise((resolve) => setTimeout(resolve, 4000))
 
         setProgressState("MINTED")
+        setProgressBarVal(25)
         await new Promise((resolve) => setTimeout(resolve, 4000))
 
         setProgressState("WAIT_IMAGE")
+        setProgressBarVal(75)
         await new Promise((resolve) => setTimeout(resolve, 4000))
 
         setProgressState("DONE")
+        setProgressBarVal(100)
+
+        // Cleanup progress bar
+        setTimeout(() => {
+            setProgressBarVal(0)
+        }, PROGRESS_BAR_CLEANUP_TIMEOUT_MS)
+
         console.log("done ", contractNFTs[0].image)
         setNftImg(convertToIfpsURL(contractNFTs[0].image))
         setNftImgR(22)
@@ -70,7 +84,6 @@ const Generate = () => {
     useEffect(() => {
         setProgressMessage(nftCreationStatusMessages[progressState])
     }, [progressState])
-
 
     // NOTE: Current listener is leaking somewhere, causes high CPU usage(!)
     // const progressListener = () => {
@@ -114,20 +127,31 @@ const Generate = () => {
 
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
+
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
+
+                    {/* Img container */}
                     <GenerateContainer imgSrc={nftImg} isPulsating={!isConnected} isGenerating={(progressState !== "NONE" && progressState !== "DONE")} />
-                    <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border`}>
-                        <div style={{ width: `0%` }} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
-                    </div>
+
+                    {/* Progress bar */}
+                    {(progressBarVal !== 0) &&
+                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border animate-pulse`}>
+                            <div style={{ width: `${progressBarVal}%`}} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
+                        </div>
+                    }
+
+                    {/* State/Progress text */}
                     {progressState === "DONE" ?
                         <NftResultText imgRarityPerc={nftImgR} />
                         :
                         <span>{progressMessage}</span>
                     }
-                    <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
+
+                    {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
                         // graviolaContext.contract?.requestMint()
                         simulateGenerationProcess()
-                    }} />
+                    }} />}
+
                 </div>
 
                 <SectionTitle
