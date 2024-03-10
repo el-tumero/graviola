@@ -1,5 +1,5 @@
 import { getRarityBorder } from "../../utils/getRarityBorder"
-import { RarityLevel } from "../../types/rarity"
+import { RarityLevel } from "../../types/Rarity"
 
 type BlockNFTPropsWithGlow = {
     src: string

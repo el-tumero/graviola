@@ -4,81 +4,101 @@ import Navbar from "../components/Navbar"
 import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/ContentContainer"
 import FullscreenContainer from "../components/ui/FullscreenContainer"
-import HorizontalLine from "../components/ui/HorizontalLine"
+import { NFT } from "../types/NFT"
+import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
 import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
+import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
+import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import { ethers } from "ethers"
 import SectionTitle from "../components/ui/SectionTitle"
-
-interface Keyword {
-    name: string
-    lowerRange: number
-    upperRange: number
-}
-
+import { NFTCreationStatus } from "../types/NFTCreationStatus"
+import { convertToIfpsURL } from "../utils/convertToIpfsURL"
+import { getRarityColor } from "../utils/getRarityBorder"
+import { RarityLevel } from "../types/Rarity"
+import { rarities } from "../rarityData"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
-    "event Transfer(address from, address to, uint tokenId)"
+    "event Transfer(address from, address to, uint tokenId)",
+    "event PromptResponse(string input, string output)",
+    "event TokenReady(uint256 tokenId)"
 ]
 
-type ProgressState = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE" 
 
 const Generate = () => {
 
+    const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
+    const contractNFTs = graviolaContext.collection as NFT[]
+    const contractKeywords = graviolaContext.keywords as Keyword[]
+
     const { isConnected } = useWeb3ModalAccount()
 
-    const [keywordsLoaded, setKeywordsLoaded] = useState<boolean>(false)
-    const [keywords, setKeywords] = useState<Array<Keyword>>([])
+    const [nftImg, setNftImg] = useState<string>() // mock img 
+    const [nftImgR, setNftImgR] = useState<number>(0) // mock rar
 
-    const { walletProvider } = useWeb3ModalProvider()
+    // export type NFTCreationStatus = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE"
+    const [progressState, setProgressState] = useState<NFTCreationStatus>("NONE")
+    const [progressMessage, setProgressMessage] = useState<string>(nftCreationStatusMessages["NONE"])
 
+    const simulateGenerationProcess = async () => {
 
-    const [nftImg, setNftImg] = useState<string>()
-    const [progressState, setProgressState] = useState<ProgressState>("NONE")
-    
-    const progressListener = () => {
+        setProgressState("BEFORE_MINT")
+        await new Promise((resolve) => setTimeout(resolve, 4000))
 
-        const address = GRAVIOLA_CONTRACT_ADDRESS
-        if(!walletProvider) return
-        const provider = new ethers.providers.Web3Provider(walletProvider)
-        const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
-        console.log(graviolaEvents)
+        setProgressState("MINTED")
+        await new Promise((resolve) => setTimeout(resolve, 4000))
 
-        // graviolaEvents.on("RequestSent", (requestId, event) => {
-        //     console.log(`rId: ${requestId},  event: ${event}`)
-        // })
+        setProgressState("WAIT_IMAGE")
+        await new Promise((resolve) => setTimeout(resolve, 4000))
 
-        // graviolaEvents.on("Transfer", (requestId, event) => {
-        //     console.log(event)
-        //     console.log(`rId: ${requestId},  event: ${event}`)
-        // })
-
-    
-        // graviolaEvents.on("PromptResponse", (requestId, event) => {
-        //     console.log(event)
-        //     console.log(`rId: ${requestId},  event: ${event}`)
-        // })
-
+        setProgressState("DONE")
+        console.log("done ", contractNFTs[0].image)
+        setNftImg(convertToIfpsURL(contractNFTs[0].image))
+        setNftImgR(22)
     }
 
+    // Progress Msg based on state updater
     useEffect(() => {
-        console.log("init progressChange listener")
-        // window.addEventListener("progressChange", progressListener)
-        progressListener()
-        // return window.removeEventListener("progressChange", progressListener)
-    }, [])
-            
-    useEffect(() => {
-        graviolaContext.contract?.getAllWords().then((words) => {
-            const data = words.map(word => ({name: word.keyword, lowerRange: Number(word.lowerRange), upperRange: Number(word.upperRange)}))
-            setKeywords(data)
-        })
-        setKeywordsLoaded(true)
+        setProgressMessage(nftCreationStatusMessages[progressState])
+    }, [progressState])
 
-    })
+
+    // NOTE: Current listener is leaking somewhere, causes high CPU usage(!)
+    // const progressListener = () => {
+
+    //     const address = GRAVIOLA_CONTRACT_ADDRESS
+    //     if(!walletProvider) return
+    //     const provider = new ethers.providers.Web3Provider(walletProvider)
+    //     const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
+    //     console.log(graviolaEvents)
+
+    //     graviolaEvents.on("RequestSent", (requestId) => {
+    //         console.log(`reqId: ${requestId}`)
+    //     })
+
+    //     graviolaEvents.on("Transfer", (from, to, tokenId) => {
+    //         console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
+    //     })
+
+    //     graviolaEvents.on("PromptResponse", (input, output) => {
+    //         console.log("promptResponse: ", input, output)
+    //     })
+
+    //     graviolaEvents.on("TokenReady", (tokenId) => {
+    //         console.log("token ready! id: ", tokenId)
+    //     })
+
+    // }
+
+    // useEffect(() => {
+    //     console.log("init progressChange listener")
+    //     // window.addEventListener("progressChange", progressListener)
+    //     progressListener()
+    //     // return window.removeEventListener("progressChange", progressListener)
+    // }, [walletProvider])
 
     return (
         <FullscreenContainer>
@@ -89,13 +109,18 @@ const Generate = () => {
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
-                    <GenerateContainer isPulsating={!isConnected} isGenerating={(progressState !== "NONE")} />
+                    <GenerateContainer imgSrc={nftImg} isPulsating={!isConnected} isGenerating={(progressState !== "NONE" && progressState !== "DONE")} />
                     <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border`}>
-                        <div style={{ width: `0%`}} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
+                        <div style={{ width: `0%` }} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
                     </div>
-                    <p>State: {progressState.toString()}</p>
+                    {progressState === "DONE" ?
+                        <NftResultText imgRarityPerc={nftImgR} />
+                        :
+                        <span>{progressMessage}</span>
+                    }
                     <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
-                        graviolaContext.contract?.requestMint()
+                        // graviolaContext.contract?.requestMint()
+                        simulateGenerationProcess()
                     }} />
                 </div>
 
@@ -105,17 +130,13 @@ const Generate = () => {
                     }}
                 />
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
-                    {keywordsLoaded &&
-                    <>
-                        <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
-                            {keywords.map((keyword, index) => (
-                                <div key={index} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
-                                    <span>{keyword.name}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <Button text="Add one yourself" enabled={true} onClick={() => {}} />
-                    </>}
+                    <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
+                        {contractKeywords.map((keyword: Keyword, i) => (
+                            <div key={i} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
+                                <span>{keyword.name}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
             </ContentContainer>
@@ -123,6 +144,18 @@ const Generate = () => {
 
         </FullscreenContainer>
 
+    )
+}
+
+// Tmp here
+const NftResultText = (props: { imgRarityPerc: number }) => {
+    const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
+    return (
+        // <div>
+        // </div>
+        <p>{`Congratulations! You rolled a `}
+            <span style={getRarityColor(rarityLevel)} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
+        </p>
     )
 }
 

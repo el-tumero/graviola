@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import FullscreenContainer from "../components/ui/FullscreenContainer"
 import { useContext, useEffect, useState } from 'react'
+import { NFT } from '../types/NFT'
 import ContentContainer from "../components/ui/ContentContainer"
 import Navbar from "../components/Navbar"
 import Button from '../components/ui/Button'
@@ -8,9 +9,9 @@ import BlockMarquee from '../components/BlockMarquee'
 import NFTDetails from '../components/ui/NFTDetails'
 import { rarities } from '../rarityData'
 import { routerPaths } from '../router'
-import { RarityLevel } from '../types/rarity'
+import { RarityLevel } from '../types/Rarity'
 import { getRarityColor } from '../utils/getRarityBorder'
-import { GraviolaContext, NFT } from '../contexts/GraviolaContext'
+import { GraviolaContext } from '../contexts/GraviolaContext'
 import { convertToIfpsURL } from '../utils/convertToIpfsURL'
 import BlockNFT from '../components/ui/BlockNFT'
 import { getRarityPercentageString } from '../utils/getRarityPercentage'

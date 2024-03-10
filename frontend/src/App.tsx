@@ -4,7 +4,9 @@ import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal
 import { ethers } from 'ethers'
 import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Graviola.json"
 import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
-import { GraviolaContext, NFT } from "./contexts/GraviolaContext"
+import { GraviolaContext } from "./contexts/GraviolaContext"
+import { NFT } from "./types/NFT"
+import { Keyword } from "./types/Keyword"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 
@@ -33,36 +35,55 @@ const App = (props: { children: ReactNode }) => {
 
     const [,] = useTheme()
     const [graviola, setGraviola] = useState<Graviola | null>(null)
+    const [loading, setLoading] = useState<boolean>(true)
+
+    // Contract data    
+    const [dataFetched, setDataFetched] = useState<boolean>(false)
     const [collection, setCollection] = useState<NFT[]>([])
+    const [keywords, setKeywords] = useState<Keyword[]>([])
+
+    // Web3 stuff
     // const { isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
-    const [loading, setLoading] = useState<boolean>(true)
     
     const graviolaContextValue = {
         contract: graviola,
-        collection: collection
+        collection: collection,
+        keywords: keywords
     }
 
     // Fetch NFT data for read-only site mode
     useEffect(() => {
-        if (!graviola) return;
+        if (!graviola || dataFetched) return
     
         const fetchCollection = async () => {
+
             const allKeywords = await graviola.getAllWords()
             const promises = Array.from({ length: allKeywords.length }, async (_, i) => {
                 const uri = await graviola.tokenURI(BigInt(i))
                 const response = await fetch(uri)
                 return response.json()
             })
-    
+            
+            // Nfts
             const collection = await Promise.all(promises)
             console.log("fetched collection ", collection)
             setCollection(prev => [...prev, ...collection])
+
+            // Keywords
+            allKeywords.map((keywordData) => {
+                const keyword: Keyword = {
+                    name: keywordData[0],
+                }
+                setKeywords(prev => [...prev, keyword])
+            })
     
             setLoading(false)
         }
-    
+
         fetchCollection()
+        setDataFetched(true)
+
     }, [graviola])
 
     useEffect(() => {

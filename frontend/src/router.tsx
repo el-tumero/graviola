@@ -5,7 +5,8 @@ import Generate from "./pages/Generate";
 
 export const routerPaths = {
     root: "/",
-    generate: "/generate"
+    generate: "/generate",
+    gallery: "/gallery"
 }
 
 const router = createBrowserRouter([
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
     {
         path: routerPaths.generate,
         element: <Generate />
+    },
+    {
+        path: routerPaths.gallery,
+        element: <></>
     }
 ])
 

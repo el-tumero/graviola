@@ -1,6 +1,12 @@
-import { RarityData, RarityLevel } from "./types/rarity"
+import { RarityData, RarityLevel } from "./types/Rarity"
 
-export const rarityScale: Array<RarityLevel> = [RarityLevel.Common, RarityLevel.Uncommon, RarityLevel.Rare, RarityLevel.VeryRare, RarityLevel.Legendary]
+export const rarityScale: Array<RarityLevel> = [
+    RarityLevel.Common,
+    RarityLevel.Uncommon,
+    RarityLevel.Rare,
+    RarityLevel.VeryRare,
+    RarityLevel.Legendary
+]
 
 // Data for NFT rarities
 export const rarities: Record<RarityLevel, RarityData> = {
@@ -29,4 +35,4 @@ export const rarities: Record<RarityLevel, RarityData> = {
         threshold: 0,
         color: "rgba(239, 68, 68, 0.8)",
     }
-};
+}

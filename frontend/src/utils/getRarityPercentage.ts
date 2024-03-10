@@ -1,4 +1,4 @@
-import { RarityLevel } from "../types/rarity";
+import { RarityLevel } from "../types/Rarity";
 import { rarities, rarityScale } from "../rarityData";
 
 export function getRarityPercentageString(rarityLevel: RarityLevel) {
