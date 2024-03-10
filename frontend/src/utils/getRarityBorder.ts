@@ -1,4 +1,4 @@
-import { RarityLevel } from "../types/rarity";
+import { RarityLevel } from "../types/Rarity";
 import { rarities } from "../rarityData";
 
 

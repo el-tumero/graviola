@@ -4,81 +4,73 @@ import Navbar from "../components/Navbar"
 import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/ContentContainer"
 import FullscreenContainer from "../components/ui/FullscreenContainer"
-import HorizontalLine from "../components/ui/HorizontalLine"
+import { NFT } from "../types/NFT"
+import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
 import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
 import { ethers } from "ethers"
 import SectionTitle from "../components/ui/SectionTitle"
-
-interface Keyword {
-    name: string
-    lowerRange: number
-    upperRange: number
-}
-
+import { NFTCreationStatus } from "../types/NFTCreationStatus"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
-    "event Transfer(address from, address to, uint tokenId)"
+    "event Transfer(address from, address to, uint tokenId)",
+    "event PromptResponse(string input, string output)",
+    "event TokenReady(uint256 tokenId)"
 ]
 
-type ProgressState = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE" 
 
 const Generate = () => {
-
+    
+    const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
+    const contractNFTs = graviolaContext.collection as NFT[]
+    const contractKeywords = graviolaContext.keywords as Keyword[]
+
     const { isConnected } = useWeb3ModalAccount()
 
-    const [keywordsLoaded, setKeywordsLoaded] = useState<boolean>(false)
-    const [keywords, setKeywords] = useState<Array<Keyword>>([])
-
-    const { walletProvider } = useWeb3ModalProvider()
-
-
     const [nftImg, setNftImg] = useState<string>()
-    const [progressState, setProgressState] = useState<ProgressState>("NONE")
-    
-    const progressListener = () => {
+    const [progressState, setProgressState] = useState<NFTCreationStatus>("NONE")
 
-        const address = GRAVIOLA_CONTRACT_ADDRESS
-        if(!walletProvider) return
-        const provider = new ethers.providers.Web3Provider(walletProvider)
-        const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
-        console.log(graviolaEvents)
-
-        // graviolaEvents.on("RequestSent", (requestId, event) => {
-        //     console.log(`rId: ${requestId},  event: ${event}`)
-        // })
-
-        // graviolaEvents.on("Transfer", (requestId, event) => {
-        //     console.log(event)
-        //     console.log(`rId: ${requestId},  event: ${event}`)
-        // })
-
-    
-        // graviolaEvents.on("PromptResponse", (requestId, event) => {
-        //     console.log(event)
-        //     console.log(`rId: ${requestId},  event: ${event}`)
-        // })
+    const simulateGenerationProcess = async () => {
 
     }
 
-    useEffect(() => {
-        console.log("init progressChange listener")
-        // window.addEventListener("progressChange", progressListener)
-        progressListener()
-        // return window.removeEventListener("progressChange", progressListener)
-    }, [])
-            
-    useEffect(() => {
-        graviolaContext.contract?.getAllWords().then((words) => {
-            const data = words.map(word => ({name: word.keyword, lowerRange: Number(word.lowerRange), upperRange: Number(word.upperRange)}))
-            setKeywords(data)
-        })
-        setKeywordsLoaded(true)
+    
+    // NOTE: Current listener is leaking somewhere, causes high CPU usage(!)
+    // const progressListener = () => {
 
-    })
+    //     const address = GRAVIOLA_CONTRACT_ADDRESS
+    //     if(!walletProvider) return
+    //     const provider = new ethers.providers.Web3Provider(walletProvider)
+    //     const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
+    //     console.log(graviolaEvents)
+
+    //     graviolaEvents.on("RequestSent", (requestId) => {
+    //         console.log(`reqId: ${requestId}`)
+    //     })
+
+    //     graviolaEvents.on("Transfer", (from, to, tokenId) => {
+    //         console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
+    //     })
+
+    //     graviolaEvents.on("PromptResponse", (input, output) => {
+    //         console.log("promptResponse: ", input, output)
+    //     })
+
+    //     graviolaEvents.on("TokenReady", (tokenId) => {
+    //         console.log("token ready! id: ", tokenId)
+    //     })
+
+    // }
+
+    // useEffect(() => {
+    //     console.log("init progressChange listener")
+    //     // window.addEventListener("progressChange", progressListener)
+    //     progressListener()
+    //     // return window.removeEventListener("progressChange", progressListener)
+    // }, [walletProvider])
 
     return (
         <FullscreenContainer>
@@ -105,17 +97,13 @@ const Generate = () => {
                     }}
                 />
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
-                    {keywordsLoaded &&
-                    <>
-                        <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
-                            {keywords.map((keyword, index) => (
-                                <div key={index} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
-                                    <span>{keyword.name}</span>
-                                </div>
-                            ))}
-                        </div>
-                        <Button text="Add one yourself" enabled={true} onClick={() => {}} />
-                    </>}
+                    <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
+                        {contractKeywords.map((keyword: Keyword, i) => (
+                            <div key={i} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
+                                <span>{keyword.name}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
             </ContentContainer>
