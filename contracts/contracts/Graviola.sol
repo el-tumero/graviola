@@ -13,53 +13,82 @@ import "./VRFConsumer.sol";
 // Uncomment this line to use console.log
 import "hardhat/console.sol";
 
+/// @notice A base contract for Graviola non-fungible token
 contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, AutomationCompatibleInterface, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
-    event RequestSent(uint256 refId);
-    event TokenReady(uint256 tokenId);
+    /// @notice PreMint is emitted when the account calls preMint()  
+    event PreMint(address addr, uint256 requestId);
+    
+    /// @notice PromptRequest is emitted when the request is sent to AIOracle
+    event PromptRequest(string input);
+    
+    /// @notice PromptResponse is emitted when the response is written to the contract using its callback function (receiveOAOCallback)
     event PromptResponse(string input, string output);
-
-    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 30_000_000;
-
-    uint256 private _nextTokenId;
-    uint256 private _nextVrfReqId;
-
-    constructor(
-        address aiOracle,
-        address vrfHost
-    ) ERC721("Graviola", "GRV") GraviolaWell() VRFConsumer(vrfHost) AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
+    
+    /// @notice TokenReady is emitted when the token has the complete metadata 
+    event TokenReady(address addr, uint256 tokenId);
 
 
-    DoubleEndedQueue.Bytes32Deque private OAORequests;
+    // gas limit for AIOracle callback function
+    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 3_000_000;
+
+    // stack for storing pending vrf request ids
     DoubleEndedQueue.Bytes32Deque private VRFRequests;
 
+    // stack for storing pending AIOracle request ids
+    DoubleEndedQueue.Bytes32Deque private OAORequests;
 
+
+    /// @notice VRFRequest
+    /// @notice requestor - address of the account which made the request
+    /// @notice noiseId - id of the random value (stored in the VRFHost) 
+    /// @notice done - indicates whether the request was completed
     struct VRFRequest {
         address requestor;
-        uint256 refId;
+        uint256 noiseId;
         bool done;
     }
 
-
-    // vrf request id
-
+    // maps vrf request id to VRFRequest struct
     mapping(uint256 => VRFRequest) vrfRequests;
 
+    // is equal to the id of the next minted token
+    uint256 private _nextTokenId;
 
-    function requestMint() external {
-        // TODO: fees mechanism
-        uint256 refId = saveRandomValue();
-        vrfRequests[_nextVrfReqId] = VRFRequest(msg.sender, refId, false);
-        VRFRequests.pushBack(bytes32(_nextVrfReqId));
-        emit RequestSent(_nextVrfReqId);
-        _nextVrfReqId++;
+    // is equal to the id of the next VRF request
+    uint256 private _nextVrfReqId;
+
+
+    /// @notice creates the ERC-721 token contract that uses verifiable randomness and on-chain AI oracles
+    /// @param aiOracle address of the on-chain AI oracle contract
+    /// @param vrfHost  address of the VRF host
+    constructor(
+        address aiOracle,
+        address vrfHost
+    ) ERC721("Graviola", "GRV")
+    GraviolaWell() 
+    VRFConsumer(vrfHost) 
+    AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
+
+
+    /// @notice does actions required before minting a token
+    /// @dev is called by user
+    function preMint() external {
+        // uint256 noiseId = requestNoise()
+        uint256 noiseId = 0;
+        vrfRequests[_nextVrfReqId] = VRFRequest(msg.sender, noiseId, false);
+        emit PreMint(msg.sender, _nextVrfReqId);
+        ++_nextVrfReqId;
     }
+
+    // -----
 
     function pasteRandomValue(uint256 reqId) internal {
         require(!vrfRequests[reqId].done, "request has already been processed");
 
-        uint256 randomValue = readRandomValue(vrfRequests[reqId].refId);
+        // uint256 randomValue = readNoise(vrfRequests[reqId].noiseId);
+        uint256 randomValue = 0;
         vrfRequests[reqId].done = true;
 
         
@@ -100,7 +129,7 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
     function checkUpkeep(bytes calldata) external view override returns (bool upkeepNeeded, bytes memory performData) {
         if(!VRFRequests.empty()){
             uint256 id = uint256(VRFRequests.front());
-            return (isRandomValueReady(vrfRequests[id].refId), abi.encode(uint8(0), id));
+            return (isRandomValueReady(vrfRequests[id].noiseId), abi.encode(uint8(0), id));
         }
         if(!OAORequests.empty()){
             uint256 id = uint256(OAORequests.front());
@@ -117,7 +146,7 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
         if(op == 1) {
             savePromptResponseToMetadata(id);
             OAORequests.popFront();
-            emit TokenReady(id);
+            emit TokenReady(address(0), id);
         }
     }
 
