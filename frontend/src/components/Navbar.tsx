@@ -3,7 +3,7 @@ import Link from "./Link"
 import Logo from "../assets/logo.webp"
 import useTheme from "../hooks/useTheme"
 import { useNavigate } from "react-router-dom"
-import { routerPaths } from "../router"
+import router, { routerPaths } from "../router"
 
 const LightThemeIcon = () => {
     return (
@@ -21,20 +21,29 @@ const DarkThemeIcon = () => {
     )
 }
 
-const NavRightList = (props: { theme: string, themeOnClick: () => void }) => {
+const NavRightList = (props: { theme: string, generateOnClick: () => void, themeOnClick: () => void }) => {
     const mobileStyles = `flex-col max-md:absolute max-md:right-6 max-md:top-16 max-md:p-4 max-md:rounded-xl max-md:border-2 max-md:border-light-border max-md:dark:border-dark-border max-md:shadow-lg`
-    const mobileItemCtn = `p-2 rounded-xl max-md:w-full max-md:bg-light-border/40 max-md:dark:bg-dark-border/40`
+    const mobileItemCtn = `p-2 rounded-xl max-md:w-full max-md:bg-light-border max-md:dark:bg-dark-border/40 max-md:flex max-md:justify-center`
     return (
         <div className={`flex justify-center items-center gap-4 bg-light-bgDark dark:bg-dark-bgDark max-md:${mobileStyles}`}>
+            {/* Generate */}
+            <div className={mobileItemCtn}>
+                <span className="cursor-pointer hover:underline" onClick={() => props.generateOnClick()}>Generate</span>
+            </div>
+
+            {/* GitHub */}
             <div className={mobileItemCtn}>
                 <Link text="GitHub" href="https://github.com/el-tumero/graviola" openInNewTab={true} additionalClasses="w-min" />
             </div>
 
+            {/* Theme switch */}
             <div className={mobileItemCtn}>
                 <div className="flex justify-center items-center w-6 h-6 cursor-pointer" onClick={() => props.themeOnClick()}>
                     {props.theme === "dark" ? <LightThemeIcon /> : <DarkThemeIcon /> }
                 </div>
             </div>
+
+            {/* Wallet */}
             <w3m-button />
         </div>
     )
@@ -57,7 +66,7 @@ const Navbar = () => {
             </div>
 
             <div className="max-md:hidden md:visible">
-                <NavRightList theme={theme} themeOnClick={toggleTheme} />
+                <NavRightList theme={theme} generateOnClick={() => navigate(routerPaths.generate)} themeOnClick={toggleTheme} />
             </div>
 
             {/* Mobile navbar right panel */}
@@ -70,9 +79,8 @@ const Navbar = () => {
                 </svg>
 
                 {mobileListVisible &&
-                    // <div className={`flex flex-col gap-4 transition-opacity duration-200`}>
                     <div className={`flex flex-col gap-4 transition-opacity duration-200 ${mobileListVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
-                        <NavRightList theme={theme} themeOnClick={toggleTheme} />
+                        <NavRightList theme={theme} generateOnClick={() => navigate(routerPaths.generate)} themeOnClick={toggleTheme} />
                     </div>
                 }
 
