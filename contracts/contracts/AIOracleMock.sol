@@ -3,10 +3,9 @@ pragma solidity ^0.8.24;
 import "./IAIOracle.sol";
 
 contract AIOracleMock is IAIOracle {
-
     uint256 public constant fee = 0;
-    
-    struct AICallbackRequestData{
+
+    struct AICallbackRequestData {
         address account;
         uint256 requestId;
         uint256 modelId;
@@ -20,8 +19,13 @@ contract AIOracleMock is IAIOracle {
 
     uint256 public requestCounter;
 
-
-    function requestCallback(uint256 modelId, bytes calldata input, address callbackContract, bytes4 functionSelector, uint64 gasLimit) external payable{
+    function requestCallback(
+        uint256 modelId,
+        bytes calldata input,
+        address callbackContract,
+        bytes4 functionSelector,
+        uint64 gasLimit
+    ) external payable {
         require(msg.value >= fee, "insuefficient fee");
 
         AICallbackRequestData storage request = requests[requestCounter];
@@ -33,17 +37,30 @@ contract AIOracleMock is IAIOracle {
         request.functionSelector = functionSelector;
         request.gasLimit = gasLimit;
         // Emit event
-        emit AICallbackRequest(msg.sender, requestCounter, modelId, input, callbackContract, functionSelector, gasLimit);
+        emit AICallbackRequest(
+            msg.sender,
+            requestCounter,
+            modelId,
+            input,
+            callbackContract,
+            functionSelector,
+            gasLimit
+        );
         requestCounter++;
     }
-
-
 
     function invokeCallback(uint256 requestId, bytes calldata output) public {
         AICallbackRequestData storage request = requests[requestId];
 
-        bytes memory payload = abi.encodeWithSelector(request.functionSelector, request.modelId, request.input, output);
-        (bool success, bytes memory data) = request.callbackContract.call{gas: request.gasLimit}(payload);
+        bytes memory payload = abi.encodeWithSelector(
+            request.functionSelector,
+            request.modelId,
+            request.input,
+            output
+        );
+        (bool success, bytes memory data) = request.callbackContract.call{
+            gas: request.gasLimit
+        }(payload);
         require(success, "failed to call selector!");
         if (!success) {
             assembly {

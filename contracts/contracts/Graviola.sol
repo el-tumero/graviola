@@ -1,34 +1,39 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import { AutomationCompatibleInterface } from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import "./GraviolaMetadata.sol";
 import "./AIOracleCallbackReceiver.sol";
 import "./GraviolaWell.sol";
 import "./VRFConsumer.sol";
 
-
 // Uncomment this line to use console.log
 import "hardhat/console.sol";
 
 /// @notice A base contract for Graviola non-fungible token
-contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, AutomationCompatibleInterface, AIOracleCallbackReceiver {
+contract Graviola is
+    ERC721,
+    GraviolaMetadata,
+    GraviolaWell,
+    VRFConsumer,
+    AutomationCompatibleInterface,
+    AIOracleCallbackReceiver
+{
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
-    /// @notice PreMint is emitted when the account calls preMint()  
+    /// @notice PreMint is emitted when the account calls preMint()
     event PreMint(address addr, uint256 requestId);
-    
+
     /// @notice PromptRequest is emitted when the request is sent to AIOracle
     event PromptRequest(string input);
-    
+
     /// @notice PromptResponse is emitted when the response is written to the contract using its callback function (receiveOAOCallback)
     event PromptResponse(string input, string output);
-    
-    /// @notice TokenReady is emitted when the token has the complete metadata 
-    event TokenReady(address addr, uint256 tokenId);
 
+    /// @notice TokenReady is emitted when the token has the complete metadata
+    event TokenReady(address addr, uint256 tokenId);
 
     // gas limit for AIOracle callback function
     uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 3_000_000;
@@ -39,10 +44,9 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
     // stack for storing pending AIOracle request ids
     DoubleEndedQueue.Bytes32Deque private OAORequests;
 
-
     /// @notice VRFRequest
     /// @notice requestor - address of the account which made the request
-    /// @notice noiseId - id of the random value (stored in the VRFHost) 
+    /// @notice noiseId - id of the random value (stored in the VRFHost)
     /// @notice done - indicates whether the request was completed
     struct VRFRequest {
         address requestor;
@@ -59,18 +63,18 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
     // is equal to the id of the next VRF request
     uint256 private _nextVrfReqId;
 
-
     /// @notice creates the ERC-721 token contract that uses verifiable randomness and on-chain AI oracles
     /// @param aiOracle address of the on-chain AI oracle contract
     /// @param vrfHost  address of the VRF host
     constructor(
         address aiOracle,
         address vrfHost
-    ) ERC721("Graviola", "GRV")
-    GraviolaWell() 
-    VRFConsumer(vrfHost) 
-    AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
-
+    )
+        ERC721("Graviola", "GRV")
+        GraviolaWell()
+        VRFConsumer(vrfHost)
+        AIOracleCallbackReceiver(IAIOracle(aiOracle))
+    {}
 
     /// @notice does actions required before minting a token
     /// @dev is called by user
@@ -91,17 +95,16 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
         uint256 randomValue = 0;
         vrfRequests[reqId].done = true;
 
-        
         // mints nft
         uint256 tokenId = _nextTokenId++;
-        _safeMint(vrfRequests[reqId].requestor, tokenId);        
+        _safeMint(vrfRequests[reqId].requestor, tokenId);
         OAORequests.pushBack(bytes32(tokenId));
-        
+
         // words well logic
         string memory prompt;
         uint256 rarity;
         (prompt, rarity) = rollWords(randomValue);
-        
+
         string memory fullPrompt = string.concat(promptBase, prompt);
 
         // metadata
@@ -109,48 +112,78 @@ contract Graviola is ERC721, GraviolaMetadata, GraviolaWell, VRFConsumer, Automa
         addRarity(tokenId, rarity);
         bytes memory input = bytes(fullPrompt);
 
-        // request to ai oracle 
-        aiOracle.requestCallback(1, input, address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
+        // request to ai oracle
+        aiOracle.requestCallback(
+            1,
+            input,
+            address(this),
+            this.receiveOAOCallback.selector,
+            AIORACLE_CALLBACK_GAS_LIMIT
+        );
     }
 
-    function receiveOAOCallback(uint256 /*modelId*/, bytes calldata input, bytes calldata output) external onlyAIOracleCallback {
+    function receiveOAOCallback(
+        uint256 /*modelId*/,
+        bytes calldata input,
+        bytes calldata output
+    ) external onlyAIOracleCallback {
         addPromptResponse(string(input), string(output));
         emit PromptResponse(string(input), string(output));
     }
 
-    function replayOAORequest(uint256 tokenId) public{
+    function replayOAORequest(uint256 tokenId) public {
         Metadata memory data = getMetadata(tokenId);
-        require(!hasPromptResponse2(data.prompt), "prompt has already had response!");
+        require(
+            !hasPromptResponse2(data.prompt),
+            "prompt has already had response!"
+        );
         bytes memory input = bytes(data.prompt);
-        aiOracle.requestCallback(1, input, address(this), this.receiveOAOCallback.selector, AIORACLE_CALLBACK_GAS_LIMIT);
+        aiOracle.requestCallback(
+            1,
+            input,
+            address(this),
+            this.receiveOAOCallback.selector,
+            AIORACLE_CALLBACK_GAS_LIMIT
+        );
     }
 
-
-    function checkUpkeep(bytes calldata) external view override returns (bool upkeepNeeded, bytes memory performData) {
-        if(!VRFRequests.empty()){
+    function checkUpkeep(
+        bytes calldata
+    )
+        external
+        view
+        override
+        returns (bool upkeepNeeded, bytes memory performData)
+    {
+        if (!VRFRequests.empty()) {
             uint256 id = uint256(VRFRequests.front());
-            return (isRandomValueReady(vrfRequests[id].noiseId), abi.encode(uint8(0), id));
+            return (
+                isRandomValueReady(vrfRequests[id].noiseId),
+                abi.encode(uint8(0), id)
+            );
         }
-        if(!OAORequests.empty()){
+        if (!OAORequests.empty()) {
             uint256 id = uint256(OAORequests.front());
-            return (hasPromptResponse(id), abi.encode(uint8(1), id));            
+            return (hasPromptResponse(id), abi.encode(uint8(1), id));
         }
     }
 
     function performUpkeep(bytes calldata performData) external {
         (uint8 op, uint256 id) = abi.decode(performData, (uint8, uint256));
-        if(op == 0) {
+        if (op == 0) {
             pasteRandomValue(id);
             VRFRequests.popFront();
         }
-        if(op == 1) {
+        if (op == 1) {
             savePromptResponseToMetadata(id);
             OAORequests.popFront();
             emit TokenReady(address(0), id);
         }
     }
 
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory){
+    function tokenURI(
+        uint256 tokenId
+    ) public view virtual override returns (string memory) {
         return _tokenURI(tokenId);
     }
 }

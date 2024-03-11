@@ -48,9 +48,6 @@ contract GraviolaWell {
         // WELL_OF_WORDS.push(Word("goblin", 150));
         // WELL_OF_WORDS.push(Word("android", 100));
 
-
-       
-      
         // WELL_OF_WORDS.push(Word("piercing", 20));
         // WELL_OF_WORDS.push(Word("bald", 10));
         // WELL_OF_WORDS.push(Word("tattoo", 30));
@@ -64,23 +61,29 @@ contract GraviolaWell {
     }
 
     function addWordToWell(string memory _keyword, uint256 _seed) public {
-
         // TODO: replace _seed with VRF call
         // Reject if caller does not own at least one NFT
         // Keyword should be no longer than 12 characters
         require(bytes(_keyword).length <= 12 && bytes(_keyword).length > 0);
-        
+
         // Generate a (pseudorandom) probability for the new keyword
         uint256 rand = uint256(keccak256(abi.encodePacked(_seed, msg.sender))); // CHANGE THIS TO VRF
-        uint256 newWordRange = ((rand % ((WELL_OF_WORDS_TOTAL_R - WELL_OF_WORDS_MIN_R) / 10 + 1)) * 10) + WELL_OF_WORDS_MIN_R;
+        uint256 newWordRange = ((rand %
+            ((WELL_OF_WORDS_TOTAL_R - WELL_OF_WORDS_MIN_R) / 10 + 1)) * 10) +
+            WELL_OF_WORDS_MIN_R;
 
         // Add probability sum to totalRarity
         WELL_OF_WORDS_TOTAL_R += newWordRange;
 
-        uint256 newWordLowerRange = WELL_OF_WORDS[WELL_OF_WORDS.length - 1].upperRange + 1;
+        uint256 newWordLowerRange = WELL_OF_WORDS[WELL_OF_WORDS.length - 1]
+            .upperRange + 1;
         uint256 newWordUpperRange = newWordLowerRange + newWordRange;
 
-        Word memory newWord = Word(_keyword, newWordLowerRange, newWordUpperRange);
+        Word memory newWord = Word(
+            _keyword,
+            newWordLowerRange,
+            newWordUpperRange
+        );
         WELL_OF_WORDS.push(newWord);
     }
 
@@ -89,7 +92,10 @@ contract GraviolaWell {
     }
 
     // Converts a fraction to basis points uint256
-    function fractionToBasisPoints(uint256 numerator, uint256 denumerator) internal pure returns (uint256) {
+    function fractionToBasisPoints(
+        uint256 numerator,
+        uint256 denumerator
+    ) internal pure returns (uint256) {
         return (numerator * 100) / denumerator;
     }
 
@@ -114,7 +120,9 @@ contract GraviolaWell {
         }
     }
 
-    function rollWords(uint256 _seed) public view returns (string memory, uint256) {
+    function rollWords(
+        uint256 _seed
+    ) public view returns (string memory, uint256) {
         uint8 keywordAmount = 3;
         uint256 totalProbability;
         string memory result = "";
@@ -126,11 +134,17 @@ contract GraviolaWell {
         uint256 j = 0;
 
         while (i < keywordAmount) {
-
             j++;
 
             uint256 randomNum = uint256(
-                keccak256(abi.encodePacked(_seed, uint256(i + j), msg.sender, block.timestamp))
+                keccak256(
+                    abi.encodePacked(
+                        _seed,
+                        uint256(i + j),
+                        msg.sender,
+                        block.timestamp
+                    )
+                )
             ) % WELL_OF_WORDS_TOTAL_R; // Random number between [0 and totalRarity]
             uint256 randomNumWordRangeIndex = findNearestWordRangeIndex(
                 randomNum
@@ -150,19 +164,28 @@ contract GraviolaWell {
                 randomNumWordRangeIndex
             ].upperRange - WELL_OF_WORDS[randomNumWordRangeIndex].lowerRange;
 
-            bpProbabilities[i] = (fractionToBasisPoints(selectedWordTotalRarity, dynamicRarity));
+            bpProbabilities[i] = (
+                fractionToBasisPoints(selectedWordTotalRarity, dynamicRarity)
+            );
             dynamicRarity -= selectedWordTotalRarity; // Update dynamic rarity
 
             // // Add selected word's range to usedRangeIndices to prevent duplicates.
             usedRangeIndices[i] = int256(randomNumWordRangeIndex);
 
-            result = string(abi.encodePacked(result, (i > 0 ? ", " : ""), WELL_OF_WORDS[randomNumWordRangeIndex].keyword));
-            
+            result = string(
+                abi.encodePacked(
+                    result,
+                    (i > 0 ? ", " : ""),
+                    WELL_OF_WORDS[randomNumWordRangeIndex].keyword
+                )
+            );
+
             i++;
         }
 
-        totalProbability = (bpProbabilities[0] * bpProbabilities[1] * bpProbabilities[2]);
+        totalProbability = (bpProbabilities[0] *
+            bpProbabilities[1] *
+            bpProbabilities[2]);
         return (result, totalProbability);
-
     }
 }
