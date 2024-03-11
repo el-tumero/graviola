@@ -4,27 +4,43 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract GraviolaWell {
+
+    // Internal Word structure
     struct Word {
         string keyword;
         uint256 lowerRange;
         uint256 upperRange;
     }
 
+    // Struct for displaying human-readable info about keywords
+    struct WordStats {
+        string keyword;
+        uint256 rarityPerc;
+    }
+
+    mapping(string => uint256) internal wordMap;
     Word[] public WELL_OF_WORDS;
     uint256 public WELL_OF_WORDS_MIN_R = 10; // Minimum rarity for any keyword
     uint256 public WELL_OF_WORDS_TOTAL_R = 2000; // Collective rarity of all keywords
+    uint256 public KEYWORDS_PER_TOKEN = 3; // How many keywords should be used to roll and generate the image
 
     event RollResult(string result, uint256 rarity);
 
     constructor() {
         // Init base keywords and rarity factors
-
         // Simplified for probability testing
 
         WELL_OF_WORDS.push(Word("human", 0, 999));
+        wordMap["human"] = 0;
+
         WELL_OF_WORDS.push(Word("goblin", 1000, 1249));
+        wordMap["goblin"] = 1;
+
         WELL_OF_WORDS.push(Word("alien", 1250, 1749));
+        wordMap["alien"] = 2;
+
         WELL_OF_WORDS.push(Word("elf", 1750, 2000));
+        wordMap["elf"] = 3;
 
         // WELL_OF_WORDS.push(Word("human", 0, 999));
         // WELL_OF_WORDS.push(Word("elf", 1000, 1249));
@@ -85,6 +101,19 @@ contract GraviolaWell {
             newWordUpperRange
         );
         WELL_OF_WORDS.push(newWord);
+    }
+
+    /// @notice We're estimating the word's probability with this equation: 1 - (1 - P)^n, 
+    /// @notice Where `P` is the probability of target keyword in a single keyword roll and `n` is the KEYWORDS_PER_TOKEN value.
+    function calculateEstimatedWordRarityPerc(string memory _keyword) public view returns (uint256) {
+
+        uint rawKeywordRange = WELL_OF_WORDS[wordMap[_keyword]].upperRange - WELL_OF_WORDS[wordMap[_keyword]].lowerRange;
+        uint maxProbabilityPerc = 100;
+        uint maxProbabilityInBp = 1000000; // 100 perc in BP
+        uint singleRollProbabilityInBP = maxProbabilityPerc - fractionToBasisPoints(rawKeywordRange, WELL_OF_WORDS_TOTAL_R);
+        uint totalRollProbabilityInBP = singleRollProbabilityInBP ** KEYWORDS_PER_TOKEN;
+        uint res = maxProbabilityInBp - totalRollProbabilityInBP;
+        return res;
     }
 
     function getAllWords() public view returns (Word[] memory) {
