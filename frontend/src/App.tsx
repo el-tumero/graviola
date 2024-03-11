@@ -9,6 +9,7 @@ import { NFT } from "./types/NFT"
 import { Keyword } from "./types/Keyword"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
+import { useRouteError } from "react-router-dom"
 
 export const GRAVIOLA_CONTRACT_ADDRESS = "0xf378b8be1b54CCaD85298e76E5ffDdA03ef1A89B"
 

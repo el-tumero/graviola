@@ -8,15 +8,14 @@ import { NFT } from "../types/NFT"
 import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
-import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
+// import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
+// import { ethers } from "ethers"
 import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
-import { ethers } from "ethers"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
-import { getRarityBorder, getRarityColor } from "../utils/getRarityBorder"
-import { RarityLevel } from "../types/Rarity"
+import { getRarityColor } from "../utils/getRarityBorder"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
