@@ -125,26 +125,26 @@ const Generate = () => {
 
             <ContentContainer additionalClasses="flex-col gap-4">
 
-
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
 
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
 
                     {/* Img container */}
-                    <GenerateContainer imgSrc={nftImg} isPulsating={!isConnected} isGenerating={(progressState !== "NONE" && progressState !== "DONE")} />
+                    <GenerateContainer resImg={nftImg} resRarity={getRarityFromThreshold(nftImgR)[0]} isPulsating={!isConnected} isGenerating={(progressState !== "NONE" && progressState !== "DONE")} />
 
                     {/* Progress bar */}
                     {(progressBarVal !== 0) &&
-                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border animate-pulse`}>
+                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border`}>
                             <div style={{ width: `${progressBarVal}%`}} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
                         </div>
                     }
 
                     {/* State/Progress text */}
-                    {progressState === "DONE" ?
-                        <NftResultText imgRarityPerc={nftImgR} />
+                    {progressState === "DONE"
+                        ?
+                            <NftResultText imgRarityPerc={nftImgR} />
                         :
-                        <span>{progressMessage}</span>
+                            <span>{progressMessage}</span>
                     }
 
                     {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
