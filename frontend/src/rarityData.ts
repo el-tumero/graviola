@@ -13,7 +13,7 @@ export const rarities: Record<RarityLevel, RarityData> = {
     [RarityLevel.Common]: {
         name: "Common",
         threshold: 30,
-        color: "rgba(82, 82, 91, 0.8)",
+        color: "rgba(132, 132, 148, 0.8)",
     },
     [RarityLevel.Uncommon]: {
         name: "Uncommon",

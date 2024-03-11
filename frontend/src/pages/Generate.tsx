@@ -134,7 +134,7 @@ const Generate = () => {
 
                     {/* Progress bar */}
                     {(progressBarVal !== 0) &&
-                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border`}>
+                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border shadow-inner`}>
                             <div style={{ width: `${progressBarVal}%`}} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
                         </div>
                     }
