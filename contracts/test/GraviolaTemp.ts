@@ -6,8 +6,7 @@ import {
   import { AbiCoder, EventLog } from "ethers"
   import { randomBytes } from "crypto";
   
-  describe("GraviolaTemp", function () {
-  
+describe("GraviolaTemp", function () { 
     async function deployFixture() {
       const [owner, otherAccount] = await ethers.getSigners()
   
@@ -24,17 +23,14 @@ import {
     }
   
     describe("Tests", function () {
-        it("Test", async() => {
+        it("Mint one NFT", async() => {
             const {graviola, aiOracle} = await deployFixture()
-            
-            const preMintTx = await graviola.preMint()
-            await preMintTx.wait()
-
-            const upkeepData = await graviola.checkUpkeep(Uint8Array.from([0]))
-            console.log(upkeepData)
-        })    
-
-  
+            const mintTx = await graviola.mint()
+            await mintTx.wait()
+            const aiTx = await aiOracle.invokeCallback(0n, new TextEncoder().encode("hello!"))
+            await aiTx.wait()
+            console.log(await graviola.getMetadata(0n))
+        }) 
     })
   })
   

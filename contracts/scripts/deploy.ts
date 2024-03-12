@@ -5,7 +5,7 @@ import { ethers } from "hardhat";
 async function main() {
   const [acc0] = await ethers.getSigners()
 
-  const aiOracleAddress = "0xb880d47d3894d99157b52a7f869ab3b1e2d4349d"
+  const aiOracleAddress = "0x0A0f4321214BB6C7811dD8a71cF587bdaF03f0A0"
   // const linkAddress = "0x779877a7b0d9e8603169ddbd7836e478b4624789"
   const vrfHostAddress = "0x20f6ade65F4416d4bA64113191c373766bfea0E4"
   

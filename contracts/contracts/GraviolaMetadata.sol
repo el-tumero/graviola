@@ -64,7 +64,7 @@ contract GraviolaMetadata {
         return promptsStorage[prompt].exists;
     }
 
-    function addImage(uint256 tokenId, string memory image) private {
+    function addImage(uint256 tokenId, string memory image) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].image = image;
         metadataStorage[tokenId].filled = true;
