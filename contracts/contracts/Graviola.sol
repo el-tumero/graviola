@@ -143,6 +143,7 @@ contract Graviola is
         require(oaoRequestsStatus[requestId] == OAORequestStatus.EXISTENT);
         uint256 tokenId = abi.decode(callbackData, (uint256));
         addImage(tokenId, string(output));
+        oaoRequestsStatus[requestId] = OAORequestStatus.DONE;
         emit TokenReady(ownerOf(tokenId), tokenId);
     }
 
