@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
 contract GraviolaWell {
-
     // Internal Word structure
     struct Word {
         string keyword;
@@ -76,6 +75,8 @@ contract GraviolaWell {
         // WELL_OF_WORDS.push(Word("yellow", 200));
     }
 
+    /// @notice Add a new keyword to the pool (well) of possible keywords.
+    /// @notice The rarity of new keywords is chosen randomly.
     function addWordToWell(string memory _keyword, uint256 _seed) public {
         // TODO: replace _seed with VRF call
         // Reject if caller does not own at least one NFT
@@ -91,8 +92,8 @@ contract GraviolaWell {
         // Add probability sum to totalRarity
         WELL_OF_WORDS_TOTAL_R += newWordRange;
 
-        uint256 newWordLowerRange = WELL_OF_WORDS[WELL_OF_WORDS.length - 1]
-            .upperRange + 1;
+        Word memory currentLastWord = WELL_OF_WORDS[WELL_OF_WORDS.length - 1];
+        uint256 newWordLowerRange = currentLastWord.upperRange + 1;
         uint256 newWordUpperRange = newWordLowerRange + newWordRange;
 
         Word memory newWord = Word(
@@ -100,27 +101,43 @@ contract GraviolaWell {
             newWordLowerRange,
             newWordUpperRange
         );
+        wordMap[_keyword] = (WELL_OF_WORDS.length);
         WELL_OF_WORDS.push(newWord);
     }
 
-    /// @notice We're estimating the word's probability with this equation: 1 - (1 - P)^n, 
+    /// @notice We're estimating the word's probability with this equation: 1 - (1 - P)^n,
     /// @notice Where `P` is the probability of target keyword in a single keyword roll and `n` is the KEYWORDS_PER_TOKEN value.
-    function calculateEstimatedWordRarityPerc(string memory _keyword) public view returns (uint256) {
-
-        uint rawKeywordRange = WELL_OF_WORDS[wordMap[_keyword]].upperRange - WELL_OF_WORDS[wordMap[_keyword]].lowerRange;
+    function calculateEstimatedWordRarityPerc(
+        string memory _keyword
+    ) public view returns (uint256) {
+        uint rawKeywordRange = WELL_OF_WORDS[wordMap[_keyword]].upperRange -
+            WELL_OF_WORDS[wordMap[_keyword]].lowerRange;
         uint maxProbabilityPerc = 100;
         uint maxProbabilityInBp = 1000000; // 100 perc in BP
-        uint singleRollProbabilityInBP = maxProbabilityPerc - fractionToBasisPoints(rawKeywordRange, WELL_OF_WORDS_TOTAL_R);
-        uint totalRollProbabilityInBP = singleRollProbabilityInBP ** KEYWORDS_PER_TOKEN;
+        uint singleRollProbabilityInBP = maxProbabilityPerc -
+            fractionToBasisPoints(rawKeywordRange, WELL_OF_WORDS_TOTAL_R);
+        uint totalRollProbabilityInBP = singleRollProbabilityInBP **
+            KEYWORDS_PER_TOKEN;
         uint res = maxProbabilityInBp - totalRollProbabilityInBP;
         return res;
     }
 
-    function getAllWords() public view returns (Word[] memory) {
+    function getWellOfWords() public view returns (Word[] memory) {
         return WELL_OF_WORDS;
     }
 
-    // Converts a fraction to basis points uint256
+    function getAllWords() public view returns (WordStats[] memory) {
+        WordStats[] memory res = new WordStats[](WELL_OF_WORDS.length);
+        for (uint i = 0; i < WELL_OF_WORDS.length; i++) {
+            Word memory word = WELL_OF_WORDS[i];
+            uint prob = calculateEstimatedWordRarityPerc(word.keyword);
+            WordStats memory wordStats = WordStats(word.keyword, prob);
+            res[i] = wordStats;
+        }
+        return res;
+    }
+
+    /// @notice Convert a fraction to basis points uint256
     function fractionToBasisPoints(
         uint256 numerator,
         uint256 denumerator
