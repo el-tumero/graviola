@@ -5,7 +5,6 @@ import "./IAIOracle.sol";
 
 /// @notice A base contract for writing a AIOracle app
 abstract contract AIOracleCallbackReceiver {
-
     // Address of the AIOracle contract
     IAIOracle public immutable aiOracle;
 
@@ -25,7 +24,7 @@ abstract contract AIOracleCallbackReceiver {
         }
     }
 
-    /// @notice Verify this is a callback by the aiOracle contract 
+    /// @notice Verify this is a callback by the aiOracle contract
     modifier onlyAIOracleCallback() {
         _verifyMessageSource();
         _;

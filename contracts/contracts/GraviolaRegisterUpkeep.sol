@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
 
-
 struct RegistrationParams {
     string name;
     bytes encryptedEmail;
@@ -43,5 +42,3 @@ contract GraviolaRegisterUpkeep {
         emit UpkeepRegistered(upkeepID);
     }
 }
-
-
