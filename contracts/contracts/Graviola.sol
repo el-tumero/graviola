@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import "./GraviolaMetadata.sol";
 import "./AIOracleCallbackReceiver.sol";
 import "./GraviolaWell.sol";
+import "./GraviolaNonFungible.sol";
 import "./VRFConsumer.sol";
 
 // Uncomment this line to use console.log
@@ -14,7 +15,7 @@ import "hardhat/console.sol";
 
 /// @notice A base contract for Graviola non-fungible token
 contract Graviola is
-    ERC721,
+    GraviolaNonFungible,
     GraviolaMetadata,
     GraviolaWell,
     VRFConsumer,
@@ -63,8 +64,6 @@ contract Graviola is
     // is equal to the id of the next VRF request
     uint256 private _nextVrfReqId;
 
-    // mapping for tokens owned by address (user)
-    mapping(address => uint256[]) private _ownedTokens;
 
     /// @notice creates the ERC-721 token contract that uses verifiable randomness and on-chain AI oracles
     /// @param aiOracle address of the on-chain AI oracle contract
@@ -74,6 +73,7 @@ contract Graviola is
         address vrfHost
     )
         ERC721("Graviola", "GRV")
+        GraviolaNonFungible()
         GraviolaWell()
         VRFConsumer(vrfHost)
         AIOracleCallbackReceiver(IAIOracle(aiOracle))
@@ -95,7 +95,7 @@ contract Graviola is
         require(!vrfRequests[reqId].done, "request has already been processed");
 
         // uint256 randomValue = readNoise(vrfRequests[reqId].noiseId);
-        uint256 randomValue = 0;
+        uint256 randomValue = uint256(blockhash(block.number)); // temp option
         vrfRequests[reqId].done = true;
 
         // mints nft
@@ -189,31 +189,6 @@ contract Graviola is
         _nextTokenId++; 
     }
 
-    function _update(address to, uint256 tokenId, address auth) internal virtual override returns (address) {
-        address previousOwner = super._update(to, tokenId, auth);
-
-        if(to != address(0)) _ownedTokens[to].push(tokenId);
-        return previousOwner;
-    }
-
-
-
-    function ownedTokens(address addr) public view returns (uint256[] memory output){
-        uint256[] memory buffer = new uint256[](_ownedTokens[addr].length);
-        uint256 j = 0;
-        for (uint i = 0; i < _ownedTokens[addr].length; i++) {
-            uint256 tokenId = _ownedTokens[addr][i];
-            if(_ownerOf(tokenId) == addr){
-                buffer[j] = tokenId;
-                j++;
-            }
-        }
-        output = new uint256[](j);
-        for (uint i = 0; i < j; i++) {
-            output[i] = buffer[i];
-        }
-    }
-
     function burn(uint256 tokenId) external {
         _burn(tokenId);
     } 
@@ -222,4 +197,6 @@ contract Graviola is
     function tokenURI(uint256 tokenId) public view virtual override returns (string memory){
         return _tokenURI(tokenId);
     }
+
+    // function _update() internal override virtual{}
 }
