@@ -1,4 +1,3 @@
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
@@ -15,10 +14,7 @@ interface IAIOracle {
     );
 
     /// @notice Event emitted when the result is uploaded or update.
-    event AICallbackResult(
-        uint256 requestId,
-        bytes output
-    );
+    event AICallbackResult(uint256 requestId, bytes output);
 
     function requestCallback(
         uint256 modelId,
