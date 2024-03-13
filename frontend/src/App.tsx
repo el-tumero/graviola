@@ -10,7 +10,7 @@ import { Keyword } from "./types/Keyword"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 
-export const GRAVIOLA_CONTRACT_ADDRESS = "0xf378b8be1b54CCaD85298e76E5ffDdA03ef1A89B"
+export const GRAVIOLA_CONTRACT_ADDRESS = "0x037D6C9571823aCFbEB634220C39A56FE97f5e01"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -60,8 +60,9 @@ const App = (props: { children: ReactNode }) => {
 
             const allKeywords = await graviola.getAllWords()
             console.log("getAllWords: ", allKeywords)
-            const promises = Array.from({ length: allKeywords.length }, async (_, i) => {
+            const promises = Array.from({ length: 3 }, async (_, i) => { // TODO: Change the "3" to result of "totalSupply" function from contracts.
                 const uri = await graviola.tokenURI(BigInt(i))
+                console.log("uri ", uri)
                 const response = await fetch(uri)
                 return response.json()
             })

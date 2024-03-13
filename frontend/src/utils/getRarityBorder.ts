@@ -1,9 +1,8 @@
 import { RarityLevel } from "../types/Rarity";
 import { rarities, rarityScale } from "../rarityData";
 
-
-export function getRarityColor(rarityLevel: RarityLevel): React.CSSProperties {
-    return { color: rarities[rarityLevel].color }
+export function getRarityColor(rarityLevel: RarityLevel): string {
+    return rarities[rarityLevel].color
 }
 
 export function getRarityBorder(rarityLevel: RarityLevel): React.CSSProperties {

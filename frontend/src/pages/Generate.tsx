@@ -16,6 +16,7 @@ import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { getRarityColor } from "../utils/getRarityBorder"
+import RarityBubble from "../components/ui/RarityBubble"
 
 const abi = [
     "event RequestSent(uint256 requestId)",
@@ -28,7 +29,7 @@ const NftResultText = (props: { imgRarityPerc: number }) => {
     const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
     return (
         <p>{`Congratulations! You rolled a `}
-            <span style={getRarityColor(rarityLevel)} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
+            <span style={{ color: getRarityColor(rarityLevel) }} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
         </p>
     )
 }
@@ -138,9 +139,9 @@ const Generate = () => {
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
                     <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
                         {contractKeywords.map((keyword: Keyword, i) => (
-                            <div key={i} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
+                            <div key={i} className="flex justify-center items-center gap-1 bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl">
+                                <RarityBubble rarity={getRarityFromThreshold(keyword.rarityPerc)[0]} />
                                 <span>{keyword.name}</span>
-                                <span>{keyword.rarityPerc}</span>
                             </div>
                         ))}
                     </div>

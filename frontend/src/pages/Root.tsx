@@ -88,11 +88,11 @@ function Root() {
                     />
                     <NFTDetails
                         nftProps={{
-                            src: convertToIfpsURL(nftSources[3].image),
+                            src: convertToIfpsURL(nftSources[2].image),
                             glow: true,
-                            rarityLevel: RarityLevel.VeryRare,
+                            rarityLevel: RarityLevel.Uncommon,
                         }}
-                        upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.VeryRare} />}
+                        upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.Uncommon} />}
                         lowerBubbleChildren={<NFTDetailsLower metadata={nftSources[0].attributes} />}
                     />
 
@@ -109,7 +109,7 @@ function Root() {
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
                                 <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
-                                    <p className='font-bold' style={getRarityColor(rarityLevel as RarityLevel)}>{rarities[rarityLevel as RarityLevel].name}</p>
+                                    <p className='font-bold' style={{color: getRarityColor(rarityLevel as RarityLevel)}}>{rarities[rarityLevel as RarityLevel].name}</p>
                                     <span className='font-bold'>
                                         {getRarityPercentageString(rarityLevel as RarityLevel)}
                                     </span>
@@ -150,7 +150,7 @@ function Root() {
 
 const NFTDetailsUpper = (props: { rarity: RarityLevel }) => {
     return (
-        <p className='font-semibold'>Rarity: <span className='font-bold' style={getRarityColor(props.rarity)}>{rarities[props.rarity].name.toUpperCase()}</span></p>
+        <p className='font-semibold'>Rarity: <span className='font-bold' style={{color: getRarityColor(props.rarity)}}>{rarities[props.rarity].name.toUpperCase()}</span></p>
     )
 }
 
