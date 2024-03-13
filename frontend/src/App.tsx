@@ -59,6 +59,7 @@ const App = (props: { children: ReactNode }) => {
         const fetchCollection = async () => {
 
             const allKeywords = await graviola.getAllWords()
+            console.log("getAllWords: ", allKeywords)
             const promises = Array.from({ length: allKeywords.length }, async (_, i) => {
                 const uri = await graviola.tokenURI(BigInt(i))
                 const response = await fetch(uri)
@@ -72,8 +73,10 @@ const App = (props: { children: ReactNode }) => {
 
             // Keywords
             allKeywords.map((keywordData) => {
+                console.log(Number(keywordData[1]))
                 const keyword: Keyword = {
                     name: keywordData[0],
+                    rarityPerc: Number(keywordData[1]),
                 }
                 setKeywords(prev => [...prev, keyword])
             })

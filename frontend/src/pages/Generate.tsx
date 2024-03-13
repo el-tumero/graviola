@@ -140,6 +140,7 @@ const Generate = () => {
                         {contractKeywords.map((keyword: Keyword, i) => (
                             <div key={i} className="bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl text-center">
                                 <span>{keyword.name}</span>
+                                <span>{keyword.rarityPerc}</span>
                             </div>
                         ))}
                     </div>
