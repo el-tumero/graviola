@@ -132,11 +132,7 @@ contract Graviola is
             AIORACLE_CALLBACK_GAS_LIMIT,
             abi.encode(tokenId)
         );
-
-
-
         oaoRequestsStatus[requestId] = OAORequestStatus.EXISTENT;
-        
     }
 
     function aiOracleCallback(uint256 requestId, bytes calldata output, bytes calldata callbackData) external override onlyAIOracleCallback {
@@ -147,13 +143,15 @@ contract Graviola is
         emit TokenReady(ownerOf(tokenId), tokenId);
     }
 
-  
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory){
-        return _tokenURI(tokenId);
-    }
-
     function estimateFee() public view returns(uint256){
         return aiOracle.estimateFee(AIORACLE_MODEL_ID, AIORACLE_CALLBACK_GAS_LIMIT);
     }
 
+    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+        return _tokenURI(tokenId);
+    }
+
+    function totalSupply() public view returns (uint256) {
+        return _nextTokenId;
+    }
 }

@@ -14,27 +14,14 @@ contract GraviolaMetadata {
         bool filled;
     }
 
-    struct PromptsResponse {
-        string response;
-        bool exists;
-    }
-
     mapping(uint256 => Metadata) private metadataStorage;
-    mapping(string => PromptsResponse) private promptsStorage;
-    string internal constant promptBase =
-        "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
+    string internal constant promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
-    // DEBUG function - must be removed after local tests
-    // function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
-    //     metadataStorage[tokenId] = Metadata(image, prompt, 25, true);
-    // }
 
     // NOTE: addRarity() should be called after this func
     function addPrompt(uint256 tokenId, string memory prompt) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].prompt = prompt;
-        // NOTE: low probability of failure of this mechanism
-        // if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
     }
 
     // NOTE: requestCallback() should be called after this func
@@ -43,62 +30,23 @@ contract GraviolaMetadata {
         metadataStorage[tokenId].rarity = rarity;
     }
 
-    // NOTE: should be exec in OAO callback
-    function addPromptResponse(
-        string memory prompt,
-        string memory response
-    ) internal {
-        promptsStorage[prompt].response = response;
-        promptsStorage[prompt].exists = true;
-    }
-
-    // NOTE: should be exec in checkUpkeep
-    function hasPromptResponse(uint256 tokenId) internal view returns (bool) {
-        string memory prompt = metadataStorage[tokenId].prompt;
-        return promptsStorage[prompt].exists;
-    }
-
-    function hasPromptResponse2(
-        string memory prompt
-    ) internal view returns (bool) {
-        return promptsStorage[prompt].exists;
-    }
-
+    /// @notice Adds image cid to metadata for the token with given tokenId
+    /// @param tokenId id of the token
+    /// @param image cid
     function addImage(uint256 tokenId, string memory image) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].image = image;
         metadataStorage[tokenId].filled = true;
     }
 
-    // NOTE: should be exec in performUpkeep
-    function savePromptResponseToMetadata(uint256 tokenId) internal {
-        string memory prompt = metadataStorage[tokenId].prompt;
-        require(
-            promptsStorage[prompt].exists,
-            "Prompt response does not exists!"
-        );
-        addImage(tokenId, promptsStorage[prompt].response);
-    }
 
-    function readPromptResponse(
-        string calldata prompt
-    ) external view returns (string memory) {
-        return promptsStorage[prompt].response;
-    }
-
-    function getMetadata(
-        uint256 tokenId
-    ) public view returns (Metadata memory) {
+    function getMetadata(uint256 tokenId) public view returns (Metadata memory) {
         return metadataStorage[tokenId];
     }
 
     // -- conversions --
 
-    function generateJSON(
-        string memory image,
-        string memory prompt,
-        uint256 rarity
-    ) private pure returns (string memory) {
+    function generateJSON(string memory image, string memory prompt, uint256 rarity) private pure returns (string memory) {
         JsonWriter.Json memory writer;
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("image", image);
@@ -114,9 +62,7 @@ contract GraviolaMetadata {
         return writer.value;
     }
 
-    function convertToBase64URL(
-        bytes memory data
-    ) private pure returns (string memory) {
+    function convertToBase64URL(bytes memory data) private pure returns (string memory) {
         return
             string(
                 abi.encodePacked(
