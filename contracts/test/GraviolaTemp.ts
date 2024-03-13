@@ -25,11 +25,12 @@ describe("GraviolaTemp", function () {
     describe("Tests", function () {
         it("Mint one NFT", async() => {
             const {graviola, aiOracle} = await deployFixture()
-            const mintTx = await graviola.mint()
+            const mintTx = await graviola.mint({value: 10001n})
             await mintTx.wait()
             const aiTx = await aiOracle.invokeCallback(0n, new TextEncoder().encode("hello!"))
             await aiTx.wait()
             console.log(await graviola.getMetadata(0n))
+            expect(await graviola.totalSupply()).to.be.eq(1n)
         }) 
     })
   })
