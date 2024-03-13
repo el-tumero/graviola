@@ -7,7 +7,9 @@ async function main() {
   const [acc0] = await ethers.getSigners()
   const graviola = await ethers.getContractAt("Graviola", GRAVIOLA_ADDRESS)
 
-  const tx = await graviola.requestMint()
+  const fee = await graviola.estimateFee()
+
+  const tx = await graviola.mint({value: fee + 12000n})
   const recp = (await tx.wait())!
   console.log(recp.logs)
 
