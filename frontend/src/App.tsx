@@ -43,7 +43,6 @@ const App = (props: { children: ReactNode }) => {
     const [keywords, setKeywords] = useState<Keyword[]>([])
 
     // Web3 stuff
-    // const { isConnected } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
     
     const graviolaContextValue = {
