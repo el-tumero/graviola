@@ -88,7 +88,7 @@ function Root() {
                     />
                     <NFTDetails
                         nftProps={{
-                            src: convertToIfpsURL(nftSources[2].image),
+                            src: convertToIfpsURL(nftSources[0].image),
                             glow: true,
                             rarityLevel: RarityLevel.Uncommon,
                         }}
