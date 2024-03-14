@@ -112,19 +112,14 @@ contract GraviolaWell {
 
     /// @notice We're estimating the word's probability with this equation: 1 - (1 - P)^n,
     /// @notice Where `P` is the probability of target keyword in a single keyword roll and `n` is the KEYWORDS_PER_TOKEN value.
-    function calculateEstimatedWordRarityPerc(
-        string memory _keyword
-    ) public view returns (uint256) {
-        uint rawKeywordRange = WELL_OF_WORDS[wordMap[_keyword]].upperRange -
-            WELL_OF_WORDS[wordMap[_keyword]].lowerRange;
-        uint maxProbabilityPerc = 100;
-        uint maxProbabilityInBp = 1000000; // 100 perc in BP
-        uint singleRollProbabilityInBP = maxProbabilityPerc -
-            fractionToBasisPoints(rawKeywordRange, WELL_OF_WORDS_TOTAL_R);
-        uint totalRollProbabilityInBP = singleRollProbabilityInBP **
-            KEYWORDS_PER_TOKEN;
-        uint res = maxProbabilityInBp - totalRollProbabilityInBP;
-        return res;
+    function calculateEstimatedWordRarityPerc(string memory _keyword) public view returns (uint256) {
+        uint rawKeywordRange = WELL_OF_WORDS[wordMap[_keyword]].upperRange - WELL_OF_WORDS[wordMap[_keyword]].lowerRange;
+        // (1-P) operation; for greater division precision, the number 10_000 is used 
+        uint singleRollProbability = 10_000 - ((rawKeywordRange*10_000)/WELL_OF_WORDS_TOTAL_R);
+        // (1-P)^n
+        uint totalRollProbability = singleRollProbability ** KEYWORDS_PER_TOKEN;
+        // 1 - (1-P)^n operation; 1e12 = (10_000)^3; 1e6 is used to decrease precision of the result
+        return (1e12 - totalRollProbability) / 1e6;
     }
 
     function getWellOfWords() public view returns (Word[] memory) {

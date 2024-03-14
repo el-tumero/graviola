@@ -12,7 +12,7 @@ describe("Graviola Well", function () {
         return { graviolaWell, owner, otherAccount };
     }
 
-    it("Test", async () => {
+    it("Random word squence", async () => {
         const { graviolaWell } = await deployFixture()
 
         console.log("generating random uint256...")
@@ -22,6 +22,12 @@ describe("Graviola Well", function () {
         const res = await graviolaWell.rollWords(input)
 
         console.log(res)
+    })
+
+    it("Check words probability", async () => {
+        const { graviolaWell } = await deployFixture()
+        const result = await graviolaWell.getAllWords()
+        console.log(result)
     })
 
 });

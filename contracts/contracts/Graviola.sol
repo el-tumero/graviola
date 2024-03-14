@@ -23,10 +23,10 @@ contract Graviola is
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
     /// @notice Mint is emitted when the account calls mint()
-    event Mint(address addr, uint256 requestId);
+    event Mint(address addr, uint256 tokenId);
 
     /// @notice PromptRequest is emitted when the request is sent to AIOracle
-    event PromptRequest(string input);
+    event PromptRequest(uint256 tokenId, string keywords, uint256 rarity);
 
     /// @notice PromptResponse is emitted when the response is written to the contract using its callback function (receiveOAOCallback)
     event PromptResponse(string input, string output);
@@ -133,6 +133,7 @@ contract Graviola is
             abi.encode(tokenId)
         );
         oaoRequestsStatus[requestId] = OAORequestStatus.EXISTENT;
+        emit PromptRequest(tokenId, prompt, rarity);
     }
 
     function aiOracleCallback(uint256 requestId, bytes calldata output, bytes calldata callbackData) external override onlyAIOracleCallback {
