@@ -10,7 +10,7 @@ import { Keyword } from "./types/Keyword"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 
-export const GRAVIOLA_CONTRACT_ADDRESS = "0x037D6C9571823aCFbEB634220C39A56FE97f5e01"
+export const GRAVIOLA_CONTRACT_ADDRESS = "0x97964891B8a9d2c0431cDBfb8b433bfE1D683585"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -58,22 +58,22 @@ const App = (props: { children: ReactNode }) => {
         const fetchCollection = async () => {
 
             const allKeywords = await graviola.getAllWords()
-            console.log("getAllWords: ", allKeywords)
-            const promises = Array.from({ length: 3 }, async (_, i) => { // TODO: Change the "3" to result of "totalSupply" function from contracts.
+            const nftTotalSupply = await graviola.totalSupply()
+            console.log("[info] getAllWords: ", allKeywords)
+            console.log("[info] totalSupply: ", Number(nftTotalSupply))
+            const promises = Array.from({ length: Number(nftTotalSupply) }, async (_, i) => { // TODO: Change the "3" to result of "totalSupply" function from contracts.
                 const uri = await graviola.tokenURI(BigInt(i))
-                console.log("uri ", uri)
                 const response = await fetch(uri)
                 return response.json()
             })
             
             // Nfts
             const collection = await Promise.all(promises)
-            console.log("fetched collection ", collection)
+            console.log("[info] fetched collection ", collection)
             setCollection(prev => [...prev, ...collection])
 
             // Keywords
             allKeywords.map((keywordData) => {
-                console.log(Number(keywordData[1]))
                 const keyword: Keyword = {
                     name: keywordData[0],
                     rarityPerc: Number(keywordData[1]),

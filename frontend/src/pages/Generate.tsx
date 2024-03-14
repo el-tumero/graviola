@@ -8,8 +8,6 @@ import { NFT } from "../types/NFT"
 import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
-// import { GRAVIOLA_CONTRACT_ADDRESS } from "../App"
-// import { ethers } from "ethers"
 import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/SectionTitle"
@@ -17,13 +15,8 @@ import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { getRarityColor } from "../utils/getRarityBorder"
 import RarityBubble from "../components/ui/RarityBubble"
-
-const abi = [
-    "event RequestSent(uint256 requestId)",
-    "event Transfer(address from, address to, uint tokenId)",
-    "event PromptResponse(string input, string output)",
-    "event TokenReady(uint256 tokenId)"
-]
+import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
+import { ethers } from "ethers"
 
 const NftResultText = (props: { imgRarityPerc: number }) => {
     const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
@@ -51,73 +44,44 @@ const Generate = () => {
     const [progressMessage, setProgressMessage] = useState<string>(nftCreationStatusMessages["NONE"])
     const [progressBarVal, setProgressBarVal] = useState<number>(0)
 
-    const simulateGenerationProcess = async () => {
+    // Generation state listener
+    const progressListener = () => {
+        if(!walletProvider) return
+        const graviola = graviolaContext.contract as Graviola
 
-        const PROGRESS_BAR_CLEANUP_TIMEOUT_MS = 1500
+        const onRequestSent = (requestId: number) => {
+            console.log(`reqId: ${requestId}`)
+        }
 
-        setProgressState("BEFORE_MINT")
-        setProgressBarVal(3)
-        await new Promise((resolve) => setTimeout(resolve, 4000))
+        const onTransfer = (from: string, to: string, tokenId: number) => {
+            console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
+        }
 
-        setProgressState("MINTED")
-        setProgressBarVal(25)
-        await new Promise((resolve) => setTimeout(resolve, 4000))
+        const onPromptResponse = (input: number, output: number) => {
+            console.log("promptResponse: ", input, output)
+        }
 
-        setProgressState("WAIT_IMAGE")
-        setProgressBarVal(75)
-        await new Promise((resolve) => setTimeout(resolve, 4000))
+        const onTokenReady = (tokenId: number) => {
+            console.log("token ready! id: ", tokenId)
+        }
 
-        setProgressState("DONE")
-        setProgressBarVal(100)
+        graviola.on("PromptRequest", onRequestSent);
+        graviola.on("Transfer", onTransfer);
+        graviola.on("PromptResponse", onPromptResponse);
+        graviola.on("TokenReady", onTokenReady);
 
-        // Cleanup progress bar
-        setTimeout(() => {
-            setProgressBarVal(0)
-        }, PROGRESS_BAR_CLEANUP_TIMEOUT_MS)
+        return () => {
+            graviola.off("PromptRequest", onRequestSent);
+            graviola.off("Transfer", onTransfer);
+            graviola.off("PromptResponse", onPromptResponse);
+            graviola.off("TokenReady", onTokenReady);
+        };
 
-        console.log("done ", contractNFTs[0].image)
-        setNftImg(convertToIfpsURL(contractNFTs[0].image))
-        setNftImgR(22)
     }
 
-    // Progress Msg based on state updater
     useEffect(() => {
-        setProgressMessage(nftCreationStatusMessages[progressState])
-    }, [progressState])
-
-    // NOTE: Current listener is leaking somewhere, causes high CPU usage(!)
-    // const progressListener = () => {
-
-    //     const address = GRAVIOLA_CONTRACT_ADDRESS
-    //     if(!walletProvider) return
-    //     const provider = new ethers.providers.Web3Provider(walletProvider)
-    //     const graviolaEvents = new ethers.Contract(address, abi, provider.getSigner())
-    //     console.log(graviolaEvents)
-
-    //     graviolaEvents.on("RequestSent", (requestId) => {
-    //         console.log(`reqId: ${requestId}`)
-    //     })
-
-    //     graviolaEvents.on("Transfer", (from, to, tokenId) => {
-    //         console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
-    //     })
-
-    //     graviolaEvents.on("PromptResponse", (input, output) => {
-    //         console.log("promptResponse: ", input, output)
-    //     })
-
-    //     graviolaEvents.on("TokenReady", (tokenId) => {
-    //         console.log("token ready! id: ", tokenId)
-    //     })
-
-    // }
-
-    // useEffect(() => {
-    //     console.log("init progressChange listener")
-    //     // window.addEventListener("progressChange", progressListener)
-    //     progressListener()
-    //     // return window.removeEventListener("progressChange", progressListener)
-    // }, [walletProvider])
+        progressListener()
+    }, [])
 
     return (
         <FullscreenContainer>
@@ -148,8 +112,9 @@ const Generate = () => {
                     }
 
                     {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
-                        // graviolaContext.contract?.requestMint()
-                        simulateGenerationProcess()
+                        graviolaContext.contract?.mint({
+                            gasLimit: ethers.utils.hexlify(2500000)
+                        })
                     }} />}
 
                 </div>
