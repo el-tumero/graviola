@@ -2,9 +2,9 @@ import FullscreenContainer from "../components/ui/FullscreenContainer";
 import ContentContainer from "../components/ui/ContentContainer";
 import Navbar from "../components/Navbar";
 import { useContext } from "react";
+import { createWeb3Modal, defaultConfig, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react'
 import { GraviolaContext } from "../contexts/GraviolaContext";
 import { NFT } from "../types/NFT";
-import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
 import SectionTitle from "../components/ui/SectionTitle";
 
 const Collection = () => {

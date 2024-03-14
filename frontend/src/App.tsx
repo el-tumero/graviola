@@ -1,32 +1,32 @@
 import "./App.css"
 import { useEffect, useState, ReactNode } from 'react'
-import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal/ethers5/react'
-import { ethers } from 'ethers'
-import GraviolaAbi from "../../contracts/artifacts/contracts/Graviola.sol/Graviola.json"
-import { Graviola } from '../../contracts/typechain-types/contracts/Graviola'
+import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal/ethers/react'
+import { ethers, BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers'
+import { Graviola } from "../../contracts/typechain-types/contracts/Graviola"
+// import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-v5/factories/Graviola__factory"
+import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/contracts/Graviola__factory"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import { Keyword } from "./types/Keyword"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-
-export const GRAVIOLA_CONTRACT_ADDRESS = "0x97964891B8a9d2c0431cDBfb8b433bfE1D683585"
+import { GRAVIOLA_ADDRESS } from "../../contracts/scripts/constants"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[readonly] connecting to contract...")
-    const provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
-    const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, provider)
+    const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
+    const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
     console.log("[readonly] connected")
     return graviola as unknown as Graviola
 }
 
 // Conn to contract with wallet
-async function connectContractWallet(walletProvider: ethers.providers.ExternalProvider): Promise<Graviola> {
+async function connectContractWallet(walletProvider: Eip1193Provider): Promise<Graviola> {
     console.log("[wallet] connecting to contract...")
-    const ethersProvider = new ethers.providers.Web3Provider(walletProvider)
-    const signer = ethersProvider.getSigner()
-    const graviola = new ethers.Contract(GRAVIOLA_CONTRACT_ADDRESS, GraviolaAbi.abi, signer)
+    const provider = new BrowserProvider(walletProvider)
+    const signer = await provider.getSigner()
+    const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, signer)
     console.log("[wallet] connected")
     return graviola as unknown as Graviola
 }
@@ -58,6 +58,9 @@ const App = (props: { children: ReactNode }) => {
         const fetchCollection = async () => {
 
             const allKeywords = await graviola.getAllWords()
+            // allKeywords.forEach(element => {
+            //     console.log("r ", element[0], Number(element[1]))
+            // });
             const nftTotalSupply = await graviola.totalSupply()
             console.log("[info] getAllWords: ", allKeywords)
             console.log("[info] totalSupply: ", Number(nftTotalSupply))

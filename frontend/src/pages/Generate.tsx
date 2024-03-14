@@ -7,7 +7,7 @@ import FullscreenContainer from "../components/ui/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers5/react"
+import { createWeb3Modal, defaultConfig, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react'
 import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/SectionTitle"
@@ -111,9 +111,10 @@ const Generate = () => {
                             <span>{progressMessage}</span>
                     }
 
-                    {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={() => {
+                    {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={async () => {
+                        const estFee = await graviolaContext.contract?.estimateFee() as bigint
                         graviolaContext.contract?.mint({
-                            gasLimit: ethers.utils.hexlify(2500000)
+                            value: estFee + 12000n
                         })
                     }} />}
 
