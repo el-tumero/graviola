@@ -49,32 +49,35 @@ const Generate = () => {
         if(!walletProvider) return
         const graviola = graviolaContext.contract as Graviola
 
-        const onRequestSent = (requestId: number) => {
-            console.log(`reqId: ${requestId}`)
+        const onMint = (addr: string, tokenId: bigint) => {
+            console.log(`addr: ${addr}`)
+            console.log(`tokenid: ${tokenId}`)
         }
 
-        const onTransfer = (from: string, to: string, tokenId: number) => {
-            console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
-        }
+        // const onTransfer = (from: string, to: string, tokenId: number) => {
+        //     console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
+        // }
 
-        const onPromptResponse = (input: number, output: number) => {
-            console.log("promptResponse: ", input, output)
-        }
+        // const onPromptResponse = (input: number, output: number) => {
+        //     console.log("promptResponse: ", input, output)
+        // }
 
-        const onTokenReady = (tokenId: number) => {
-            console.log("token ready! id: ", tokenId)
-        }
+        // const onTokenReady = (tokenId: number) => {
+        //     console.log("token ready! id: ", tokenId)
+        // }
 
-        graviola.on("PromptRequest", onRequestSent);
-        graviola.on("Transfer", onTransfer);
-        graviola.on("PromptResponse", onPromptResponse);
-        graviola.on("TokenReady", onTokenReady);
+
+        graviola.on(graviola.filters.Mint, onMint);
+        // graviola.on("Transfer", onTransfer);
+        // graviola.on("PromptResponse", onPromptResponse);
+        // graviola.on("TokenReady", onTokenReady);
 
         return () => {
-            graviola.off("PromptRequest", onRequestSent);
-            graviola.off("Transfer", onTransfer);
-            graviola.off("PromptResponse", onPromptResponse);
-            graviola.off("TokenReady", onTokenReady);
+            graviola.off(graviola.filters.Mint, onMint)
+            // graviola.off("PromptRequest", );
+            // graviola.off("Transfer", onTransfer);
+            // graviola.off("PromptResponse", onPromptResponse);
+            // graviola.off("TokenReady", onTokenReady);
         };
 
     }
