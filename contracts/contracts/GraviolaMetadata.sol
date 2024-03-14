@@ -80,7 +80,7 @@ contract GraviolaMetadata {
                 bytes(
                     generateJSON(
                         metadataStorage[tokenId].image,
-                        metadataStorage[tokenId].prompt,
+                        string.concat(promptBase, metadataStorage[tokenId].prompt),
                         metadataStorage[tokenId].rarity
                     )
                 )

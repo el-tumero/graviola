@@ -38,13 +38,18 @@ contract GraviolaWell {
         WELL_OF_WORDS.push(Word("alien", 1250, 1749));
         wordMap["alien"] = 2;
 
-        WELL_OF_WORDS.push(Word("elf", 1750, 2000));
+        WELL_OF_WORDS.push(Word("elf", 1750, 1999));
         wordMap["elf"] = 3;
 
         // WELL_OF_WORDS.push(Word("human", 0, 999));
         // WELL_OF_WORDS.push(Word("elf", 1000, 1249));
         // WELL_OF_WORDS.push(Word("bald", 1250, 1349));
-        // WELL_OF_WORDS.push(Word("hairy", 1350, 1399));
+        WELL_OF_WORDS.push(Word("hairy", 2000, 2019));
+        wordMap["hairy"] = 4;
+
+        WELL_OF_WORDS.push(Word("monobrow", 2020, 2021));
+        wordMap["monobrow"] = 5;
+        
         // WELL_OF_WORDS.push(Word("tattoo", 1400, 1449));
         // WELL_OF_WORDS.push(Word("green", 1450, 1499));
         // WELL_OF_WORDS.push(Word("red", 1500, 1599));

@@ -35,7 +35,7 @@ contract Graviola is
     event TokenReady(address addr, uint256 tokenId);
 
     // gas limit for AIOracle callback function
-    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 3_000_000;
+    uint64 private constant AIORACLE_CALLBACK_GAS_LIMIT = 200_000;
     
     // Stable Diffusion model id
     uint256 constant AIORACLE_MODEL_ID = 50;
@@ -120,7 +120,7 @@ contract Graviola is
         string memory fullPrompt = string.concat(promptBase, prompt);
 
         // metadata
-        addPrompt(tokenId, fullPrompt);
+        addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
         bytes memory input = bytes(fullPrompt);
 

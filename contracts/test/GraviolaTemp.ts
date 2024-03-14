@@ -29,7 +29,9 @@ describe("GraviolaTemp", function () {
             await mintTx.wait()
             const aiTx = await aiOracle.invokeCallback(0n, new TextEncoder().encode("hello!"))
             await aiTx.wait()
-            console.log(await graviola.getMetadata(0n))
+
+            console.log(await (await fetch(await graviola.tokenURI(0n))).json())
+            // console.log(await graviola.getMetadata(0n))
             expect(await graviola.totalSupply()).to.be.eq(1n)
         }) 
     })
