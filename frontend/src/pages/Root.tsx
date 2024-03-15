@@ -8,7 +8,7 @@ import Button from '../components/ui/Button'
 import BlockMarquee from '../components/BlockMarquee'
 import NFTDetails from '../components/ui/NFTDetails'
 import { rarities } from '../rarityData'
-import { routerPaths } from '../router'
+import router, { routerPaths } from '../router'
 import { RarityLevel } from '../types/Rarity'
 import { getRarityColor } from '../utils/getRarityBorder'
 import { GraviolaContext } from '../contexts/GraviolaContext'
@@ -18,6 +18,8 @@ import { getRarityPercentageString } from '../utils/getRarityPercentage'
 import SectionTitle from '../components/ui/SectionTitle'
 import OraIoBanner from '../components/ui/OraIoBanner'
 import Link from '../components/Link'
+import fallbackNFT from "../assets/fallbackNFT.png"
+import { getRarityFromThreshold } from '../utils/getRarityDataFromThreshold'
 
 function Root() {
 
@@ -27,10 +29,13 @@ function Root() {
     const graviolaContext = useContext(GraviolaContext)
     const nftSources = graviolaContext.collection as NFT[]
     const fallbackNfts: NFT[] = [{
-        image: "",
-        description: "Contract has no NFTs minted",
-        attributes: []
-    }] // Should be a sample from /assets and used when the contract has no NFTs minted yet
+        image: fallbackNFT,
+        description: "This is a fallback NFT image. Go generate some!",
+        attributes: [{
+            "trait_type": "Rarity",
+            "value": 8332
+        }]
+    }]
 
     // Change this to 3 different-sized arrays once we have more data to work with
     const marqueeSources = nftSources.map((nft: NFT) => (
@@ -65,8 +70,8 @@ function Root() {
 
                     <div className='flex flex-col mb-36'>
                         <div className='flex max-lg:flex-col justify-center items-center gap-4 w-full px-4 mt-4 mb-8'>
-                            <Button enabled={true} text='Get yours now!' onClick={() => {navigate(routerPaths.generate)}} />
-                            <Button enabled={false} text='Browse marketplace (COMING SOON)' onClick={() => {}} />
+                            <Button enabled={true} text='Get yours now!' onClick={() => navigate(routerPaths.generate)} />
+                            <Button enabled={true} text='Browse collection' onClick={() => navigate(routerPaths.collection)} />
                         </div>
                         <div className={`bg-light-bgDark/50 dark:bg-dark-bgDark/50
                             flex flex-col rounded-xl py-4 border-2 border-light-border dark:border-dark-border`}
@@ -95,9 +100,9 @@ function Root() {
                         nftProps={{
                             src: convertToIfpsURL(nftSources[0].image || fallbackNfts[0].image),
                             glow: true,
-                            rarityLevel: RarityLevel.Uncommon,
+                            rarityLevel: getRarityFromThreshold(nftSources[0].attributes[0].value)[0] || RarityLevel.Rare,
                         }}
-                        upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.Uncommon} />}
+                        upperBubbleChildren={<NFTDetailsUpper rarity={getRarityFromThreshold(nftSources[0].attributes[0].value)[0] || RarityLevel.Rare} />}
                         lowerBubbleChildren={<NFTDetailsLower metadata={nftSources[0].attributes || fallbackNfts[0].attributes} />}
                     />
 

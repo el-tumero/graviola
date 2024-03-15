@@ -7,8 +7,8 @@ import FullscreenContainer from "../components/ui/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { createWeb3Modal, defaultConfig, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react'
-import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
+import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react'
+import { getRarityFromThreshold, formatBpToPercentage } from "../utils/getRarityDataFromThreshold"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
@@ -148,11 +148,21 @@ const Generate = () => {
                     }}
                 />
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
-                    <div className="md:grid md:grid-cols-4 max-md:flex-col max-md:flex gap-4 w-full font-bold">
+                    <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
                         {contractKeywords.map((keyword: Keyword, i) => (
-                            <div key={i} className="flex justify-center items-center gap-1 bg-light-bgLight/50 dark:bg-dark-bgLight/50 border-2 border-light-border dark:border-dark-border p-4 rounded-xl">
-                                <RarityBubble rarity={getRarityFromThreshold(keyword.rarityPerc)[0]} />
-                                <span>{keyword.name}</span>
+                            <div
+                                key={i}
+                                className={`
+                                    flex flex-col justify-center items-center
+                                    gap-1 bg-light-bgLight/50 dark:bg-dark-bgLight/50
+                                    border-2 border-light-border dark:border-dark-border
+                                    p-4 rounded-xl
+                                `}>
+                                <div className="flex gap-1 justify-center items-center">
+                                    <RarityBubble rarity={getRarityFromThreshold(formatBpToPercentage(keyword.rarityPerc))[0]} additionalClasses="self-center" />
+                                    <span>{keyword.name}</span>
+                                </div>
+                                <p className="text-xs opacity-50">{formatBpToPercentage(keyword.rarityPerc).toFixed(4) + "%"}</p>
                             </div>
                         ))}
                     </div>
