@@ -58,13 +58,10 @@ const App = (props: { children: ReactNode }) => {
         const fetchCollection = async () => {
 
             const allKeywords = await graviola.getAllWords()
-            // allKeywords.forEach(element => {
-            //     console.log("r ", element[0], Number(element[1]))
-            // });
             const nftTotalSupply = await graviola.totalSupply()
             console.log("[info] getAllWords: ", allKeywords)
             console.log("[info] totalSupply: ", Number(nftTotalSupply))
-            const promises = Array.from({ length: Number(nftTotalSupply) }, async (_, i) => { // TODO: Change the "3" to result of "totalSupply" function from contracts.
+            const promises = Array.from({ length: Number(nftTotalSupply) }, async (_, i) => {
                 const uri = await graviola.tokenURI(BigInt(i))
                 const response = await fetch(uri)
                 return response.json()
