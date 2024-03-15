@@ -1,17 +1,38 @@
 import FullscreenContainer from "../components/ui/FullscreenContainer";
 import ContentContainer from "../components/ui/ContentContainer";
 import Navbar from "../components/Navbar";
-import { useContext } from "react";
-import { createWeb3Modal, defaultConfig, useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react'
+import { useContext, useEffect, useState } from "react";
+import { useWeb3ModalAccount } from '@web3modal/ethers/react'
 import { GraviolaContext } from "../contexts/GraviolaContext";
+import { convertToIfpsURL } from "../utils/convertToIpfsURL";
 import { NFT } from "../types/NFT";
 import SectionTitle from "../components/ui/SectionTitle";
+import Button from "../components/ui/Button";
+import BlockNFT from "../components/ui/BlockNFT";
+import { getRarityColor } from "../utils/getRarityBorder";
+import { formatBpToPercentage, getRarityFromThreshold } from "../utils/getRarityDataFromThreshold";
+
+type CollectionMode = "Everyone" | "My Drops"
 
 const Collection = () => {
 
-    const { isConnected } = useWeb3ModalAccount()
+    const { isConnected, address } = useWeb3ModalAccount()
     const graviolaContext = useContext(GraviolaContext)
-    const nftSources = graviolaContext.collection as NFT[]
+    const contractNFTs = graviolaContext.collection as NFT[]
+    const [collectionMode, setCollectionMode] = useState<CollectionMode>("My Drops")
+    const [ownedTokensIds, setOwnedTokensIds] = useState<Array<number>>([])
+    const [isLoading, setIsLoading] = useState<boolean>(true)
+
+    useEffect(() => {
+        (async () => {
+            const userOwnedTokens = await graviolaContext.contract?.ownedTokens(address as string)
+            userOwnedTokens && userOwnedTokens.forEach(token => {
+                setOwnedTokensIds(prev => [...prev, Number(token)])
+            })
+            // console.log(ownedTokensIds)
+            setIsLoading(false)
+        })()
+    }, [])
 
     return (
         <FullscreenContainer>
@@ -23,18 +44,34 @@ const Collection = () => {
                     <h1 className='font-bold text-2xl'>Collection</h1>
                 </div>
 
-                {(!isConnected) ?
-                    <p>You need to connect your wallet to see your drops</p>
+                {(isLoading) ?
+                    <p>Fetching data...</p>
                     :
-                    <>
-                        <SectionTitle
-                            mainText={{
-                                content: "Dropped NFTs"
-                            }}
-                        />
-                        {}
-                        
-                    </>
+                    (!isConnected) ?
+                        <p>You need to connect your wallet to see your drops</p>
+                        :
+                        <>
+                            <SectionTitle
+                                mainText={{
+                                    content: `Dropped NFTs`
+                                }}
+                            />
+
+                            <div className="flex justify-between items-center mb-4">
+                                <p className="text-xl">Showing: <span className="font-bold">{collectionMode.toLowerCase()}</span></p>
+                                <Button
+                                    text={`Change to ${(collectionMode === "My Drops") ? "all drops" : "my drops only"}`}
+                                    onClick={() => {
+                                        const invertedCollectionMode = (collectionMode === "My Drops") ? "Everyone" : "My Drops"
+                                        setCollectionMode(invertedCollectionMode)
+                                    }}
+                                />
+                            </div>
+
+                            <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
+                                <CollectionList contractNFTs={contractNFTs} collectionMode={collectionMode} ownedTokenIds={ownedTokensIds} />
+                            </div>
+                        </>
                 }
 
 
@@ -44,4 +81,41 @@ const Collection = () => {
     )
 }
 
+const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: CollectionMode, ownedTokenIds: Array<number> }) => {
+    return (
+        <>
+            {props.contractNFTs.map((nft: NFT, i) => {
+                const percRarity = formatBpToPercentage(nft.attributes[0].value)
+                const [rarityLevel, rarityData] = getRarityFromThreshold(percRarity)
+                const rarityColor = getRarityColor(rarityLevel)
+                if ((props.collectionMode === "My Drops") && !(props.ownedTokenIds.includes(i))) {
+                    return null
+                } else {
+                    return (
+                        <div
+                            key={i}
+                            className={`
+                            flex flex-col justify-center items-center
+                            gap-2 bg-light-bgLight/50 dark:bg-dark-bgLight/50
+                            border-2 border-light-border dark:border-dark-border
+                            p-4 rounded-x
+                            `}
+                            style={{ borderRadius: 24, borderWidth: 2, borderColor: getRarityColor(rarityLevel)}}
+                            >
+                                <div>
+                                    <BlockNFT src={convertToIfpsURL(nft.image)} glow={false} disableMargin={true} additionalClasses={`w-fit h-fit max-w-[14em]`} />
+                                </div>
+                            <p className="font-normal">
+                                Rarity: {" "}
+                                <span style={{ color: rarityColor }} className="font-bold">{rarityData.name}</span>
+                            </p>
+                            <p style={{ color: rarityColor }} className="text-xs opacity-75">({percRarity}%)</p>
+                            <p>Keywords: SOON</p>
+                        </div>
+                    )
+                }
+            })}
+        </>
+    );
+};
 export default Collection
