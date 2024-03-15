@@ -58,7 +58,7 @@ const NavRightList = (props: { theme: string, generateOnClick: () => void, colle
 const Navbar = () => {
 
     const navigate = useNavigate()
-    const [theme, toggleTheme] = useTheme()
+    const [theme, toggleTheme] = useTheme(true)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
 
     return (

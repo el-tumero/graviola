@@ -26,6 +26,11 @@ function Root() {
 
     const graviolaContext = useContext(GraviolaContext)
     const nftSources = graviolaContext.collection as NFT[]
+    const fallbackNfts: NFT[] = [{
+        image: "",
+        description: "Contract has no NFTs minted",
+        attributes: []
+    }] // Should be a sample from /assets and used when the contract has no NFTs minted yet
 
     // Change this to 3 different-sized arrays once we have more data to work with
     const marqueeSources = nftSources.map((nft: NFT) => (
@@ -70,9 +75,9 @@ function Root() {
                             transition-opacity duration-4000 ease-in-out
                             ${marqueeInit ? "opacity-100" : "opacity-0"}
                             `}>
-                                <BlockMarquee nftSources={marqueeSources} />
-                                <BlockMarquee nftSources={marqueeSources} />
-                                <BlockMarquee nftSources={marqueeSources} />
+                                <BlockMarquee nftSources={marqueeSources || fallbackNfts} />
+                                <BlockMarquee nftSources={marqueeSources || fallbackNfts} />
+                                <BlockMarquee nftSources={marqueeSources || fallbackNfts} />
                             </div>
                         </div>
                     </div>
@@ -88,12 +93,12 @@ function Root() {
                     />
                     <NFTDetails
                         nftProps={{
-                            src: convertToIfpsURL(nftSources[0].image),
+                            src: convertToIfpsURL(nftSources[0].image || fallbackNfts[0].image),
                             glow: true,
                             rarityLevel: RarityLevel.Uncommon,
                         }}
                         upperBubbleChildren={<NFTDetailsUpper rarity={RarityLevel.Uncommon} />}
-                        lowerBubbleChildren={<NFTDetailsLower metadata={nftSources[0].attributes} />}
+                        lowerBubbleChildren={<NFTDetailsLower metadata={nftSources[0].attributes || fallbackNfts[0].attributes} />}
                     />
 
                     <SectionTitle

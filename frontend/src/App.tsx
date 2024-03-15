@@ -1,9 +1,8 @@
 import "./App.css"
 import { useEffect, useState, ReactNode } from 'react'
-import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal/ethers/react'
-import { ethers, BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers'
+import { createWeb3Modal, defaultConfig, useWeb3ModalProvider, useWeb3ModalTheme } from '@web3modal/ethers/react'
+import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers'
 import { Graviola } from "../../contracts/typechain-types/contracts/Graviola"
-// import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-v5/factories/Graviola__factory"
 import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/contracts/Graviola__factory"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
@@ -33,7 +32,31 @@ async function connectContractWallet(walletProvider: Eip1193Provider): Promise<G
 
 const App = (props: { children: ReactNode }) => {
 
-    const [,] = useTheme()
+    const projectId = 'a09890b34dc1551c2534337dbc22de8c'
+    const sepolia = {
+        chainId: 11155111,
+        name: 'Sepolia testnet',
+        currency: 'ETH',
+        explorerUrl: 'https://sepolia.etherscan.io/',
+        rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com'
+    }
+    const metadata = {
+        name: 'Graviola NFT',
+        description: 'NFT generator powered by opML',
+        url: 'https://mywebsite.com', // origin must match your domain & subdomain
+        icons: ['https://avatars.mywebsite.com/']
+    }
+
+    const modal = createWeb3Modal({
+        ethersConfig: defaultConfig({ metadata }),
+        chains: [sepolia],
+        projectId
+    })
+
+
+    const { walletProvider } = useWeb3ModalProvider()
+    const [,] = useTheme((modal === undefined))
+
     const [graviola, setGraviola] = useState<Graviola | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
 
@@ -42,9 +65,6 @@ const App = (props: { children: ReactNode }) => {
     const [collection, setCollection] = useState<NFT[]>([])
     const [keywords, setKeywords] = useState<Keyword[]>([])
 
-    // Web3 stuff
-    const { walletProvider } = useWeb3ModalProvider()
-    
     const graviolaContextValue = {
         contract: graviola,
         collection: collection,
@@ -58,13 +78,10 @@ const App = (props: { children: ReactNode }) => {
         const fetchCollection = async () => {
 
             const allKeywords = await graviola.getAllWords()
-            // allKeywords.forEach(element => {
-            //     console.log("r ", element[0], Number(element[1]))
-            // });
             const nftTotalSupply = await graviola.totalSupply()
             console.log("[info] getAllWords: ", allKeywords)
             console.log("[info] totalSupply: ", Number(nftTotalSupply))
-            const promises = Array.from({ length: Number(nftTotalSupply) }, async (_, i) => { // TODO: Change the "3" to result of "totalSupply" function from contracts.
+            const promises = Array.from({ length: Number(nftTotalSupply) }, async (_, i) => {
                 const uri = await graviola.tokenURI(BigInt(i))
                 const response = await fetch(uri)
                 return response.json()
@@ -96,35 +113,6 @@ const App = (props: { children: ReactNode }) => {
         if (walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract)) // override readonly contract conn
         else connectContract().then(noWalletContract => setGraviola(noWalletContract))
     }, [walletProvider])
-
-    const projectId = 'a09890b34dc1551c2534337dbc22de8c'
-    // 1. Get projectId
-
-    // 2. Set chains
-    const sepolia = {
-        chainId: 11155111,
-        name: 'Sepolia testnet',
-        currency: 'ETH',
-        explorerUrl: 'https://sepolia.etherscan.io/',
-        rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com'
-    }
-
-    // 3. Create modal
-    const metadata = {
-        name: 'Graviola NFT',
-        description: 'NFT generator powered by opML',
-        url: 'https://mywebsite.com', // origin must match your domain & subdomain
-        icons: ['https://avatars.mywebsite.com/']
-    }
-
-    createWeb3Modal({
-        ethersConfig: defaultConfig({ metadata }),
-        chains: [sepolia],
-        projectId,
-        enableAnalytics: true // Optional - defaults to your Cloud configuration
-    })
-
-
 
     return (
         (loading) ? 

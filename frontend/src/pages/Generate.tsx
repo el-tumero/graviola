@@ -12,79 +12,89 @@ import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
-import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { getRarityColor } from "../utils/getRarityBorder"
 import RarityBubble from "../components/ui/RarityBubble"
 import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
-import { ethers } from "ethers"
+import { RarityData, RarityLevel } from "../types/Rarity"
 
-const NftResultText = (props: { imgRarityPerc: number }) => {
-    const [rarityLevel, rarityData] = getRarityFromThreshold(props.imgRarityPerc)
-    return (
-        <p>{`Congratulations! You rolled a `}
-            <span style={{ color: getRarityColor(rarityLevel) }} className="font-bold underline">{(rarityData.name).toUpperCase()}!!!</span>
-        </p>
-    )
+// Extended NFT interface to avoid computing the same properties multiple times
+interface NFTExt extends NFT {
+    rarityLevel: RarityLevel
+    rarityData: RarityData
 }
 
 const Generate = () => {
 
     const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
-    const contractNFTs = graviolaContext.collection as NFT[]
     const contractKeywords = graviolaContext.keywords as Keyword[]
 
     const { isConnected } = useWeb3ModalAccount()
 
-    const [nftImg, setNftImg] = useState<string>() // mock img 
-    const [nftImgR, setNftImgR] = useState<number>(0) // mock rar
-
-    // export type NFTCreationStatus = "NONE" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE"
     const [progressState, setProgressState] = useState<NFTCreationStatus>("NONE")
+    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
     const [progressMessage, setProgressMessage] = useState<string>(nftCreationStatusMessages["NONE"])
     const [progressBarVal, setProgressBarVal] = useState<number>(0)
 
+    const [rolledNFT, setRolledNFT] = useState<NFTExt>()
+
     // Generation state listener
     const progressListener = () => {
-        if(!walletProvider) return
+        if (!walletProvider) return
         const graviola = graviolaContext.contract as Graviola
 
         const onMint = (addr: string, tokenId: bigint) => {
-            console.log(`addr: ${addr}`)
-            console.log(`tokenid: ${tokenId}`)
+            console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
+            setProgressState("MINTED")
+            setProgressBarVal(50)
         }
 
-        // const onTransfer = (from: string, to: string, tokenId: number) => {
-        //     console.log(`from: ${from}, to: ${to}, tokenid: ${tokenId}`)
-        // }
+        const onPromptRequest = (smth: string) => {
+            console.log(`[info] onPromptRequest done: ${smth}`)
+            setProgressState("WAIT_IMAGE")
+            setProgressBarVal(75)
+        }
 
-        // const onPromptResponse = (input: number, output: number) => {
-        //     console.log("promptResponse: ", input, output)
-        // }
+        const onTokenReady = async (addr: string, tokenId: bigint) => {
 
-        // const onTokenReady = (tokenId: number) => {
-        //     console.log("token ready! id: ", tokenId)
-        // }
+            console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
 
+            // TODO: CHECK ADDRESS OF ROLLER
+            const uri = await graviola.tokenURI(tokenId)
+            const response = await fetch(uri)
+            const nft: NFT = await response.json()
+            const [rarityLevel, rarityData] = getRarityFromThreshold(nft.attributes[0].value)
 
-        graviola.on(graviola.filters.Mint, onMint);
-        // graviola.on("Transfer", onTransfer);
-        // graviola.on("PromptResponse", onPromptResponse);
-        // graviola.on("TokenReady", onTokenReady);
+            setProgressState("DONE")
+            setProgressBarVal(100)
+
+            const nftRes: NFTExt = {
+                ...nft,
+                rarityLevel: rarityLevel,
+                rarityData: rarityData,
+            }
+            setRolledNFT(nftRes)
+        }
+
+        graviola.on(graviola.filters.Mint, onMint)
+        graviola.on(graviola.filters.PromptRequest, onPromptRequest)
+        graviola.on(graviola.filters.TokenReady, onTokenReady)
 
         return () => {
             graviola.off(graviola.filters.Mint, onMint)
-            // graviola.off("PromptRequest", );
-            // graviola.off("Transfer", onTransfer);
-            // graviola.off("PromptResponse", onPromptResponse);
-            // graviola.off("TokenReady", onTokenReady);
-        };
+            graviola.off(graviola.filters.PromptRequest, onPromptRequest)
+            graviola.off(graviola.filters.TokenReady, onTokenReady)
+        }
 
     }
 
     useEffect(() => {
         progressListener()
     }, [])
+
+    useEffect(() => {
+        setProgressMessage(nftCreationStatusMessages[progressState])
+    }, [progressState])
 
     return (
         <FullscreenContainer>
@@ -97,28 +107,37 @@ const Generate = () => {
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
 
                     {/* Img container */}
-                    <GenerateContainer resImg={nftImg} resRarity={getRarityFromThreshold(nftImgR)[0]} isPulsating={!isConnected} isGenerating={(progressState !== "NONE" && progressState !== "DONE")} />
+                    <GenerateContainer rolledNFT={rolledNFT} isPulsating={!isConnected} isGenerating={!isPreGenerationState} />
 
                     {/* Progress bar */}
                     {(progressBarVal !== 0) &&
                         <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border shadow-inner`}>
-                            <div style={{ width: `${progressBarVal}%`}} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
+                            <div style={{ width: `${progressBarVal}%` }} className="flex h-full bg-accent rounded-xl transition-all duration-150"></div>
                         </div>
                     }
 
                     {/* State/Progress text */}
                     {progressState === "DONE"
                         ?
-                            <NftResultText imgRarityPerc={nftImgR} />
+                        <NftResultText rarityLevel={rolledNFT!.rarityLevel} rarityName={rolledNFT!.rarityData.name} />
                         :
-                            <span>{progressMessage}</span>
+                        <span className="text-lg font-bold">{progressMessage}</span>
                     }
 
                     {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={async () => {
+                        setProgressState("CONFIRM_TX")
                         const estFee = await graviolaContext.contract?.estimateFee() as bigint
-                        graviolaContext.contract?.mint({
-                            value: estFee + 12000n
-                        })
+                        try {
+                            await graviolaContext.contract?.mint({
+                                value: estFee + 12000n
+                            })
+                            setProgressState("BEFORE_MINT")
+                            setProgressBarVal(25)
+                        } catch (err) {
+                            setProgressState("TX_REJECTED")
+                            setTimeout(() => setProgressState("NONE"), 5000)
+                            return
+                        }
                     }} />}
 
                 </div>
@@ -144,6 +163,14 @@ const Generate = () => {
 
         </FullscreenContainer>
 
+    )
+}
+
+const NftResultText = (props: { rarityLevel: RarityLevel, rarityName: string }) => {
+    return (
+        <p className="text-lg font-bold">{`Congratulations! You rolled a `}
+            <span style={{ color: getRarityColor(props.rarityLevel) }} className="font-bold underline">{(props.rarityName).toUpperCase()}!!!</span>
+        </p>
     )
 }
 
