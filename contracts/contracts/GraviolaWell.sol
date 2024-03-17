@@ -22,17 +22,13 @@ contract GraviolaWell {
         uint256 rarityPerc;
     }
 
-    // Each keyword needs its id
-    mapping(string => uint256) internal wordMap;
     Word[] public WELL_OF_WORDS;
-
-    uint256 public WELL_OF_WORDS_MIN_R = 1; // Minimum rarity for any keyword
-    uint256 public WELL_OF_WORDS_TOTAL_R = 2021; // Collective rarity of all base* keywords
-    // *Base keywords = all Words included with the contract. Any keyword added by a User is not a base keyword
-
-    uint256 public constant KEYWORDS_PER_TOKEN = 3; // How many keywords should determine the token's description (result)
-
     event RollResult(string result, uint256 rarity);
+    mapping(string => uint256) internal wordMap;    // Each keyword needs its id
+    uint256 public WELL_OF_WORDS_MIN_R = 1;         // Minimum rarity for any keyword
+    uint256 public WELL_OF_WORDS_TOTAL_R = 2021;    // Collective rarity of all base* keywords
+                                                    // *Base keywords = all Words included with the contract. Any keyword added by a User is not a base keyword
+    uint256 public constant KEYWORDS_PER_TOKEN = 3; // How many keywords should determine the token's description (result)
 
     constructor() {
 
@@ -54,9 +50,7 @@ contract GraviolaWell {
 
     /// @notice Add a new keyword to the pool (well) of possible keywords.
     /// @notice The rarity of new keywords is chosen randomly.
-    function addWordToWell(string memory _keyword, uint256 _seed) public {
-
-        // TODO: Reject if caller does not own at least one NFT
+    function addWordToWell(string memory _keyword, uint256 _seed) internal {
 
         // Keyword should be no longer than 12 characters
         require(bytes(_keyword).length <= 12 && bytes(_keyword).length > 0);

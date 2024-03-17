@@ -155,4 +155,10 @@ contract Graviola is
     function totalSupply() public view returns (uint256) {
         return _nextTokenId;
     }
+
+    function addWordToWellOfWords(string memory _keyword, uint256 _seed) external {
+        require(balanceOf(msg.sender) > 0);
+        addWordToWell(_keyword, _seed);
+    }
+    
 }
