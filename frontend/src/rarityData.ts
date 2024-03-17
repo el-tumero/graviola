@@ -12,22 +12,22 @@ export const rarityScale: Array<RarityLevel> = [
 export const rarities: Record<RarityLevel, RarityData> = {
     [RarityLevel.Common]: {
         name: "Common",
-        threshold: 30,
-        color: "rgba(82, 82, 91, 0.8)",
+        threshold: 25,
+        color: "rgba(140, 140, 155, 0.8)",
     },
     [RarityLevel.Uncommon]: {
         name: "Uncommon",
-        threshold: 25,
-        color: "rgba(74, 222, 128, 0.8)",
+        threshold: 15,
+        color: "rgba(54, 202, 108, 0.8)",
     },
     [RarityLevel.Rare]: {
         name: "Rare",
-        threshold: 4,
+        threshold: 8,
         color: "rgba(37, 99, 235, 0.8)",
     },
     [RarityLevel.VeryRare]: {
         name: "Very Rare",
-        threshold: 0.5,
+        threshold: 1.5,
         color: "rgba(147, 51, 234, 0.8)",
     },
     [RarityLevel.Legendary]: {

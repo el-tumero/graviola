@@ -2,11 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 // pages
 import Root from "./pages/Root";
 import Generate from "./pages/Generate";
+import Collection from "./pages/Collection";
+import Error from "./pages/Error";
 
 export const routerPaths = {
     root: "/",
     generate: "/generate",
-    gallery: "/gallery"
+    collection: "/collection"
 }
 
 const router = createBrowserRouter([
@@ -19,8 +21,12 @@ const router = createBrowserRouter([
         element: <Generate />
     },
     {
-        path: routerPaths.gallery,
-        element: <></>
+        path: routerPaths.collection,
+        element: <Collection />
+    },
+    {
+        path: "*",
+        element: <Error />
     }
 ])
 

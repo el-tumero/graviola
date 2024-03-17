@@ -21,7 +21,7 @@ const DarkThemeIcon = () => {
     )
 }
 
-const NavRightList = (props: { theme: string, generateOnClick: () => void, galleryOnClick: () => void, themeOnClick: () => void }) => {
+const NavRightList = (props: { theme: string, generateOnClick: () => void, collectionOnClick: () => void, themeOnClick: () => void }) => {
     const mobileStyles = `flex-col max-lg:absolute max-lg:right-6 max-lg:top-16 max-lg:p-4 max-lg:rounded-xl max-lg:border-2 max-lg:border-light-border max-lg:dark:border-dark-border max-lg:shadow-lg`
     const mobileItemCtn = `p-2 rounded-xl max-lg:w-full max-lg:bg-light-border max-lg:dark:bg-dark-border/40 max-lg:flex max-lg:justify-center`
     return (
@@ -32,9 +32,9 @@ const NavRightList = (props: { theme: string, generateOnClick: () => void, galle
                 <span className="cursor-pointer hover:underline" onClick={() => props.generateOnClick()}>Generate</span>
             </div>
 
-            {/* Gallery */}
+            {/* Collection */}
             <div className={mobileItemCtn}>
-                <span className="cursor-pointer hover:underline" onClick={() => props.galleryOnClick()}>Gallery</span>
+                <span className="cursor-pointer hover:underline" onClick={() => props.collectionOnClick()}>Collection</span>
             </div>
 
             {/* GitHub */}
@@ -58,7 +58,7 @@ const NavRightList = (props: { theme: string, generateOnClick: () => void, galle
 const Navbar = () => {
 
     const navigate = useNavigate()
-    const [theme, toggleTheme] = useTheme()
+    const [theme, toggleTheme] = useTheme(true)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
 
     return (
@@ -75,7 +75,7 @@ const Navbar = () => {
                 <NavRightList
                     theme={theme}
                     generateOnClick={() => navigate(routerPaths.generate)}
-                    galleryOnClick={() => navigate(routerPaths.generate)}
+                    collectionOnClick={() => navigate(routerPaths.collection)}
                     themeOnClick={toggleTheme}
                 />
             </div>
@@ -94,7 +94,7 @@ const Navbar = () => {
                         <NavRightList
                             theme={theme}
                             generateOnClick={() => navigate(routerPaths.generate)}
-                            galleryOnClick={() => navigate(routerPaths.generate)}
+                            collectionOnClick={() => navigate(routerPaths.generate)}
                             themeOnClick={toggleTheme}
                         />
                     </div>

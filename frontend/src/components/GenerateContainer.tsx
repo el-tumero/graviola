@@ -1,25 +1,51 @@
+import { useEffect, useState } from "react"
 import useRandomRarityBorder from "../hooks/useBorderAnimation"
+import { getRarityBorder } from "../utils/getRarityBorder"
+import { NFT } from "../types/NFT"
+import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
+import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 
 interface GenerateContainerProps {
-    imgSrc?: string
+    rolledNFT?: NFT
     isPulsating: boolean
     isGenerating: boolean
 }
 
-const GenerateContainer = ({ imgSrc, isPulsating, isGenerating }: GenerateContainerProps) => {
+const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating }: GenerateContainerProps) => {
+
     const rarityAnimBorder = useRandomRarityBorder(isGenerating, 750)
+    const [resOpacity, setResOpacity] = useState<number>(0)
+
+    // Dynamic styles based on passed rolledNFT
+    const {
+        style: breathingBorderStyle = {},
+        className: breathingBorderClassNames = ""
+    } = rolledNFT ? getRarityBorder(getRarityFromThreshold(rolledNFT.attributes[0].value)[0], true) : {};
+
+    useEffect(() => {
+        if (!rolledNFT) return
+        setTimeout(() => setResOpacity(1), 100)
+    }, [rolledNFT])
+
     return (
         // TODO: Change this empty style{} to a passed as prop resultRarity
-        <div style={isGenerating ? rarityAnimBorder : {}} className={`flex justify-center items-center w-64 h-64 p-4 m-8 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border-2 border-light-border dark:border-dark-border ${isPulsating ? "animate-pulse" : ""}`}>
-            {imgSrc ?
+        <div
+            style={rolledNFT ? breathingBorderStyle : isGenerating ? rarityAnimBorder : {}}
+            className={`
+                flex justify-center items-center
+                w-64 h-64 p-4 m-8 rounded-xl
+                bg-light-bgDark dark:bg-dark-bgDark
+                border-2 border-light-border dark:border-dark-border
+                ${rolledNFT ? breathingBorderClassNames : ""}
+                ${isPulsating ? "animate-pulse" : ""}
+            `}
+        >
+            {rolledNFT &&
                 <>
-                    <img className="w-full h-full rounded-lg" src={imgSrc} />
-                </>
-            : isGenerating &&
-                <>
-                    <svg className={`${isGenerating ? "animate-spin" : ""}`} width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path className={`stroke-2 stroke-light-border dark:stroke-dark-border`} d="M20.0001 12C20.0001 13.3811 19.6425 14.7386 18.9623 15.9405C18.282 17.1424 17.3022 18.1477 16.1182 18.8587C14.9341 19.5696 13.5862 19.9619 12.2056 19.9974C10.825 20.0328 9.45873 19.7103 8.23975 19.0612" stroke="#000000" strokeWidth="3.55556" strokeLinecap="round"/>
-                    </svg>
+                    <img
+                        className={`w-full h-full rounded-lg`}
+                        style={{ opacity: resOpacity, transition: 'opacity 0.6s' }}
+                        src={convertToIfpsURL(rolledNFT.image)} />
                 </>
             }
         </div>
