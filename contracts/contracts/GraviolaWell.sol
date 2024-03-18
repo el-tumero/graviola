@@ -55,19 +55,17 @@ contract GraviolaWell {
         // Keyword should be no longer than 12 characters
         require(bytes(_keyword).length <= 12 && bytes(_keyword).length > 0);
 
-        // Generate a (pseudorandom) probability for the new keyword
+        // Generate a (pseudo) random probability for the new keyword
         uint256 rand = uint256(keccak256(abi.encodePacked(_seed, msg.sender))); // TODO: CHANGE THIS TO VRF
-        uint256 newWordRange = ((rand %
-            ((WELL_OF_WORDS_TOTAL_R - WELL_OF_WORDS_MIN_R) / 10 + 1)) * 10) +
-            WELL_OF_WORDS_MIN_R;
-
+        // The range sum of new word should never be higher than 50% of Well's total rarity
+        uint256 newWordRange = (rand % (WELL_OF_WORDS_TOTAL_R / 2)) + WELL_OF_WORDS_MIN_R;
         // Add new keyword's probability (range sum) to totalRarity
         WELL_OF_WORDS_TOTAL_R += newWordRange;
 
+        // Calculate range bounds and push the new word to Well
         Word memory currentLastWord = WELL_OF_WORDS[WELL_OF_WORDS.length - 1];
         uint256 newWordLowerRange = currentLastWord.upperRange + 1;
         uint256 newWordUpperRange = newWordLowerRange + newWordRange;
-
         Word memory newWord = Word(
             _keyword,
             newWordLowerRange,
