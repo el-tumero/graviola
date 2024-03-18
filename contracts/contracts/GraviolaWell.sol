@@ -112,6 +112,13 @@ contract GraviolaWell {
         return WORD_RARITY_SCALE[WORD_RARITY_SCALE.length - 1];
     }
 
+    /// @notice Helper function for determining if a rarity (BP)
+    /// @notice is within the target RarityLevel threshold (is of same RarityLevel or more rare than target)
+    function isRareEnough(uint _rarityInBp, WordRarity memory _targetRarity) public pure returns (bool) {
+        uint rarityPerc = _rarityInBp / 10_000;
+        return rarityPerc < _targetRarity.threshold;
+    }
+
     function getWellOfWords() public view returns (Word[] memory) {
         return WELL_OF_WORDS;
     }
@@ -159,10 +166,11 @@ contract GraviolaWell {
 
     /// @notice Roll 3 random keywords based on VRF (used for Token generation later)
     function rollWords(
-        uint256 _seed
+        uint256 _seed,
+        bool _tradeUp
     ) public view returns (string memory, uint256, uint256) {
 
-        uint256 rollProbability;                         // Cumulative probability of all keywords in a single roll (in BP)
+        uint256 rollProbability = 1;                     // Cumulative probability of all keywords in a single roll (in BP)
         uint256 rollTotalRarity = WELL_OF_WORDS_TOTAL_R; // Make a copy of totalRarity to keep track of relative probabilities
         string memory result = "";                       // Concatenated rolled keywords
 
@@ -219,12 +227,23 @@ contract GraviolaWell {
                 )
             );
 
+            // Update rollProbability
+            rollProbability *= bpProbabilities[i];
+            
+            // Check if we're in a Trade Up and if rerolls are needed
+            if (_tradeUp && (bpProbabilities.length == 2)) {
+                // Let's say we're Trading Up 3 Commons to an Uncommon
+                WordRarity memory hardcodedTradeUpTargetRarity = WORD_RARITY_SCALE[0]; // RarityData for Common,
+                // because we're using 3 Commons for this TradeUp
+                bool tradeUpOK = isRareEnough(rollProbability, hardcodedTradeUpTargetRarity);
+                if (!tradeUpOK) {
+                    continue; // Roll again (not rare enough)
+                }
+            }
+
             i++;
         }
 
-        rollProbability = (bpProbabilities[0] *
-            bpProbabilities[1] *
-            bpProbabilities[2]);
         return (result, rollProbability, j);
     }
 }
