@@ -22,15 +22,31 @@ contract GraviolaWell {
         uint256 rarityPerc;
     }
 
+    // This defines the rarity "levels" of keywords, e.g. a "Common" keyword
+    // is anything between 100% and 25%, so the threshold would be 25
+    struct WordRarity {
+        string name;
+        uint256 threshold;
+    }
+
     Word[] public WELL_OF_WORDS;
-    event RollResult(string result, uint256 rarity);
-    mapping(string => uint256) internal wordMap;    // Each keyword needs its id
+    WordRarity[] public WORD_RARITY_SCALE;          // Sorted array of all keyword rarities' data
+    mapping(string => uint256) internal wordMap;    // Give each keyword a unique id
     uint256 public WELL_OF_WORDS_MIN_R = 1;         // Minimum rarity for any keyword
-    uint256 public WELL_OF_WORDS_TOTAL_R = 2021;    // Collective rarity of all base* keywords
-                                                    // *Base keywords = all Words included with the contract. Any keyword added by a User is not a base keyword
+    uint256 public WELL_OF_WORDS_TOTAL_R = 2021;    // Collective rarity of all (base + added by Users) keywords
+                                                    // Base keywords = all Words included with the contract. Any keyword added by a User is not a base keyword
     uint256 public constant KEYWORDS_PER_TOKEN = 3; // How many keywords should determine the token's description (result)
+    uint256 public constant KEYWORDS_PER_TRADE_UP = 3; // How many tokens are needed to perform a Trade Up
+    event RollResult(string result, uint256 rarity);
 
     constructor() {
+
+        // Init keyword rarity data
+        WORD_RARITY_SCALE.push(WordRarity("Common", 25));
+        WORD_RARITY_SCALE.push(WordRarity("Uncommon", 15));
+        WORD_RARITY_SCALE.push(WordRarity("Rare", 8));
+        WORD_RARITY_SCALE.push(WordRarity("Very Rare", 1));
+        WORD_RARITY_SCALE.push(WordRarity("Legendary", 0));
 
         // Init base keywords and rarity factors
         WELL_OF_WORDS.push(Word("human", 0, 999));
@@ -84,6 +100,18 @@ contract GraviolaWell {
         return (1e12 - totalRollProbability) / 1e6;                                                 // 1 - (1-P)^n operation; 1e12 = (10_000)^3; 1e6 is used to decrease precision of the result
     }
 
+    /// @notice Get WordRarity object from keyword probability
+    /// @param _rarityBp Probability of the input keyword in a single roll (in BP)
+    function getRarityDataFromBp(uint _rarityBp) public view returns (WordRarity memory) {
+        uint _rarityPerc = _rarityBp / 10_000;
+        for (uint i = 0; i < WORD_RARITY_SCALE.length; i++) {
+            if (_rarityPerc >= WORD_RARITY_SCALE[i].threshold) {
+                return WORD_RARITY_SCALE[i];
+            }
+        }
+        return WORD_RARITY_SCALE[WORD_RARITY_SCALE.length - 1];
+    }
+
     function getWellOfWords() public view returns (Word[] memory) {
         return WELL_OF_WORDS;
     }
@@ -132,7 +160,7 @@ contract GraviolaWell {
     /// @notice Roll 3 random keywords based on VRF (used for Token generation later)
     function rollWords(
         uint256 _seed
-    ) public view returns (string memory, uint256) {
+    ) public view returns (string memory, uint256, uint256) {
 
         uint256 rollProbability;                         // Cumulative probability of all keywords in a single roll (in BP)
         uint256 rollTotalRarity = WELL_OF_WORDS_TOTAL_R; // Make a copy of totalRarity to keep track of relative probabilities
@@ -197,6 +225,6 @@ contract GraviolaWell {
         rollProbability = (bpProbabilities[0] *
             bpProbabilities[1] *
             bpProbabilities[2]);
-        return (result, rollProbability);
+        return (result, rollProbability, j);
     }
 }
