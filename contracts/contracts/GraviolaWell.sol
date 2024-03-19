@@ -102,7 +102,7 @@ contract GraviolaWell {
     /// @notice Returns index of word in the scope of its group
     function findWordFromRand(uint _randNum, RarityGroup memory _targetGroup) public pure returns (uint) {
         // Searched number must be within the group's keyword bounds
-        require(_randNum > 0 && _randNum <= _targetGroup.keywords[_targetGroup.keywords.length - 1].upperRange, "Input is out of bounds for that group.");
+        require(_randNum > 0 && _randNum <= getRarityGroupCount(_targetGroup), "Input is out of bounds for the specified group.");
         for (uint i = 0; i < _targetGroup.keywords.length; i++) {
             if (_randNum <= _targetGroup.keywords[i].upperRange ) {
                 return i;
