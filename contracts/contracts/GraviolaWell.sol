@@ -98,6 +98,19 @@ contract GraviolaWell {
         revert("Input does not match any rarity group");
     }
 
+    /// @notice After rolling a random number in the range of a group, find the rolled word by ranges
+    /// @notice Returns index of word in the scope of its group
+    function findWordFromRand(uint _randNum, RarityGroup memory _targetGroup) public pure returns (uint) {
+        // Searched number must be within the group's keyword bounds
+        require(_randNum > 0 && _randNum <= _targetGroup.keywords[_targetGroup.keywords.length - 1].upperRange, "Input is out of bounds for that group.");
+        for (uint i = 0; i < _targetGroup.keywords.length; i++) {
+            if (_randNum <= _targetGroup.keywords[i].upperRange ) {
+                return i;
+            }
+        }
+        revert("Input does not match any word in group");
+    }
+
     /// @notice Roll 3 random keywords based on VRF (used for Token generation later)
     function rollWords(
         uint256 _seed
