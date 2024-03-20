@@ -80,6 +80,15 @@ contract GraviolaWell {
         return (numerator * 100) / denumerator;
     }
 
+    /// @notice Get all rarities in a list (frontend)
+    function getRarityGroups() public view returns (RarityGroup[RARITY_GROUPS_LENGTH] memory) {
+        RarityGroup[RARITY_GROUPS_LENGTH] memory res;
+        for (uint i = 0; i < RARITY_GROUPS_LENGTH; i++) {
+            res[i] = rarities[i];
+        }
+        return res;
+    }
+
     /// @notice Get sum of all keywords' count in a rarity group
     function getRarityGroupCount(RarityGroup memory _rGroup) private pure returns (uint) {
         return _rGroup.keywords[_rGroup.keywords.length - 1].upperRange;
