@@ -115,6 +115,43 @@ contract GraviolaWell {
     function rollWords(
         uint256 _seed
     ) public view returns (string memory, uint256, uint256) {
-        // ..
+        
+        uint16 i = 0;
+        uint16 j = 0;
+        uint16 groupMax = 100;
+        int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
+        uint256 rollProbability;
+        string memory result = "";
+
+        // Init usedIndices arr
+        for (uint x = 0; x < KEYWORDS_PER_TOKEN; x++) {
+            for (uint y = 0; y < RARITY_GROUPS_LENGTH; y++) {
+                usedIndices[x][y] = -1;
+            }
+        }
+       
+        while (i < KEYWORDS_PER_TOKEN) {
+            j++;
+
+            uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
+
+            uint rolledGroup = randNum % groupMax;
+            RarityGroup memory selectedGroup = findRarityGroupRange(rolledGroup);
+
+            uint rolledWord = randNum % selectedGroup.keywords.length;
+            Word memory selectedWord = 
+            selectedGroup.keywords[findWordFromRand(rolledWord, selectedGroup)];
+
+            result = string(
+                abi.encodePacked(
+                    result,
+                    (i > 0 ? ", " : ""),
+                    selectedWord.keyword
+                )
+            );
+
+            i++;
+        }
+        
     }
 }
