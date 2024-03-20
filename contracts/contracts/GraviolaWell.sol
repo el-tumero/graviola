@@ -10,7 +10,8 @@ contract GraviolaWell {
     struct Word {
         string keyword;
         uint lowerRange;
-        uint upperRange;
+        uint upperRange; // upperRange - lowerRange = "count" of a keyword
+                         // The count is used to calculate the probability of getting a certain keyword
     }
 
     // A group represents an object containing everything related to a rarity level
@@ -20,15 +21,16 @@ contract GraviolaWell {
         Word[] keywords; // All keywords that belong to the group
     }
 
-    mapping (uint => RarityGroup) rarities;
-    uint256 public constant KEYWORDS_PER_TOKEN = 3;    // How many keywords should determine the token's description (result)
-    uint256 public constant KEYWORDS_PER_TRADE_UP = 3; // How many tokens are needed to perform a Trade Up
-    uint256 public constant RARITY_GROUPS_LENGTH = 5;  // How many distinct rarity groups
+    mapping (uint => RarityGroup) rarities; 
+    uint256 public constant KEYWORDS_PER_TOKEN = 3;             // How many keywords should determine the token's description (result)
+    uint256 public constant TOKENS_PER_TRADE_UP = 3;            // How many tokens are needed to perform a Trade Up
+    uint256 public constant RARITY_GROUPS_LENGTH = 5;           // How many distinct rarity groups
     uint256 public constant RARITY_GROUP_MAX_PROBABILITY = 100; // Basically just 100%
     event RollResult(string result, uint256 rarityPerc);
 
     
     constructor() {
+
         // Common RarityGroup
         RarityGroup storage commons = rarities[0];
         commons.name = "Common";
@@ -72,7 +74,7 @@ contract GraviolaWell {
         legendaries.keywords.push(Word("god", 20, 21));
     }
 
-    /// @notice Convert a fraction to basis points uint256
+    /// @notice Convert a fraction to basis points (BP)
     function fractionToBasisPoints(
         uint256 numerator,
         uint256 denumerator
@@ -94,7 +96,7 @@ contract GraviolaWell {
         return _rGroup.keywords[_rGroup.keywords.length - 1].upperRange;
     }
 
-    /// @notice Get real count of a keyword in a group
+    /// @notice Get the count of a keyword in a rarity group
     function getWordCount(uint _keywordId, RarityGroup memory _rGroup) private pure returns (uint) {
         return _rGroup.keywords[_keywordId].upperRange - _rGroup.keywords[_keywordId].lowerRange;
     }
@@ -116,7 +118,7 @@ contract GraviolaWell {
     }
 
     /// @notice After rolling a random number in the range of a group, find the rolled word by ranges
-    /// @notice Returns index of word in the scope of its group
+    /// @return Index of word in the scope of its group
     function findWordFromRand(uint _randNum, RarityGroup memory _targetGroup) public pure returns (uint) {
         // Searched number must be within the group's keyword bounds
         require(_randNum > 0 && _randNum <= getRarityGroupCount(_targetGroup), "Input is out of bounds for the specified group.");
@@ -129,6 +131,7 @@ contract GraviolaWell {
     }
 
     /// @notice Calculate probabilirt of rolling the specified keyword in a group in a single roll
+    /// @return Probability of getting the keyword in perc. format
     function getWordProbability(uint _keywordIndex, RarityGroup memory _targetGroup) public pure returns (uint) {
         require(_targetGroup.keywords.length >= _keywordIndex, "Keyword index out of bounds");
         uint targetWordCount = getWordCount(_keywordIndex, _targetGroup);
