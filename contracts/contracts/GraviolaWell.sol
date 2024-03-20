@@ -24,6 +24,7 @@ contract GraviolaWell {
     uint256 public constant KEYWORDS_PER_TOKEN = 3;    // How many keywords should determine the token's description (result)
     uint256 public constant KEYWORDS_PER_TRADE_UP = 3; // How many tokens are needed to perform a Trade Up
     uint256 public constant RARITY_GROUPS_LENGTH = 5;  // How many distinct rarity groups
+    uint256 public constant RARITY_GROUP_MAX_PROBABILITY = 100; // Basically just 100%
     event RollResult(string result, uint256 rarityPerc);
 
     
@@ -79,8 +80,14 @@ contract GraviolaWell {
         return (numerator * 100) / denumerator;
     }
 
+    /// @notice Get sum of all keywords' count in a rarity group
     function getRarityGroupCount(RarityGroup memory _rGroup) private pure returns (uint) {
         return _rGroup.keywords[_rGroup.keywords.length - 1].upperRange;
+    }
+
+    /// @notice Get real count of a keyword in a group
+    function getWordCount(uint _keywordId, RarityGroup memory _rGroup) private pure returns (uint) {
+        return _rGroup.keywords[_keywordId].upperRange - _rGroup.keywords[_keywordId].lowerRange;
     }
 
     /// @notice Get RarityGroup object from a percentage input based on the group's threshold
@@ -111,6 +118,15 @@ contract GraviolaWell {
         revert("Input does not match any word in group");
     }
 
+    /// @notice Calculate probabilirt of rolling the specified keyword in a group in a single roll
+    function getWordProbability(uint _keywordIndex, RarityGroup memory _targetGroup) public pure returns (uint) {
+        require(_targetGroup.keywords.length >= _keywordIndex, "Keyword index out of bounds");
+
+        uint targetWordCount = getWordCount(_keywordIndex, _targetGroup);
+        uint totalGroupCount = getRarityGroupCount(_targetGroup);
+        return fractionToBasisPoints(targetWordCount, totalGroupCount);
+    }
+
     /// @notice Roll 3 random keywords based on VRF (used for Token generation later)
     function rollWords(
         uint256 _seed
@@ -118,29 +134,29 @@ contract GraviolaWell {
         
         uint16 i = 0;
         uint16 j = 0;
-        uint16 groupMax = 100;
-        int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
-        uint256 rollProbability;
+        // int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
+        uint256 rollProbability = 1;
         string memory result = "";
 
-        // Init usedIndices arr
-        for (uint x = 0; x < KEYWORDS_PER_TOKEN; x++) {
-            for (uint y = 0; y < RARITY_GROUPS_LENGTH; y++) {
-                usedIndices[x][y] = -1;
-            }
-        }
+        // // Init usedIndices arr
+        // for (uint x = 0; x < KEYWORDS_PER_TOKEN; x++) {
+        //     for (uint y = 0; y < RARITY_GROUPS_LENGTH; y++) {
+        //         usedIndices[x][y] = -1;
+        //     }
+        // }
        
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
 
             uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
 
-            uint rolledGroup = randNum % groupMax;
+            uint rolledGroup = randNum % RARITY_GROUP_MAX_PROBABILITY;
             RarityGroup memory selectedGroup = findRarityGroupRange(rolledGroup);
 
-            uint rolledWord = randNum % selectedGroup.keywords.length;
-            Word memory selectedWord = 
-            selectedGroup.keywords[findWordFromRand(rolledWord, selectedGroup)];
+            uint wordNum = randNum % getRarityGroupCount(selectedGroup);
+            uint rolledWord = findWordFromRand(wordNum, selectedGroup);
+
+            Word memory selectedWord = selectedGroup.keywords[rolledWord];
 
             result = string(
                 abi.encodePacked(
@@ -150,8 +166,12 @@ contract GraviolaWell {
                 )
             );
 
+            rollProbability *= fractionToBasisPoints(selectedGroup.rarityPerc, RARITY_GROUP_MAX_PROBABILITY);
+
             i++;
         }
+
+        return (result, rollProbability, j);
         
     }
 }
