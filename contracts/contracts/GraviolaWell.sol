@@ -91,14 +91,15 @@ contract GraviolaWell {
     }
 
     /// @notice Get RarityGroup object from a percentage input based on the group's threshold
-    /// @param _percInput Uint in range 1-100. E.g: 80 => Common, 5 => Rare
-    function findRarityGroupRange(uint _percInput) public view returns (RarityGroup memory) {
-        require(_percInput <= 100 && _percInput > 0, "Input must be between 1 and 100");
+    /// @param _percInput Uint in range 0-100. E.g: 80 => Common, 5 => Rare
+    /// @return Rarity Group (if found) and index of group in the rarities mapping
+    function findRarityGroupRange(uint _percInput) public view returns (RarityGroup memory, uint) {
+        require(_percInput <= 100 && _percInput >= 0, "Input must be between 0 and 100");
         uint cumulativeThreshold = 0;
         for (uint i = RARITY_GROUPS_LENGTH; i > 0; i--) {
             RarityGroup storage currentGroup = rarities[i - 1];
             if (_percInput <= cumulativeThreshold + currentGroup.rarityPerc) {
-                return currentGroup;
+                return (currentGroup, (i-1));
             }
             cumulativeThreshold += currentGroup.rarityPerc;
         }
@@ -121,7 +122,6 @@ contract GraviolaWell {
     /// @notice Calculate probabilirt of rolling the specified keyword in a group in a single roll
     function getWordProbability(uint _keywordIndex, RarityGroup memory _targetGroup) public pure returns (uint) {
         require(_targetGroup.keywords.length >= _keywordIndex, "Keyword index out of bounds");
-
         uint targetWordCount = getWordCount(_keywordIndex, _targetGroup);
         uint totalGroupCount = getRarityGroupCount(_targetGroup);
         return fractionToBasisPoints(targetWordCount, totalGroupCount);
@@ -134,16 +134,16 @@ contract GraviolaWell {
         
         uint16 i = 0;
         uint16 j = 0;
-        // int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
+        int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
         uint256 rollProbability = 1;
         string memory result = "";
 
-        // // Init usedIndices arr
-        // for (uint x = 0; x < KEYWORDS_PER_TOKEN; x++) {
-        //     for (uint y = 0; y < RARITY_GROUPS_LENGTH; y++) {
-        //         usedIndices[x][y] = -1;
-        //     }
-        // }
+        // Init usedIndices arr
+        for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
+            for (uint y = 0; y < KEYWORDS_PER_TOKEN; y++) {
+                usedIndices[x][y] = -1;
+            }
+        }
        
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
@@ -151,12 +151,20 @@ contract GraviolaWell {
             uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
 
             uint rolledGroup = randNum % RARITY_GROUP_MAX_PROBABILITY;
-            RarityGroup memory selectedGroup = findRarityGroupRange(rolledGroup);
+            (RarityGroup memory selectedGroup, uint selectedGroupId) = findRarityGroupRange(rolledGroup);
 
             uint wordNum = randNum % getRarityGroupCount(selectedGroup);
             uint rolledWord = findWordFromRand(wordNum, selectedGroup);
 
             Word memory selectedWord = selectedGroup.keywords[rolledWord];
+
+            // Dup group + word = reroll
+            if (usedIndices[selectedGroupId][0] == int256(rolledWord) ||
+                usedIndices[selectedGroupId][1] == int256(rolledWord) ||
+                usedIndices[selectedGroupId][2] == int256(rolledWord))
+            {
+                continue;
+            }
 
             result = string(
                 abi.encodePacked(
@@ -166,12 +174,16 @@ contract GraviolaWell {
                 )
             );
 
+            // Update probability
             rollProbability *= fractionToBasisPoints(selectedGroup.rarityPerc, RARITY_GROUP_MAX_PROBABILITY);
+
+            // Update dup filter arr
+            usedIndices[selectedGroupId][i] = int256(rolledWord);
 
             i++;
         }
 
         return (result, rollProbability, j);
-        
+
     }
 }
