@@ -114,7 +114,7 @@ function Root() {
                             content: "Check out the chances for each rarity level"
                         }}
                     />
-                    <div className='xl:flex xl:justify-around sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
+                    <div className='xl:flex xl:justify-center sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
                         {Object.keys(rarities).map((rarityLevel, i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
                                 <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
