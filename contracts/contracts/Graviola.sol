@@ -108,7 +108,7 @@ contract Graviola is
         // require(!vrfRequests[tokenId].isDone, "request has already been processed");
 
         // uint256 randomValue = readNoise(vrfRequests[reqId].noiseId);
-        uint256 randomValue = uint256(blockhash(block.number)); // temp option
+        uint256 randomValue = uint256(blockhash(block.number - 1)); // temp option
         // vrfRequests[tokenId].isDone = true;
 
 
