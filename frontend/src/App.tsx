@@ -12,6 +12,7 @@ import { GRAVIOLA_ADDRESS } from "../../contracts/scripts/constants"
 import { rarityScale, rarityGroupColors } from "./rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
+import { getRarityFromThreshold } from "./utils/getRarityDataFromThreshold"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -81,7 +82,6 @@ const App = (props: { children: ReactNode }) => {
 
             const rarityGroupsData = await graviola.getRarityGroups()
             const nftTotalSupply = await graviola.totalSupply()
-            console.log("[info] getRarityGroups: ", rarityGroupsData)
             console.log("[info] totalSupply: ", Number(nftTotalSupply))
             const promises = Array.from({ length: Number(nftTotalSupply)}, async (_, i) => {
                 const uri = await graviola.tokenURI(BigInt(i))
@@ -118,9 +118,9 @@ const App = (props: { children: ReactNode }) => {
                 return accumulator;
             }, {} as Record<RarityLevel, RarityGroupData>);
 
-            console.log(raritiesData)
-    
-            // setRarities(raritiesData)
+            console.log("[info] raritiesData: ", raritiesData)
+            setRarities(raritiesData)
+
             // setLoading(false)
         }
 

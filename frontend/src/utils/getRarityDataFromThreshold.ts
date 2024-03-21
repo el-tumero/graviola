@@ -1,31 +1,28 @@
 import { RarityGroupData, RarityLevel } from "../types/Rarity";
-// import { rarityScale, rarities } from "../rarityData";
 
-// Get rarityLevel and rarityData based on percentage Threshold (input 1-100)
-export function getRarityFromThreshold(threshold: number): [RarityLevel, RarityData] {
+// Get rarityLevel and rarityData index based on percentage Threshold (input 1-100)
+export function getRarityFromThreshold(threshold: number, rGroups: Record<string, RarityGroupData>): [string, RarityGroupData] {
 
-        // // Clamping the threshold to be within 0 and 100
-        // if (threshold > 100) threshold = 100;
-        // if (threshold < 0) threshold = 0;
-    
-        // // Iterate over the rarityScale array in reverse order
-        // for (let i = rarityScale.length - 1; i >= 0; i--) {
-        //     const rarityLevel = rarityScale[i];
-        //     const rarityData = rarities[rarityLevel];
-    
-        //     // Since we're iterating in reverse, we check if the threshold is less than the next rarity's threshold (if any)
-        //     const nextRarityData = rarities[rarityScale[i - 1]];
-    
-        //     if (threshold >= rarityData.threshold && (!nextRarityData || threshold < nextRarityData.threshold)) {
-        //         return [rarityLevel, rarityData];
-        //     }
-        // }
+    // Clamp input
+    threshold = Math.max(0, Math.min(threshold, 100));
 
-    return [RarityLevel.Legendary, [RarityLevel.Legendary]] // This is here just for the return type
+    let perc = 0, prevPerc = 100
+
+    for (const rarityLevel of Object.keys(rGroups).sort((a, b) => rGroups[b].rarityPerc - rGroups[a].rarityPerc)) {
+        const data = rGroups[rarityLevel]
+        perc += data.rarityPerc
+
+        if (threshold <= prevPerc && threshold > 100 - perc) {
+            return [rarityLevel, data]
+        }
+        prevPerc = 100 - perc
+    }
+
+    throw new Error("Threshold does not match any rarity level.")
 }
 
 // Get rarityLevel and rarityData from BP value, e.g. (1499 = 1,499%, 28230 = 28,230%)
 export function formatBpToPercentage(bp: number): number {
-    let divisor = 10000
+    let divisor = 10_000
     return bp / divisor
 }
