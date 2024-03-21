@@ -62,7 +62,7 @@ const Collection = () => {
                                 }}
                             />
 
-                            <div className="flex justify-between items-center mb-4">
+                            <div className="flex justify-between items-center mb-4 max-sm:flex-col max-sm:gap-2">
                                 <p className="text-xl">Showing: <span className="font-bold">{collectionMode.toLowerCase()}</span></p>
                                 <Button
                                     text={`Change to ${(collectionMode === "My Drops") ? "all drops" : "my drops only"}`}
@@ -120,7 +120,7 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                                 </div>
                                 <div className="flex flex-col gap-2 justify-center items-center">
                                     {/* Rarity name */}
-                                    <p className="font-normal">
+                                    <p className="flex gap-1 font-normal">
                                         Rarity: {" "}
                                         <span style={{ color: rarityData.color }} className="font-bold">{rarityData.name}</span>
                                     </p>
