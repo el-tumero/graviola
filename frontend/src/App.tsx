@@ -13,6 +13,7 @@ import { rarityScale, rarityGroupColors } from "./rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
+import { getRarityFromPerc } from "./utils/getRarityDataFromThreshold"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {

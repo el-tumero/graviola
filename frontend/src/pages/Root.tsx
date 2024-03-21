@@ -33,9 +33,10 @@ function Root() {
         description: "This is a fallback NFT image. Go generate some!",
         attributes: [{
             "trait_type": "Rarity",
-            "value": 8332
+            "value": 2874
         }]
     }]
+    const fallbackNftsRariries = [RarityLevel.Rare]
 
     // Change this to 3 different-sized arrays once we have more data to work with
     const marqueeSources = nftSources.map((nft: NFT) => (
@@ -100,7 +101,7 @@ function Root() {
                         nftProps={{
                             src: convertToIfpsURL(nftSources[0].image || fallbackNfts[0].image),
                             glow: true,
-                            rarityGroup: getRarityFromPerc(nftSources[0].attributes[0].value, rGroups)[1] || RarityLevel.Rare,
+                            rarityGroup: getRarityFromPerc(nftSources[0].attributes[0].value, rGroups)[1] || fallbackNftsRariries[0],
                         }}
                         upperBubbleChildren={<NFTDetailsUpper
                             rarityPerc={nftSources[0].attributes[0].value || 5}
@@ -124,7 +125,7 @@ function Root() {
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
                                     <p className='font-bold' style={{color: rarityGroup.color }}>{rarityGroup.name}</p>
                                     <span className='font-bold'>
-                                        {rarityGroup.rarityPerc}
+                                        {rarityGroup.rarityPerc}%
                                     </span>
                                 </div>
                             </div>
