@@ -17,7 +17,7 @@ contract GraviolaWell {
     // A group represents an object containing everything related to a rarity level
     struct RarityGroup {
         string name;
-        uint rarityPerc; // The probability of the entire group, e.g. 75% for Common
+        uint rarityPerc; // The probability of the entire group (Frontend only)
         Word[] keywords; // All keywords that belong to the group
     }
 
@@ -106,11 +106,16 @@ contract GraviolaWell {
     function getRarityGroups() public view returns (RarityGroup[RARITY_GROUPS_LENGTH] memory) {
         RarityGroup[RARITY_GROUPS_LENGTH] memory res;
         for (uint i = 0; i < RARITY_GROUPS_LENGTH; i++) {
-            res[i] = rarities[i];
+            RarityGroup memory group = RarityGroup(
+                rarities[i].name,
+                defaultRarityGroupSetting.groupProbabilities[i],
+                rarities[i].keywords
+            );
+            res[i] = group;
         }
         return res;
     }
-
+    
     /// @notice Get sum of all keywords' count in a rarity group
     function getRarityGroupCount(RarityGroup memory _rGroup) private pure returns (uint) {
         return _rGroup.keywords[_rGroup.keywords.length - 1].upperRange;
