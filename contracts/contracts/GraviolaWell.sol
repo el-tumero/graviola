@@ -21,13 +21,22 @@ contract GraviolaWell {
         Word[] keywords; // All keywords that belong to the group
     }
 
+    // All data related to a single roll of n keywords
+    struct RollData {
+        RarityGroup selectedGroup;
+        uint256 selectedGroupId;
+        uint256 rolledGroup;         // Num between 0 and raritySetting.omega
+        uint256 uniqueGroupsBitmask; // Bitmask for group uniqueness check
+        bool reroll;                 // Reroll group blocker
+    }
 
     mapping (uint => RarityGroup) rarities;
-    uint256 public constant KEYWORDS_PER_TOKEN = 3;              // How many keywords should determine the token's description (result)
-    uint256 public constant TOKENS_PER_TRADE_UP = 3;             // How many tokens are needed to perform a Trade Up
-    uint256 public constant RARITY_GROUPS_LENGTH = 5;            // How many distinct rarity groups
+    uint256 public constant KEYWORDS_PER_TOKEN = 3;   // How many keywords should determine the token's description (result)
+    uint256 public constant TOKENS_PER_TRADE_UP = 3;  // How many tokens are needed to perform a Trade Up
+    uint256 public constant RARITY_GROUPS_LENGTH = 5; // How many distinct rarity groups
     event RollResult(string result, uint256 rarityPerc);
 
+    // Custom setting allows to boost certain groups during a TradeUp call
     struct RarityGroupSetting {
         uint omega; // 100 on default, or more when in TradeUp
         uint[RARITY_GROUPS_LENGTH] groupProbabilities;
@@ -160,10 +169,10 @@ contract GraviolaWell {
         
         uint16 i = 0;
         uint16 j = 0;
-        uint256 uniqueGroupsBitmask = 0;
-        int256 [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;
         uint256 rollProbability = 1;
+        int256 [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;
         string memory result = "";
+        RollData memory rollData;
 
         // // Init usedIndices arr
         for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
@@ -176,22 +185,26 @@ contract GraviolaWell {
             j++;
 
             uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
-            uint rolledGroup = randNum % defaultRarityGroupSetting.omega;
+            
+            // We only want to roll a group if we're not performing a re-roll in the current iteration
+            if (!rollData.reroll) {
+                rollData.rolledGroup = randNum % defaultRarityGroupSetting.omega;
+                // (Group object, uint groupId)
+                (rollData.selectedGroup, rollData.selectedGroupId) = findRarityGroupRange(rollData.rolledGroup, defaultRarityGroupSetting);
+            }
 
-            (RarityGroup memory selectedGroup, uint selectedGroupId) = findRarityGroupRange(rolledGroup, defaultRarityGroupSetting);
-            uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[selectedGroupId];
-
-            uint wordNum = randNum % getRarityGroupCount(selectedGroup);
+            uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[rollData.selectedGroupId];
+            uint wordNum = randNum % getRarityGroupCount(rollData.selectedGroup);
            
             // wordId
-            uint rolledWord = findWordFromRand(wordNum, selectedGroup);
+            uint rolledWord = findWordFromRand(wordNum, rollData.selectedGroup);
             // Word object
-            Word memory selectedWord = selectedGroup.keywords[rolledWord];
+            Word memory selectedWord = rollData.selectedGroup.keywords[rolledWord];
 
             // Dup group + word = reroll
-            if (usedIndices[selectedGroupId][0] == int256(rolledWord) ||
-                usedIndices[selectedGroupId][1] == int256(rolledWord) ||
-                usedIndices[selectedGroupId][2] == int256(rolledWord)) {
+            if (usedIndices[rollData.selectedGroupId][0] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][1] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][2] == int256(rolledWord)) {
                 continue;
             }
 
@@ -203,19 +216,18 @@ contract GraviolaWell {
                 )
             );
 
+
             // Update probability
             rollProbability *= fractionToBasisPoints(selectedGroupRarityPerc, defaultRarityGroupSetting.omega);
-
             // Update dup filter arr
-            usedIndices[selectedGroupId][i] = int256(rolledWord);
-
+            usedIndices[rollData.selectedGroupId][i] = int256(rolledWord);
             // Shift groups bitmask to left
-            uniqueGroupsBitmask |= (1 << selectedGroupId);
+            rollData.uniqueGroupsBitmask |= (1 << rollData.selectedGroupId);
 
             i++;
         }
 
-        uint256 uniqueGroupCount = popcount(uniqueGroupsBitmask);
+        uint256 uniqueGroupCount = popcount(rollData.uniqueGroupsBitmask);
 
         if (uniqueGroupCount == 3) {
             rollProbability *= 6;
@@ -226,7 +238,8 @@ contract GraviolaWell {
         return (result, rollProbability, j);
     }
 
-
+    /// @notice Roll 3 random keywords (used for Token generation later)
+    /// @dev TradeUp implementation (Custom RaritySetting)
     function rollWords(
         uint256 _seed,
         RarityGroupSetting memory _customRaritySetting
@@ -234,10 +247,10 @@ contract GraviolaWell {
         
         uint16 i = 0;
         uint16 j = 0;
-        uint256 uniqueGroupsBitmask = 0;
         int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
         uint256 rollProbability = 1;
         string memory result = "";
+        RollData memory rollData;
 
         // Init usedIndices arr
         for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
@@ -249,26 +262,30 @@ contract GraviolaWell {
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
 
-            uint customOmega = _customRaritySetting.omega;
             uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
 
-            // (Group object, uint groupId) 
-            (RarityGroup memory selectedGroup, uint selectedGroupId) =
-                findRarityGroupRange((randNum % customOmega), _customRaritySetting);
+            // We only want to roll a group if we're not performing a re-roll in the current iteration
+            if (!rollData.reroll) {
+                // We only use the custom omega for rolling elements, but not for calculating the probability
+                // Of the end result (group combinarion rarity stays the same)
+                rollData.rolledGroup = randNum % _customRaritySetting.omega;
+                // (Group object, uint groupId) 
+                (rollData.selectedGroup, rollData.selectedGroupId) = findRarityGroupRange(rollData.rolledGroup, _customRaritySetting);
+            }
 
             // ! We're calculating this step normally (using the default rarity setting)
-            uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[selectedGroupId];
+            uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[rollData.selectedGroupId];
 
-            uint wordNum = randNum % getRarityGroupCount(selectedGroup);
+            uint wordNum = randNum % getRarityGroupCount(rollData.selectedGroup);
             // wordId
-            uint rolledWord = findWordFromRand(wordNum, selectedGroup);
+            uint rolledWord = findWordFromRand(wordNum, rollData.selectedGroup);
             // Word object
-            Word memory selectedWord = selectedGroup.keywords[rolledWord];
+            Word memory selectedWord = rollData.selectedGroup.keywords[rolledWord];
 
             // Dup group + word = reroll
-            if (usedIndices[selectedGroupId][0] == int256(rolledWord) ||
-                usedIndices[selectedGroupId][1] == int256(rolledWord) ||
-                usedIndices[selectedGroupId][2] == int256(rolledWord)) {
+            if (usedIndices[rollData.selectedGroupId][0] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][1] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][2] == int256(rolledWord)) {
                 continue;
             }
 
@@ -284,15 +301,16 @@ contract GraviolaWell {
             rollProbability *= fractionToBasisPoints(selectedGroupRarityPerc, defaultRarityGroupSetting.omega);
 
             // Update dup filter arr
-            usedIndices[selectedGroupId][i] = int256(rolledWord);
+            usedIndices[rollData.selectedGroupId][i] = int256(rolledWord);
 
             // Shift groups bitmask to left
-            uniqueGroupsBitmask |= (1 << selectedGroupId);
+            rollData.uniqueGroupsBitmask |= (1 << rollData.selectedGroupId);
+
 
             i++;
         }
 
-        uint256 uniqueGroupCount = popcount(uniqueGroupsBitmask);
+        uint256 uniqueGroupCount = popcount(rollData.uniqueGroupsBitmask);
 
         if (uniqueGroupCount == 3) {
             rollProbability *= 6;
@@ -313,7 +331,8 @@ contract GraviolaWell {
         // (,uint inputRarityGroupId) = findRarityGroupRange(18, defaultRarityGroupSetting);
         // RarityGroup memory targetRarityGroup = rarities[inputRarityGroupId + 1];
         
-        RarityGroupSetting memory tradeUpSetting = RarityGroupSetting(110, [uint(66), 35, 9, 4, 1]);
+        // Target (boost) = Uncommon
+        RarityGroupSetting memory tradeUpSetting = RarityGroupSetting(120, [uint(88), 26, 3, 2, 1]);
         (string memory res, uint prob, uint j) = rollWords(_seed, tradeUpSetting);
         return (res, prob, j);
     }
