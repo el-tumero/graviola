@@ -11,6 +11,7 @@ import Button from "../components/ui/Button";
 import BlockNFT from "../components/ui/BlockNFT";
 import { getRarityColor } from "../utils/getRarityBorder";
 import { formatBpToPercentage, getRarityFromThreshold } from "../utils/getRarityDataFromThreshold";
+import { ethers } from "ethers";
 
 type CollectionMode = "Everyone" | "My Drops"
 
@@ -25,7 +26,10 @@ const Collection = () => {
 
     useEffect(() => {
         (async () => {
-            const userOwnedTokens = await graviolaContext.contract?.ownedTokens(address as string)
+            let userOwnedTokens
+            if (address) {
+                userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
+            }
             userOwnedTokens && userOwnedTokens.forEach(token => {
                 setOwnedTokensIds(prev => [...prev, Number(token)])
             })
@@ -98,11 +102,10 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                             flex flex-col justify-center items-center
                             gap-2 bg-light-bgLight/50 dark:bg-dark-bgLight/50
                             border-2 border-light-border dark:border-dark-border
-                            p-4 rounded-x
+                            p-4 rounded-xl
                             `}
-                            style={{ borderRadius: 24, borderWidth: 2, borderColor: getRarityColor(rarityLevel)}}
                             >
-                                <div>
+                                <div className="p-px" style={{ borderRadius: 16, borderWidth: 2, borderColor: getRarityColor(rarityLevel)}}>
                                     <BlockNFT src={convertToIfpsURL(nft.image)} glow={false} disableMargin={true} additionalClasses={`w-fit h-fit max-w-[14em]`} />
                                 </div>
                             <p className="font-normal">
