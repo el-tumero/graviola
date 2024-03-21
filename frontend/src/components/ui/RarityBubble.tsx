@@ -1,15 +1,13 @@
-import { RarityLevel } from "../../types/Rarity"
-import { getRarityColor } from "../../utils/getRarityBorder"
+import { RarityGroupData } from "../../types/Rarity"
 
 interface RarityBubbleProps {
-    rarity: RarityLevel
+    rarityGroup: RarityGroupData
     additionalClasses?: string
 }
 
-const RarityBubble = ({ rarity, additionalClasses }: RarityBubbleProps) => {
-    const rarityColor = getRarityColor(rarity)
+const RarityBubble = ({ rarityGroup, additionalClasses }: RarityBubbleProps) => {
     return (
-        <div style={{ backgroundColor: rarityColor }} className={`flex w-4 h-4 rounded-xl ${additionalClasses}`}></div>
+        <div style={{ backgroundColor: rarityGroup.color }} className={`flex w-4 h-4 rounded-xl ${additionalClasses}`}></div>
     )
 }
 

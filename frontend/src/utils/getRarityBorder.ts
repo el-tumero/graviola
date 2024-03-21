@@ -1,17 +1,12 @@
-import { RarityLevel } from "../types/Rarity";
+import { RarityGroupData, RarityLevel } from "../types/Rarity";
 import { rarityScale } from "../rarityData";
 
-export function getRarityColor(rarityLevel: RarityLevel): string {
-    // return rarities[rarityLevel].color
-    return ""
-}
-
-export function getRarityBorder(rarityLevel: RarityLevel, breathingEffect?: boolean): { style: React.CSSProperties, className?: string } {
+export function getRarityBorder(rarityGroup: RarityGroupData, breathingEffect?: boolean): { style: React.CSSProperties, className?: string } {
     const baseStyle = {
-        // boxShadow: `0px 0px 20px 6px ${rarities[rarityLevel].color}`,
-        // WebkitBoxShadow: `0px 0px 20px 6px ${rarities[rarityLevel].color}`,
-        // MozBoxShadow: `0px 0px 20px 6px ${rarities[rarityLevel].color}`,
-        // '--rarity-color': rarities[rarityLevel].color,
+        boxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
+        WebkitBoxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
+        MozBoxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
+        '--rarity-color': rarityGroup.color,
     }
     if (breathingEffect) {
         return {

@@ -12,7 +12,7 @@ import { GRAVIOLA_ADDRESS } from "../../contracts/scripts/constants"
 import { rarityScale, rarityGroupColors } from "./rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
-import { getRarityFromThreshold } from "./utils/getRarityDataFromThreshold"
+import { RaritiesData } from "./types/RarityGroup"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -66,7 +66,7 @@ const App = (props: { children: ReactNode }) => {
     // Contract data    
     const [dataFetched, setDataFetched] = useState<boolean>(false)
     const [collection, setCollection] = useState<NFT[]>([])
-    const [rarities, setRarities] = useState<Record<RarityLevel, RarityGroupData> | null>(null)
+    const [rarities, setRarities] = useState<RaritiesData | null>(null)
 
     const graviolaContextValue = {
         contract: graviola,
@@ -95,33 +95,30 @@ const App = (props: { children: ReactNode }) => {
             console.log("[info] fetched collection ", collection)
             setCollection(prev => [...prev, ...collection])
 
-            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((accumulator, groupData, index) => {
-                // Process keywords
+            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((acc, groupData, index) => {
+
+                // Cast keywords
                 const keywords: Keyword[] = groupData.keywords.map((keyword) => ({
                     name: keyword[0],
                     lowerRange: Number(keyword[1]),
                     upperRange: Number(keyword[2]),
-                }));
+                }))
             
-                // Construct the RarityGroupData object for the current group
-                console.log("rarityPerc ", groupData.rarityPerc)
                 const rarityGroupData: RarityGroupData = {
                     name: groupData.name,
                     rarityPerc: Number(groupData.rarityPerc),
                     color: rarityGroupColors[rarityScale[index]],
                     keywords,
-                };
-            
-                // Assign the constructed RarityGroupData to the corresponding rarity level in the accumulator
-                accumulator[rarityScale[index] as RarityLevel] = rarityGroupData;
-            
-                return accumulator;
-            }, {} as Record<RarityLevel, RarityGroupData>);
+                }
+
+                acc[rarityScale[index] as RarityLevel] = rarityGroupData
+                return acc
+            }, {} as Record<RarityLevel, RarityGroupData>)
 
             console.log("[info] raritiesData: ", raritiesData)
             setRarities(raritiesData)
 
-            // setLoading(false)
+            setLoading(false)
         }
 
         fetchCollection()
