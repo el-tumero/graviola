@@ -97,6 +97,9 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
         <>
             {props.contractNFTs.map((nft: NFT, i) => {
                 const percRarity = formatBpToPercentage(nft.attributes[0].value)
+                const keywordsArray: string[] = (nft.description.split(":").pop()!.trim()).split(",")
+                const keywords: string[] = keywordsArray.map(keyword => keyword.trim())
+
                 console.log("perc ", percRarity)
                 const [,rarityData] = getRarityFromPerc(percRarity, props.rGroups)
                 if ((props.collectionMode === "My Drops") && !(props.ownedTokenIds.includes(i))) {
@@ -115,12 +118,27 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                                 <div className="p-px" style={{ borderRadius: 16, borderWidth: 2, borderColor: rarityData.color }}>
                                     <BlockNFT src={convertToIfpsURL(nft.image)} glow={false} disableMargin={true} additionalClasses={`w-fit h-fit max-w-[14em]`} />
                                 </div>
-                            <p className="font-normal">
-                                Rarity: {" "}
-                                <span style={{ color: rarityData.color }} className="font-bold">{rarityData.name}</span>
-                            </p>
-                            <p style={{ color: rarityData.color }} className="text-xs opacity-75">({percRarity}%)</p>
-                            <p>Keywords: SOON</p>
+                                <div className="flex flex-col gap-2 justify-center items-center">
+                                    {/* Rarity name */}
+                                    <p className="font-normal">
+                                        Rarity: {" "}
+                                        <span style={{ color: rarityData.color }} className="font-bold">{rarityData.name}</span>
+                                    </p>
+                                    {/* Rarity perc */}
+                                    <p style={{ color: rarityData.color }} className="text-xs opacity-75">({percRarity}%)</p>
+                                </div>
+                                <div className="w-full h-1 bg-light-bgLight dark:bg-dark-bgLight"></div>
+                                <div className="flex flex-wrap w-full h-full gap-2 justify-center items-center">
+                                    {/* Keywords */}
+                                    {keywords.map((keyword, i) => (
+                                        <span
+                                            className="py-1 px-2 rounded-lg bg-light-bgLight dark:bg-dark-bgLight text-sm"
+                                            key={i}
+                                        >
+                                            {keyword}
+                                        </span>
+                                    ))}
+                                </div>
                         </div>
                     )
                 }
