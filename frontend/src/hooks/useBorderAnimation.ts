@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { getRandomRarity } from "../utils/getRarityBorder"
-import { rarities } from "../rarityData"
+// import { rarities } from "../rarityData"
 
 const useRandomRarityBorder = (run: boolean, ms: number): React.CSSProperties => {
     const [rarityBorder, setRarityBorder] = useState<React.CSSProperties>({})
@@ -13,9 +13,9 @@ const useRandomRarityBorder = (run: boolean, ms: number): React.CSSProperties =>
         const interval = setInterval(() => {
             const randomRarity = getRandomRarity()
             const newBorder = {
-                boxShadow: `0px 0px 32px 8px ${rarities[randomRarity].color}`,
-                WebkitBoxShadow: `0px 0px 32px 8px ${rarities[randomRarity].color}`,
-                MozBoxShadow: `0px 0px 32px 8px ${rarities[randomRarity].color}`,
+                // boxShadow: `0px 0px 32px 8px ${rarities[randomRarity].color}`,
+                // WebkitBoxShadow: `0px 0px 32px 8px ${rarities[randomRarity].color}`,
+                // MozBoxShadow: `0px 0px 32px 8px ${rarities[randomRarity].color}`,
                 transition: 'box-shadow 0.75s ease-in-out', // Dont change 0.6
             }
             setRarityBorder(newBorder)

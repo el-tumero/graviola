@@ -21,10 +21,10 @@ const config: HardhatUserConfig = {
     //   },
     //   accounts: [{privateKey: process.env.PRIV_KEY as string, balance: "479000000000000000"}]
     // },
-    sepolia: {
-      url: process.env.RPC_URL as string,
-      accounts: [process.env.PRIV_KEY as string]
-    }
+    // sepolia: {
+    //   url: process.env.RPC_URL as string,
+    //   accounts: [process.env.PRIV_KEY as string]
+    // }
   }
 };
 

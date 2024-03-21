@@ -7,7 +7,7 @@ import Navbar from "../components/Navbar"
 import Button from '../components/ui/Button'
 import BlockMarquee from '../components/BlockMarquee'
 import NFTDetails from '../components/ui/NFTDetails'
-import { rarities } from '../rarityData'
+// import { rarities } from '../rarityData'
 import { routerPaths } from '../router'
 import { RarityLevel } from '../types/Rarity'
 import { getRarityColor } from '../utils/getRarityBorder'
@@ -115,7 +115,7 @@ function Root() {
                         }}
                     />
                     <div className='xl:flex xl:justify-center sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
-                        {Object.keys(rarities).map((rarityLevel, i) => (
+                        {/* {Object.keys(rarities).map((rarityLevel, i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
                                 <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
@@ -125,7 +125,7 @@ function Root() {
                                     </span>
                                 </div>
                             </div>
-                        ))}
+                        ))} */}
                     </div>
 
 
@@ -160,7 +160,8 @@ function Root() {
 
 const NFTDetailsUpper = (props: { rarity: RarityLevel }) => {
     return (
-        <p className='font-semibold'>Rarity: <span className='font-bold' style={{color: getRarityColor(props.rarity)}}>{rarities[props.rarity].name.toUpperCase()}</span></p>
+        <></>
+        // <p className='font-semibold'>Rarity: <span className='font-bold' style={{color: getRarityColor(props.rarity)}}>{rarities[props.rarity].name.toUpperCase()}</span></p>
     )
 }
 

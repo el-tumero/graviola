@@ -6,10 +6,12 @@ import { Graviola } from "../../contracts/typechain-types/contracts/Graviola"
 import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/contracts/Graviola__factory"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
-import { Keyword } from "./types/Keyword"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 import { GRAVIOLA_ADDRESS } from "../../contracts/scripts/constants"
+import { rarityScale, rarityGroupColors } from "./rarityData"
+import { RarityLevel, RarityGroupData } from "./types/Rarity"
+import { Keyword } from "./types/Keyword"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -63,23 +65,23 @@ const App = (props: { children: ReactNode }) => {
     // Contract data    
     const [dataFetched, setDataFetched] = useState<boolean>(false)
     const [collection, setCollection] = useState<NFT[]>([])
-    const [keywords, setKeywords] = useState<Keyword[]>([])
+    const [rarities, setRarities] = useState<Record<RarityLevel, RarityGroupData> | null>(null)
 
     const graviolaContextValue = {
         contract: graviola,
         collection: collection,
-        keywords: keywords
+        rarities: rarities
     }
 
-    // Fetch NFT data for read-only site mode
+    // Fetch contract data
     useEffect(() => {
         if (!graviola || dataFetched) return
     
         const fetchCollection = async () => {
 
-            const allKeywords = await graviola.getAllWords()
+            const rarityGroupsData = await graviola.getRarityGroups()
             const nftTotalSupply = await graviola.totalSupply()
-            console.log("[info] getAllWords: ", allKeywords)
+            console.log("[info] getRarityGroups: ", rarityGroupsData)
             console.log("[info] totalSupply: ", Number(nftTotalSupply))
             const promises = Array.from({ length: Number(nftTotalSupply)}, async (_, i) => {
                 const uri = await graviola.tokenURI(BigInt(i))
@@ -93,16 +95,33 @@ const App = (props: { children: ReactNode }) => {
             console.log("[info] fetched collection ", collection)
             setCollection(prev => [...prev, ...collection])
 
-            // Keywords
-            allKeywords.map((keywordData) => {
-                const keyword: Keyword = {
-                    name: keywordData[0],
-                    rarityPerc: Number(keywordData[1]),
-                }
-                setKeywords(prev => [...prev, keyword])
-            })
+            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((accumulator, groupData, index) => {
+                // Process keywords
+                const keywords: Keyword[] = groupData.keywords.map((keyword) => ({
+                    name: keyword[0],
+                    lowerRange: Number(keyword[1]),
+                    upperRange: Number(keyword[2]),
+                }));
+            
+                // Construct the RarityGroupData object for the current group
+                console.log("rarityPerc ", groupData.rarityPerc)
+                const rarityGroupData: RarityGroupData = {
+                    name: groupData.name,
+                    rarityPerc: Number(groupData.rarityPerc),
+                    color: rarityGroupColors[rarityScale[index]],
+                    keywords,
+                };
+            
+                // Assign the constructed RarityGroupData to the corresponding rarity level in the accumulator
+                accumulator[rarityScale[index] as RarityLevel] = rarityGroupData;
+            
+                return accumulator;
+            }, {} as Record<RarityLevel, RarityGroupData>);
+
+            console.log(raritiesData)
     
-            setLoading(false)
+            // setRarities(raritiesData)
+            // setLoading(false)
         }
 
         fetchCollection()
