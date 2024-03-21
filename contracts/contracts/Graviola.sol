@@ -108,14 +108,14 @@ contract Graviola is
         // require(!vrfRequests[tokenId].isDone, "request has already been processed");
 
         // uint256 randomValue = readNoise(vrfRequests[reqId].noiseId);
-        uint256 randomValue = uint256(blockhash(block.number)); // temp option
+        uint256 randomValue = uint256(blockhash(block.number - 1)); // temp option
         // vrfRequests[tokenId].isDone = true;
 
 
         // words well logic
         string memory prompt;
         uint256 rarity;
-        (prompt, rarity) = rollWords(randomValue);
+        (prompt, rarity, ) = rollWords(randomValue);
 
         string memory fullPrompt = string.concat(promptBase, prompt);
 
@@ -155,4 +155,10 @@ contract Graviola is
     function totalSupply() public view returns (uint256) {
         return _nextTokenId;
     }
+
+    // function addWordToWellOfWords(string memory _keyword, uint256 _seed) external {
+    //     require(balanceOf(msg.sender) > 0);
+    //     addWordToWell(_keyword, _seed);
+    // }
+    
 }
