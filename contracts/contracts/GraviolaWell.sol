@@ -3,146 +3,98 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
 
+/// @notice Contract for rolling Graviola tokens and all logic related to keywords
 contract GraviolaWell {
+
     // Internal Word structure
     struct Word {
         string keyword;
-        uint256 lowerRange;
-        uint256 upperRange;
+        uint lowerRange;
+        uint upperRange; // upperRange - lowerRange = "count" of a keyword
+                         // The count is used to calculate the probability of getting a certain keyword
     }
 
-    // Struct for displaying human-readable info about keywords
-    struct WordStats {
-        string keyword;
-        uint256 rarityPerc;
+    // A group represents an object containing everything related to a rarity level
+    struct RarityGroup {
+        string name;
+        uint rarityPerc; // The probability of the entire group, e.g. 75% for Common
+        Word[] keywords; // All keywords that belong to the group
     }
 
-    mapping(string => uint256) internal wordMap;
-    Word[] public WELL_OF_WORDS;
-    uint256 public WELL_OF_WORDS_MIN_R = 10; // Minimum rarity for any keyword
-    uint256 public WELL_OF_WORDS_TOTAL_R = 2000; // Collective rarity of all keywords
-    uint256 public KEYWORDS_PER_TOKEN = 3; // How many keywords should be used to roll and generate the image
+    // All data related to a single roll of n keywords
+    struct RollData {
+        RarityGroup selectedGroup;
+        uint256 selectedGroupId;
+        uint256 rolledGroup;         // Num between 0 and raritySetting.omega
+        uint256 uniqueGroupsBitmask; // Bitmask for group uniqueness check
+        bool reroll;                 // Reroll group blocker
+    }
 
-    event RollResult(string result, uint256 rarity);
+    mapping (uint => RarityGroup) rarities;
+    uint256 public constant KEYWORDS_PER_TOKEN = 3;   // How many keywords should determine the token's description (result)
+    uint256 public constant TOKENS_PER_TRADE_UP = 3;  // How many tokens are needed to perform a Trade Up
+    uint256 public constant RARITY_GROUPS_LENGTH = 5; // How many distinct rarity groups
+    event RollResult(string result, uint256 rarityPerc);
+
+    // Custom setting allows to boost certain groups during a TradeUp call
+    struct RarityGroupSetting {
+        uint omega; // 100 on default, or more when in TradeUp
+        uint[RARITY_GROUPS_LENGTH] groupProbabilities;
+    }
+
+    RarityGroupSetting defaultRarityGroupSetting = RarityGroupSetting(100, [uint(88), 6, 3, 2, 1]);
 
     constructor() {
-        // Init base keywords and rarity factors
-        // Simplified for probability testing
 
-        WELL_OF_WORDS.push(Word("human", 0, 999));
-        wordMap["human"] = 0;
+        // Common RarityGroup
+        RarityGroup storage commons = rarities[0];
+        commons.name = "Common";
+        commons.keywords.push(Word("human", 0, 99));
+        commons.keywords.push(Word("android", 100, 199));
+        commons.keywords.push(Word("robot", 200, 299));
+        commons.keywords.push(Word("cyborg", 300, 399));
+        commons.keywords.push(Word("droid", 400, 499));
 
-        WELL_OF_WORDS.push(Word("goblin", 1000, 1249));
-        wordMap["goblin"] = 1;
+        // Uncommon RarityGroup
+        RarityGroup storage uncommons = rarities[1];
+        uncommons.name = "Uncommon";
+        uncommons.keywords.push(Word("elf", 0, 99));
+        uncommons.keywords.push(Word("goblin", 100, 199));
+        uncommons.keywords.push(Word("gnome", 200, 299));
 
-        WELL_OF_WORDS.push(Word("alien", 1250, 1749));
-        wordMap["alien"] = 2;
+        // Rare RarityGroup
+        RarityGroup storage rares = rarities[2];
+        rares.name = "Rare";
+        rares.keywords.push(Word("nomad", 0, 99));
+        rares.keywords.push(Word("assassin", 100, 199));
+        rares.keywords.push(Word("agent", 200, 299));
 
-        WELL_OF_WORDS.push(Word("elf", 1750, 1999));
-        wordMap["elf"] = 3;
+        // Very Rare RarityGroup
+        RarityGroup storage veryRares = rarities[3];
+        veryRares.name = "Very Rare";
+        veryRares.keywords.push(Word("hunter", 0, 99));
+        veryRares.keywords.push(Word("berserker", 100, 199));
+        veryRares.keywords.push(Word("mage", 200, 299));
 
-        // WELL_OF_WORDS.push(Word("human", 0, 999));
-        // WELL_OF_WORDS.push(Word("elf", 1000, 1249));
-        // WELL_OF_WORDS.push(Word("bald", 1250, 1349));
-        WELL_OF_WORDS.push(Word("hairy", 2000, 2019));
-        wordMap["hairy"] = 4;
-
-        WELL_OF_WORDS.push(Word("monobrow", 2020, 2021));
-        wordMap["monobrow"] = 5;
-        
-        // WELL_OF_WORDS.push(Word("tattoo", 1400, 1449));
-        // WELL_OF_WORDS.push(Word("green", 1450, 1499));
-        // WELL_OF_WORDS.push(Word("red", 1500, 1599));
-        // WELL_OF_WORDS.push(Word("blue", 1600, 1749));
-        // WELL_OF_WORDS.push(Word("goblin", 1750, 1949));
-        // WELL_OF_WORDS.push(Word("android", 1950, 1999));
-        // WELL_OF_WORDS.push(Word("cyborg", 2000, 2009));
-        // WELL_OF_WORDS.push(Word("android", 2010, 2012));
-        // WELL_OF_WORDS.push(Word("mage", 2013, 2062));
-        // WELL_OF_WORDS.push(Word("angry", 2063, 2115));
-        // WELL_OF_WORDS.push(Word("stunned", 2116, 2205));
-        // WELL_OF_WORDS.push(Word("monobrow", 2206, 2207));
-
-        // WELL_OF_WORDS.push(Word("human", 1500));
-        // WELL_OF_WORDS.push(Word("elf", 250));
-        // WELL_OF_WORDS.push(Word("goblin", 150));
-        // WELL_OF_WORDS.push(Word("android", 100));
-
-        // WELL_OF_WORDS.push(Word("piercing", 20));
-        // WELL_OF_WORDS.push(Word("bald", 10));
-        // WELL_OF_WORDS.push(Word("tattoo", 30));
-        // WELL_OF_WORDS.push(Word("hairy", 5));
-        // WELL_OF_WORDS.push(Word("white", 200));
-        // WELL_OF_WORDS.push(Word("green", 200));
-        // WELL_OF_WORDS.push(Word("black", 200));
-        // WELL_OF_WORDS.push(Word("red", 200));
-        // WELL_OF_WORDS.push(Word("blue", 200));
-        // WELL_OF_WORDS.push(Word("yellow", 200));
+        // Legendary RarityGroup
+        RarityGroup storage legendaries = rarities[4];
+        legendaries.name = "Legendary";
+        legendaries.keywords.push(Word("graviola", 0, 9));
+        legendaries.keywords.push(Word("golden", 10, 19));
+        legendaries.keywords.push(Word("god", 20, 21));
     }
 
-    /// @notice Add a new keyword to the pool (well) of possible keywords.
-    /// @notice The rarity of new keywords is chosen randomly.
-    function addWordToWell(string memory _keyword, uint256 _seed) public {
-        // TODO: replace _seed with VRF call
-        // Reject if caller does not own at least one NFT
-        // Keyword should be no longer than 12 characters
-        require(bytes(_keyword).length <= 12 && bytes(_keyword).length > 0);
-
-        // Generate a (pseudorandom) probability for the new keyword
-        uint256 rand = uint256(keccak256(abi.encodePacked(_seed, msg.sender))); // CHANGE THIS TO VRF
-        uint256 newWordRange = ((rand %
-            ((WELL_OF_WORDS_TOTAL_R - WELL_OF_WORDS_MIN_R) / 10 + 1)) * 10) +
-            WELL_OF_WORDS_MIN_R;
-
-        // Add probability sum to totalRarity
-        WELL_OF_WORDS_TOTAL_R += newWordRange;
-
-        Word memory currentLastWord = WELL_OF_WORDS[WELL_OF_WORDS.length - 1];
-        uint256 newWordLowerRange = currentLastWord.upperRange + 1;
-        uint256 newWordUpperRange = newWordLowerRange + newWordRange;
-
-        Word memory newWord = Word(
-            _keyword,
-            newWordLowerRange,
-            newWordUpperRange
-        );
-        wordMap[_keyword] = (WELL_OF_WORDS.length);
-        WELL_OF_WORDS.push(newWord);
-    }
-
-    /// @notice We're estimating the word's probability with this equation: 1 - (1 - P)^n,
-    /// @notice Where `P` is the probability of target keyword in a single keyword roll and `n` is the KEYWORDS_PER_TOKEN value.
-    function calculateEstimatedWordRarityPerc(
-        string memory _keyword
-    ) public view returns (uint256) {
-        uint rawKeywordRange = WELL_OF_WORDS[wordMap[_keyword]].upperRange -
-            WELL_OF_WORDS[wordMap[_keyword]].lowerRange;
-        uint maxProbabilityPerc = 100;
-        uint maxProbabilityInBp = 1000000; // 100 perc in BP
-        uint singleRollProbabilityInBP = maxProbabilityPerc -
-            fractionToBasisPoints(rawKeywordRange, WELL_OF_WORDS_TOTAL_R);
-        uint totalRollProbabilityInBP = singleRollProbabilityInBP **
-            KEYWORDS_PER_TOKEN;
-        uint res = maxProbabilityInBp - totalRollProbabilityInBP;
-        return res;
-    }
-
-    function getWellOfWords() public view returns (Word[] memory) {
-        return WELL_OF_WORDS;
-    }
-
-    function getAllWords() public view returns (WordStats[] memory) {
-        WordStats[] memory res = new WordStats[](WELL_OF_WORDS.length);
-        for (uint i = 0; i < WELL_OF_WORDS.length; i++) {
-            Word memory word = WELL_OF_WORDS[i];
-            uint prob = calculateEstimatedWordRarityPerc(word.keyword);
-            WordStats memory wordStats = WordStats(word.keyword, prob);
-            res[i] = wordStats;
+    /// @notice Count the number of set bits in an uint
+    function popcount(uint256 n) internal pure returns (uint256) {
+        uint256 count = 0;
+        while (n != 0) {
+            count += n & 1;
+            n >>= 1;
         }
-        return res;
+        return count;
     }
 
-    /// @notice Convert a fraction to basis points uint256
+    /// @notice Convert a fraction to basis points (BP)
     function fractionToBasisPoints(
         uint256 numerator,
         uint256 denumerator
@@ -150,93 +102,241 @@ contract GraviolaWell {
         return (numerator * 100) / denumerator;
     }
 
-    function findNearestWordRangeIndex(
-        uint256 _number
-    ) public view returns (uint256) {
-        require(_number < WELL_OF_WORDS_TOTAL_R);
-        uint256 low = 0;
-        uint256 high = WELL_OF_WORDS.length;
-        while (low < high) {
-            uint256 mid = Math.average(low, high);
-            if (WELL_OF_WORDS[mid].upperRange > _number) {
-                high = mid;
-            } else {
-                low = mid + 1;
-            }
+    /// @notice Get all rarities in a list (frontend)
+    function getRarityGroups() public view returns (RarityGroup[RARITY_GROUPS_LENGTH] memory) {
+        RarityGroup[RARITY_GROUPS_LENGTH] memory res;
+        for (uint i = 0; i < RARITY_GROUPS_LENGTH; i++) {
+            res[i] = rarities[i];
         }
-        if (low > 0 && WELL_OF_WORDS[low - 1].upperRange == _number) {
-            return low - 1;
-        } else {
-            return low;
-        }
+        return res;
     }
 
+    /// @notice Get sum of all keywords' count in a rarity group
+    function getRarityGroupCount(RarityGroup memory _rGroup) private pure returns (uint) {
+        return _rGroup.keywords[_rGroup.keywords.length - 1].upperRange;
+    }
+
+    /// @notice Get the count of a keyword in a rarity group
+    function getWordCount(uint _keywordId, RarityGroup memory _rGroup) private pure returns (uint) {
+        return _rGroup.keywords[_keywordId].upperRange - _rGroup.keywords[_keywordId].lowerRange;
+    }
+
+    /// @notice Get RarityGroup object from a percentage input based on the group's threshold
+    /// @param _percInput Uint in range 0-100. E.g: 80 => Common, 5 => Rare
+    /// @return Rarity Group (if found) and index of group in the rarities mapping
+    function findRarityGroupRange(uint _percInput, RarityGroupSetting memory _raritySetting) public view returns (RarityGroup memory, uint) {
+        require(_percInput <= _raritySetting.omega && _percInput >= 0, "Input out of bounds");
+        uint cumulativeThreshold = 0;
+        for (uint i = RARITY_GROUPS_LENGTH; i > 0; i--) {
+            RarityGroup storage currentGroup = rarities[i - 1];
+            uint currentGroupRarityPerc = _raritySetting.groupProbabilities[i - 1];
+            if (_percInput <= cumulativeThreshold + currentGroupRarityPerc) {
+                return (currentGroup, (i-1));
+            }
+            cumulativeThreshold += currentGroupRarityPerc;
+        }
+        revert("Input does not match any rarity group");
+    }
+
+    /// @notice After rolling a random number in the range of a group, find the rolled word by ranges
+    /// @return Index of word in the scope of its group
+    function findWordFromRand(uint _randNum, RarityGroup memory _targetGroup) public pure returns (uint) {
+        // Searched number must be within the group's keyword bounds
+        require(_randNum > 0 && _randNum <= getRarityGroupCount(_targetGroup), "Input is out of bounds for the specified group.");
+        for (uint i = 0; i < _targetGroup.keywords.length; i++) {
+            if (_randNum <= _targetGroup.keywords[i].upperRange ) {
+                return i;
+            }
+        }
+        revert("Input does not match any word in group");
+    }
+
+    /// @notice Calculate probabilirt of rolling the specified keyword in a group in a single roll
+    /// @return Probability of getting the keyword in perc. format
+    function getWordProbability(uint _keywordIndex, RarityGroup memory _targetGroup) public pure returns (uint) {
+        require(_targetGroup.keywords.length >= _keywordIndex, "Keyword index out of bounds");
+        uint targetWordCount = getWordCount(_keywordIndex, _targetGroup);
+        uint totalGroupCount = getRarityGroupCount(_targetGroup);
+        return fractionToBasisPoints(targetWordCount, totalGroupCount);
+    }
+
+    /// @notice Roll 3 random keywords (used for Token generation later)
+    /// @dev Classic implementation (non-TradeUp)
+    /// @param _seed Result of a VRF function or any other randomness source
     function rollWords(
         uint256 _seed
-    ) public view returns (string memory, uint256) {
-        uint8 keywordAmount = 3;
-        uint256 totalProbability;
+    ) public view returns (string memory, uint256, uint256) {
+        
+        uint16 i = 0;
+        uint16 j = 0;
+        uint256 rollProbability = 1;
+        int256 [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;
         string memory result = "";
-        int256[3] memory usedRangeIndices = [int256(-1), -1, -1];
-        uint256[3] memory bpProbabilities;
-        uint256 dynamicRarity = WELL_OF_WORDS_TOTAL_R; // Dynamic rarity of each iteration
+        RollData memory rollData;
 
-        uint256 i = 0;
-        uint256 j = 0;
-
-        while (i < keywordAmount) {
+        // // Init usedIndices arr
+        for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
+            for (uint y = 0; y < KEYWORDS_PER_TOKEN; y++) {
+                usedIndices[x][y] = -1;
+            }
+        }
+       
+        while (i < KEYWORDS_PER_TOKEN) {
             j++;
 
-            uint256 randomNum = uint256(
-                keccak256(
-                    abi.encodePacked(
-                        _seed,
-                        uint256(i + j),
-                        msg.sender,
-                        block.timestamp
-                    )
-                )
-            ) % WELL_OF_WORDS_TOTAL_R; // Random number between [0 and totalRarity]
-            uint256 randomNumWordRangeIndex = findNearestWordRangeIndex(
-                randomNum
-            );
-
-            // If we rolled a word (range) that has been already used -> roll again.
-            if (
-                (usedRangeIndices[0] == int256(randomNumWordRangeIndex)) ||
-                (usedRangeIndices[1] == int256(randomNumWordRangeIndex)) ||
-                (usedRangeIndices[2] == int256(randomNumWordRangeIndex))
-            ) {
-                continue;
+            uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
+            
+            // We only want to roll a group if we're not performing a re-roll in the current iteration
+            if (!rollData.reroll) {
+                rollData.rolledGroup = randNum % defaultRarityGroupSetting.omega;
+                // (Group object, uint groupId)
+                (rollData.selectedGroup, rollData.selectedGroupId) = findRarityGroupRange(rollData.rolledGroup, defaultRarityGroupSetting);
             }
 
-            // Calculate probability factor of selected keyword & subtract from total probability.
-            uint256 selectedWordTotalRarity = WELL_OF_WORDS[
-                randomNumWordRangeIndex
-            ].upperRange - WELL_OF_WORDS[randomNumWordRangeIndex].lowerRange;
+            uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[rollData.selectedGroupId];
+            uint wordNum = randNum % getRarityGroupCount(rollData.selectedGroup);
+           
+            // wordId
+            uint rolledWord = findWordFromRand(wordNum, rollData.selectedGroup);
+            // Word object
+            Word memory selectedWord = rollData.selectedGroup.keywords[rolledWord];
 
-            bpProbabilities[i] = (
-                fractionToBasisPoints(selectedWordTotalRarity, dynamicRarity)
-            );
-            dynamicRarity -= selectedWordTotalRarity; // Update dynamic rarity
-
-            // // Add selected word's range to usedRangeIndices to prevent duplicates.
-            usedRangeIndices[i] = int256(randomNumWordRangeIndex);
+            // Dup group + word = reroll
+            if (usedIndices[rollData.selectedGroupId][0] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][1] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][2] == int256(rolledWord)) {
+                continue;
+            }
 
             result = string(
                 abi.encodePacked(
                     result,
                     (i > 0 ? ", " : ""),
-                    WELL_OF_WORDS[randomNumWordRangeIndex].keyword
+                    selectedWord.keyword
                 )
             );
+
+
+            // Update probability
+            rollProbability *= fractionToBasisPoints(selectedGroupRarityPerc, defaultRarityGroupSetting.omega);
+            // Update dup filter arr
+            usedIndices[rollData.selectedGroupId][i] = int256(rolledWord);
+            // Shift groups bitmask to left
+            rollData.uniqueGroupsBitmask |= (1 << rollData.selectedGroupId);
 
             i++;
         }
 
-        totalProbability = (bpProbabilities[0] *
-            bpProbabilities[1] *
-            bpProbabilities[2]);
-        return (result, totalProbability);
+        uint256 uniqueGroupCount = popcount(rollData.uniqueGroupsBitmask);
+
+        if (uniqueGroupCount == 3) {
+            rollProbability *= 6;
+        } else if (uniqueGroupCount == 2) {
+            rollProbability *= 2;
+        }
+
+        return (result, rollProbability, j);
     }
+
+    /// @notice Roll 3 random keywords (used for Token generation later)
+    /// @dev TradeUp implementation (Custom RaritySetting)
+    function rollWords(
+        uint256 _seed,
+        RarityGroupSetting memory _customRaritySetting
+    ) public view returns (string memory, uint256, uint256) {
+        
+        uint16 i = 0;
+        uint16 j = 0;
+        int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
+        uint256 rollProbability = 1;
+        string memory result = "";
+        RollData memory rollData;
+
+        // Init usedIndices arr
+        for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
+            for (uint y = 0; y < KEYWORDS_PER_TOKEN; y++) {
+                usedIndices[x][y] = -1;
+            }
+        }
+       
+        while (i < KEYWORDS_PER_TOKEN) {
+            j++;
+
+            uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
+
+            // We only want to roll a group if we're not performing a re-roll in the current iteration
+            if (!rollData.reroll) {
+                // We only use the custom omega for rolling elements, but not for calculating the probability
+                // Of the end result (group combinarion rarity stays the same)
+                rollData.rolledGroup = randNum % _customRaritySetting.omega;
+                // (Group object, uint groupId) 
+                (rollData.selectedGroup, rollData.selectedGroupId) = findRarityGroupRange(rollData.rolledGroup, _customRaritySetting);
+            }
+
+            // ! We're calculating this step normally (using the default rarity setting)
+            uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[rollData.selectedGroupId];
+
+            uint wordNum = randNum % getRarityGroupCount(rollData.selectedGroup);
+            // wordId
+            uint rolledWord = findWordFromRand(wordNum, rollData.selectedGroup);
+            // Word object
+            Word memory selectedWord = rollData.selectedGroup.keywords[rolledWord];
+
+            // Dup group + word = reroll
+            if (usedIndices[rollData.selectedGroupId][0] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][1] == int256(rolledWord) ||
+                usedIndices[rollData.selectedGroupId][2] == int256(rolledWord)) {
+                continue;
+            }
+
+            result = string(
+                abi.encodePacked(
+                    result,
+                    (i > 0 ? ", " : ""),
+                    selectedWord.keyword
+                )
+            );
+
+            // Update probability
+            rollProbability *= fractionToBasisPoints(selectedGroupRarityPerc, defaultRarityGroupSetting.omega);
+
+            // Update dup filter arr
+            usedIndices[rollData.selectedGroupId][i] = int256(rolledWord);
+
+            // Shift groups bitmask to left
+            rollData.uniqueGroupsBitmask |= (1 << rollData.selectedGroupId);
+
+
+            i++;
+        }
+
+        uint256 uniqueGroupCount = popcount(rollData.uniqueGroupsBitmask);
+
+        if (uniqueGroupCount == 3) {
+            rollProbability *= 6;
+        } else if (uniqueGroupCount == 2) {
+            rollProbability *= 2;
+        }
+
+        return (result, rollProbability, j);
+    }
+
+    /// @notice The TradeUp mechanic allows the User to "trade" three NFTs of their choice for one of a better rarity
+    /// @notice All 3 input NFTs must be of the same rarity level in order to perform a successful TradeUp.
+    function tradeUp(uint _seed) view  public returns (string memory, uint, uint) {
+        // TODO: Check inputs, requiure ownership of input NFTs
+        // TODO: Check if all inputs are of the same Rarity level
+
+        // Needed
+        // (,uint inputRarityGroupId) = findRarityGroupRange(18, defaultRarityGroupSetting);
+        // RarityGroup memory targetRarityGroup = rarities[inputRarityGroupId + 1];
+        
+        // Target (boost) = Uncommon
+        RarityGroupSetting memory tradeUpSetting = RarityGroupSetting(120, [uint(88), 26, 3, 2, 1]);
+        (string memory res, uint prob, uint j) = rollWords(_seed, tradeUpSetting);
+        return (res, prob, j);
+    }
+
+
+
 }

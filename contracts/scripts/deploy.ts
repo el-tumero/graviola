@@ -20,7 +20,7 @@ async function main() {
 
   const Graviola = await ethers.getContractFactory("Graviola")
   const graviola = await Graviola.deploy(aiOracleAddress, vrfHostAddress)
-
+  await graviola.waitForDeployment()
 
   // Upkeep registration
   // Sepolia Registry: 0x86EFBD0b6736Bed994962f9797049422A3A8E8Ad
