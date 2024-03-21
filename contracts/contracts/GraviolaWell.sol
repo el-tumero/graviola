@@ -33,7 +33,7 @@ contract GraviolaWell {
         uint[RARITY_GROUPS_LENGTH] groupProbabilities;
     }
 
-    RarityGroupSetting defaultRarityGroupSetting = RarityGroupSetting(100, [uint(66), 20, 9, 4, 1]);
+    RarityGroupSetting defaultRarityGroupSetting = RarityGroupSetting(100, [uint(88), 6, 3, 2, 1]);
 
     constructor() {
 
@@ -73,6 +73,16 @@ contract GraviolaWell {
         legendaries.keywords.push(Word("graviola", 0, 9));
         legendaries.keywords.push(Word("golden", 10, 19));
         legendaries.keywords.push(Word("god", 20, 21));
+    }
+
+    /// @notice Count the number of set bits in an uint
+    function popcount(uint256 n) internal pure returns (uint256) {
+        uint256 count = 0;
+        while (n != 0) {
+            count += n & 1;
+            n >>= 1;
+        }
+        return count;
     }
 
     /// @notice Convert a fraction to basis points (BP)
@@ -150,24 +160,23 @@ contract GraviolaWell {
         
         uint16 i = 0;
         uint16 j = 0;
-        uint aa;
-        // int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;
+        uint256 uniqueGroupsBitmask = 0;
+        int256 [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;
         uint256 rollProbability = 1;
         string memory result = "";
 
         // // Init usedIndices arr
-        // for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
-        //     for (uint y = 0; y < KEYWORDS_PER_TOKEN; y++) {
-        //         usedIndices[x][y] = -1;
-        //     }
-        // }
+        for (uint x = 0; x < RARITY_GROUPS_LENGTH; x++) {
+            for (uint y = 0; y < KEYWORDS_PER_TOKEN; y++) {
+                usedIndices[x][y] = -1;
+            }
+        }
        
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
 
             uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
             uint rolledGroup = randNum % defaultRarityGroupSetting.omega;
-            aa = rolledGroup;
 
             (RarityGroup memory selectedGroup, uint selectedGroupId) = findRarityGroupRange(rolledGroup, defaultRarityGroupSetting);
             uint selectedGroupRarityPerc = defaultRarityGroupSetting.groupProbabilities[selectedGroupId];
@@ -180,11 +189,11 @@ contract GraviolaWell {
             Word memory selectedWord = selectedGroup.keywords[rolledWord];
 
             // Dup group + word = reroll
-            // if (usedIndices[selectedGroupId][0] == int256(rolledWord) ||
-            //     usedIndices[selectedGroupId][1] == int256(rolledWord) ||
-            //     usedIndices[selectedGroupId][2] == int256(rolledWord)) {
-            //     continue;
-            // }
+            if (usedIndices[selectedGroupId][0] == int256(rolledWord) ||
+                usedIndices[selectedGroupId][1] == int256(rolledWord) ||
+                usedIndices[selectedGroupId][2] == int256(rolledWord)) {
+                continue;
+            }
 
             result = string(
                 abi.encodePacked(
@@ -198,12 +207,23 @@ contract GraviolaWell {
             rollProbability *= fractionToBasisPoints(selectedGroupRarityPerc, defaultRarityGroupSetting.omega);
 
             // Update dup filter arr
-            // usedIndices[selectedGroupId][i] = int256(rolledWord);
+            usedIndices[selectedGroupId][i] = int256(rolledWord);
+
+            // Shift groups bitmask to left
+            uniqueGroupsBitmask |= (1 << selectedGroupId);
 
             i++;
         }
 
-        return (result, rollProbability, aa);
+        uint256 uniqueGroupCount = popcount(uniqueGroupsBitmask);
+
+        if (uniqueGroupCount == 3) {
+            rollProbability *= 6;
+        } else if (uniqueGroupCount == 2) {
+            rollProbability *= 2;
+        }
+
+        return (result, rollProbability, j);
     }
 
 
@@ -214,6 +234,7 @@ contract GraviolaWell {
         
         uint16 i = 0;
         uint16 j = 0;
+        uint256 uniqueGroupsBitmask = 0;
         int [KEYWORDS_PER_TOKEN][RARITY_GROUPS_LENGTH] memory usedIndices;       
         uint256 rollProbability = 1;
         string memory result = "";
@@ -265,7 +286,18 @@ contract GraviolaWell {
             // Update dup filter arr
             usedIndices[selectedGroupId][i] = int256(rolledWord);
 
+            // Shift groups bitmask to left
+            uniqueGroupsBitmask |= (1 << selectedGroupId);
+
             i++;
+        }
+
+        uint256 uniqueGroupCount = popcount(uniqueGroupsBitmask);
+
+        if (uniqueGroupCount == 3) {
+            rollProbability *= 6;
+        } else if (uniqueGroupCount == 2) {
+            rollProbability *= 2;
         }
 
         return (result, rollProbability, j);
