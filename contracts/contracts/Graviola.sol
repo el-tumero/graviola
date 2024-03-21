@@ -115,7 +115,7 @@ contract Graviola is
         // words well logic
         string memory prompt;
         uint256 rarity;
-        (prompt, rarity) = rollWords(randomValue);
+        (prompt, rarity, ) = rollWords(randomValue);
 
         string memory fullPrompt = string.concat(promptBase, prompt);
 
@@ -156,9 +156,9 @@ contract Graviola is
         return _nextTokenId;
     }
 
-    function addWordToWellOfWords(string memory _keyword, uint256 _seed) external {
-        require(balanceOf(msg.sender) > 0);
-        addWordToWell(_keyword, _seed);
-    }
+    // function addWordToWellOfWords(string memory _keyword, uint256 _seed) external {
+    //     require(balanceOf(msg.sender) > 0);
+    //     addWordToWell(_keyword, _seed);
+    // }
     
 }
