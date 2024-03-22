@@ -119,6 +119,11 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                                     <BlockNFT src={convertToIfpsURL(nft.image)} glow={false} disableMargin={true} additionalClasses={`w-fit h-fit max-w-[14em]`} />
                                 </div>
                                 <div className="flex flex-col gap-2 justify-center items-center">
+                                    {/* Id */}
+                                    <p className="font-bold">
+                                        Id: {i}
+                                    </p>
+
                                     {/* Rarity name */}
                                     <p className="flex gap-1 font-normal">
                                         Rarity: {" "}
