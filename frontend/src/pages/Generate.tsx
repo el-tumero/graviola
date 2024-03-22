@@ -56,7 +56,7 @@ const Generate = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromPerc(nft.attributes[0].value, rGroups)
+            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
 
             setProgressState("DONE")
             setProgressBarVal(100)

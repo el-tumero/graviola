@@ -11,7 +11,7 @@ const TradeUp = () => {
         <FullscreenContainer additionalClasses="font-bold text-2xl">
             <Navbar />
 
-            <ContentContainer additionalClasses="flex-col gap-4">
+            <ContentContainer additionalClasses="flex-col h-full gap-4">
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
 

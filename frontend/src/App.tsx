@@ -14,6 +14,7 @@ import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./utils/fallbackNFT"
+import { formatBpToPercentage, getRarityFromPerc } from "./utils/getRarityDataFromThreshold"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -77,6 +78,7 @@ const App = (props: { children: ReactNode }) => {
 
     // Fetch contract data
     useEffect(() => {
+
         if (!graviola || dataFetched) return
     
         const fetchCollection = async () => {
