@@ -17,7 +17,7 @@ import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 
 // Extended NFT interface to avoid computing the same properties multiple times
-interface NFTExt extends NFT {
+export interface NFTExt extends NFT {
     rarityLevel: RarityLevel
     rarityData: RarityGroupData
 }

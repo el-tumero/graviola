@@ -12,7 +12,6 @@ import BlockNFT from "../components/ui/BlockNFT";
 import { formatBpToPercentage, getRarityFromPerc } from "../utils/getRarityDataFromThreshold";
 import { ethers } from "ethers";
 import { RaritiesData } from "../types/RarityGroup";
-import { fallbackNFT } from "../utils/fallbackNFT";
 
 type CollectionMode = "Everyone" | "My Drops"
 
