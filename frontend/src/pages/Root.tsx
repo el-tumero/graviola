@@ -103,11 +103,17 @@ function Root() {
                             glow: true,
                             rarityGroup: getRarityFromPerc(nftSources[0].attributes[0].value, rGroups)[1] || fallbackNftsRariries[0],
                         }}
-                        upperBubbleChildren={<NFTDetailsUpper
-                            rarityPerc={nftSources[0].attributes[0].value || 5}
-                            rGroups={rGroups}
-                        />}
-                        lowerBubbleChildren={<NFTDetailsLower metadata={nftSources[0].attributes || fallbackNfts[0].attributes} />}
+                        upperBubbleChildren={
+                            <NFTDetailsUpper
+                                rarityPerc={nftSources[0].attributes[0].value || 5}
+                                rGroups={rGroups}
+                            />
+                        }
+                        lowerBubbleChildren={
+                            <NFTDetailsLower
+                                metadata={nftSources[0].attributes || fallbackNfts[0].attributes}
+                            />
+                        }
                     />
 
                     <SectionTitle
@@ -146,11 +152,12 @@ function Root() {
                     <OraIoBanner>
                         <div className='flex flex-col gap-2 mb-24 p-4'>
                             <div className='flex'>
-                                <Link text='Ora' href={"https://www.ora.io/"} additionalClasses='font-bold' />
+                                <Link text='Ora' href={"https://www.ora.io/"} additionalClasses='font-bold text-cyan-400 underline' />
                                 <p>&nbsp;is an on-chain verifiable oracle protocol</p>
                             </div>
-                            <p>A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.</p>
-                            <p>This means easy AI inference for the user and for the developer.</p>
+                            <p>A verifiable oracle protocol allows a user to perform verifiable operations (like inferring a deep learning model) on-chain, without sacrificing performance or security.</p>
+                            <p>This is a gamechanger. With the AI-onchain being relatively fast, we can build amazing decentralized applications in a more organized, transparent and trustless environment.</p>
+                            <p>Every NFT generated on this page was made using on-chain AI and is verifiable!</p>
                         </div>
                     </OraIoBanner>
 
@@ -165,7 +172,7 @@ function Root() {
 const NFTDetailsUpper = (props: { rarityPerc: number, rGroups: RaritiesData }) => {
     const [,rarityData] = getRarityFromPerc(props.rarityPerc, props.rGroups)
     return (
-        <p className='font-semibold'>Rarity:
+        <p className='font-semibold'>Rarity: {" "}
             <span className='font-bold' style={{color: rarityData.color }}>
                 {rarityData.name.toUpperCase()}
             </span>
