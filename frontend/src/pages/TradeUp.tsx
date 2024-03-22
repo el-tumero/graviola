@@ -175,8 +175,8 @@ const TradeUp = () => {
 
                                                 if (selectedGroup !== null && selectedGroup !== rarityLevel) {
                                                     return null
-                                                // } else if (!ownedTokenIds.includes(i)) {
-                                                    // return null
+                                                } else if (!ownedTokenIds.includes(i)) {
+                                                    return null
                                                 } else {
                                                     return (
                                                         <div
