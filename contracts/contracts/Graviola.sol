@@ -131,15 +131,21 @@ contract Graviola is
     function tradeUp(uint[TOKENS_PER_TRADE_UP] memory _tradeUpTokenIds) external payable {
         require(msg.value > estimateFee() + 0.005 ether, "Fee is too low!");
         require(
-            _ownerOf(_tradeUpTokenIds[0]) != msg.sender ||
-            _ownerOf(_tradeUpTokenIds[1]) != msg.sender ||
-            _ownerOf(_tradeUpTokenIds[2]) != msg.sender,
+            _ownerOf(_tradeUpTokenIds[0]) == msg.sender &&
+            _ownerOf(_tradeUpTokenIds[1]) == msg.sender &&
+            _ownerOf(_tradeUpTokenIds[2]) == msg.sender,
             "Only the owner of the tokens can trade them up!"
         );
 
-        // check if the tokens has the same rarity rarity
-        (bool sameRarities, uint rarityId) = raritiesInTheSameGroup(getRarities(_tradeUpTokenIds[0], _tradeUpTokenIds[1], _tradeUpTokenIds[2]));
-        require(sameRarities);
+        (uint256[3] memory tokenRaritiesBp, uint256 averageTokenRarity) = getTokenRarities(_tradeUpTokenIds[0], _tradeUpTokenIds[1], _tradeUpTokenIds[2]);
+
+        // console.log("still ok");
+        // console.log(tokenRaritiesBp[0], tokenRaritiesBp[1], tokenRaritiesBp[2]);
+
+        // check if the tokens has the same rarity
+        (bool sameRarities, uint rarityId) = raritiesInTheSameGroup(tokenRaritiesBp);
+        // console.log(sameRarities);
+        require(sameRarities, "Given tokens are from different rarity groups!");
 
 
         // mints
@@ -148,7 +154,8 @@ contract Graviola is
         emit Mint(msg.sender, tokenId);
 
         uint256 randomValue = uint256(blockhash(block.number - 1)); // temp option
-        (string memory prompt, uint256 rarity,) = _tradeUp(randomValue, rarityId);
+        // console.log("Ok!");
+        (string memory prompt, uint256 rarity,) = _tradeUp(randomValue, rarityId, averageTokenRarity);
         
         // burns old tokens 
         _burn(_tradeUpTokenIds[0]);        
@@ -176,6 +183,7 @@ contract Graviola is
         );
         oaoRequestsStatus[requestId] = OAORequestStatus.EXISTENT;
     }
+
 
     function aiOracleCallback(uint256 requestId, bytes calldata output, bytes calldata callbackData) external override onlyAIOracleCallback {
         require(oaoRequestsStatus[requestId] == OAORequestStatus.EXISTENT);

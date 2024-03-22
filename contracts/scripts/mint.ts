@@ -1,6 +1,7 @@
 import { AbiCoder, Contract, EventLog, id, parseEther } from "ethers";
 import { ethers } from "hardhat";
 import { GRAVIOLA_ADDRESS } from "./constants";
+import { parse } from "path";
 
 
 async function main() {
@@ -9,7 +10,7 @@ async function main() {
 
   const fee = await graviola.estimateFee()
 
-  const tx = await graviola.mint({value: fee + 12000n})
+  const tx = await graviola.mint({value: fee + parseEther("0.007")})
   const recp = (await tx.wait())!
   console.log(recp.logs)
 

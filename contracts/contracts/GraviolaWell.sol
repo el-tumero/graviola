@@ -32,7 +32,7 @@ contract GraviolaWell {
         bool reroll;                 // Reroll group blocker
     }
 
-    mapping (uint => RarityGroup) rarities;
+    mapping (uint => RarityGroup) private rarities;
     uint256 public constant KEYWORDS_PER_TOKEN = 3;   // How many keywords should determine the token's description (result)
     uint256 public constant TOKENS_PER_TRADE_UP = 3;  // How many tokens are needed to perform a Trade Up
     uint256 public constant RARITY_GROUPS_LENGTH = 5; // How many distinct rarity groups
@@ -145,12 +145,13 @@ contract GraviolaWell {
         revert("Input does not match any rarity group");
     }
 
+
     // temp name
-    function raritiesInTheSameGroup(uint256[3] memory _rarities) internal view returns(bool, uint) {
+    function raritiesInTheSameGroup(uint256[TOKENS_PER_TRADE_UP] memory _rarities) internal view returns(bool, uint) {
         (,uint id) = findRarityGroupRange(_rarities[0], defaultRarityGroupSetting);
         (,uint nextId) = findRarityGroupRange(_rarities[1], defaultRarityGroupSetting);
         if(id != nextId) return (false, 0);
-        (,nextId) = findRarityGroupRange(_rarities[1], defaultRarityGroupSetting);
+        (,nextId) = findRarityGroupRange(_rarities[2], defaultRarityGroupSetting);
         if(id != nextId) return (false, 0);
         return (true, id);
     }
@@ -338,8 +339,9 @@ contract GraviolaWell {
     /// @notice The TradeUp mechanic allows the User to "trade" three NFTs of their choice for one of a better rarity
     /// @notice All 3 input NFTs must be of the same rarity level in order to perform a successful TradeUp.
     /// @param _tradeUpComponentsGroupId GroupId of caller tokens that they wish to trade up with 
-    function _tradeUp(uint256 _seed, uint256 _tradeUpComponentsGroupId) view public returns (string memory, uint, uint) {
-
+    function _tradeUp(uint256 _seed, uint256 _tradeUpComponentsGroupId, uint256 _averageTokenRarity) view public returns (string memory, uint, uint) {
+        console.log(_tradeUpComponentsGroupId);
+        console.log(_averageTokenRarity);
 
         // Calc target rarity group for the TradeUp
         uint256 currentRarityGroupId = _tradeUpComponentsGroupId;
@@ -347,21 +349,13 @@ contract GraviolaWell {
         
 
         // Calculate bonus and boost the group we're targeting
-        uint targetGroupBonus = (2 ** (RARITY_GROUPS_LENGTH - currentRarityGroupId)) + defaultRarityGroupSetting.groupProbabilities[currentRarityGroupId];
+        uint targetGroupBonus = (2 ** (RARITY_GROUPS_LENGTH - currentRarityGroupId)) + (_averageTokenRarity/2); 
 
-        console.log(targetGroupBonus); 
+        // console.log(targetGroupBonus); 
         
         RarityGroupSetting memory tradeUpSetting = defaultRarityGroupSetting;
         tradeUpSetting.omega = defaultRarityGroupSetting.omega + targetGroupBonus;
-        tradeUpSetting.groupProbabilities[targetRarityGroupId] = targetGroupBonus;
-
-        console.log(tradeUpSetting.groupProbabilities[0]);
-        console.log(tradeUpSetting.groupProbabilities[1]);
-        console.log(tradeUpSetting.groupProbabilities[2]);
-        console.log(tradeUpSetting.groupProbabilities[3]);
-        console.log(tradeUpSetting.groupProbabilities[4]);
-        console.log(tradeUpSetting.omega);
-
+        tradeUpSetting.groupProbabilities[targetRarityGroupId] += targetGroupBonus;
 
 
         // Finally, roll with the TradeUp setting

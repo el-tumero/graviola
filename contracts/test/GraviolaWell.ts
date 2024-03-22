@@ -19,10 +19,8 @@ describe("Graviola Well", function () {
     it("TradeUp", async () => {
         const { graviolaWell } = await deployFixture()
 
-        const output = await graviolaWell._tradeUp(generateSeed(), 1)
+        const output = await graviolaWell._tradeUp(generateSeed(), 0n, 480000n)
 
-
-        // const res = await graviolaWell._tradeUp(generateSeed(), )
 
         console.log(output)
     })
