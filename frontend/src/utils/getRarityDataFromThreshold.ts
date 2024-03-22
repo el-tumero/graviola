@@ -1,15 +1,25 @@
-import { RarityData, RarityLevel } from "../types/Rarity";
-import { rarityScale, rarities } from "../rarityData";
+import { RarityGroupData, RarityLevel } from "../types/Rarity";
+import { RaritiesData } from "../types/RarityGroup";
 
+// Get rarityLevel and rarityData index based on perc
+export function getRarityFromPerc(threshold: number, rGroups: RaritiesData): [RarityLevel, RarityGroupData] {
+    // Clamp input
+    threshold = Math.max(0, Math.min(threshold, 100))
+    let perc = 0, prevPerc = 100
 
-export function getRarityFromThreshold(threshold: number): [RarityLevel, RarityData] {
-    if (threshold > 100) threshold = 100
-    if (threshold < 0) threshold = 0
-    for (let rarityLevel of rarityScale) {
-      const rarityData = rarities[rarityLevel]
-      if (threshold >= rarityData.threshold) {
-        return [rarityLevel, rarityData]
-      }
+    for (const rarityLevel of Object.keys(rGroups).sort((a, b) => rGroups[b as RarityLevel].rarityPerc - rGroups[a as RarityLevel].rarityPerc) as RarityLevel[]) {
+        const data = rGroups[rarityLevel]
+        perc += data.rarityPerc
+        if (threshold <= prevPerc && threshold > 100 - perc) {
+            return [rarityLevel, data]
+        }
+        prevPerc = 100 - perc
     }
-    return [RarityLevel.Legendary, rarities[RarityLevel.Legendary]] // This is here just for the return type
-  }
+    throw new Error("Threshold does not match any rarity level.")
+}
+
+// Get rarityLevel and rarityData from BP value, e.g. (1499 = 1,499%, 28230 = 28,230%)
+export function formatBpToPercentage(bp: number): number {
+    let divisor = 10_000
+    return bp / divisor
+}

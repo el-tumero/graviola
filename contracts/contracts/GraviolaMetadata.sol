@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract GraviolaMetadata {
     using JsonWriter for JsonWriter.Json;
-    
+
     struct Metadata {
         string image;
         string prompt;
@@ -14,26 +14,14 @@ contract GraviolaMetadata {
         bool filled;
     }
 
-    struct PromptsResponse {
-        string response;
-        bool exists;
-    }
-
     mapping(uint256 => Metadata) private metadataStorage;
-    mapping(string=>PromptsResponse) private promptsStorage;
-    string constant internal promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
+    string internal constant promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
-    // DEBUG function - must be removed after local tests
-    // function debugAddMetadata(uint256 tokenId, string memory image, string memory prompt) external {
-    //     metadataStorage[tokenId] = Metadata(image, prompt, 25, true);
-    // }
 
     // NOTE: addRarity() should be called after this func
     function addPrompt(uint256 tokenId, string memory prompt) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].prompt = prompt;
-        // NOTE: low probability of failure of this mechanism
-        // if(promptsStorage[prompt].exists) promptsStorage[prompt].exists = false;
     }
 
     // NOTE: requestCallback() should be called after this func
@@ -42,41 +30,25 @@ contract GraviolaMetadata {
         metadataStorage[tokenId].rarity = rarity;
     }
 
-    // NOTE: should be exec in OAO callback
-    function addPromptResponse(string memory prompt, string memory response) internal {
-        promptsStorage[prompt].response = response;
-        promptsStorage[prompt].exists = true;
-    }
-
-    // NOTE: should be exec in checkUpkeep
-    function hasPromptResponse(uint256 tokenId) internal view returns(bool) {
-        string memory prompt = metadataStorage[tokenId].prompt;
-        return promptsStorage[prompt].exists;
-    }
-
-    function hasPromptResponse2(string memory prompt) internal view returns(bool) {
-        return promptsStorage[prompt].exists;
-    } 
-
-    function addImage(uint256 tokenId, string memory image) private {
+    /// @notice Adds image cid to metadata for the token with given tokenId
+    /// @param tokenId id of the token
+    /// @param image cid
+    function addImage(uint256 tokenId, string memory image) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].image = image;
         metadataStorage[tokenId].filled = true;
     }
 
-    // NOTE: should be exec in performUpkeep
-    function savePromptResponseToMetadata(uint256 tokenId) internal {
-        string memory prompt = metadataStorage[tokenId].prompt;
-        require(promptsStorage[prompt].exists, "Prompt response does not exists!");
-        addImage(tokenId, promptsStorage[prompt].response);
-    }
 
-    function readPromptResponse(string calldata prompt) external view returns(string memory) {
-        return promptsStorage[prompt].response;
-    }
-
-    function getMetadata(uint256 tokenId) public view returns(Metadata memory) {
+    function getMetadata(uint256 tokenId) public view returns (Metadata memory) {
         return metadataStorage[tokenId];
+    }
+
+    function getTokenRarities(uint256 tokenId0, uint256 tokenId1, uint256 tokenId2 ) public view returns (uint256[3] memory rarities, uint256 average) {
+        rarities[0] = metadataStorage[tokenId0].rarity / 10_000;
+        rarities[1] = metadataStorage[tokenId1].rarity / 10_000;
+        rarities[2] = metadataStorage[tokenId2].rarity / 10_000;
+        average = (rarities[0] + rarities[1] + rarities[2])/3;
     }
 
     // -- conversions --
@@ -87,28 +59,38 @@ contract GraviolaMetadata {
         writer = writer.writeStringProperty("image", image);
         writer = writer.writeStringProperty("description", prompt);
         writer = writer.writeStartArray("attributes");
-            writer = writer.writeStartObject();
-            writer = writer.writeStringProperty("trait_type", "Rarity");
-            writer = writer.writeUintProperty("value", rarity);
-            writer = writer.writeEndObject();
+        writer = writer.writeStartObject();
+        writer = writer.writeStringProperty("trait_type", "Rarity");
+        writer = writer.writeUintProperty("value", rarity);
+        writer = writer.writeEndObject();
         writer = writer.writeEndArray();
         writer = writer.writeEndObject();
 
         return writer.value;
     }
 
-    function convertToBase64URL(bytes memory data) private pure returns(string memory) {
-        return string(
-            abi.encodePacked(
-                "data:application/json;base64,",
-                Base64.encode(data)
-            )
-        );
+    function convertToBase64URL(bytes memory data) private pure returns (string memory) {
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Base64.encode(data)
+                )
+            );
     }
 
     // NOTE: public only for local tests
     function _tokenURI(uint256 tokenId) internal view returns (string memory) {
         require(metadataStorage[tokenId].filled, "Metadata is empty!");
-        return convertToBase64URL(bytes(generateJSON(metadataStorage[tokenId].image, metadataStorage[tokenId].prompt, metadataStorage[tokenId].rarity)));
+        return
+            convertToBase64URL(
+                bytes(
+                    generateJSON(
+                        metadataStorage[tokenId].image,
+                        string.concat(promptBase, metadataStorage[tokenId].prompt),
+                        metadataStorage[tokenId].rarity
+                    )
+                )
+            );
     }
 }

@@ -10,6 +10,7 @@ node_modules
 # TypeChain files
 /typechain
 /typechain-types
+/typechain-v5
 
 # solidity-coverage files
 /coverage

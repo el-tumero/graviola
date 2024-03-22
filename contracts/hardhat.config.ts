@@ -13,19 +13,18 @@ const config: HardhatUserConfig = {
     }
   },
   networks: {
-    hardhat: {
-      forking: {
-        url: process.env.RPC_URL as string,
-        enabled: true,
-        blockNumber: 5402075
-      },
-      accounts: [{privateKey: process.env.PRIV_KEY as string, balance: "479000000000000000"}]
-    },
-    sepolia: {
-      url: process.env.RPC_URL as string,
-      accounts: [process.env.PRIV_KEY as string]
-      // accounts: [{privateKey: process.env.PRIV_KEY as string, balance: "479000000000000000"}]
-    }
+    // hardhat: {
+    //   forking: {
+    //     url: process.env.RPC_URL as string,
+    //     enabled: true,
+    //     blockNumber: 5402075
+    //   },
+    //   accounts: [{privateKey: process.env.PRIV_KEY as string, balance: "479000000000000000"}]
+    // },
+    // sepolia: {
+    //   url: process.env.RPC_URL as string,
+    //   accounts: [process.env.PRIV_KEY as string]
+    // }
   }
 };
 
