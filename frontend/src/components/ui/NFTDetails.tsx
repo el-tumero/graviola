@@ -12,7 +12,7 @@ const NFTDetails = ({ nftProps, upperBubbleChildren, lowerBubbleChildren }: NFTD
             <div className="relative max-sm:flex max-sm:flex-col max-sm:gap-8 max-sm:jusitfy-center h-full items-center">
                 <BlockNFT {...nftProps} disableMargin={true} additionalClasses="sm:w-64 sm:h-64 max-sm:w-1/2 max-sm:h-1/2 max-sm:mx-2 sm:mx-8" />
 
-                <div className="sm:absolute max-sm:relative shadow-lg sm:top-[1.5em] sm:-right-[8em] flex bg-light-bgPrimary dark:bg-dark-bgPrimary w-fit h-fit p-4 rounded-lg border-2 border-light-border dark:border-dark-border">
+                <div className="sm:absolute max-sm:relative shadow-lg sm:top-[1.5em] sm:-right-[9em] flex bg-light-bgPrimary dark:bg-dark-bgPrimary w-fit h-fit p-4 rounded-lg border-2 border-light-border dark:border-dark-border">
                     {upperBubbleChildren}
                 </div>
 

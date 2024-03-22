@@ -5,29 +5,27 @@ import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/ContentContainer"
 import FullscreenContainer from "../components/ui/FullscreenContainer"
 import { NFT } from "../types/NFT"
-import { Keyword } from "../types/Keyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from '@web3modal/ethers/react'
-import { getRarityFromThreshold, formatBpToPercentage } from "../utils/getRarityDataFromThreshold"
+import { getRarityFromPerc, formatBpToPercentage } from "../utils/getRarityDataFromThreshold"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
-import { getRarityColor } from "../utils/getRarityBorder"
-import RarityBubble from "../components/ui/RarityBubble"
 import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
-import { RarityData, RarityLevel } from "../types/Rarity"
+import { RarityGroupData, RarityLevel } from "../types/Rarity"
+import { RaritiesData } from "../types/RarityGroup"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 interface NFTExt extends NFT {
     rarityLevel: RarityLevel
-    rarityData: RarityData
+    rarityData: RarityGroupData
 }
 
 const Generate = () => {
 
     const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
-    const contractKeywords = graviolaContext.keywords as Keyword[]
+    const rGroups = graviolaContext.rarities as RaritiesData
 
     const { isConnected } = useWeb3ModalAccount()
 
@@ -49,11 +47,11 @@ const Generate = () => {
             setProgressBarVal(50)
         }
 
-        const onPromptRequest = (smth: string) => {
-            console.log(`[info] onPromptRequest done: ${smth}`)
-            setProgressState("WAIT_IMAGE")
-            setProgressBarVal(75)
-        }
+        // const onPromptRequest = (smth: string) => {
+        //     console.log(`[info] onPromptRequest done: ${smth}`)
+        //     setProgressState("WAIT_IMAGE")
+        //     setProgressBarVal(75)
+        // }
 
         const onTokenReady = async (addr: string, tokenId: bigint) => {
 
@@ -63,7 +61,7 @@ const Generate = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromThreshold(nft.attributes[0].value)
+            const [rarityLevel, rarityData] = getRarityFromPerc(nft.attributes[0].value, rGroups)
 
             setProgressState("DONE")
             setProgressBarVal(100)
@@ -77,12 +75,12 @@ const Generate = () => {
         }
 
         graviola.on(graviola.filters.Mint, onMint)
-        graviola.on(graviola.filters.PromptRequest, onPromptRequest)
+        // graviola.on(graviola.filters.PromptRequest, onPromptRequest)
         graviola.on(graviola.filters.TokenReady, onTokenReady)
 
         return () => {
             graviola.off(graviola.filters.Mint, onMint)
-            graviola.off(graviola.filters.PromptRequest, onPromptRequest)
+            // graviola.off(graviola.filters.PromptRequest, onPromptRequest)
             graviola.off(graviola.filters.TokenReady, onTokenReady)
         }
 
@@ -107,7 +105,12 @@ const Generate = () => {
                     <h1 className='font-bold text-2xl'>NFT Generator</h1>
 
                     {/* Img container */}
-                    <GenerateContainer rolledNFT={rolledNFT} isPulsating={!isConnected} isGenerating={!isPreGenerationState} />
+                    <GenerateContainer
+                        rolledNFT={rolledNFT}
+                        isPulsating={!isConnected}
+                        isGenerating={!isPreGenerationState}
+                        rGroups={rGroups}
+                    />
 
                     {/* Progress bar */}
                     {(progressBarVal !== 0) &&
@@ -118,10 +121,8 @@ const Generate = () => {
 
                     {/* State/Progress text */}
                     {progressState === "DONE"
-                        ?
-                        <NftResultText rarityLevel={rolledNFT!.rarityLevel} rarityName={rolledNFT!.rarityData.name} />
-                        :
-                        <span className="text-lg font-bold">{progressMessage}</span>
+                        ? <NftResultText rGroup={getRarityFromPerc(rolledNFT!.rarityData.rarityPerc, rGroups)[1]} />
+                        : <span className="text-lg font-bold">{progressMessage}</span>
                     }
 
                     {(progressState === "NONE") && <Button text={isConnected ? "Generate!" : "Connect your wallet first"} enabled={isConnected && (progressState === "NONE")} onClick={async () => {
@@ -144,28 +145,30 @@ const Generate = () => {
 
                 <SectionTitle
                     mainText={{
-                        content: "Keyword list"
+                        content: "Keywords"
                     }}
                 />
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
-                    <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
-                        {contractKeywords.map((keyword: Keyword, i) => (
-                            <div
-                                key={i}
-                                className={`
-                                    flex flex-col justify-center items-center
-                                    gap-1 bg-light-bgLight/50 dark:bg-dark-bgLight/50
-                                    border-2 border-light-border dark:border-dark-border
-                                    p-4 rounded-xl
-                                `}>
-                                <div className="flex gap-1 justify-center items-center">
-                                    <RarityBubble rarity={getRarityFromThreshold(formatBpToPercentage(keyword.rarityPerc))[0]} additionalClasses="self-center" />
-                                    <span>{keyword.name}</span>
+                    {Object.entries(rGroups).map(([,rGroup], i) => (
+                        <div key={i} className="flex flex-col gap-4 w-full h-full">
+                            <div className="flex flex-col gap-2 mb-6">
+                                <p className="font-bold text-xl mb-2">
+                                    {rGroup.name}
+                                </p>
+                                <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
+                                    {rGroup.keywords.map((keyword, keywordIndex) => (
+                                        <span 
+                                        key={keywordIndex} 
+                                        className="flex justify-center items-center py-2 px-3 rounded-md bg-light-bgLight/75 dark:bg-dark-bgLight/75"
+                                        style={{ borderWidth: 1.5, borderRadius: 8, borderColor: rGroup.color }}
+                                        >
+                                            {keyword.name}
+                                        </span>
+                                    ))}
                                 </div>
-                                <p className="text-xs opacity-50">{formatBpToPercentage(keyword.rarityPerc).toFixed(4) + "%"}</p>
                             </div>
-                        ))}
-                    </div>
+                        </div>
+                    ))}
                 </div>
 
             </ContentContainer>
@@ -176,10 +179,10 @@ const Generate = () => {
     )
 }
 
-const NftResultText = (props: { rarityLevel: RarityLevel, rarityName: string }) => {
+const NftResultText = (props: { rGroup: RarityGroupData }) => {
     return (
         <p className="text-lg font-bold">{`Congratulations! You rolled a `}
-            <span style={{ color: getRarityColor(props.rarityLevel) }} className="font-bold underline">{(props.rarityName).toUpperCase()}!!!</span>
+            <span style={{ color: props.rGroup.color }} className="font-bold underline">{(props.rGroup.name).toUpperCase()}!</span>
         </p>
     )
 }

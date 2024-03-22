@@ -2,25 +2,27 @@ import { useEffect, useState } from "react"
 import useRandomRarityBorder from "../hooks/useBorderAnimation"
 import { getRarityBorder } from "../utils/getRarityBorder"
 import { NFT } from "../types/NFT"
-import { getRarityFromThreshold } from "../utils/getRarityDataFromThreshold"
+import { getRarityFromPerc } from "../utils/getRarityDataFromThreshold"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
+import { RaritiesData } from "../types/RarityGroup"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
     isPulsating: boolean
     isGenerating: boolean
+    rGroups: RaritiesData
 }
 
-const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating }: GenerateContainerProps) => {
+const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating, rGroups }: GenerateContainerProps) => {
 
-    const rarityAnimBorder = useRandomRarityBorder(isGenerating, 750)
+    const rarityAnimBorder = useRandomRarityBorder(isGenerating, 750, rGroups)
     const [resOpacity, setResOpacity] = useState<number>(0)
 
     // Dynamic styles based on passed rolledNFT
     const {
         style: breathingBorderStyle = {},
         className: breathingBorderClassNames = ""
-    } = rolledNFT ? getRarityBorder(getRarityFromThreshold(rolledNFT.attributes[0].value)[0], true) : {};
+    } = rolledNFT ? getRarityBorder(getRarityFromPerc(rolledNFT.attributes[0].value, rGroups)[1], true) : {};
 
     useEffect(() => {
         if (!rolledNFT) return

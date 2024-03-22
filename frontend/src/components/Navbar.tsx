@@ -22,7 +22,7 @@ const DarkThemeIcon = () => {
 }
 
 const NavRightList = (props: { theme: string, generateOnClick: () => void, collectionOnClick: () => void, themeOnClick: () => void }) => {
-    const mobileStyles = `flex-col max-lg:absolute max-lg:right-6 max-lg:top-16 max-lg:p-4 max-lg:rounded-xl max-lg:border-2 max-lg:border-light-border max-lg:dark:border-dark-border max-lg:shadow-lg`
+    const mobileStyles = `flex-col max-lg:absolute max-lg:right-6 max-lg:top-16 max-lg:p-4 max-lg:rounded-xl max-lg:border-2 max-lg:border-light-border max-lg:dark:border-dark-border max-lg:shadow-xl`
     const mobileItemCtn = `p-2 rounded-xl max-lg:w-full max-lg:bg-light-border max-lg:dark:bg-dark-border/40 max-lg:flex max-lg:justify-center`
     return (
         <div className={`flex justify-center items-center gap-4 bg-light-bgDark dark:bg-dark-bgDark max-lg:${mobileStyles}`}>

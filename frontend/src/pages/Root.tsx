@@ -7,19 +7,18 @@ import Navbar from "../components/Navbar"
 import Button from '../components/ui/Button'
 import BlockMarquee from '../components/BlockMarquee'
 import NFTDetails from '../components/ui/NFTDetails'
-import { rarities } from '../rarityData'
+// import { rarities } from '../rarityData'
 import { routerPaths } from '../router'
-import { RarityLevel } from '../types/Rarity'
-import { getRarityColor } from '../utils/getRarityBorder'
+import { RarityGroupData, RarityLevel } from '../types/Rarity'
 import { GraviolaContext } from '../contexts/GraviolaContext'
 import { convertToIfpsURL } from '../utils/convertToIpfsURL'
 import BlockNFT from '../components/ui/BlockNFT'
-import { getRarityPercentageString } from '../utils/getRarityPercentage'
 import SectionTitle from '../components/ui/SectionTitle'
 import OraIoBanner from '../components/ui/OraIoBanner'
 import Link from '../components/Link'
 import fallbackNFT from "../assets/fallbackNFT.png"
-import { getRarityFromThreshold } from '../utils/getRarityDataFromThreshold'
+import { getRarityFromPerc } from '../utils/getRarityDataFromThreshold'
+import { RaritiesData } from '../types/RarityGroup'
 
 function Root() {
 
@@ -27,15 +26,17 @@ function Root() {
     const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
 
     const graviolaContext = useContext(GraviolaContext)
+    const rGroups = graviolaContext.rarities as RaritiesData
     const nftSources = graviolaContext.collection as NFT[]
     const fallbackNfts: NFT[] = [{
         image: fallbackNFT,
         description: "This is a fallback NFT image. Go generate some!",
         attributes: [{
             "trait_type": "Rarity",
-            "value": 8332
+            "value": 2874
         }]
     }]
+    const fallbackNftsRariries = [RarityLevel.Rare]
 
     // Change this to 3 different-sized arrays once we have more data to work with
     const marqueeSources = nftSources.map((nft: NFT) => (
@@ -100,10 +101,19 @@ function Root() {
                         nftProps={{
                             src: convertToIfpsURL(nftSources[0].image || fallbackNfts[0].image),
                             glow: true,
-                            rarityLevel: getRarityFromThreshold(nftSources[0].attributes[0].value)[0] || RarityLevel.Rare,
+                            rarityGroup: getRarityFromPerc(nftSources[0].attributes[0].value, rGroups)[1] || fallbackNftsRariries[0],
                         }}
-                        upperBubbleChildren={<NFTDetailsUpper rarity={getRarityFromThreshold(nftSources[0].attributes[0].value)[0] || RarityLevel.Rare} />}
-                        lowerBubbleChildren={<NFTDetailsLower metadata={nftSources[0].attributes || fallbackNfts[0].attributes} />}
+                        upperBubbleChildren={
+                            <NFTDetailsUpper
+                                rarityPerc={nftSources[0].attributes[0].value || 5}
+                                rGroups={rGroups}
+                            />
+                        }
+                        lowerBubbleChildren={
+                            <NFTDetailsLower
+                                metadata={nftSources[0].attributes || fallbackNfts[0].attributes}
+                            />
+                        }
                     />
 
                     <SectionTitle
@@ -114,14 +124,14 @@ function Root() {
                             content: "Check out the chances for each rarity level"
                         }}
                     />
-                    <div className='xl:flex xl:justify-around sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
-                        {Object.keys(rarities).map((rarityLevel, i) => (
+                    <div className='xl:flex xl:justify-center sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
+                        {Object.entries(rGroups).map(([,rarityGroup], i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
-                                <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityLevel={rarityLevel as RarityLevel} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
+                                <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityGroup={rarityGroup} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
-                                    <p className='font-bold' style={{color: getRarityColor(rarityLevel as RarityLevel)}}>{rarities[rarityLevel as RarityLevel].name}</p>
+                                    <p className='font-bold' style={{color: rarityGroup.color }}>{rarityGroup.name}</p>
                                     <span className='font-bold'>
-                                        {getRarityPercentageString(rarityLevel as RarityLevel)}
+                                        {rarityGroup.rarityPerc}%
                                     </span>
                                 </div>
                             </div>
@@ -142,11 +152,12 @@ function Root() {
                     <OraIoBanner>
                         <div className='flex flex-col gap-2 mb-24 p-4'>
                             <div className='flex'>
-                                <Link text='Ora' href={"https://www.ora.io/"} additionalClasses='font-bold' />
+                                <Link text='Ora' href={"https://www.ora.io/"} additionalClasses='font-bold text-cyan-400 underline' />
                                 <p>&nbsp;is an on-chain verifiable oracle protocol</p>
                             </div>
-                            <p>A verifiable oracle protocol allows a user to perform verifiable operations in a truly decentralized environment.</p>
-                            <p>This means easy AI inference for the user and for the developer.</p>
+                            <p>A verifiable oracle protocol allows a user to perform verifiable operations (like inferring a deep learning model) on-chain, without sacrificing performance or security.</p>
+                            <p>This is a gamechanger. With the AI-onchain being relatively fast, we can build amazing decentralized applications in a more organized, transparent and trustless environment.</p>
+                            <p>Every NFT generated on this page was made using on-chain AI and is verifiable!</p>
                         </div>
                     </OraIoBanner>
 
@@ -158,9 +169,14 @@ function Root() {
     )
 }
 
-const NFTDetailsUpper = (props: { rarity: RarityLevel }) => {
+const NFTDetailsUpper = (props: { rarityPerc: number, rGroups: RaritiesData }) => {
+    const [,rarityData] = getRarityFromPerc(props.rarityPerc, props.rGroups)
     return (
-        <p className='font-semibold'>Rarity: <span className='font-bold' style={{color: getRarityColor(props.rarity)}}>{rarities[props.rarity].name.toUpperCase()}</span></p>
+        <p className='font-semibold'>Rarity: {" "}
+            <span className='font-bold' style={{color: rarityData.color }}>
+                {rarityData.name.toUpperCase()}
+            </span>
+        </p>
     )
 }
 
