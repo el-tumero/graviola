@@ -2,6 +2,8 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
+import "hardhat/console.sol";
+
 
 /// @notice Contract for rolling Graviola tokens and all logic related to keywords
 contract GraviolaWell {
@@ -30,7 +32,7 @@ contract GraviolaWell {
         bool reroll;                 // Reroll group blocker
     }
 
-    mapping (uint => RarityGroup) rarities;
+    mapping (uint => RarityGroup) private rarities;
     uint256 public constant KEYWORDS_PER_TOKEN = 3;   // How many keywords should determine the token's description (result)
     uint256 public constant TOKENS_PER_TRADE_UP = 3;  // How many tokens are needed to perform a Trade Up
     uint256 public constant RARITY_GROUPS_LENGTH = 5; // How many distinct rarity groups
@@ -143,6 +145,17 @@ contract GraviolaWell {
         revert("Input does not match any rarity group");
     }
 
+
+    // temp name
+    function raritiesInTheSameGroup(uint256[TOKENS_PER_TRADE_UP] memory _rarities) internal view returns(bool, uint) {
+        (,uint id) = findRarityGroupRange(_rarities[0], defaultRarityGroupSetting);
+        (,uint nextId) = findRarityGroupRange(_rarities[1], defaultRarityGroupSetting);
+        if(id != nextId) return (false, 0);
+        (,nextId) = findRarityGroupRange(_rarities[2], defaultRarityGroupSetting);
+        if(id != nextId) return (false, 0);
+        return (true, id);
+    }
+
     /// @notice After rolling a random number in the range of a group, find the rolled word by ranges
     /// @return Index of word in the scope of its group
     function findWordFromRand(uint _randNum, RarityGroup memory _targetGroup) public pure returns (uint) {
@@ -167,10 +180,7 @@ contract GraviolaWell {
 
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @dev Classic implementation (non-TradeUp)
-    /// @param _seed Result of a VRF function or any other randomness source
-    function rollWords(
-        uint256 _seed
-    ) public view returns (string memory, uint256, uint256) {
+    function rollWords(uint256 _seed) public view returns (string memory, uint256, uint256) {
         
         uint16 i = 0;
         uint16 j = 0;
@@ -328,20 +338,30 @@ contract GraviolaWell {
 
     /// @notice The TradeUp mechanic allows the User to "trade" three NFTs of their choice for one of a better rarity
     /// @notice All 3 input NFTs must be of the same rarity level in order to perform a successful TradeUp.
-    function tradeUp(uint _seed) view  public returns (string memory, uint, uint) {
-        // TODO: Check inputs, requiure ownership of input NFTs
-        // TODO: Check if all inputs are of the same Rarity level
+    /// @param _tradeUpComponentsGroupId GroupId of caller tokens that they wish to trade up with 
+    function _tradeUp(uint256 _seed, uint256 _tradeUpComponentsGroupId, uint256 _averageTokenRarity) view public returns (string memory, uint, uint) {
+        console.log(_tradeUpComponentsGroupId);
+        console.log(_averageTokenRarity);
 
-        // Needed
-        // (,uint inputRarityGroupId) = findRarityGroupRange(18, defaultRarityGroupSetting);
-        // RarityGroup memory targetRarityGroup = rarities[inputRarityGroupId + 1];
+        // Calc target rarity group for the TradeUp
+        uint256 currentRarityGroupId = _tradeUpComponentsGroupId;
+        uint256 targetRarityGroupId = currentRarityGroupId + 1;
         
-        // Target (boost) = Uncommon
-        RarityGroupSetting memory tradeUpSetting = RarityGroupSetting(120, [uint(88), 26, 3, 2, 1]);
+
+        // Calculate bonus and boost the group we're targeting
+        uint targetGroupBonus = (2 ** (RARITY_GROUPS_LENGTH - currentRarityGroupId)) + (_averageTokenRarity/2); 
+
+        // console.log(targetGroupBonus); 
+        
+        RarityGroupSetting memory tradeUpSetting = defaultRarityGroupSetting;
+        tradeUpSetting.omega = defaultRarityGroupSetting.omega + targetGroupBonus;
+        tradeUpSetting.groupProbabilities[targetRarityGroupId] += targetGroupBonus;
+
+
+        // Finally, roll with the TradeUp setting
         (string memory res, uint prob, uint j) = rollWords(_seed, tradeUpSetting);
         return (res, prob, j);
     }
-
 
 
 }

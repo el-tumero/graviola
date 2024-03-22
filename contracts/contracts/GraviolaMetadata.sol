@@ -44,6 +44,13 @@ contract GraviolaMetadata {
         return metadataStorage[tokenId];
     }
 
+    function getTokenRarities(uint256 tokenId0, uint256 tokenId1, uint256 tokenId2 ) public view returns (uint256[3] memory rarities, uint256 average) {
+        rarities[0] = metadataStorage[tokenId0].rarity / 10_000;
+        rarities[1] = metadataStorage[tokenId1].rarity / 10_000;
+        rarities[2] = metadataStorage[tokenId2].rarity / 10_000;
+        average = (rarities[0] + rarities[1] + rarities[2])/3;
+    }
+
     // -- conversions --
 
     function generateJSON(string memory image, string memory prompt, uint256 rarity) private pure returns (string memory) {
