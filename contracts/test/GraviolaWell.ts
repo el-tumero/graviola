@@ -12,22 +12,25 @@ describe("Graviola Well", function () {
         return { graviolaWell, owner, otherAccount };
     }
 
-    it("Random word squence", async () => {
+    function generateSeed() {
+        return ethers.toBigInt(randomBytes(32))
+    }
+
+    it("TradeUp", async () => {
         const { graviolaWell } = await deployFixture()
 
-        console.log("generating random uint256...")
-        const bytes = randomBytes(32)
-        const input = ethers.toBigInt(bytes)
-        console.log("rand input: ", input.toString())
-        const res = await graviolaWell.rollWords(input)
+        const output = await graviolaWell._tradeUp(generateSeed(), 1)
 
-        console.log(res)
+
+        // const res = await graviolaWell._tradeUp(generateSeed(), )
+
+        console.log(output)
     })
 
-    it("Check words probability", async () => {
-        const { graviolaWell } = await deployFixture()
-        const result = await graviolaWell.getAllWords()
-        console.log(result)
-    })
+    // it("Check words probability", async () => {
+    //     const { graviolaWell } = await deployFixture()
+    //     const result = await graviolaWell.getAllWords()
+    //     console.log(result)
+    // })
 
 });

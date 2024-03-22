@@ -11,7 +11,7 @@ import "./GraviolaNonFungible.sol";
 import "./VRFConsumer.sol";
 
 // Uncomment this line to use console.log
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
 
 /// @notice A base contract for Graviola non-fungible token
 contract Graviola is
@@ -93,7 +93,7 @@ contract Graviola is
     /// @notice minting a token without metadata
     /// @dev is called by user
     function mint() external payable {
-        require(msg.value > estimateFee() + 10000);
+        require(msg.value > estimateFee() + 0.005 ether);
         _safeMint(msg.sender, _nextTokenId);
         emit Mint(msg.sender, _nextTokenId);
         pasteRandomValue(_nextTokenId); // temp
@@ -113,27 +113,68 @@ contract Graviola is
 
 
         // words well logic
-        string memory prompt;
-        uint256 rarity;
-        (prompt, rarity, ) = rollWords(randomValue);
+        (string memory prompt, uint256 rarity, ) = rollWords(randomValue);
 
         string memory fullPrompt = string.concat(promptBase, prompt);
 
         // metadata
         addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
-        bytes memory input = bytes(fullPrompt);
 
         // request to ai oracle
+        aiOracleRequest(tokenId, fullPrompt);
+        emit PromptRequest(tokenId, prompt, rarity);
+    }
+
+    
+
+    function tradeUp(uint[TOKENS_PER_TRADE_UP] memory _tradeUpTokenIds) external payable {
+        require(msg.value > estimateFee() + 0.005 ether, "Fee is too low!");
+        require(
+            _ownerOf(_tradeUpTokenIds[0]) != msg.sender ||
+            _ownerOf(_tradeUpTokenIds[1]) != msg.sender ||
+            _ownerOf(_tradeUpTokenIds[2]) != msg.sender,
+            "Only the owner of the tokens can trade them up!"
+        );
+
+        // check if the tokens has the same rarity rarity
+        (bool sameRarities, uint rarityId) = raritiesInTheSameGroup(getRarities(_tradeUpTokenIds[0], _tradeUpTokenIds[1], _tradeUpTokenIds[2]));
+        require(sameRarities);
+
+
+        // mints
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(msg.sender, tokenId);
+        emit Mint(msg.sender, tokenId);
+
+        uint256 randomValue = uint256(blockhash(block.number - 1)); // temp option
+        (string memory prompt, uint256 rarity,) = _tradeUp(randomValue, rarityId);
+        
+        // burns old tokens 
+        _burn(_tradeUpTokenIds[0]);        
+        _burn(_tradeUpTokenIds[1]);        
+        _burn(_tradeUpTokenIds[2]);        
+
+        string memory fullPrompt = string.concat(promptBase, prompt);
+        
+        // adds metadata
+        addPrompt(tokenId, prompt);
+        addRarity(tokenId, rarity);
+
+        // requests ai oracle
+        aiOracleRequest(tokenId, fullPrompt);
+        emit PromptRequest(tokenId, prompt, rarity);
+    }
+
+    function aiOracleRequest(uint256 _tokenId, string memory _input) internal {
         uint256 requestId = aiOracle.requestCallback{value: estimateFee()}(
             AIORACLE_MODEL_ID,
-            input,
+            bytes(_input),
             address(this),
             AIORACLE_CALLBACK_GAS_LIMIT,
-            abi.encode(tokenId)
+            abi.encode(_tokenId)
         );
         oaoRequestsStatus[requestId] = OAORequestStatus.EXISTENT;
-        emit PromptRequest(tokenId, prompt, rarity);
     }
 
     function aiOracleCallback(uint256 requestId, bytes calldata output, bytes calldata callbackData) external override onlyAIOracleCallback {
@@ -155,6 +196,8 @@ contract Graviola is
     function totalSupply() public view returns (uint256) {
         return _nextTokenId;
     }
+
+    
 
     // function addWordToWellOfWords(string memory _keyword, uint256 _seed) external {
     //     require(balanceOf(msg.sender) > 0);

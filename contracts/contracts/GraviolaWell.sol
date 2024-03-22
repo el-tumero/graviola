@@ -2,6 +2,8 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
+import "hardhat/console.sol";
+
 
 /// @notice Contract for rolling Graviola tokens and all logic related to keywords
 contract GraviolaWell {
@@ -143,6 +145,16 @@ contract GraviolaWell {
         revert("Input does not match any rarity group");
     }
 
+    // temp name
+    function raritiesInTheSameGroup(uint256[3] memory _rarities) internal view returns(bool, uint) {
+        (,uint id) = findRarityGroupRange(_rarities[0], defaultRarityGroupSetting);
+        (,uint nextId) = findRarityGroupRange(_rarities[1], defaultRarityGroupSetting);
+        if(id != nextId) return (false, 0);
+        (,nextId) = findRarityGroupRange(_rarities[1], defaultRarityGroupSetting);
+        if(id != nextId) return (false, 0);
+        return (true, id);
+    }
+
     /// @notice After rolling a random number in the range of a group, find the rolled word by ranges
     /// @return Index of word in the scope of its group
     function findWordFromRand(uint _randNum, RarityGroup memory _targetGroup) public pure returns (uint) {
@@ -167,7 +179,7 @@ contract GraviolaWell {
 
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @dev Classic implementation (non-TradeUp)
-    function rollWords() public view returns (string memory, uint256, uint256) {
+    function rollWords(uint256 _seed) public view returns (string memory, uint256, uint256) {
         
         uint16 i = 0;
         uint16 j = 0;
@@ -186,7 +198,7 @@ contract GraviolaWell {
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
 
-            uint256 randNum = uint256(keccak256(abi.encode(uint256(blockhash(block.number - 1)), i, j)));
+            uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
             
             // We only want to roll a group if we're not performing a re-roll in the current iteration
             if (!rollData.reroll) {
@@ -243,6 +255,7 @@ contract GraviolaWell {
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @dev TradeUp implementation (Custom RaritySetting)
     function rollWords(
+        uint256 _seed,
         RarityGroupSetting memory _customRaritySetting
     ) public view returns (string memory, uint256, uint256) {
         
@@ -263,7 +276,7 @@ contract GraviolaWell {
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
 
-            uint256 randNum = uint256(keccak256(abi.encode(uint256(blockhash(block.number - 1)), i, j)));
+            uint256 randNum = uint256(keccak256(abi.encode(_seed, i, j)));
 
             // We only want to roll a group if we're not performing a re-roll in the current iteration
             if (!rollData.reroll) {
@@ -324,44 +337,35 @@ contract GraviolaWell {
 
     /// @notice The TradeUp mechanic allows the User to "trade" three NFTs of their choice for one of a better rarity
     /// @notice All 3 input NFTs must be of the same rarity level in order to perform a successful TradeUp.
-    /// @param _tradeUpTokenIds Ids of caller tokens that they wish to trade up with 
-    function tradeUp(uint[TOKENS_PER_TRADE_UP] memory _tradeUpTokenIds) view  public returns (string memory, uint, uint) {
+    /// @param _tradeUpComponentsGroupId GroupId of caller tokens that they wish to trade up with 
+    function _tradeUp(uint256 _seed, uint256 _tradeUpComponentsGroupId) view public returns (string memory, uint, uint) {
 
-        // This needs to be wrapped & moved to Graviola.sol later
-
-        // TODO: Chec ownership of input NFTs
-
-        // Calc mean of inputs and check if all are of the same group
-        RarityGroup [KEYWORDS_PER_TOKEN] memory tradeUpComponentGroups;
-        uint [KEYWORDS_PER_TOKEN] memory tradeUpComponentGroupIds;
-
-        for (uint i = 0; i < KEYWORDS_PER_TOKEN; i++) {
-            // NOTE: _tradeUpTokenIds should be changed to result of tokenURI once this function is properly scoped & wrapped
-            (tradeUpComponentGroups[i], tradeUpComponentGroupIds[i]) = findRarityGroupRange(_tradeUpTokenIds[i], defaultRarityGroupSetting);
-        }
-
-        require(
-            tradeUpComponentGroupIds[0] == tradeUpComponentGroupIds[1] &&
-            tradeUpComponentGroupIds[1] == tradeUpComponentGroupIds[2],
-            "Input tokens must be of the same rarity group!"
-        );
 
         // Calc target rarity group for the TradeUp
-        RarityGroup memory targetRarityGroup = rarities[tradeUpComponentGroupIds[0] + 1];
-
-        uint inputSum =
-            (rarities[tradeUpComponentGroupIds[0]].rarityPerc +
-             rarities[tradeUpComponentGroupIds[1]].rarityPerc +
-             rarities[tradeUpComponentGroupIds[2]].rarityPerc
-            );
-        uint inputMean = fractionToBasisPoints(inputSum, (defaultRarityGroupSetting.omega * TOKENS_PER_TRADE_UP));
+        uint256 currentRarityGroupId = _tradeUpComponentsGroupId;
+        uint256 targetRarityGroupId = currentRarityGroupId + 1;
+        
 
         // Calculate bonus and boost the group we're targeting
-        uint targetGroupBonus = (2 ^ (RARITY_GROUPS_LENGTH - tradeUpComponentGroupIds[0])) + inputMean;
-        RarityGroupSetting memory tradeUpSetting = RarityGroupSetting((defaultRarityGroupSetting.omega + targetGroupBonus), [uint(88), 26, 3, 2, 1]); // TODO: Allocate bonus to this array too 
+        uint targetGroupBonus = (2 ** (RARITY_GROUPS_LENGTH - currentRarityGroupId)) + defaultRarityGroupSetting.groupProbabilities[currentRarityGroupId];
+
+        console.log(targetGroupBonus); 
+        
+        RarityGroupSetting memory tradeUpSetting = defaultRarityGroupSetting;
+        tradeUpSetting.omega = defaultRarityGroupSetting.omega + targetGroupBonus;
+        tradeUpSetting.groupProbabilities[targetRarityGroupId] = targetGroupBonus;
+
+        console.log(tradeUpSetting.groupProbabilities[0]);
+        console.log(tradeUpSetting.groupProbabilities[1]);
+        console.log(tradeUpSetting.groupProbabilities[2]);
+        console.log(tradeUpSetting.groupProbabilities[3]);
+        console.log(tradeUpSetting.groupProbabilities[4]);
+        console.log(tradeUpSetting.omega);
+
+
 
         // Finally, roll with the TradeUp setting
-        (string memory res, uint prob, uint j) = rollWords(tradeUpSetting);
+        (string memory res, uint prob, uint j) = rollWords(_seed, tradeUpSetting);
         return (res, prob, j);
     }
 
