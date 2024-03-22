@@ -11,6 +11,7 @@ import { getRarityFromPerc, formatBpToPercentage } from "../utils/getRarityDataF
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
+import { parseEther } from "ethers"
 import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
@@ -122,11 +123,15 @@ const Generate = () => {
                         setProgressState("CONFIRM_TX")
                         const estFee = await graviolaContext.contract?.estimateFee() as bigint
                         try {
-                            await graviolaContext.contract?.mint({
-                                value: estFee + 12000n
+                            const tx = await graviolaContext.contract?.mint({
+                                value: estFee + parseEther("0.008")
                             })
-                            setProgressState("BEFORE_MINT")
-                            setProgressBarVal(25)
+                            const receipt = await tx?.wait()
+                            if (receipt) {
+                                console.log("OK")
+                                setProgressState("BEFORE_MINT")
+                                setProgressBarVal(25)
+                            }
                         } catch (err) {
                             setProgressState("TX_REJECTED")
                             setTimeout(() => setProgressState("NONE"), 5000)
