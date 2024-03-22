@@ -13,6 +13,7 @@ import { rarityScale, rarityGroupColors } from "./rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
+import { fallbackNFT } from "./utils/fallbackNFT"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -84,18 +85,19 @@ const App = (props: { children: ReactNode }) => {
             const nftTotalSupply = await graviola.totalSupply()
             console.log("[info] totalSupply: ", Number(nftTotalSupply))
             const promises = Array.from({ length: Number(nftTotalSupply)}, async (_, i) => {
-                const uri = await graviola.tokenURI(BigInt(i))
-                console.log(uri)
                 try {
+                    const uri = await graviola.tokenURI(BigInt(i))
+                    // console.log(uri)
                     const response = await fetch(uri)
                     return response.json()
                 } catch (error) {
-                    console.log(error)
+                    console.error(error)
+                    return fallbackNFT
                 }
             })
             
             // Nfts
-            const collection = await Promise.all(promises)
+            const collection: NFT[] = await Promise.all(promises)
             console.log("[info] fetched collection ", collection)
             setCollection(prev => [...prev, ...collection])
 

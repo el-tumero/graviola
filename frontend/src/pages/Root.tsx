@@ -7,18 +7,18 @@ import Navbar from "../components/Navbar"
 import Button from '../components/ui/Button'
 import BlockMarquee from '../components/BlockMarquee'
 import NFTDetails from '../components/ui/NFTDetails'
-// import { rarities } from '../rarityData'
 import { routerPaths } from '../router'
-import { RarityGroupData, RarityLevel } from '../types/Rarity'
+import { RarityLevel } from '../types/Rarity'
 import { GraviolaContext } from '../contexts/GraviolaContext'
 import { convertToIfpsURL } from '../utils/convertToIpfsURL'
 import BlockNFT from '../components/ui/BlockNFT'
 import SectionTitle from '../components/ui/SectionTitle'
 import OraIoBanner from '../components/ui/OraIoBanner'
 import Link from '../components/Link'
-import fallbackNFT from "../assets/fallbackNFT.png"
 import { getRarityFromPerc } from '../utils/getRarityDataFromThreshold'
 import { RaritiesData } from '../types/RarityGroup'
+import { fallbackNFT, fallbackNFTRarity } from '../utils/fallbackNFT'
+import { splitCollectionToMarquee } from '../utils/splitCollectionToMarquee'
 
 function Root() {
 
@@ -28,20 +28,12 @@ function Root() {
     const graviolaContext = useContext(GraviolaContext)
     const rGroups = graviolaContext.rarities as RaritiesData
     const nftSources = graviolaContext.collection as NFT[]
-    const fallbackNfts: NFT[] = [{
-        image: fallbackNFT,
-        description: "This is a fallback NFT image. Go generate some!",
-        attributes: [{
-            "trait_type": "Rarity",
-            "value": 2874
-        }]
-    }]
-    const fallbackNftsRariries = [RarityLevel.Rare]
+    const fallbackNfts: NFT[] = Array(16).fill(fallbackNFT)
+    const fallbackNftsRariries = Array(16).fill(fallbackNFTRarity)
 
-    // Change this to 3 different-sized arrays once we have more data to work with
-    const marqueeSources = nftSources.map((nft: NFT) => (
-        convertToIfpsURL(nft.image)
-    ))
+    const useContractCollection = nftSources.length >= 16
+    const [marqueeSources1, marqueeSources2, marqueeSources3] =
+        splitCollectionToMarquee(useContractCollection ? nftSources : fallbackNfts)
 
     // Init NFT marquee opacity animation
     useEffect(() => {
@@ -81,9 +73,9 @@ function Root() {
                             transition-opacity duration-4000 ease-in-out
                             ${marqueeInit ? "opacity-100" : "opacity-0"}
                             `}>
-                                <BlockMarquee nftSources={marqueeSources || fallbackNfts} />
-                                <BlockMarquee nftSources={marqueeSources || fallbackNfts} />
-                                <BlockMarquee nftSources={marqueeSources || fallbackNfts} />
+                                <BlockMarquee nftSources={marqueeSources1.map((nft) => convertToIfpsURL(nft.image))} />
+                                <BlockMarquee nftSources={marqueeSources2.map((nft) => convertToIfpsURL(nft.image))} />
+                                <BlockMarquee nftSources={marqueeSources3.map((nft) => convertToIfpsURL(nft.image))} />
                             </div>
                         </div>
                     </div>
@@ -127,7 +119,7 @@ function Root() {
                     <div className='xl:flex xl:justify-center sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
                         {Object.entries(rGroups).map(([,rarityGroup], i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
-                                <BlockNFT src={convertToIfpsURL(nftSources[0].image)} glow={true} rarityGroup={rarityGroup} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
+                                <BlockNFT src={convertToIfpsURL(nftSources[i].image)} glow={true} rarityGroup={rarityGroup} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />
                                 <div className='flex flex-col justify-center items-center w-fit h-fit p-2 my-1'>
                                     <p className='font-bold' style={{color: rarityGroup.color }}>{rarityGroup.name}</p>
                                     <span className='font-bold'>

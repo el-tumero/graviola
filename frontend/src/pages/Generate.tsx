@@ -47,12 +47,6 @@ const Generate = () => {
             setProgressBarVal(50)
         }
 
-        // const onPromptRequest = (smth: string) => {
-        //     console.log(`[info] onPromptRequest done: ${smth}`)
-        //     setProgressState("WAIT_IMAGE")
-        //     setProgressBarVal(75)
-        // }
-
         const onTokenReady = async (addr: string, tokenId: bigint) => {
 
             console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
@@ -71,16 +65,15 @@ const Generate = () => {
                 rarityLevel: rarityLevel,
                 rarityData: rarityData,
             }
+            
             setRolledNFT(nftRes)
         }
 
         graviola.on(graviola.filters.Mint, onMint)
-        // graviola.on(graviola.filters.PromptRequest, onPromptRequest)
         graviola.on(graviola.filters.TokenReady, onTokenReady)
 
         return () => {
             graviola.off(graviola.filters.Mint, onMint)
-            // graviola.off(graviola.filters.PromptRequest, onPromptRequest)
             graviola.off(graviola.filters.TokenReady, onTokenReady)
         }
 

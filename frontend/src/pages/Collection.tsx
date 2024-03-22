@@ -12,6 +12,7 @@ import BlockNFT from "../components/ui/BlockNFT";
 import { formatBpToPercentage, getRarityFromPerc } from "../utils/getRarityDataFromThreshold";
 import { ethers } from "ethers";
 import { RaritiesData } from "../types/RarityGroup";
+import { fallbackNFT } from "../utils/fallbackNFT";
 
 type CollectionMode = "Everyone" | "My Drops"
 
@@ -100,7 +101,6 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                 const keywordsArray: string[] = (nft.description.split(":").pop()!.trim()).split(",")
                 const keywords: string[] = keywordsArray.map(keyword => keyword.trim())
 
-                console.log("perc ", percRarity)
                 const [,rarityData] = getRarityFromPerc(percRarity, props.rGroups)
                 if ((props.collectionMode === "My Drops") && !(props.ownedTokenIds.includes(i))) {
                     return null
