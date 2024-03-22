@@ -5,6 +5,7 @@ import { NFT } from "../types/NFT"
 import { getRarityFromPerc } from "../utils/getRarityDataFromThreshold"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { RaritiesData } from "../types/RarityGroup"
+import { formatBpToPercentage } from "../utils/getRarityDataFromThreshold"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
@@ -22,7 +23,7 @@ const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating, rGroups }: Ge
     const {
         style: breathingBorderStyle = {},
         className: breathingBorderClassNames = ""
-    } = rolledNFT ? getRarityBorder(getRarityFromPerc(rolledNFT.attributes[0].value, rGroups)[1], true) : {};
+    } = rolledNFT ? getRarityBorder(getRarityFromPerc(formatBpToPercentage(rolledNFT.attributes[0].value), rGroups)[1], true) : {};
 
     useEffect(() => {
         if (!rolledNFT) return
