@@ -12,3 +12,6 @@ Graviola's initiative employs blockchain, AI, and randomness to autonomously pro
 3. run website
     1. `cd ../frontend && yarn`
     2. `yarn dev`
+
+## Live demo
+https://el-tumero.github.io/graviola/
