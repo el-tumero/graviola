@@ -56,7 +56,15 @@ const Generate = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
+
+            // DEBUG
+            // console.log("raw val ", nft.attributes[0].value)
+            // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
+            // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
+
             const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
+
+            // console.log("rarityLevel from conv:  ", rarityLevel)
 
             setProgressState("DONE")
             setProgressBarVal(100)
@@ -115,7 +123,7 @@ const Generate = () => {
 
                     {/* State/Progress text */}
                     {progressState === "DONE"
-                        ? <NftResultText rGroup={getRarityFromPerc(rolledNFT!.rarityData.rarityPerc, rGroups)[1]} />
+                        ? <NftResultText rGroup={rolledNFT!.rarityData} />
                         : <span className="text-lg font-bold">{progressMessage}</span>
                     }
 
@@ -124,7 +132,7 @@ const Generate = () => {
                         const estFee = await graviolaContext.contract?.estimateFee() as bigint
                         try {
                             const tx = await graviolaContext.contract?.mint({
-                                value: estFee + parseEther("0.008")
+                                value: estFee + parseEther("0.01")
                             })
                             const receipt = await tx?.wait()
                             if (receipt) {
@@ -158,7 +166,7 @@ const Generate = () => {
                                         <span 
                                         key={keywordIndex} 
                                         className="flex justify-center items-center py-2 px-3 rounded-md bg-light-bgLight/75 dark:bg-dark-bgLight/75"
-                                        style={{ borderWidth: 1.5, borderRadius: 8, borderColor: rGroup.color }}
+                                        style={{ borderWidth: 2, borderRadius: 8, borderColor: rGroup.color }}
                                         >
                                             {keyword.name}
                                         </span>
