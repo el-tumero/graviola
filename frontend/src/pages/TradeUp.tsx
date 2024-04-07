@@ -37,20 +37,6 @@ const TradeUp = () => {
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
 
-    useEffect(() => {
-        (async () => {
-            let userOwnedTokens
-            if (address) {
-                userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
-            }
-            userOwnedTokens && userOwnedTokens.forEach(token => {
-                setOwnedTokensIds(prev => [...prev, Number(token)])
-            })
-            // console.log(ownedTokensIds)
-            setIsLoading(false)
-        })()
-    }, [])
-
     // Generation state listener
     const progressListener = () => {
         if (!isConnected) return
@@ -93,6 +79,20 @@ const TradeUp = () => {
         }
 
     }
+
+    useEffect(() => {
+        (async () => {
+            let userOwnedTokens
+            if (address) {
+                userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
+            }
+            userOwnedTokens && userOwnedTokens.forEach(token => {
+                setOwnedTokensIds(prev => [...prev, Number(token)])
+            })
+            // console.log(ownedTokensIds)
+            setIsLoading(false)
+        })()
+    }, [])
 
     useEffect(() => {
         progressListener()
@@ -157,7 +157,6 @@ const TradeUp = () => {
                                                                     `}
                                                                 style={{ borderRadius: 16, borderWidth: 2, borderColor: rarityData.color }}
                                                                 onClick={() => {
-
                                                                     const indexOf = selectedIds.indexOf(i)
                                                                     if (indexOf !== -1) {
                                                                         if (selectedIds.length === 1) setSelectedGroup(null)
@@ -194,7 +193,7 @@ const TradeUp = () => {
                                 </div>
 
                                 {/* RIGHT PANEL (SELECTED NFTS / RESULT) */}
-                                 <div className={`
+                                <div className={`
                                     flex w-1/3 flex-col gap-4 p-4
                                     justify-center items-center
                                     bg-light-bgDark dark:bg-dark-bgDark
@@ -211,12 +210,12 @@ const TradeUp = () => {
                                             :
                                             (selectedIds.length === 0)
                                                 ? <p className="mx-2">Select the Graviola NFTs you want to trade</p>
-                                                : selectedIds.map((id, key) => {
+                                                : selectedIds.map((id, i) => {
                                                     const percRarity = formatBpToPercentage(contractNFTs[id].attributes[0].value)
                                                     const [, rarityData] = getRarityFromPerc(percRarity, rGroups)
                                                     return (
                                                         <div
-                                                            key={key}
+                                                            key={i}
                                                             className={`
                                                                 relative flex justify-center items-center
                                                                 flex-[1_1_auto] max-w-full max-h-[12em]
@@ -225,8 +224,23 @@ const TradeUp = () => {
                                                                 border-2 border-light-border dark:border-dark-border
                                                                 rounded-xl aspect-square`
                                                             }
+                                                            onClick={() => {
+                                                                const indexOf = selectedIds.indexOf(id)
+                                                                console.log(indexOf)
+                                                                if (indexOf !== -1) {
+                                                                    if (selectedIds.length === 1) setSelectedGroup(null)
+                                                                    setSelectedIds(prev => prev.filter((_id) => id !== _id))
+                                                                    return
+                                                                }
+                                                            }}
                                                         >
-                                                            <p className="absolute top-0 left-0 m-2 p-1 rounded-xl bg-light-bgPrimary dark:bg-dark-bgPrimary border border-light-border dark:border-dark-border">{key+1}</p>
+                                                            <p className={`
+                                                                absolute top-0 left-0 m-2 p-1
+                                                                rounded-xl bg-light-bgPrimary dark:bg-dark-bgPrimary
+                                                                border border-light-border dark:border-dark-border
+                                                            `}>
+                                                                {i + 1}
+                                                            </p>
                                                             <BlockNFT
                                                                 src={convertToIfpsURL(contractNFTs[id].image)}
                                                                 glow={true}
