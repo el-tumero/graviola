@@ -194,7 +194,7 @@ const TradeUp = () => {
                                 </div>
 
                                 {/* RIGHT PANEL (SELECTED NFTS / RESULT) */}
-                                <div className={`
+                                 <div className={`
                                     flex w-1/3 flex-col gap-4 p-4
                                     justify-center items-center
                                     bg-light-bgDark dark:bg-dark-bgDark
@@ -218,18 +218,21 @@ const TradeUp = () => {
                                                         <div
                                                             key={key}
                                                             className={`
-                                                                flex justify-center items-center flex-1 max-w-[12em] max-h-[12em]
+                                                                relative flex justify-center items-center
+                                                                flex-[1_1_auto] max-w-full max-h-[12em]
+                                                                h-auto
                                                                 bg-light-bgLight/50 dark:bg-dark-bgLight/50
                                                                 border-2 border-light-border dark:border-dark-border
                                                                 rounded-xl aspect-square`
                                                             }
                                                         >
+                                                            <p className="absolute top-0 left-0 m-2 p-1 rounded-xl bg-light-bgPrimary dark:bg-dark-bgPrimary border border-light-border dark:border-dark-border">{key+1}</p>
                                                             <BlockNFT
                                                                 src={convertToIfpsURL(contractNFTs[id].image)}
                                                                 glow={true}
                                                                 disableMargin={true}
                                                                 rarityGroup={rarityData}
-                                                                additionalClasses="m-2 w-min h-min flex-1"
+                                                                additionalClasses="m-2 p-2 w-min h-min flex-1"
                                                             />
                                                         </div>
                                                     )
