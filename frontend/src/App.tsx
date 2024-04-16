@@ -1,6 +1,6 @@
 import "./App.css"
 import { useEffect, useState, ReactNode } from 'react'
-import { createWeb3Modal, defaultConfig, useWeb3ModalProvider, useWeb3ModalTheme } from '@web3modal/ethers/react'
+import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal/ethers/react'
 import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers'
 import { Graviola } from "../../contracts/typechain-types/contracts/Graviola"
 import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/contracts/Graviola__factory"
@@ -14,7 +14,6 @@ import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./utils/fallbackNFT"
-import { formatBpToPercentage, getRarityFromPerc } from "./utils/getRarityDataFromThreshold"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
@@ -89,11 +88,10 @@ const App = (props: { children: ReactNode }) => {
             const promises = Array.from({ length: Number(nftTotalSupply)}, async (_, i) => {
                 try {
                     const uri = await graviola.tokenURI(BigInt(i))
-                    // console.log(uri)
                     const response = await fetch(uri)
                     return response.json()
                 } catch (error) {
-                    console.error(error)
+                    console.warn(`[warn] err while fetching collection: ${error}`)
                     return fallbackNFT
                 }
             })
@@ -140,15 +138,12 @@ const App = (props: { children: ReactNode }) => {
     }, [walletProvider])
 
     return (
-        (loading) ? 
-            <Loading />
-        :
-            <>
-                <GraviolaContext.Provider value={graviolaContextValue}>
-                    {props.children}
-                </GraviolaContext.Provider>
-            </>
-    )   
+        (loading)
+        ? <Loading />
+        : <GraviolaContext.Provider value={graviolaContextValue}>
+            {props.children}
+          </GraviolaContext.Provider>
+    )
 }
 
 export default App

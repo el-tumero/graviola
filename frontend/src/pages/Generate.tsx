@@ -167,7 +167,7 @@ const Generate = () => {
                                         key={keywordIndex} 
                                         className="flex justify-center items-center py-2 px-3 rounded-md bg-light-bgLight/75 dark:bg-dark-bgLight/75"
                                         style={{ borderWidth: 2, borderRadius: 8, borderColor: rGroup.color }}
-                                        >
+                                    >
                                             {keyword.name}
                                         </span>
                                     ))}

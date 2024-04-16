@@ -8,7 +8,6 @@ import Button from '../components/ui/Button'
 import BlockMarquee from '../components/BlockMarquee'
 import NFTDetails from '../components/ui/NFTDetails'
 import { routerPaths } from '../router'
-import { RarityLevel } from '../types/Rarity'
 import { GraviolaContext } from '../contexts/GraviolaContext'
 import { convertToIfpsURL } from '../utils/convertToIpfsURL'
 import BlockNFT from '../components/ui/BlockNFT'
@@ -49,7 +48,6 @@ function Root() {
 
             <ContentContainer additionalClasses='flex-col'>
                 <div className='flex flex-col mt-16 p-4 gap-2'>
-
                     <SectionTitle
                         mainText={{
                             content: "Your own dynamically generated NFT character portrait",

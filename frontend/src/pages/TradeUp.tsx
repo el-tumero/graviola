@@ -40,6 +40,7 @@ const TradeUp = () => {
     // Generation state listener
     const progressListener = () => {
         if (!isConnected) return
+        console.log('123')
         const graviola = graviolaContext.contract as Graviola
 
         const onMint = (addr: string, tokenId: bigint) => {
@@ -80,6 +81,7 @@ const TradeUp = () => {
 
     }
 
+    // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
         (async () => {
             let userOwnedTokens
@@ -92,12 +94,14 @@ const TradeUp = () => {
             // console.log(ownedTokensIds)
             setIsLoading(false)
         })()
-    }, [])
+    }, [isConnected, address])
 
+    // Init listeners for the contract
     useEffect(() => {
         progressListener()
     }, [])
 
+    // Progress state text updater
     useEffect(() => {
         setProgressMessage(nftCreationStatusMessages[progressState])
     }, [progressState])
