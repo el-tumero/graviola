@@ -1,6 +1,7 @@
 
 export type NFTCreationStatus = "NONE" | "CONFIRM_TX" | "TX_REJECTED" | "BEFORE_MINT" | "MINTED" | "WAIT_IMAGE" | "DONE"
 
+// TODO: Add trade-up specific messages too
 export const nftCreationStatusMessages: Record<NFTCreationStatus, string> = {
     NONE: "Are you ready to try your luck?",
     CONFIRM_TX: "Waiting for transaction confirmation...",
