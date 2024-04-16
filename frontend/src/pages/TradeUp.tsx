@@ -114,13 +114,13 @@ const TradeUp = () => {
         <FullscreenContainer additionalClasses="text-2xl">
             <Navbar />
 
-            <ContentContainer additionalClasses="flex-col h-min overflow-y-hidden">
+            <ContentContainer additionalClasses="flex-col h-auto grow overflow-y-hidden">
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center mt-28 mb-14">
                     <h1 className='font-bold text-2xl'>Trade Up</h1>
                 </div>
 
-                <div className="flex flex-col gap-2 h-2/3">
+                <div className="flex flex-col gap-2 h-full">
                     <div className="flex w-full h-full gap-4">
 
                         {/* LEFT PANEL (ALL OWNED NFTS) */}
@@ -214,7 +214,7 @@ const TradeUp = () => {
 
                         {/* RIGHT PANEL (SELECTED NFTS / RESULT) */}
                         <div className={`
-                                    flex w-1/3 flex-col gap-4 p-4
+                                    flex w-1/3 h-full flex-col gap-4 p-4
                                     justify-center items-center
                                     bg-light-bgDark dark:bg-dark-bgDark
                                     rounded-xl
@@ -239,7 +239,7 @@ const TradeUp = () => {
                                                     className={`
                                                                 relative flex justify-center items-center
                                                                 flex-[1_1_auto] max-w-full max-h-[12em]
-                                                                h-auto
+                                                                h-auto grow
                                                                 bg-light-bgLight/50 dark:bg-dark-bgLight/50
                                                                 border-2 border-light-border dark:border-dark-border
                                                                 rounded-xl aspect-square`
@@ -304,7 +304,10 @@ const TradeUp = () => {
                                     }
                                 } catch (err) {
                                     setProgressState("TX_REJECTED")
-                                    setTimeout(() => setProgressState("NONE"), 5000)
+                                    setTimeout(() => {
+                                        setProgressState("NONE")
+                                        setProgressBarVal(0)
+                                    }, 3000)
                                     return
                                 }
                             }}

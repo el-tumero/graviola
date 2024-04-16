@@ -143,7 +143,7 @@ const Generate = () => {
                             }
                         } catch (err) {
                             setProgressState("TX_REJECTED")
-                            setTimeout(() => setProgressState("NONE"), 5000)
+                            setTimeout(() => setProgressState("NONE"), 3000)
                             return
                         }
                     }} />}
