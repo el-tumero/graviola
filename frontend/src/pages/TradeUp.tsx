@@ -11,7 +11,8 @@ import { ethers, toBigInt } from "ethers";
 import { formatBpToPercentage, getRarityFromPerc } from "../utils/getRarityDataFromThreshold";
 import BlockNFT from "../components/ui/BlockNFT";
 import { convertToIfpsURL } from "../utils/convertToIpfsURL";
-import { RarityGroupData, RarityLevel } from "../types/Rarity";
+import ResultText from "../components/ui/ResultText";
+import { RarityLevel } from "../types/Rarity";
 import GenerateContainer from "../components/GenerateContainer";
 import { NFTCreationStatus, nftCreationStatusMessages } from "../types/NFTCreationStatus";
 import { NFTExt } from "./Generate";
@@ -320,7 +321,7 @@ const TradeUp = () => {
 
                             {/* State/Progress text */}
                             {(progressState === "DONE")
-                                ? <NftResultText rGroup={getRarityFromPerc(rolledNFT!.rarityData.rarityPerc, rGroups)[1]} />
+                                ? <ResultText rGroup={rolledNFT!.rarityData} />
                                 : <p>{progressMessage}</p>
                             }
                         </div>
@@ -332,14 +333,6 @@ const TradeUp = () => {
             </ContentContainer>
 
         </FullscreenContainer>
-    )
-}
-
-const NftResultText = (props: { rGroup: RarityGroupData }) => {
-    return (
-        <p className="text-lg font-bold">{`Congratulations! You rolled a `}
-            <span style={{ color: props.rGroup.color }} className="font-bold underline">{(props.rGroup.name).toUpperCase()}!</span>
-        </p>
     )
 }
 

@@ -14,6 +14,7 @@ import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { parseEther } from "ethers"
 import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
+import ResultText from "../components/ui/ResultText"
 import { RaritiesData } from "../types/RarityGroup"
 
 // Extended NFT interface to avoid computing the same properties multiple times
@@ -123,7 +124,7 @@ const Generate = () => {
 
                     {/* State/Progress text */}
                     {progressState === "DONE"
-                        ? <NftResultText rGroup={rolledNFT!.rarityData} />
+                        ? <ResultText rGroup={rolledNFT!.rarityData} />
                         : <span className="text-lg font-bold">{progressMessage}</span>
                     }
 
@@ -182,14 +183,6 @@ const Generate = () => {
 
         </FullscreenContainer>
 
-    )
-}
-
-const NftResultText = (props: { rGroup: RarityGroupData }) => {
-    return (
-        <p className="text-lg font-bold">{`Congratulations! You rolled a `}
-            <span style={{ color: props.rGroup.color }} className="font-bold underline">{(props.rGroup.name).toUpperCase()}!</span>
-        </p>
     )
 }
 
