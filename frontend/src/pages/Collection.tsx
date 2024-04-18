@@ -132,7 +132,7 @@ const Collection = () => {
                                             `}
                                             onClick={() => scrollToTop()}
                                         >
-                                            <svg width="800px" height="800px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                            <svg className="w-min h-min" width="800px" height="800px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 18V2m0 0l7 7m-7-7L3 9" />
                                             </svg>
                                         </div>
