@@ -1,7 +1,7 @@
 import FullscreenContainer from "../components/ui/FullscreenContainer";
 import ContentContainer from "../components/ui/ContentContainer";
 import Navbar from "../components/Navbar";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useWeb3ModalAccount } from '@web3modal/ethers/react'
 import { GraviolaContext } from "../contexts/GraviolaContext";
 import { convertToIfpsURL } from "../utils/convertToIpfsURL";
@@ -39,8 +39,46 @@ const Collection = () => {
         })()
     }, [])
 
+    // Scroll to top stuff
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const [backToTopVisible, setBackToTopVisible] = useState<boolean>(false)
+
+    const scrollToTop = () => {
+        scrollContainerRef.current?.scrollTo({
+            top: 0,
+            behavior: "smooth",
+        })
+    }
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scrollContainerRef.current) {
+                const scrollThresholdPerc = 20
+                const scrollTop = scrollContainerRef.current.scrollTop
+                const scrollHeight = scrollContainerRef.current.scrollHeight
+                const clientHeight = scrollContainerRef.current.clientHeight
+                const scrolledPercentage =
+                    (scrollTop / (scrollHeight - clientHeight)) * 100
+
+                // console.log("scroll ", scrolledPercentage)
+                if (scrolledPercentage < scrollThresholdPerc) {
+                    setBackToTopVisible(false)
+                    return
+                }
+
+                setBackToTopVisible(true)
+            }
+        }
+
+        const scrollContainer = scrollContainerRef.current
+        scrollContainer?.addEventListener("scroll", handleScroll)
+
+        return () =>
+            scrollContainer?.removeEventListener("scroll", handleScroll)
+    }, [])
+
     return (
-        <FullscreenContainer>
+        <FullscreenContainer ref={scrollContainerRef} >
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col gap-4">
@@ -73,7 +111,9 @@ const Collection = () => {
                                 />
                             </div>
 
-                            <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
+                            <div
+                                className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold"
+                            >
                                 <CollectionList
                                     contractNFTs={contractNFTs}
                                     collectionMode={collectionMode}
@@ -81,13 +121,30 @@ const Collection = () => {
                                     rGroups={rGroups}
                                 />
 
+                                {/* Scroll to Top Button */}
+                                {backToTopVisible && (
+                                    <div className="flex absolute bottom-0 right-0 w-16 h-16 m-8 bg-transparent">
+                                        <div
+                                            className={`
+                                                flex w-16 h-16 p-3 justify-center items-center hover:cursor-pointer border
+                                                rounded-lg bg-light-bgLight dark:bg-dark-bgLight border-light-border dark:border-dark-border
+                                                stroke-accent/40
+                                            `}
+                                            onClick={() => scrollToTop()}
+                                        >
+                                            <svg width="800px" height="800px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 18V2m0 0l7 7m-7-7L3 9" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                )}
+
                             </div>
                         </>
                 }
 
 
             </ContentContainer>
-
         </FullscreenContainer>
     )
 }
@@ -100,7 +157,7 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                 const keywordsArray: string[] = (nft.description.split(":").pop()!.trim()).split(",")
                 const keywords: string[] = keywordsArray.map(keyword => keyword.trim())
 
-                const [,rarityData] = getRarityFromPerc(percRarity, props.rGroups)
+                const [, rarityData] = getRarityFromPerc(percRarity, props.rGroups)
                 if ((props.collectionMode === "My Drops") && !(props.ownedTokenIds.includes(i))) {
                     return null
                 } else {
@@ -113,36 +170,36 @@ const CollectionList = (props: { contractNFTs: Array<NFT>, collectionMode: Colle
                             border-2 border-light-border dark:border-dark-border
                             p-4 rounded-xl
                             `}
-                            >
-                                <div className="p-px" style={{ borderRadius: 16, borderWidth: 2, borderColor: rarityData.color }}>
-                                    <BlockNFT src={convertToIfpsURL(nft.image)} glow={false} disableMargin={true} additionalClasses={`w-fit h-fit max-w-[14em]`} />
-                                </div>
-                                <div className="flex flex-col gap-2 justify-center items-center">
-                                    {/* Id */}
-                                    <p className="font-bold">
-                                        Id: {i}
-                                    </p>
+                        >
+                            <div className="p-px" style={{ borderRadius: 16, borderWidth: 2, borderColor: rarityData.color }}>
+                                <BlockNFT src={convertToIfpsURL(nft.image)} glow={false} disableMargin={true} additionalClasses={`w-fit h-fit max-w-[14em]`} />
+                            </div>
+                            <div className="flex flex-col gap-2 justify-center items-center">
+                                {/* Id */}
+                                <p className="font-bold">
+                                    Id: {i}
+                                </p>
 
-                                    {/* Rarity name */}
-                                    <p className="flex gap-1 font-normal">
-                                        Rarity: {" "}
-                                        <span style={{ color: rarityData.color }} className="font-bold">{rarityData.name}</span>
-                                    </p>
-                                    {/* Rarity perc */}
-                                    <p style={{ color: rarityData.color }} className="text-xs opacity-75">({percRarity}%)</p>
-                                </div>
-                                <div className="w-full h-1 bg-light-bgLight dark:bg-dark-bgLight"></div>
-                                <div className="flex flex-wrap w-full h-full gap-2 justify-center items-center">
-                                    {/* Keywords */}
-                                    {keywords.map((keyword, i) => (
-                                        <span
-                                            className="py-1 px-2 rounded-lg bg-light-bgLight dark:bg-dark-bgLight text-sm"
-                                            key={i}
-                                        >
-                                            {keyword}
-                                        </span>
-                                    ))}
-                                </div>
+                                {/* Rarity name */}
+                                <p className="flex gap-1 font-normal">
+                                    Rarity: {" "}
+                                    <span style={{ color: rarityData.color }} className="font-bold">{rarityData.name}</span>
+                                </p>
+                                {/* Rarity perc */}
+                                <p style={{ color: rarityData.color }} className="text-xs opacity-75">({percRarity}%)</p>
+                            </div>
+                            <div className="w-full h-1 bg-light-bgLight dark:bg-dark-bgLight"></div>
+                            <div className="flex flex-wrap w-full h-full gap-2 justify-center items-center">
+                                {/* Keywords */}
+                                {keywords.map((keyword, i) => (
+                                    <span
+                                        className="py-1 px-2 rounded-lg bg-light-bgLight dark:bg-dark-bgLight text-sm"
+                                        key={i}
+                                    >
+                                        {keyword}
+                                    </span>
+                                ))}
+                            </div>
                         </div>
                     )
                 }
