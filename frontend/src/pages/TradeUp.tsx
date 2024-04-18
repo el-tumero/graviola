@@ -110,7 +110,7 @@ const TradeUp = () => {
     }, [progressState])
 
     return (
-        <FullscreenContainer additionalClasses="text-2xl">
+        <FullscreenContainer>
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col h-auto grow overflow-y-hidden">

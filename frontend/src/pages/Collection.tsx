@@ -12,6 +12,7 @@ import BlockNFT from "../components/ui/BlockNFT";
 import { formatBpToPercentage, getRarityFromPerc } from "../utils/getRarityDataFromThreshold";
 import { ethers } from "ethers";
 import { RaritiesData } from "../types/RarityGroup";
+import { cn } from "../utils/cn";
 
 type CollectionMode = "Everyone" | "My Drops"
 
@@ -24,19 +25,25 @@ const Collection = () => {
     const [collectionMode, setCollectionMode] = useState<CollectionMode>("Everyone")
     const [ownedTokensIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [fetchingCollection, setFetchingCollection] = useState<boolean>(false)
+
+    const fetchCollectionTokens = async () => {
+        setFetchingCollection(true)
+        let userOwnedTokens
+        if (address) {
+            userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
+        }
+        userOwnedTokens && userOwnedTokens.forEach(token => {
+            setOwnedTokensIds(prev => [...prev, Number(token)])
+        })
+        // console.log(ownedTokensIds)
+        setIsLoading(false)
+        setFetchingCollection(false)
+    }
 
     useEffect(() => {
-        (async () => {
-            let userOwnedTokens
-            if (address) {
-                userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
-            }
-            userOwnedTokens && userOwnedTokens.forEach(token => {
-                setOwnedTokensIds(prev => [...prev, Number(token)])
-            })
-            // console.log(ownedTokensIds)
-            setIsLoading(false)
-        })()
+        fetchCollectionTokens()
+
     }, [])
 
     // Scroll to top stuff
@@ -102,13 +109,20 @@ const Collection = () => {
 
                             <div className="flex justify-between items-center mb-4 max-sm:flex-col max-sm:gap-2">
                                 <p className="text-xl">Showing: <span className="font-bold">{collectionMode.toLowerCase()}</span></p>
-                                <Button
-                                    text={`Change to ${(collectionMode === "My Drops") ? "all drops" : "my drops only"}`}
-                                    onClick={() => {
-                                        const invertedCollectionMode = (collectionMode === "My Drops") ? "Everyone" : "My Drops"
-                                        setCollectionMode(invertedCollectionMode)
-                                    }}
-                                />
+                                <div className="flex gap-3">
+                                    <Button
+                                        text="Refresh"
+                                        onClick={() => fetchCollectionTokens()}
+                                        enabled={!fetchingCollection}
+                                    />
+                                    <Button
+                                        text={`Change to ${(collectionMode === "My Drops") ? "all drops" : "my drops only"}`}
+                                        onClick={() => {
+                                            const invertedCollectionMode = (collectionMode === "My Drops") ? "Everyone" : "My Drops"
+                                            setCollectionMode(invertedCollectionMode)
+                                        }}
+                                    />
+                                </div>
                             </div>
 
                             <div
@@ -125,11 +139,11 @@ const Collection = () => {
                                 {backToTopVisible && (
                                     <div className="flex absolute bottom-0 right-0 w-16 h-16 m-8 bg-transparent">
                                         <div
-                                            className={`
-                                                flex w-16 h-16 p-3 justify-center items-center hover:cursor-pointer border
-                                                rounded-lg bg-light-bgLight dark:bg-dark-bgLight border-light-border dark:border-dark-border
-                                                stroke-accent/40
-                                            `}
+                                            className={cn(
+                                                "flex w-16 h-16 p-3 justify-center items-center hover:cursor-pointer border",
+                                                "rounded-lg bg-light-bgLight dark:bg-dark-bgLight border-light-border dark:border-dark-border",
+                                                "stroke-accent/40 hover:border hover:border-accent/80 dark:hover:border-accent/80",
+                                            )}
                                             onClick={() => scrollToTop()}
                                         >
                                             <svg className="w-min h-min" width="800px" height="800px" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
