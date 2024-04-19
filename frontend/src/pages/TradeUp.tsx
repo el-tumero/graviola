@@ -115,16 +115,16 @@ const TradeUp = () => {
 
             <ContentContainer additionalClasses="flex-col h-auto grow overflow-y-hidden">
 
+                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
+                    <h1 className='font-bold text-2xl'>Trade Up</h1>
+                </div>
+
                 {(isLoading)
                     ? <p className="self-center my-2">Loading...</p>
                     : (!isConnected)
                         ? <p className="self-center my-2">You need to connect your wallet to perform a Trade Up</p>
                         :
                         <>
-                            <div className="flex flex-col gap-4 w-full h-fit justify-center items-center mt-28 mb-14">
-                                <h1 className='font-bold text-2xl'>Trade Up</h1>
-                            </div>
-
                             <div className="flex flex-col gap-2 h-[65%]">
                                 <div className="flex w-full h-full gap-4">
 
