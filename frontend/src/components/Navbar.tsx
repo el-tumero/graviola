@@ -86,7 +86,7 @@ const Navbar = () => {
             </NavElement>,
         },
         {
-            children: <NavElement onClick={() => navigate(routerPaths.root)}>
+            children: <NavElement onClick={() => navigate(routerPaths.accouncement)}>
                 <NavLink text="🎉 Announcement 🎉" />
             </NavElement>,
         },

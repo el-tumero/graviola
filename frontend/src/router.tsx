@@ -5,12 +5,14 @@ import Generate from "./pages/Generate";
 import Collection from "./pages/Collection";
 import Error from "./pages/Error";
 import TradeUp from "./pages/TradeUp";
+import Announcement from "./pages/Announcement";
 
 export const routerPaths = {
     root: "/",
     generate: "/generate",
     collection: "/collection",
-    tradeup: "/tradeup"
+    tradeup: "/tradeup",
+    accouncement: "/announcement"
 }
 
 const router = createBrowserRouter([
@@ -29,6 +31,10 @@ const router = createBrowserRouter([
     {
         path: routerPaths.tradeup,
         element: <TradeUp />
+    },
+    {
+        path: routerPaths.accouncement,
+        element: <Announcement />
     },
     {
         path: "*",
