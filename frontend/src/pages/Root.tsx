@@ -18,6 +18,7 @@ import { getRarityFromPerc } from '../utils/getRarityDataFromThreshold'
 import { RaritiesData } from '../types/RarityGroup'
 import { fallbackNFT, fallbackNFTRarity } from '../utils/fallbackNFT'
 import { splitCollectionToMarquee } from '../utils/splitCollectionToMarquee'
+import { clsx as cl } from "clsx"
 
 function Root() {
 
@@ -45,7 +46,6 @@ function Root() {
 
             <Navbar />
 
-
             <ContentContainer additionalClasses='flex-col'>
                 <div className='flex flex-col mt-16 p-4 gap-2'>
                     <SectionTitle
@@ -60,17 +60,22 @@ function Root() {
                     />
 
                     <div className='flex flex-col mb-36'>
-                        <div className='flex max-lg:flex-col justify-center items-center gap-4 w-full px-4 mt-4 mb-8'>
+                        <div className={cl([
+                            "flex justify-center items-center gap-4 w-full px-4 mt-4 mb-8",
+                            "max-lg:flex-col"
+                        ])}>
                             <Button enabled={true} text='Get yours now!' onClick={() => navigate(routerPaths.generate)} />
                             <Button enabled={true} text='Browse collection' onClick={() => navigate(routerPaths.collection)} />
                         </div>
-                        <div className={`bg-light-bgDark/50 dark:bg-dark-bgDark/50
-                            flex flex-col rounded-xl py-4 border-2 border-light-border dark:border-dark-border`}
+                        <div className={cl([
+                            "bg-light-bgDark/50 flex flex-col rounded-xl py-4 border-2 border-light-border",
+                            "dark:bg-dark-bgDark/50 dark:border-dark-border"
+                        ])}
                         >
-                            <div className={`flex flex-col
-                            transition-opacity duration-4000 ease-in-out
-                            ${marqueeInit ? "opacity-100" : "opacity-0"}
-                            `}>
+                            <div className={cl(
+                                "flex flex-col transition-opacity duration-4000 ease-in-out",
+                                marqueeInit ? "opacity-100" : "opacity-0"
+                            )}>
                                 <BlockMarquee nftSources={marqueeSources1.map((nft) => convertToIfpsURL(nft.image))} />
                                 <BlockMarquee nftSources={marqueeSources2.map((nft) => convertToIfpsURL(nft.image))} />
                                 <BlockMarquee nftSources={marqueeSources3.map((nft) => convertToIfpsURL(nft.image))} />
@@ -114,7 +119,11 @@ function Root() {
                             content: "Check out the chances for each rarity level"
                         }}
                     />
-                    <div className='xl:flex xl:justify-center sm:grid sm:grid-cols-2 sm:gap-16 mt-6 mb-20'>
+                    <div className={cl(
+                            "mt-6 mb-20",
+                            "xl:flex xl:justify-center",
+                            "sm:grid sm:grid-cols-2 sm:gap-16",
+                        )}>
                         {Object.entries(rGroups).map(([,rarityGroup], i) => (
                             <div className='flex flex-col gap-1 justify-center items-center' key={i}>
                                 <BlockNFT src={convertToIfpsURL(nftSources[i].image)} glow={true} rarityGroup={rarityGroup} additionalClasses='xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]' />

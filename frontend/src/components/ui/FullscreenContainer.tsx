@@ -1,17 +1,25 @@
+import { ReactNode, forwardRef } from "react"
+import { cn } from "../../utils/cn"
 
 interface GenericContainerProps {
-    children: React.ReactNode
+    children: ReactNode
     additionalClasses?: string
 }
 
-const FullscreenContainer = ({ children, additionalClasses }: GenericContainerProps) => {
+const FullscreenContainer = forwardRef<HTMLDivElement, GenericContainerProps>(({ children, additionalClasses }, ref) => {
     return (
         <div
-            className={`w-screen h-screen min-w-screen min-h-screen overflow-x-hidden flex flex-col items-center text-light-text dark:text-dark-text bg-light-bgPrimary dark:bg-dark-bgPrimary text-base tracking-wide ${additionalClasses}`}
+            ref={ref}
+            className={cn(
+                "w-screen h-screen min-w-screen min-h-screen overflow-x-hidden",
+                "flex flex-col items-center text-base tracking-wide",
+                "text-light-text dark:text-dark-text bg-light-bgPrimary dark:bg-dark-bgPrimary",
+                additionalClasses
+            )}
         >
             {children}
         </div>
-    )
-}
+    );
+});
 
 export default FullscreenContainer

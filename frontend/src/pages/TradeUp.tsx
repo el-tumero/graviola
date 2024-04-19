@@ -110,10 +110,14 @@ const TradeUp = () => {
     }, [progressState])
 
     return (
-        <FullscreenContainer additionalClasses="text-2xl">
+        <FullscreenContainer>
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col h-auto grow overflow-y-hidden">
+
+                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
+                    <h1 className='font-bold text-2xl'>Trade Up</h1>
+                </div>
 
                 {(isLoading)
                     ? <p className="self-center my-2">Loading...</p>
@@ -121,10 +125,6 @@ const TradeUp = () => {
                         ? <p className="self-center my-2">You need to connect your wallet to perform a Trade Up</p>
                         :
                         <>
-                            <div className="flex flex-col gap-4 w-full h-fit justify-center items-center mt-28 mb-14">
-                                <h1 className='font-bold text-2xl'>Trade Up</h1>
-                            </div>
-
                             <div className="flex flex-col gap-2 h-[65%]">
                                 <div className="flex w-full h-full gap-4">
 
@@ -194,14 +194,15 @@ const TradeUp = () => {
                                                                 <div className="flex flex-col gap-2 justify-center items-center">
                                                                     {/* Keywords */}
                                                                     <div className="flex flex-wrap gap-1 justify-center items-center">
-                                                                        {keywords.map((keyword: string) => {
+                                                                        {keywords.map((keyword: string, i) => {
                                                                             return (
                                                                                 <div
-                                                                                    className={`
-                                                                            rounded-lg py-1 px-2 border
-                                                                            bg-light-bgPrimary dark:bg-dark-bgPrimary
-                                                                            border-light-border dark:border-dark-border
-                                                                        `}>
+                                                                                key={i}
+                                                                                className={`
+                                                                                    rounded-lg py-1 px-2 border
+                                                                                    bg-light-bgPrimary dark:bg-dark-bgPrimary
+                                                                                    border-light-border dark:border-dark-border
+                                                                                `}>
                                                                                     <p>{keyword}</p>
                                                                                 </div>
                                                                             )

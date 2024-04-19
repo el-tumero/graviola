@@ -6,6 +6,7 @@ import { getRarityFromPerc } from "../utils/getRarityDataFromThreshold"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { RaritiesData } from "../types/RarityGroup"
 import { formatBpToPercentage } from "../utils/getRarityDataFromThreshold"
+import { cn } from "../utils/cn"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
@@ -31,17 +32,16 @@ const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating, rGroups }: Ge
     }, [rolledNFT])
 
     return (
-        // TODO: Change this empty style{} to a passed as prop resultRarity
         <div
             style={rolledNFT ? breathingBorderStyle : isGenerating ? rarityAnimBorder : {}}
-            className={`
-                flex justify-center items-center
-                w-64 h-64 p-4 m-8 rounded-xl
-                bg-light-bgDark dark:bg-dark-bgDark
-                border-2 border-light-border dark:border-dark-border
-                ${rolledNFT ? breathingBorderClassNames : ""}
-                ${isPulsating ? "animate-pulse" : ""}
-            `}
+            className={cn(
+                "flex justify-center items-center",
+                "w-64 h-64 p-4 m-8 rounded-xl",
+                "bg-light-bgDark dark:bg-dark-bgDark",
+                "border-2 border-light-border dark:border-dark-border",
+                rolledNFT && breathingBorderClassNames,
+                isPulsating && "animate-pulse"
+            )}
         >
             {rolledNFT &&
                 <>
