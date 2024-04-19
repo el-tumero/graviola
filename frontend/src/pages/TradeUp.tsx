@@ -194,14 +194,15 @@ const TradeUp = () => {
                                                                 <div className="flex flex-col gap-2 justify-center items-center">
                                                                     {/* Keywords */}
                                                                     <div className="flex flex-wrap gap-1 justify-center items-center">
-                                                                        {keywords.map((keyword: string) => {
+                                                                        {keywords.map((keyword: string, i) => {
                                                                             return (
                                                                                 <div
-                                                                                    className={`
-                                                                            rounded-lg py-1 px-2 border
-                                                                            bg-light-bgPrimary dark:bg-dark-bgPrimary
-                                                                            border-light-border dark:border-dark-border
-                                                                        `}>
+                                                                                key={i}
+                                                                                className={`
+                                                                                    rounded-lg py-1 px-2 border
+                                                                                    bg-light-bgPrimary dark:bg-dark-bgPrimary
+                                                                                    border-light-border dark:border-dark-border
+                                                                                `}>
                                                                                     <p>{keyword}</p>
                                                                                 </div>
                                                                             )

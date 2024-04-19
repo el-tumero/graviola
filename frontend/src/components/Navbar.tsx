@@ -1,9 +1,29 @@
-import { useState } from "react"
+import { useState, Fragment } from "react"
 import Link from "./Link"
 import Logo from "../assets/logo.webp"
 import useTheme from "../hooks/useTheme"
 import { useNavigate } from "react-router-dom"
 import { routerPaths } from "../router"
+import { clsx as cl } from "clsx"
+
+interface NavElementProps {
+    children: React.ReactNode
+    onClick?: () => void
+}
+
+const NavElement = ({ children, onClick }: NavElementProps) => {
+    return <div
+        className={cl(
+            "p-2 rounded-xl",
+            "max-lg:flex max-lg:justify-center max-lg:w-full max-lg:bg-light-border max-lg:dark:bg-dark-border/40"
+        )}
+        onClick={onClick ? () => onClick() : () => {}}
+    >
+        {children}
+    </div>
+}
+
+const NavLink = (props: { text: string }) => <span className="cursor-pointer hover:underline">{props.text}</span>
 
 const LightThemeIcon = () => {
     return (
@@ -22,43 +42,20 @@ const DarkThemeIcon = () => {
 }
 
 const NavRightList = (props: {
-    theme: string,
-    generateOnClick: () => void,
-    collectionOnClick: () => void,
-    tradeupOnClick: () => void,
-    themeOnClick: () => void
+    navData: NavElementProps[]
 }) => {
     const mobileStyles = `flex-col max-lg:absolute max-lg:right-6 max-lg:top-16 max-lg:p-4 max-lg:rounded-xl max-lg:border-2 max-lg:border-light-border max-lg:dark:border-dark-border max-lg:shadow-xl`
-    const mobileItemCtn = `p-2 rounded-xl max-lg:w-full max-lg:bg-light-border max-lg:dark:bg-dark-border/40 max-lg:flex max-lg:justify-center`
     return (
         <div className={`flex justify-center items-center gap-4 bg-light-bgDark dark:bg-dark-bgDark max-lg:${mobileStyles}`}>
 
-            {/* Generate */}
-            <div className={mobileItemCtn}>
-                <span className="cursor-pointer hover:underline" onClick={() => props.generateOnClick()}>Generate</span>
-            </div>
-
-            {/* Collection */}
-            <div className={mobileItemCtn}>
-                <span className="cursor-pointer hover:underline" onClick={() => props.collectionOnClick()}>Collection</span>
-            </div>
-
-            {/* TradeUp */}
-            <div className={mobileItemCtn}>
-                <span className="cursor-pointer hover:underline" onClick={() => props.tradeupOnClick()}>Trade Up</span>
-            </div>
-
-            {/* GitHub */}
-            <div className={mobileItemCtn}>
-                <Link text="GitHub" href="https://github.com/el-tumero/graviola" openInNewTab={true} additionalClasses="w-min" />
-            </div>
-
-            {/* Theme switch */}
-            <div className={mobileItemCtn}>
-                <div className="flex justify-center items-center w-6 h-6 cursor-pointer" onClick={() => props.themeOnClick()}>
-                    {props.theme === "dark" ? <LightThemeIcon /> : <DarkThemeIcon />}
-                </div>
-            </div>
+            {/* Classic Navigation Links/Pages */}
+            {props.navData.map((navElem: NavElementProps, i) => {
+                return (
+                    <Fragment key={i}>
+                        {navElem.children}
+                    </Fragment>
+                )
+            })}
 
             {/* Wallet */}
             <w3m-button />
@@ -72,6 +69,41 @@ const Navbar = () => {
     const [theme, toggleTheme] = useTheme(true)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
 
+    const navData: NavElementProps[] = [
+        {
+            children: <NavElement onClick={() => navigate(routerPaths.generate)}>
+                <NavLink text="Generator" />
+            </NavElement>,
+        },
+        {
+            children: <NavElement onClick={() => navigate(routerPaths.collection)}>
+                <NavLink text="Collection" />
+            </NavElement>,
+        },
+        {
+            children: <NavElement onClick={() => navigate(routerPaths.tradeup)}>
+                <NavLink text="Trade Up" />
+            </NavElement>,
+        },
+        {
+            children: <NavElement onClick={() => navigate(routerPaths.root)}>
+                <NavLink text="🎉 Announcement 🎉" />
+            </NavElement>,
+        },
+        {
+            children: <NavElement onClick={() => {}}>
+                <Link text="GitHub" href="https://github.com/el-tumero/graviola" openInNewTab={true} additionalClasses="w-min" />
+            </NavElement>,
+        },
+        {
+            children: <NavElement>
+                <div className="flex justify-center items-center w-6 h-6 cursor-pointer" onClick={() => toggleTheme()}>
+                    {theme === "dark" ? <LightThemeIcon /> : <DarkThemeIcon />}
+                </div>
+            </NavElement>
+        }
+    ]
+
     return (
         <div className="sticky z-[1000] bg-light-bgDark dark:bg-dark-bgDark border-b-2 border-light-border dark:border-dark-border top-0 bg-b w-screen py-4 flex justify-between items-center px-[5%] select-none font-content">
 
@@ -83,13 +115,7 @@ const Navbar = () => {
             </div>
 
             <div className="max-lg:hidden lg:visible">
-                <NavRightList
-                    theme={theme}
-                    generateOnClick={() => navigate(routerPaths.generate)}
-                    collectionOnClick={() => navigate(routerPaths.collection)}
-                    tradeupOnClick={() => navigate(routerPaths.tradeup)}
-                    themeOnClick={toggleTheme}
-                />
+                <NavRightList navData={navData} />
             </div>
 
             {/* Mobile navbar right panel */}
@@ -103,13 +129,7 @@ const Navbar = () => {
 
                 {mobileListVisible &&
                     <div className={`flex flex-col gap-4 transition-opacity duration-200 ${mobileListVisible ? "opacity-100 visible" : "opacity-0 invisible"}`}>
-                        <NavRightList
-                            theme={theme}
-                            generateOnClick={() => navigate(routerPaths.generate)}
-                            collectionOnClick={() => navigate(routerPaths.generate)}
-                            tradeupOnClick={() => navigate(routerPaths.tradeup)}
-                            themeOnClick={toggleTheme}
-                        />
+                        <NavRightList navData={navData} />
                     </div>
                 }
 
