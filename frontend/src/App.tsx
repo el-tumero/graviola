@@ -15,6 +15,7 @@ import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./utils/fallbackNFT"
 
+
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[readonly] connecting to contract...")
@@ -91,7 +92,7 @@ const App = (props: { children: ReactNode }) => {
                     const response = await fetch(uri)
                     return response.json()
                 } catch (error) {
-                    console.warn(`[warn] err while fetching collection: ${error}`)
+                    // console.warn(`[warn] err while fetching collection: ${error}`)
                     return fallbackNFT
                 }
             })
