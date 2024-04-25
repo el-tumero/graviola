@@ -10,3 +10,8 @@
 "forge-std@github:foundry-rs/forge-std#v1.8.1":
   version "1.7.6"
   resolved "https://codeload.github.com/foundry-rs/forge-std/tar.gz/bb4ceea94d6f10eeb5b41dc2391c6c8bf8e734ef"
+
+solidity-json-writer@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/solidity-json-writer/-/solidity-json-writer-1.1.0.tgz#e8884b2eed2476a08dc573f619b6f01913b8692b"
+  integrity sha512-RQ6KHSTBedKYHCeiLdnBxr1VgukruQjrBeiqdwjZqyFlJdaBznxeugKhhpspv8yXwwb9AOZZNF74oxt3HUpOHw==
