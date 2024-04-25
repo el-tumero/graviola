@@ -14,7 +14,7 @@ import { convertToIfpsURL } from "../utils/convertToIpfsURL";
 import ResultText from "../components/ui/ResultText";
 import { RarityLevel } from "../types/Rarity";
 import GenerateContainer from "../components/GenerateContainer";
-import { NFTCreationStatus, nftCreationStatusMessages } from "../types/NFTCreationStatus";
+import { NFTCreationStatus, nftCreationStatusMessages, nftCreationTradeUpStatusMessages } from "../types/NFTCreationStatus";
 import { NFTExt } from "./Generate";
 import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola";
 import { parseEther } from "ethers";
@@ -47,16 +47,17 @@ const TradeUp = () => {
         const graviola = graviolaContext.contract as Graviola
 
         const onMint = (addr: string, tokenId: bigint) => {
+            if(addr != address) return
+
             console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
             setProgressState("MINTED")
             setProgressBarVal(50)
         }
 
         const onTokenReady = async (addr: string, tokenId: bigint) => {
+            if(addr != address) return
 
             console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
-
-            // TODO: CHECK ADDRESS OF ROLLER
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
@@ -106,13 +107,13 @@ const TradeUp = () => {
 
     // Progress state text updater
     useEffect(() => {
-        setProgressMessage(nftCreationStatusMessages[progressState])
+        setProgressMessage(nftCreationTradeUpStatusMessages[progressState])
     }, [progressState])
 
     return (
         <FullscreenContainer>
             <Navbar />
-
+            {/* TODO: FIX LAYOUT FOR (1920x1080) SCREEN */}
             <ContentContainer additionalClasses="flex-col h-auto grow overflow-y-hidden">
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">

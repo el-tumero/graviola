@@ -29,7 +29,7 @@ const Generate = () => {
     const graviolaContext = useContext(GraviolaContext)
     const rGroups = graviolaContext.rarities as RaritiesData
 
-    const { isConnected } = useWeb3ModalAccount()
+    const { isConnected, address } = useWeb3ModalAccount()
 
     const [progressState, setProgressState] = useState<NFTCreationStatus>("NONE")
     const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
@@ -38,22 +38,24 @@ const Generate = () => {
 
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
 
+
     // Generation state listener
     const progressListener = () => {
         if (!walletProvider) return
         const graviola = graviolaContext.contract as Graviola
 
         const onMint = (addr: string, tokenId: bigint) => {
+            if(addr != address) return
             console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
             setProgressState("MINTED")
             setProgressBarVal(50)
         }
 
         const onTokenReady = async (addr: string, tokenId: bigint) => {
+            if(addr != address) return
 
             console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
 
-            // TODO: CHECK ADDRESS OF ROLLER
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
