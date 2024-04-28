@@ -13,7 +13,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@web3modal/ethers": "^4.1.1",
+    "@web3modal/ethers": "^4.1.11",
     "ethers": "^6.11.1",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.4",
@@ -21,8 +21,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.2",
     "sort-by": "^1.2.0",
-    "tailwind-merge": "^2.2.2",
-    "vite-plugin-node-polyfills": "^0.21.0"
+    "tailwind-merge": "^2.2.2"
   },
   "devDependencies": {
     "@types/react": "^18.2.56",
