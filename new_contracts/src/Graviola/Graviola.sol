@@ -90,10 +90,10 @@ contract Graviola is
 
     /// @notice minting a token without metadata
     /// @dev can be called by anybody
-    function mint(address to) external payable {
+    function mint() external payable {
         require(msg.value > estimateFee() + 0.005 ether);
-        _safeMint(to, _nextTokenId);
-        emit Mint(to, _nextTokenId);
+        _safeMint(msg.sender, _nextTokenId);
+        emit Mint(msg.sender, _nextTokenId);
         pasteRandomValue(_nextTokenId); // temp
         
         ++_nextTokenId;
