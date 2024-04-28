@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "compile": "forge build",
-    "types": "forge build && typechain --target ethers-v6 --out-dir ./typechain ./out/Graviola.sol/Graviola.json"
+    "types": "forge build && typechain --target ethers-v6 --out-dir ./typechain-types ./out/Graviola.sol|GraviolaWell.sol/*.json"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",

@@ -4,7 +4,7 @@ node_modules
 .DS_Store
 out
 cache
-typechain
+typechain-types
 
 # broadcasts
 !broadcast
