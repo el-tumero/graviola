@@ -8,6 +8,13 @@ export default defineConfig(() => {
         plugins: [react(), nodePolyfills({
             include: ['util']
         })],
-        base: process.env.NODE_ENV === "dev" ? "/" : "/graviola/"
+        base: process.env.NODE_ENV === "dev" ? "/" : "/graviola/",
+        build: {
+            rollupOptions: {
+                external: [
+                    "vite-plugin-node-polyfills/shims/global"
+                ]
+            }
+        }
     }
 })
