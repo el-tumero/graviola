@@ -5,9 +5,7 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 // https://vitejs.dev/config/
 export default defineConfig(() => {
     return {
-        plugins: [react(), nodePolyfills({
-            include: ['util']
-        })],
-        base: process.env.NODE_ENV === "dev" ? "/" : "/graviola/"
+        plugins: [react()],
+        base: process.env.NODE_ENV === "dev" ? "/" : "/graviola/",
     }
 })
