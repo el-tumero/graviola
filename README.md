@@ -6,7 +6,7 @@ Graviola's initiative employs blockchain, AI, and randomness to autonomously pro
 
 ## App Setup
 1. `git clone https://github.com/el-tumero/graviola && cd graviola`
-2. Download Foundry https://book.getfoundry.sh/getting-started/installation#using-foundryup 
+2. download Foundry https://book.getfoundry.sh/getting-started/installation#using-foundryup 
 3. generate types for the frontend
     1. `cd contracts && yarn`
     2. `yarn types`
