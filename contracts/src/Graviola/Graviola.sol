@@ -2,13 +2,11 @@
 pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import "./GraviolaMetadata.sol";
-import "./AIOracleCallbackReceiver.sol";
+import "../OAO/AIOracleCallbackReceiver.sol";
 import "./GraviolaWell.sol";
 import "./GraviolaNonFungible.sol";
-import "./VRFConsumer.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
@@ -91,7 +89,7 @@ contract Graviola is
     {}
 
     /// @notice minting a token without metadata
-    /// @dev is called by user
+    /// @dev can be called by anybody
     function mint() external payable {
         require(msg.value > estimateFee() + 0.005 ether);
         _safeMint(msg.sender, _nextTokenId);

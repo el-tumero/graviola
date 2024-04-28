@@ -1,17 +1,12 @@
 node_modules
-.env
-
+*.env
+*.log
 .DS_Store
+out
+cache
+typechain-types
 
-# Hardhat files
-/cache
-/artifacts
-
-# TypeChain files
-/typechain
-/typechain-types
-/typechain-v5
-
-# solidity-coverage files
-/coverage
-/coverage.json
+# broadcasts
+!broadcast
+broadcast/*
+broadcast/*/31337/

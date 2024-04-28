@@ -4,15 +4,16 @@ pragma solidity ^0.8.24;
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
+struct Metadata {
+    string image;
+    string prompt;
+    uint256 rarity;
+    bool filled;
+}
+
 contract GraviolaMetadata {
     using JsonWriter for JsonWriter.Json;
 
-    struct Metadata {
-        string image;
-        string prompt;
-        uint256 rarity;
-        bool filled;
-    }
 
     mapping(uint256 => Metadata) private metadataStorage;
     string internal constant promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";

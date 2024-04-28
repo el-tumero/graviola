@@ -1,0 +1,9 @@
+[profile.default]
+    src = "src"
+    script = "script"
+    test = "test"
+    out = "out"
+    solc = "0.8.25"
+
+[rpc_endpoints]
+    sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"

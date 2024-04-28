@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/utils/math/Math.sol";
-import "hardhat/console.sol";
 
 
 /// @notice Contract for rolling Graviola tokens and all logic related to keywords
@@ -340,8 +339,6 @@ contract GraviolaWell {
     /// @notice All 3 input NFTs must be of the same rarity level in order to perform a successful TradeUp.
     /// @param _tradeUpComponentsGroupId GroupId of caller tokens that they wish to trade up with 
     function _tradeUp(uint256 _seed, uint256 _tradeUpComponentsGroupId, uint256 _averageTokenRarity) view public returns (string memory, uint, uint) {
-        console.log(_tradeUpComponentsGroupId);
-        console.log(_averageTokenRarity);
 
         // Calc target rarity group for the TradeUp
         uint256 currentRarityGroupId = _tradeUpComponentsGroupId;

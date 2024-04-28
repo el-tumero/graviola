@@ -2,13 +2,13 @@ import "./App.css"
 import { useEffect, useState, ReactNode } from 'react'
 import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal/ethers/react'
 import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers'
-import { Graviola } from "../../contracts/typechain-types/contracts/Graviola"
-import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/contracts/Graviola__factory"
+import { Graviola } from "../../contracts/typechain-types/Graviola"
+import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/Graviola__factory"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-import { GRAVIOLA_ADDRESS } from "../../contracts/scripts/constants"
+import { GRAVIOLA_ADDRESS } from "../../contracts/addresses.json"
 import { rarityScale, rarityGroupColors } from "./rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { Keyword } from "./types/Keyword"
