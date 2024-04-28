@@ -3,11 +3,19 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "compile": "forge build",
+    "types": "forge build && typechain --target ethers-v6 --out-dir ./typechain ./out/Graviola.sol/Graviola.json"
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
     "solidity-json-writer": "^1.1.0"
   },
   "devDependencies": {
-    "forge-std": "github:foundry-rs/forge-std#v1.8.1"
+    "@typechain/ethers-v6": "^0.5.1",
+    "ethers": "^6.12.0",
+    "forge-std": "github:foundry-rs/forge-std#v1.8.1",
+    "typechain": "^8.3.2",
+    "typescript": "^5.4.5"
   }
 }
