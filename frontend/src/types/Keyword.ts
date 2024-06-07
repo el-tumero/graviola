@@ -1,5 +1,5 @@
 export interface Keyword {
     name: string
-    lowerRange: number,
+    lowerRange: number
     upperRange: number
 }

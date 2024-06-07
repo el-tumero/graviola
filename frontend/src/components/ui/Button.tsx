@@ -7,7 +7,12 @@ interface ButtonProps {
     enabled?: boolean
 }
 
-const Button = ({ text, onClick, enabled = true, additionalClasses }: ButtonProps) => {
+const Button = ({
+    text,
+    onClick,
+    enabled = true,
+    additionalClasses,
+}: ButtonProps) => {
     return (
         <button
             onClick={enabled ? () => onClick() : () => {}}
@@ -15,8 +20,9 @@ const Button = ({ text, onClick, enabled = true, additionalClasses }: ButtonProp
                 "w-fit min-w-[14em] h-auto py-3 my-1 px-2",
                 "text-md font-semibold rounded-xl",
                 "bg-light-bgLight dark:bg-dark-bgLight border border-opacity-50",
-                enabled && "active:opacity-60 hover:opacity-80 border-accent cursor-pointer",
-                additionalClasses
+                enabled &&
+                    "active:opacity-60 hover:opacity-80 border-accent cursor-pointer",
+                additionalClasses,
             )}
             tabIndex={0}
         >

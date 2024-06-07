@@ -5,7 +5,7 @@ export const rarityScale: Array<RarityLevel> = [
     RarityLevel.Uncommon,
     RarityLevel.Rare,
     RarityLevel.VeryRare,
-    RarityLevel.Legendary
+    RarityLevel.Legendary,
 ]
 
 export const rarityGroupColors: Record<RarityLevel, string> = {

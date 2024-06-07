@@ -9,8 +9,21 @@ interface LinkProps {
 
 const Link = ({ text, href, openInNewTab, additionalClasses }: LinkProps) => {
     return (
-        <a className="flex w-min" target={openInNewTab ? "_blank" : ""} href={href} rel={openInNewTab ? "noopener noreferrer" : ""} tabIndex={0}>
-            <p className={cn("hover:underline hover:cursor-pointer", additionalClasses )}>{text}</p>
+        <a
+            className="flex w-min"
+            target={openInNewTab ? "_blank" : ""}
+            href={href}
+            rel={openInNewTab ? "noopener noreferrer" : ""}
+            tabIndex={0}
+        >
+            <p
+                className={cn(
+                    "hover:underline hover:cursor-pointer",
+                    additionalClasses,
+                )}
+            >
+                {text}
+            </p>
         </a>
     )
 }
