@@ -11,7 +11,7 @@ const NavElement = ({ children, onClick }: NavElementProps) => {
             className={cl(
                 "p-2 rounded-xl",
                 "max-lg:flex max-lg:justify-center max-lg:w-full",
-                "max-lg:bg-light-border max-lg:dark:bg-dark-border/40",
+                "max-lg:bg-light-border/75 max-lg:dark:bg-dark-border/75",
             )}
             onClick={onClick}
         >

@@ -29,14 +29,14 @@ const GenerateContainer = ({
         style: breathingBorderStyle = {},
         className: breathingBorderClassNames = "",
     } = rolledNFT
-        ? getRarityBorder(
-              getRarityFromPerc(
-                  formatBpToPercentage(rolledNFT.attributes[0].value),
-                  rGroups,
-              )[1],
-              true,
-          )
-        : {}
+            ? getRarityBorder(
+                getRarityFromPerc(
+                    formatBpToPercentage(rolledNFT.attributes[0].value),
+                    rGroups,
+                )[1],
+                true,
+            )
+            : {}
 
     useEffect(() => {
         if (!rolledNFT) return
@@ -49,16 +49,16 @@ const GenerateContainer = ({
                 rolledNFT
                     ? breathingBorderStyle
                     : isGenerating
-                      ? rarityAnimBorder
-                      : {}
+                        ? rarityAnimBorder
+                        : {}
             }
             className={cn(
                 "flex justify-center items-center",
-                "w-64 h-64 p-4 m-8 rounded-xl",
+                "w-64 h-64 p-4 m-8 rounded-xl bg-red-500",
                 "bg-light-bgDark dark:bg-dark-bgDark",
                 "border-2 border-light-border dark:border-dark-border",
                 rolledNFT && breathingBorderClassNames,
-                isPulsating && "animate-pulse",
+                // isPulsating && "animate-pulse", // TODO: fix animate-pulse breaks translucent navbar
             )}
         >
             {rolledNFT && (
