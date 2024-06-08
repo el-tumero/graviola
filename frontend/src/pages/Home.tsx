@@ -5,7 +5,6 @@ import { NFT } from "../types/NFT"
 import ContentContainer from "../components/ui/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
-import BlockMarquee from "../components/BlockMarquee"
 import NFTDetails from "../components/ui/NFTDetails"
 import { routerPaths } from "../router"
 import { GraviolaContext } from "../contexts/GraviolaContext"
@@ -19,6 +18,7 @@ import { RaritiesData } from "../types/RarityGroup"
 import { fallbackNFT, fallbackNFTRarity } from "../utils/fallbackNFT"
 import { splitCollectionToMarquee } from "../utils/splitCollectionToMarquee"
 import { clsx as cl } from "clsx"
+import icons from "../icons"
 
 function Home() {
     const navigate = useNavigate()
@@ -48,65 +48,59 @@ function Home() {
 
             <ContentContainer additionalClasses="flex-col">
                 <div className="flex flex-col mt-16 p-4 gap-2">
-                    <SectionTitle
-                        mainText={{
-                            content:
-                                "Your own dynamically generated NFT character portrait",
-                            additionalClasses: "text-accent",
-                        }}
-                        secondaryText={{
-                            content:
-                                "Roll a new one every 24h. Collect, share, sell and more!",
-                            additionalClasses:
-                                "text-light-textSecondary dark:text-dark-textSecondary",
-                        }}
-                    />
 
-                    <div className="flex flex-col mb-36">
-                        <div
-                            className={cl([
-                                "flex justify-center items-center gap-4 w-full px-4 mt-4 mb-8",
-                                "max-lg:flex-col",
-                            ])}
-                        >
-                            <Button
-                                enabled={true}
-                                text="Get yours now!"
-                                onClick={() => navigate(routerPaths.generate)}
-                            />
-                            <Button
-                                enabled={true}
-                                text="Browse collection"
-                                onClick={() => navigate(routerPaths.collection)}
-                            />
+                    <div className={cl(
+                        "flex justify-between items-center",
+                        "w-full h-fit p-6 rounded-xl",
+                        "max-sm:flex-col gap-6 max-sm:gap-6",
+                        "border border-light-border dark:border-dark-border"
+                    )}>
+                        <div className={cl(
+                            "flex flex-col w-1/2 justify-start items-center",
+                            "h-full gap-3",
+                            "max-sm:w-full"
+                        )}>
+                            <h1 className="text-accent font-extrabold leading-9 text-3xl">
+                                Unique dynamically generated character portrait NFTs
+                            </h1>
+                            <h2 className="text-light-text dark:text-dark-text leading-9 text-xl">
+                                Blah blah blah blah blah
+                                Blah blah blah blah blah
+                                Blah blah blah blah
+                            </h2>
                         </div>
+
+                        <div className={cl(
+                            "flex w-1/2 max-sm:w-full sm:w-1/3"
+                        )}>
+                            {/* TEMP */}
+                            <img className="rounded-xl" src={convertToIfpsURL(nftSources.find((nft) => nft.attributes[0].value < 5)!.image)} />
+                        </div>
+                    </div>
+
+                    <div>
                         <div
                             className={cl([
-                                "bg-light-bgDark/50 flex flex-col rounded-xl py-4 border-2 border-light-border",
-                                "dark:bg-dark-bgDark/50 dark:border-dark-border",
+                                "flex justify-end items-center gap-4 w-full mt-4 mb-8",
+                                "max-sm:flex-col",
                             ])}
                         >
-                            <div
-                                className={cl(
-                                    "flex flex-col transition-opacity duration-4000 ease-in-out",
-                                    marqueeInit ? "opacity-100" : "opacity-0",
-                                )}
-                            >
-                                <BlockMarquee
-                                    nftSources={marqueeSources1.map((nft) =>
-                                        convertToIfpsURL(nft.image),
-                                    )}
-                                />
-                                <BlockMarquee
-                                    nftSources={marqueeSources2.map((nft) =>
-                                        convertToIfpsURL(nft.image),
-                                    )}
-                                />
-                                <BlockMarquee
-                                    nftSources={marqueeSources3.map((nft) =>
-                                        convertToIfpsURL(nft.image),
-                                    )}
-                                />
+                            <div className={cl(
+                                "flex justify-between items-center gap-1.5 p-3",
+                                "rounded-xl transition-transform duration-300",
+                                "hover:translate-x-2 hover:cursor-pointer",
+                                "border border-accent bg-gradient-to-tr from-accent/25 to-accent/40"
+                            )}>
+                                <p className="">Get yours now</p>
+                                {icons.arrowRight}
+                            </div>
+                            <div className={cl(
+                                "flex justify-between items-center gap-1.5 p-3",
+                                "rounded-xl transition-transform duration-300",
+                                "hover:translate-x-2 hover:cursor-pointer",
+                            )}>
+                                <p>Browse Collection</p>
+                                {icons.arrowRight}
                             </div>
                         </div>
                     </div>

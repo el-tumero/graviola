@@ -23,7 +23,7 @@ import {
     nftCreationTradeUpStatusMessages,
 } from "../types/NFTCreationStatus"
 import { NFTExt } from "./Generate"
-import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
+import { Graviola } from "../../../contracts/typechain-types/Graviola"
 import { parseEther } from "ethers"
 // import { fallbackNFT } from "../utils/fallbackNFT";
 
@@ -108,7 +108,7 @@ const TradeUp = () => {
                 )
             }
             userOwnedTokens &&
-                userOwnedTokens.forEach((token) => {
+                userOwnedTokens.forEach((token: number) => {
                     setOwnedTokensIds((prev) => [...prev, Number(token)])
                 })
             // console.log(ownedTokensIds)

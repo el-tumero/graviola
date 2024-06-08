@@ -1,5 +1,4 @@
 import { useState } from "react"
-import Link from "../Link"
 import Logo from "../../assets/logo.webp"
 import useTheme from "../../hooks/useTheme"
 import NavItemText from "./NavItemText"
