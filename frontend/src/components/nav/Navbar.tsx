@@ -62,7 +62,7 @@ const Navbar = () => {
         <div className="sticky top-0 z-30">
             <div className={cl(
                 "flex flex-col",
-                "bg-light-bgPrimary/50 dark:bg-dark-bgPrimary/50",
+                "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
                 "w-screen backdrop-blur-lg",
                 "bg-transparent",
                 mobileListVisible && "border-b border-light-border dark:border-dark-border"

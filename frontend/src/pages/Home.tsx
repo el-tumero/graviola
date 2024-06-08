@@ -42,6 +42,36 @@ function Home() {
         setMarqueeInit(true)
     })
 
+
+    // NOTE: mock, temporarily here
+    interface MetadataProperty {
+        name: string
+        val: string
+        comment?: string
+    }
+    const mockMetadataObject: MetadataProperty[] = [
+        {
+            name: "image",
+            val: "QmQiHyuPLdC49vKDt1rJ1iyFC4Sp...",
+            comment: "IPFS cid of NFT"
+        },
+        {
+            name: "rarity",
+            val: "681472",
+            comment: "NFT rarity with 6 digits of precision"
+        },
+        {
+            name: "season",
+            val: "Summer 2024",
+            comment: "Season during which the NFT was created"
+        },
+        {
+            name: "description",
+            val: "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: cyborg, human, android",
+            comment: "The prompt used for generation"
+        },
+    ]
+
     return (
         <FullscreenContainer>
             <Navbar />
@@ -64,16 +94,15 @@ function Home() {
                                 Unique dynamically generated character portrait NFTs
                             </h1>
                             <h2 className="text-light-text dark:text-dark-text leading-9 text-xl">
-                                Blah blah blah blah blah
-                                Blah blah blah blah blah
-                                Blah blah blah blah
+                                {/* NOTE: mock */}
+                                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Nisi tenetur placeat laborum at assumenda nobis? Ipsa animi et, fugiat voluptatibus accusamus, iure quidem voluptatum perferendis neque a voluptates amet ipsum?
                             </h2>
                         </div>
 
                         <div className={cl(
                             "flex w-1/2 max-sm:w-full sm:w-1/3"
                         )}>
-                            {/* TEMP */}
+                            {/* NOTE: mock */}
                             <img className="rounded-xl" src={convertToIfpsURL(nftSources.find((nft) => nft.attributes[0].value < 5)!.image)} />
                         </div>
                     </div>
@@ -85,17 +114,17 @@ function Home() {
                                 "max-sm:flex-col",
                             ])}
                         >
-                            <div className={cl(
-                                "flex justify-between items-center gap-1.5 p-3",
+                            <div onClick={() => navigate(routerPaths.generate)} className={cl(
+                                "flex justify-between items-center gap-1.5 p-3 select-none",
                                 "rounded-xl transition-transform duration-300",
                                 "hover:translate-x-2 hover:cursor-pointer",
                                 "border border-accent bg-gradient-to-tr from-accent/25 to-accent/40"
                             )}>
-                                <p className="">Get yours now</p>
+                                <p>Get yours now</p>
                                 {icons.arrowRight}
                             </div>
-                            <div className={cl(
-                                "flex justify-between items-center gap-1.5 p-3",
+                            <div onClick={() => navigate(routerPaths.collection)} className={cl(
+                                "flex justify-between items-center gap-1.5 p-3 select-none",
                                 "rounded-xl transition-transform duration-300",
                                 "hover:translate-x-2 hover:cursor-pointer",
                             )}>
@@ -105,46 +134,48 @@ function Home() {
                         </div>
                     </div>
 
-                    <SectionTitle
-                        mainText={{
-                            content: "Inspect and see all the details",
-                        }}
-                        secondaryText={{
-                            content:
-                                "Some keywords are much rarer than others!",
-                            additionalClasses:
-                                "text-light-textSecondary dark:text-dark-textSecondary",
-                        }}
-                    />
-                    <NFTDetails
-                        nftProps={{
-                            src: convertToIfpsURL(
-                                nftSources[0].image || fallbackNfts[0].image,
-                            ),
-                            glow: true,
-                            rarityGroup:
-                                getRarityFromPerc(
-                                    nftSources[0].attributes[0].value,
-                                    rGroups,
-                                )[1] || fallbackNftsRariries[0],
-                        }}
-                        upperBubbleChildren={
-                            <NFTDetailsUpper
-                                rarityPerc={
-                                    nftSources[0].attributes[0].value || 5
-                                }
-                                rGroups={rGroups}
-                            />
-                        }
-                        lowerBubbleChildren={
-                            <NFTDetailsLower
-                                metadata={
-                                    nftSources[0].attributes ||
-                                    fallbackNfts[0].attributes
-                                }
-                            />
-                        }
-                    />
+                    <div className={cl(
+                        "flex justify-between items-center",
+                        "w-full h-fit p-6 rounded-xl",
+                        "max-sm:flex-col gap-6 max-sm:gap-6",
+                        "border border-light-border dark:border-dark-border"
+                    )}>
+                        <div className={cl(
+                            "flex flex-col gap-3 justify-start items-start",
+                            "max-sm:w-full w-1/3 h-full text-xl",
+                        )}>
+                            <p className="font-bold text-2xl">Inspect to see more details</p>
+                            <p>
+                                The metadata object contains valuable information about your image.
+                                Hover any NFT on this website to see its metadata.
+                                Learn more about meta properties
+                                <span className="font-bold">{" "}here</span>
+                            </p>
+                        </div>
+
+                        <div className={cl("max-sm:w-full w-2/3 h-fit")}>
+                            <div className={cl(
+                                "font-mono p-3 rounded-xl break-words",
+                                "border border-light-border dark:border-dark-border"
+                            )}>
+                                {/* NOTE: mock */}
+                                {"{"}
+                                {mockMetadataObject.map((property) => (
+                                    <div className="ml-6">
+                                        <p>
+                                            <span className="text-purple-600 font-semibold">{property.name}:{" "}
+                                                <span className="text-sky-600">{property.val}{" "}</span>
+                                            </span>
+                                            {property.comment &&
+                                                <span className="text-stone-500">{`// ${property.comment}`}</span>
+                                            }
+                                        </p>
+                                    </div>
+                                ))}
+                                {"}"}
+                            </div>
+                        </div>
+                    </div>
 
                     <SectionTitle
                         mainText={{
