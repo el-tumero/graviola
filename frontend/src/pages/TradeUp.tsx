@@ -1,7 +1,7 @@
 import Button from "../components/ui/Button"
 import FullscreenContainer from "../components/ui/FullscreenContainer"
 import ContentContainer from "../components/ui/ContentContainer"
-import Navbar from "../components/Navbar"
+import Navbar from "../components/nav/Navbar"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { useContext, useEffect, useState } from "react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
@@ -100,7 +100,7 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             let userOwnedTokens
             if (address) {
                 userOwnedTokens = await graviolaContext.contract?.ownedTokens(
@@ -176,7 +176,7 @@ const TradeUp = () => {
                                                 if (
                                                     selectedGroup !== null &&
                                                     selectedGroup !==
-                                                        rarityLevel
+                                                    rarityLevel
                                                 ) {
                                                     return null
                                                 } else if (
@@ -206,13 +206,12 @@ const TradeUp = () => {
                                                             <div
                                                                 className={`
                                                                         p-px hover:cursor-pointer
-                                                                        ${
-                                                                            selectedIds.includes(
-                                                                                i,
-                                                                            )
-                                                                                ? "brightness-50 hover:brightness-50"
-                                                                                : "hover:brightness-110"
-                                                                        }
+                                                                        ${selectedIds.includes(
+                                                                    i,
+                                                                )
+                                                                        ? "brightness-50 hover:brightness-50"
+                                                                        : "hover:brightness-110"
+                                                                    }
                                                                         `}
                                                                 style={{
                                                                     borderRadius: 16,
@@ -267,9 +266,9 @@ const TradeUp = () => {
                                                                         (
                                                                             prev,
                                                                         ) => [
-                                                                            ...prev,
-                                                                            i,
-                                                                        ],
+                                                                                ...prev,
+                                                                                i,
+                                                                            ],
                                                                     )
                                                                 }}
                                                             >

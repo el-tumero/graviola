@@ -1,6 +1,6 @@
 import FullscreenContainer from "../components/ui/FullscreenContainer"
 import ContentContainer from "../components/ui/ContentContainer"
-import Navbar from "../components/Navbar"
+import Navbar from "../components/nav/Navbar"
 import { useContext, useEffect, useRef, useState } from "react"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { GraviolaContext } from "../contexts/GraviolaContext"

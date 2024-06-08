@@ -1,7 +1,7 @@
 const LightThemeIcon = () => {
     return (
         <svg
-            className="w-min h-fit text-light-text dark:text-dark-text dark:hover:text-accent"
+            className="w-min h-fit text-light-text dark:text-dark-text"
             width="800px"
             height="800px"
             viewBox="0 0 24 24"
@@ -22,7 +22,7 @@ const LightThemeIcon = () => {
 const DarkThemeIcon = () => {
     return (
         <svg
-            className="w-min h-fit text-light-text dark:text-dark-text hover:text-accent"
+            className="w-min h-fit text-light-text dark:text-dark-text"
             width="800px"
             height="800px"
             viewBox="0 0 24 24"

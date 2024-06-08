@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar"
+import Navbar from "../components/nav/Navbar"
 import ContentContainer from "../components/ui/ContentContainer"
 import FullscreenContainer from "../components/ui/FullscreenContainer"
 import HorizontalLine from "../components/ui/HorizontalLine"

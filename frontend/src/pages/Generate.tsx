@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react"
 import GenerateContainer from "../components/GenerateContainer"
-import Navbar from "../components/Navbar"
+import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/ContentContainer"
 import FullscreenContainer from "../components/ui/FullscreenContainer"
