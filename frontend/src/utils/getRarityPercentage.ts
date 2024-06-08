@@ -1,5 +1,5 @@
-import { RarityLevel } from "../types/Rarity";
-import { rarityScale } from "../rarityData";
+import { RarityLevel } from "../types/Rarity"
+import { rarityScale } from "../rarityData"
 
 // export function getRarityPercentageString(rarityLevel: RarityLevel) {
 //     const index = rarityScale.findIndex(level => level === rarityLevel)

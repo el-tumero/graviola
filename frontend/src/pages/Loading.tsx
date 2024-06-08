@@ -1,4 +1,4 @@
-import FullscreenContainer from "../components/ui/FullscreenContainer";
+import FullscreenContainer from "../components/ui/FullscreenContainer"
 import Logo from "../assets/logo.webp"
 
 const Loading = () => {
