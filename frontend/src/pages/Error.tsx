@@ -12,7 +12,7 @@ const Error = () => {
                 <p>Oops!</p>
                 <p>Something went wrong.</p>
                 <Button
-                    onClick={() => navigate(routerPaths.root)}
+                    onClick={() => navigate(routerPaths.home)}
                     text="Go home"
                 />
             </div>

@@ -1,13 +1,13 @@
 import { createBrowserRouter } from "react-router-dom"
 // pages
-import Root from "./pages/Root"
+import Home from "./pages/Home"
 import Generate from "./pages/Generate"
 import Collection from "./pages/Collection"
 import Error from "./pages/Error"
 import TradeUp from "./pages/TradeUp"
 
 export const routerPaths = {
-    root: "/",
+    home: "/",
     generate: "/generate",
     collection: "/collection",
     tradeup: "/tradeup",
@@ -16,8 +16,8 @@ export const routerPaths = {
 const router = createBrowserRouter(
     [
         {
-            path: routerPaths.root,
-            element: <Root />,
+            path: routerPaths.home,
+            element: <Home />,
         },
         {
             path: routerPaths.generate,

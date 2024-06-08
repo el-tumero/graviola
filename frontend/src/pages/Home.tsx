@@ -20,7 +20,7 @@ import { fallbackNFT, fallbackNFTRarity } from "../utils/fallbackNFT"
 import { splitCollectionToMarquee } from "../utils/splitCollectionToMarquee"
 import { clsx as cl } from "clsx"
 
-function Root() {
+function Home() {
     const navigate = useNavigate()
     const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
 
@@ -275,4 +275,4 @@ const NFTDetailsLower = (props: { metadata: Object }) => {
     )
 }
 
-export default Root
+export default Home

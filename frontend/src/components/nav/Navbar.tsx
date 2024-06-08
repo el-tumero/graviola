@@ -75,7 +75,7 @@ const Navbar = () => {
                         className={cl(
                             "flex items-center gap-0.5 cursor-pointer",
                         )}
-                        onClick={() => navigate(routerPaths.root)}
+                        onClick={() => navigate(routerPaths.home)}
                     >
                         <div className={cl(
                             "flex justify-center items-center",
