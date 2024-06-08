@@ -3,7 +3,6 @@ import Link from "../Link"
 import Logo from "../../assets/logo.webp"
 import useTheme from "../../hooks/useTheme"
 import NavItemText from "./NavItemText"
-import { LightThemeIcon, DarkThemeIcon } from "../ui/ThemeIcons"
 import NavElement from "./NavElement"
 import { useNavigate } from "react-router-dom"
 import { routerPaths } from "../../router"
@@ -19,7 +18,7 @@ const Navbar = () => {
     const navItems: React.ReactNode[] = [
 
         <NavElement onClick={() => navigate(routerPaths.generate)}>
-            <NavItemText text="Generator" />
+            <NavItemText text="Generate" />
         </NavElement>,
 
         <NavElement onClick={() => navigate(routerPaths.collection)}>
@@ -31,27 +30,30 @@ const Navbar = () => {
         </NavElement>,
 
         <NavElement>
-            <Link
-                text="GitHub"
-                href="https://github.com/el-tumero/graviola"
-                openInNewTab={true}
-                additionalClasses="opacity-75 hover:opacity-100 hover:no-underline"
-            />
+            <div className={cl(
+                "flex w-min hover:cursor-pointer",
+                "opacity-75 hover:opacity-100",
+                "max-lg:w-full justify-center items-center"
+            )}
+                onClick={() => window.open('https://github.com/el-tumero/graviola', '_blank', 'noopener,noreferrer')}>
+                {icons.github}
+            </div>
         </NavElement>,
 
         <NavElement>
             <div
                 className={cl(
                     "flex justify-center items-center",
-                    "w-6 h-6 cursor-pointer",
-                    "opacity-75 hover:opacity-100"
+                    "w-full h-6 cursor-pointer",
+                    "opacity-75 hover:opacity-100",
+                    "text-light-text dark:text-dark-text",
                 )}
                 onClick={() => toggleTheme()}
             >
                 {theme === "dark" ? (
-                    <LightThemeIcon />
+                    icons.darkTheme
                 ) : (
-                    <DarkThemeIcon />
+                    icons.lightTheme
                 )}
             </div>
         </NavElement>
@@ -61,7 +63,8 @@ const Navbar = () => {
         <div className="sticky top-0 z-30">
             <div className={cl(
                 "flex flex-col",
-                "w-screen backdrop-blur-xl",
+                "bg-light-bgPrimary/50 dark:bg-dark-bgPrimary/50",
+                "w-screen backdrop-blur-lg",
                 "bg-transparent",
                 mobileListVisible && "border-b border-light-border dark:border-dark-border"
             )}>
