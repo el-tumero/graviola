@@ -12,8 +12,8 @@ import {
 } from "@web3modal/ethers/react"
 import {
     getRarityFromPerc,
-    formatBpToPercentage,
 } from "../utils/getRarityData"
+import { formatBpToPercentage } from "../utils/format"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
@@ -76,8 +76,7 @@ const Generate = () => {
             // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
 
             const [rarityLevel, rarityData] = getRarityFromPerc(
-                formatBpToPercentage(nft.attributes[0].value),
-                rGroups,
+                formatBpToPercentage(nft.attributes[0].value)
             )
 
             // console.log("rarityLevel from conv:  ", rarityLevel)

@@ -20,6 +20,7 @@ import { fallbackNFT, fallbackNFTRarity } from "../utils/fallbackNFT"
 import { splitCollectionToMarquee } from "../utils/splitCollectionToMarquee"
 import { clsx as cl } from "clsx"
 import icons from "../icons"
+import { RarityGroupData, RarityLevel } from "../types/Rarity"
 
 function Home() {
     const navigate = useNavigate()
@@ -196,31 +197,34 @@ function Home() {
                                 "xl:gap-10 max-xl:gap-6 max-sm:gap-3"
                             )}
                         >
-                            {Object.entries(rGroups).map(([, rarityGroup], i) => (
-                                <div
-                                    className="flex flex-col gap-2 justify-center items-center"
-                                    key={i}
-                                >
-                                    <BlockNFT
-                                        nftData={nftSources[i]}
-                                        glow={true}
-                                        additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
-                                    />
-                                    <div className="flex flex-col justify-center items-center w-fit h-fit p-2 my-1">
-                                        <p
-                                            className="font-bold"
-                                            style={{
-                                                color: rarityGroup.color,
-                                            }}
-                                        >
-                                            {rarityGroup.name}
-                                        </p>
-                                        <span className="font-bold">
-                                            {rarityGroup.rarityPerc}%
-                                        </span>
+                            {Object.entries(rGroups).map(([rLevel, rarityGroup]: [string, RarityGroupData], i) => {
+                                const rarityLevel = rLevel as RarityLevel // Object.entries always returns string keys
+                                return (
+                                    <div
+                                        className="flex flex-col gap-2 justify-center items-center"
+                                        key={i}
+                                    >
+                                        <BlockNFT
+                                            nftData={nftSources[i]}
+                                            glowColor={rarityLevel}
+                                            additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
+                                        />
+                                        <div className="flex flex-col justify-center items-center w-fit h-fit p-2 my-1">
+                                            <p
+                                                className="font-bold"
+                                                style={{
+                                                    color: rarityGroup.color,
+                                                }}
+                                            >
+                                                {rarityGroup.name}
+                                            </p>
+                                            <span className="font-bold">
+                                                {rarityGroup.rarityPerc}%
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                )
+                            })}
                         </div>
                     </SectionContainer>
 

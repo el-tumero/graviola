@@ -9,9 +9,9 @@ import { NFT } from "../types/NFT"
 import { RaritiesData } from "../types/RarityGroup"
 import { ethers, toBigInt } from "ethers"
 import {
-    formatBpToPercentage,
     getRarityFromPerc,
 } from "../utils/getRarityData"
+import { formatBpToPercentage } from "../utils/format"
 import BlockNFT from "../components/ui/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import ResultText from "../components/ui/ResultText"
@@ -72,10 +72,7 @@ const TradeUp = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromPerc(
-                formatBpToPercentage(nft.attributes[0].value),
-                rGroups,
-            )
+            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value))
 
             setProgressState("DONE")
             setProgressBarVal(100)
@@ -108,7 +105,7 @@ const TradeUp = () => {
                 )
             }
             userOwnedTokens &&
-                userOwnedTokens.forEach((token: number) => {
+                userOwnedTokens.forEach((token: bigint) => {
                     setOwnedTokensIds((prev) => [...prev, Number(token)])
                 })
             // console.log(ownedTokensIds)
@@ -168,10 +165,7 @@ const TradeUp = () => {
                                                 const [
                                                     rarityLevel,
                                                     rarityData,
-                                                ] = getRarityFromPerc(
-                                                    percRarity,
-                                                    rGroups,
-                                                )
+                                                ] = getRarityFromPerc(percRarity)
 
                                                 if (
                                                     selectedGroup !== null &&
@@ -272,7 +266,8 @@ const TradeUp = () => {
                                                                     )
                                                                 }}
                                                             >
-                                                                <BlockNFT
+                                                                {/* TODO: Fix */}
+                                                                {/* <BlockNFT
                                                                     src={convertToIfpsURL(
                                                                         nft.image,
                                                                     )}
@@ -281,7 +276,7 @@ const TradeUp = () => {
                                                                         true
                                                                     }
                                                                     additionalClasses={`w-fit h-fit max-w-[14em]`}
-                                                                />
+                                                                /> */}
                                                             </div>
                                                             <div className="flex flex-col gap-2 justify-center items-center">
                                                                 {/* Keywords */}
@@ -352,7 +347,6 @@ const TradeUp = () => {
                                             const [, rarityData] =
                                                 getRarityFromPerc(
                                                     percRarity,
-                                                    rGroups,
                                                 )
                                             return (
                                                 <div
@@ -399,7 +393,8 @@ const TradeUp = () => {
                                                     >
                                                         id: {id}
                                                     </p>
-                                                    <BlockNFT
+                                                    {/* TODO: Fix */}
+                                                    {/* <BlockNFT
                                                         src={convertToIfpsURL(
                                                             contractNFTs[id]
                                                                 .image,
@@ -408,7 +403,7 @@ const TradeUp = () => {
                                                         disableMargin={true}
                                                         rarityGroup={rarityData}
                                                         additionalClasses="m-2 p-2 w-min h-min flex-1"
-                                                    />
+                                                    /> */}
                                                 </div>
                                             )
                                         })

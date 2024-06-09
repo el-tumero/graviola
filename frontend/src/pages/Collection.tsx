@@ -4,15 +4,14 @@ import Navbar from "../components/nav/Navbar"
 import { useContext, useEffect, useRef, useState } from "react"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { NFT } from "../types/NFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import Button from "../components/ui/Button"
 import BlockNFT from "../components/ui/BlockNFT"
 import {
-    formatBpToPercentage,
     getRarityFromPerc,
 } from "../utils/getRarityData"
+import { formatBpToPercentage } from "../utils/format"
 import { ethers } from "ethers"
 import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
@@ -204,10 +203,7 @@ const CollectionList = (props: {
                     keyword.trim(),
                 )
 
-                const [, rarityData] = getRarityFromPerc(
-                    percRarity,
-                    props.rGroups,
-                )
+                const [, rarityData] = getRarityFromPerc(percRarity)
                 if (
                     props.collectionMode === "My Drops" &&
                     !props.ownedTokenIds.includes(i)
@@ -232,12 +228,13 @@ const CollectionList = (props: {
                                     borderColor: rarityData.color,
                                 }}
                             >
-                                <BlockNFT
+                                {/* TODO: Fix */}
+                                {/* <BlockNFT
                                     src={convertToIfpsURL(nft.image)}
                                     glow={false}
                                     disableMargin={true}
                                     additionalClasses={`w-fit h-fit max-w-[14em]`}
-                                />
+                                /> */}
                             </div>
                             <div className="flex flex-col gap-2 justify-center items-center">
                                 {/* Id */}

@@ -5,7 +5,7 @@ import { NFT } from "../../../types/NFT"
 import { getRarityFromPerc } from "../../../utils/getRarityData"
 import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
 import { RaritiesData } from "../../../types/RarityGroup"
-import { formatBpToPercentage } from "../../../utils/getRarityData"
+import { formatBpToPercentage } from "../../../utils/format"
 import { cn } from "../../../utils/cn"
 
 interface GenerateContainerProps {

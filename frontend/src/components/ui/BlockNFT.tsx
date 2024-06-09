@@ -1,35 +1,31 @@
 import { getRarityBorder } from "../../utils/getRarityBorder"
 import { cn } from "../../utils/cn"
 import { NFT } from "../../types/NFT"
-import { getRarityFromPerc } from "../../utils/getRarityData"
+import { getRarityFromLevel, getRarityFromPerc } from "../../utils/getRarityData"
 import { convertToIfpsURL } from "../../utils/convertToIpfsURL"
 import { RarityLevel } from "../../types/Rarity"
-import { rarityGroupColors } from "../../rarityData"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
 interface BlockNFTProps {
     nftData: NFT               // Pass full NFT object to preview meta object on hover
-    glowColor: NFTGlowColor       // 'Auto' will inherit color from NFT data. Can be overwritten
+    glowColor: NFTGlowColor    // 'Auto' will inherit color from NFT data. Can be overwritten
     additionalClasses?: string // Extra classes for the div, not for the img tag
 }
 
 const BlockNFT = ({ nftData, glowColor, additionalClasses }: BlockNFTProps) => {
     const [, rData] = getRarityFromPerc(nftData.attributes[0].value)
-    let glowStyles = { style: {} }
+    let style: React.CSSProperties = {}
     if (glowColor !== "none") {
-        if (glowColor === "auto") glowStyles.style = getRarityBorder(rData)
+        if (glowColor === "auto") style = getRarityBorder(rData).style
         else {
-            const customBorderStyles = {
-
-            }
+            // handle custom/hardcoded glow colors
+            const [, glowLevelData] = getRarityFromLevel(glowColor)
+            style = getRarityBorder(glowLevelData).style
         }
     }
-    // const { style: glowStyle = {} } = (glowColor !== "none")
-    //     ? (glowColor === "auto") ? getRarityBorder(rData) : { style: rarityGroupColors[glowColor as RarityLevel] }
-    //     : {}
     return (
         <div
-            style={glowStyles}
+            style={style}
             className={cn(
                 "flex w-36 h-36 shadow-sm",
                 "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border-2",
