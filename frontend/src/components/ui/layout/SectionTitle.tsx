@@ -1,4 +1,4 @@
-import HorizontalLine from "./HorizontalLine"
+import HorizontalLine from "../HorizontalLine"
 
 interface SectionTitleHeader {
     content: string

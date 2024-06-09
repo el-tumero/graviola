@@ -1,6 +1,6 @@
 import Button from "../components/ui/Button"
-import FullscreenContainer from "../components/ui/FullscreenContainer"
-import ContentContainer from "../components/ui/ContentContainer"
+import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
+import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { useContext, useEffect, useState } from "react"
@@ -11,12 +11,12 @@ import { ethers, toBigInt } from "ethers"
 import {
     formatBpToPercentage,
     getRarityFromPerc,
-} from "../utils/getRarityDataFromThreshold"
+} from "../utils/getRarityData"
 import BlockNFT from "../components/ui/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import ResultText from "../components/ui/ResultText"
 import { RarityLevel } from "../types/Rarity"
-import GenerateContainer from "../components/GenerateContainer"
+import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import {
     NFTCreationStatus,
     nftCreationStatusMessages,

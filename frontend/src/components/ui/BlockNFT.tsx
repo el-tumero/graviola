@@ -1,43 +1,47 @@
 import { getRarityBorder } from "../../utils/getRarityBorder"
-import { RarityGroupData } from "../../types/Rarity"
 import { cn } from "../../utils/cn"
+import { NFT } from "../../types/NFT"
+import { getRarityFromPerc } from "../../utils/getRarityData"
+import { convertToIfpsURL } from "../../utils/convertToIpfsURL"
+import { RarityLevel } from "../../types/Rarity"
+import { rarityGroupColors } from "../../rarityData"
 
-type BlockNFTPropsWithGlow = {
-    src: string
-    glow: true
-    rarityGroup: RarityGroupData
-    disableMargin?: boolean
-    additionalClasses?: string
+type NFTGlowColor = "auto" | "none" | RarityLevel
+interface BlockNFTProps {
+    nftData: NFT               // Pass full NFT object to preview meta object on hover
+    glowColor: NFTGlowColor       // 'Auto' will inherit color from NFT data. Can be overwritten
+    additionalClasses?: string // Extra classes for the div, not for the img tag
 }
 
-type BlockNFTPropsWithoutGlow = {
-    src: string
-    glow: false
-    disableMargin?: boolean
-    additionalClasses?: string
-}
+const BlockNFT = ({ nftData, glowColor, additionalClasses }: BlockNFTProps) => {
+    const [, rData] = getRarityFromPerc(nftData.attributes[0].value)
+    let glowStyles = { style: {} }
+    if (glowColor !== "none") {
+        if (glowColor === "auto") glowStyles.style = getRarityBorder(rData)
+        else {
+            const customBorderStyles = {
 
-export type BlockNFTProps = BlockNFTPropsWithGlow | BlockNFTPropsWithoutGlow
-
-const BlockNFT = (props: BlockNFTProps) => {
-    const { style: glowStyle = {} } = props.glow
-        ? getRarityBorder(props.rarityGroup)
-        : {}
+            }
+        }
+    }
+    // const { style: glowStyle = {} } = (glowColor !== "none")
+    //     ? (glowColor === "auto") ? getRarityBorder(rData) : { style: rarityGroupColors[glowColor as RarityLevel] }
+    //     : {}
     return (
         <div
-            style={props.glow ? (props.rarityGroup ? glowStyle : {}) : {}}
+            style={glowStyles}
             className={cn(
                 "flex w-36 h-36 shadow-sm",
                 "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border-2",
                 "border-light-border dark:border-dark-border select-none",
-                props.disableMargin ? "m-0" : "mx-4",
-                props.additionalClasses,
+                "mx-4",
+                additionalClasses,
             )}
         >
             <img
                 draggable={false}
                 className="w-full h-full rounded-lg"
-                src={props.src}
+                src={convertToIfpsURL(nftData.image)}
             />
         </div>
     )

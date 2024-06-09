@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react"
-import useRandomRarityBorder from "../hooks/useBorderAnimation"
-import { getRarityBorder } from "../utils/getRarityBorder"
-import { NFT } from "../types/NFT"
-import { getRarityFromPerc } from "../utils/getRarityDataFromThreshold"
-import { convertToIfpsURL } from "../utils/convertToIpfsURL"
-import { RaritiesData } from "../types/RarityGroup"
-import { formatBpToPercentage } from "../utils/getRarityDataFromThreshold"
-import { cn } from "../utils/cn"
+import useRandomRarityBorder from "../../../hooks/useBorderAnimation"
+import { getRarityBorder } from "../../../utils/getRarityBorder"
+import { NFT } from "../../../types/NFT"
+import { getRarityFromPerc } from "../../../utils/getRarityData"
+import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
+import { RaritiesData } from "../../../types/RarityGroup"
+import { formatBpToPercentage } from "../../../utils/getRarityData"
+import { cn } from "../../../utils/cn"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
@@ -31,8 +31,7 @@ const GenerateContainer = ({
     } = rolledNFT
             ? getRarityBorder(
                 getRarityFromPerc(
-                    formatBpToPercentage(rolledNFT.attributes[0].value),
-                    rGroups,
+                    formatBpToPercentage(rolledNFT.attributes[0].value)
                 )[1],
                 true,
             )

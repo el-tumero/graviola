@@ -1,9 +1,9 @@
 import { useState, useEffect, useContext } from "react"
-import GenerateContainer from "../components/GenerateContainer"
+import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
-import ContentContainer from "../components/ui/ContentContainer"
-import FullscreenContainer from "../components/ui/FullscreenContainer"
+import ContentContainer from "../components/ui/layout/ContentContainer"
+import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import {
@@ -13,9 +13,9 @@ import {
 import {
     getRarityFromPerc,
     formatBpToPercentage,
-} from "../utils/getRarityDataFromThreshold"
+} from "../utils/getRarityData"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
-import SectionTitle from "../components/ui/SectionTitle"
+import SectionTitle from "../components/ui/layout/SectionTitle"
 import { NFTCreationStatus } from "../types/NFTCreationStatus"
 import { parseEther } from "ethers"
 import { Graviola } from "../../../contracts/typechain-types/Graviola"

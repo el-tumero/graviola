@@ -1,18 +1,18 @@
-import FullscreenContainer from "../components/ui/FullscreenContainer"
-import ContentContainer from "../components/ui/ContentContainer"
+import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
+import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useContext, useEffect, useRef, useState } from "react"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { NFT } from "../types/NFT"
-import SectionTitle from "../components/ui/SectionTitle"
+import SectionTitle from "../components/ui/layout/SectionTitle"
 import Button from "../components/ui/Button"
 import BlockNFT from "../components/ui/BlockNFT"
 import {
     formatBpToPercentage,
     getRarityFromPerc,
-} from "../utils/getRarityDataFromThreshold"
+} from "../utils/getRarityData"
 import { ethers } from "ethers"
 import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"

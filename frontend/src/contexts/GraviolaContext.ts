@@ -1,5 +1,5 @@
 import { createContext } from "react"
-import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
+import { Graviola } from "../../../contracts/typechain-types/Graviola"
 import { NFT } from "../types/NFT"
 import { RaritiesData } from "../types/RarityGroup"
 

@@ -1,5 +1,5 @@
 import { ReactNode, forwardRef } from "react"
-import { cn } from "../../utils/cn"
+import { cn } from "../../../utils/cn"
 
 interface GenericContainerProps {
     children: ReactNode

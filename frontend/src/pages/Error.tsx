@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom"
 import Button from "../components/ui/Button"
-import FullscreenContainer from "../components/ui/FullscreenContainer"
+import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { routerPaths } from "../router"
 
 const Error = () => {

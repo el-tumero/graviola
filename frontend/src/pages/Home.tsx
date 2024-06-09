@@ -1,19 +1,20 @@
 import { useNavigate } from "react-router-dom"
-import FullscreenContainer from "../components/ui/FullscreenContainer"
+import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { useContext, useEffect, useState } from "react"
 import { NFT } from "../types/NFT"
-import ContentContainer from "../components/ui/ContentContainer"
+import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
+import SectionContainer from "../components/ui/layout/SectionContainer"
 import Button from "../components/ui/Button"
 import NFTDetails from "../components/ui/NFTDetails"
 import { routerPaths } from "../router"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import BlockNFT from "../components/ui/BlockNFT"
-import SectionTitle from "../components/ui/SectionTitle"
+import SectionTitle from "../components/ui/layout/SectionTitle"
 import OraIoBanner from "../components/ui/OraIoBanner"
 import Link from "../components/Link"
-import { getRarityFromPerc } from "../utils/getRarityDataFromThreshold"
+import { getRarityFromPerc } from "../utils/getRarityData"
 import { RaritiesData } from "../types/RarityGroup"
 import { fallbackNFT, fallbackNFTRarity } from "../utils/fallbackNFT"
 import { splitCollectionToMarquee } from "../utils/splitCollectionToMarquee"
@@ -52,7 +53,7 @@ function Home() {
     const mockMetadataObject: MetadataProperty[] = [
         {
             name: "image",
-            val: "QmQiHyuPLdC49vKDt1rJ1iyFC4Sp...",
+            val: "QmQiHyuPLdC49vKDt1rJ1iyFC4SpFFmF7yoDWEXWPfRF7Z",
             comment: "IPFS cid of NFT"
         },
         {
@@ -77,14 +78,9 @@ function Home() {
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col">
-                <div className="flex flex-col mt-16 p-4 gap-2">
+                <div className="flex flex-col mt-12 p-4 gap-3">
 
-                    <div className={cl(
-                        "flex justify-between items-center",
-                        "w-full h-fit p-6 rounded-xl",
-                        "max-sm:flex-col gap-6 max-sm:gap-6",
-                        "border border-light-border dark:border-dark-border"
-                    )}>
+                    <SectionContainer>
                         <div className={cl(
                             "flex flex-col w-1/2 justify-start items-center",
                             "h-full gap-3",
@@ -100,13 +96,14 @@ function Home() {
                         </div>
 
                         <div className={cl(
-                            "flex w-1/2 max-sm:w-full sm:w-1/3"
+                            "flex max-sm:justify-center justify-end items-center w-1/2 max-sm:w-full sm:w-1/3"
                         )}>
                             {/* NOTE: mock */}
-                            <img className="rounded-xl" src={convertToIfpsURL(nftSources.find((nft) => nft.attributes[0].value < 5)!.image)} />
+                            <img className="rounded-xl max-w-64 max-h-64" src={convertToIfpsURL(nftSources.find((nft) => nft.attributes[0].value < 5)?.image || fallbackNFT.image)} />
                         </div>
-                    </div>
+                    </SectionContainer>
 
+                    {/* Header buttons - get yours now, browse collection */}
                     <div>
                         <div
                             className={cl([
@@ -120,7 +117,7 @@ function Home() {
                                 "hover:translate-x-2 hover:cursor-pointer",
                                 "border border-accent bg-gradient-to-tr from-accent/25 to-accent/40"
                             )}>
-                                <p>Get yours now</p>
+                                <p>Get yours now!</p>
                                 {icons.arrowRight}
                             </div>
                             <div onClick={() => navigate(routerPaths.collection)} className={cl(
@@ -148,23 +145,27 @@ function Home() {
                             <p>
                                 The metadata object contains valuable information about your image.
                                 Hover any NFT on this website to see its metadata.
-                                Learn more about meta properties
-                                <span className="font-bold">{" "}here</span>
+                                Learn more about meta properties{" "}
+                                <span onClick={() => navigate(routerPaths.home)} className={cl(
+                                    "underline underline-offset-2 hover:cursor-pointer",
+                                )}>
+                                    here
+                                </span>
                             </p>
                         </div>
 
                         <div className={cl("max-sm:w-full w-2/3 h-fit")}>
                             <div className={cl(
-                                "font-mono p-3 rounded-xl break-words",
-                                "border border-light-border dark:border-dark-border"
+                                "font-mono rounded-xl break-words",
+                                "my-8 max-sm:my-0",
                             )}>
                                 {/* NOTE: mock */}
                                 {"{"}
-                                {mockMetadataObject.map((property) => (
-                                    <div className="ml-6">
+                                {mockMetadataObject.map((property, idx) => (
+                                    <div className="ml-6" key={idx}>
                                         <p>
-                                            <span className="text-purple-600 font-semibold">{property.name}:{" "}
-                                                <span className="text-sky-600">{property.val}{" "}</span>
+                                            <span className="text-violet-600 font-semibold">"{property.name}":{" "}
+                                                <span className="text-sky-400">"{property.val}"{" "}</span>
                                             </span>
                                             {property.comment &&
                                                 <span className="text-stone-500">{`// ${property.comment}`}</span>
@@ -177,49 +178,51 @@ function Home() {
                         </div>
                     </div>
 
-                    <SectionTitle
-                        mainText={{
-                            content: "Feeling lucky?",
-                        }}
-                        secondaryText={{
-                            content:
-                                "Check out the chances for each rarity level",
-                        }}
-                    />
-                    <div
-                        className={cl(
-                            "mt-6 mb-20",
-                            "xl:flex xl:justify-center",
-                            "sm:grid sm:grid-cols-2 sm:gap-16",
-                        )}
-                    >
-                        {Object.entries(rGroups).map(([, rarityGroup], i) => (
-                            <div
-                                className="flex flex-col gap-1 justify-center items-center"
-                                key={i}
-                            >
-                                <BlockNFT
-                                    src={convertToIfpsURL(nftSources[i].image)}
-                                    glow={true}
-                                    rarityGroup={rarityGroup}
-                                    additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
-                                />
-                                <div className="flex flex-col justify-center items-center w-fit h-fit p-2 my-1">
-                                    <p
-                                        className="font-bold"
-                                        style={{
-                                            color: rarityGroup.color,
-                                        }}
-                                    >
-                                        {rarityGroup.name}
-                                    </p>
-                                    <span className="font-bold">
-                                        {rarityGroup.rarityPerc}%
-                                    </span>
+                    <SectionContainer additionalClasses="flex-col mt-24">
+                        <div className="flex w-full flex-col justify-start items-start">
+                            <p className="text-2xl font-bold">
+                                Ready to test your luck?
+                            </p>
+                            <p className="text-xl">
+                                Discover your odds for each rarity tier!
+                            </p>
+                        </div>
+                        <div
+                            className={cl(
+                                "my-6 w-full",
+                                "xl:flex xl:justify-center xl:items-center",
+                                "max-xl:justify-items-center",
+                                "max-xl:grid max-sm:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3",
+                                "xl:gap-10 max-xl:gap-6 max-sm:gap-3"
+                            )}
+                        >
+                            {Object.entries(rGroups).map(([, rarityGroup], i) => (
+                                <div
+                                    className="flex flex-col gap-2 justify-center items-center"
+                                    key={i}
+                                >
+                                    <BlockNFT
+                                        nftData={nftSources[i]}
+                                        glow={true}
+                                        additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
+                                    />
+                                    <div className="flex flex-col justify-center items-center w-fit h-fit p-2 my-1">
+                                        <p
+                                            className="font-bold"
+                                            style={{
+                                                color: rarityGroup.color,
+                                            }}
+                                        >
+                                            {rarityGroup.name}
+                                        </p>
+                                        <span className="font-bold">
+                                            {rarityGroup.rarityPerc}%
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    </SectionContainer>
 
                     <SectionTitle
                         mainText={{
@@ -267,36 +270,6 @@ function Home() {
                 </div>
             </ContentContainer>
         </FullscreenContainer>
-    )
-}
-
-const NFTDetailsUpper = (props: {
-    rarityPerc: number
-    rGroups: RaritiesData
-}) => {
-    const [, rarityData] = getRarityFromPerc(props.rarityPerc, props.rGroups)
-    return (
-        <p className="font-semibold">
-            Rarity:{" "}
-            <span
-                className="font-bold"
-                style={{
-                    color: rarityData.color,
-                }}
-            >
-                {rarityData.name.toUpperCase()}
-            </span>
-        </p>
-    )
-}
-
-const NFTDetailsLower = (props: { metadata: Object }) => {
-    return (
-        <div className="font-semibold text-sm">
-            <pre className="whitespace-pre-wrap text-left overflow-x-auto">
-                <span>{JSON.stringify(props.metadata, null, 2)}</span>
-            </pre>
-        </div>
     )
 }
 
