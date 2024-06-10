@@ -142,7 +142,8 @@ function Home() {
                         <div className={cl("max-sm:w-full w-2/3 h-fit")}>
                             <div className={cl(
                                 "font-mono rounded-xl break-words",
-                                "my-8 max-sm:my-0",
+                                "bg-light-border/50 dark:bg-dark-border/50",
+                                "p-6",
                             )}>
                                 {/* NOTE: mock */}
                                 {"{"}
@@ -182,9 +183,10 @@ function Home() {
                         <div
                             className={cl(
                                 "xl:flex xl:justify-center xl:items-center",
-                                "max-xl:justify-items-center w-full mt-2",
+                                "max-xl:justify-items-center w-fit px-12 pt-12 pb-6 rounded-xl",
                                 "max-xl:grid max-sm:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3",
-                                "xl:gap-10 max-xl:gap-6 max-sm:gap-3"
+                                "xl:gap-12 max-xl:gap-9 max-sm:gap-6",
+                                "bg-light-border/50 dark:bg-dark-border/50"
                             )}
                         >
                             {Object.entries(rGroups).map(([rLevel, rarityGroup]: [string, RarityGroupData], i) => {
@@ -201,7 +203,7 @@ function Home() {
                                                 additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
                                             />
                                         </div>
-                                        <div className="flex flex-col justify-center items-center w-fit h-fit p-2 my-1">
+                                        <div className="flex flex-col justify-center items-center w-fit h-fit">
                                             <p
                                                 className="font-bold"
                                                 style={{

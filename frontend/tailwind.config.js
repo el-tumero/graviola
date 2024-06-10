@@ -44,10 +44,10 @@ export default {
                 dark: {
                     text: "#fff",
                     textSecondary: "#e3e3e3",
-                    bgPrimary: "#1b1c1b",
+                    bgPrimary: "#111112",
                     bgLight: "#252625",
                     bgDark: "#111211",
-                    border: "#2e2e2e",
+                    border: "#1e1e1e",
                 },
             },
         },

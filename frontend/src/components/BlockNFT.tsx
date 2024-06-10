@@ -12,9 +12,11 @@ interface BlockNFTProps {
     nftData: NFT               // Pass full NFT object to preview meta object on hover
     glowColor: NFTGlowColor    // 'Auto' will inherit color from NFT data. Can be overwritten
     additionalClasses?: string // Extra classes for the div, not for the img tag
+    disableMetadataOnHover?: true
 }
 
-const BlockNFT = ({ nftData, glowColor, additionalClasses }: BlockNFTProps) => {
+const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasses }: BlockNFTProps) => {
+
     const [, rData] = getRarityFromPerc(formatBpToPercentage(nftData.attributes[0].value))
     let style: React.CSSProperties = {}
     if (glowColor !== "none") {
@@ -25,6 +27,7 @@ const BlockNFT = ({ nftData, glowColor, additionalClasses }: BlockNFTProps) => {
             style = getRarityBorder(glowLevelData).style
         }
     }
+
     return (
         <div
             style={style}
@@ -39,7 +42,13 @@ const BlockNFT = ({ nftData, glowColor, additionalClasses }: BlockNFTProps) => {
                 draggable={false}
                 className={"w-full h-full rounded-lg"}
                 src={convertToIfpsURL(nftData.image)}
+                alt="NFT"
             />
+
+            {!disableMetadataOnHover && (
+                <div>
+                </div>
+            )}
         </div>
     )
 }
