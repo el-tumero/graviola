@@ -12,7 +12,7 @@ import {
     getRarityFromPerc,
 } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
-import BlockNFT from "../components/ui/BlockNFT"
+import BlockNFT from "../components/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import ResultText from "../components/ui/ResultText"
 import { RarityLevel } from "../types/Rarity"

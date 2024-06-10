@@ -7,7 +7,7 @@ import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import Button from "../components/ui/Button"
-import BlockNFT from "../components/ui/BlockNFT"
+import BlockNFT from "../components/BlockNFT"
 import {
     getRarityFromPerc,
 } from "../utils/getRarityData"

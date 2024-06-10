@@ -4,11 +4,12 @@ import { useContext, useEffect, useState } from "react"
 import { NFT } from "../types/NFT"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
+import AutoBlockNFT from "../components/AutoBlockNFT"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { routerPaths } from "../router"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
-import BlockNFT from "../components/ui/BlockNFT"
+import BlockNFT from "../components/BlockNFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { RaritiesData } from "../types/RarityGroup"
 import { fallbackNFT } from "../utils/fallbackNFT"
@@ -69,9 +70,9 @@ function Home() {
 
                     <SectionContainer>
                         <div className={cl(
-                            "flex flex-col w-1/2 gap-1 justify-start items-center",
+                            "flex flex-col gap-1 justify-start items-center",
                             "h-full",
-                            "max-sm:w-full"
+                            "max-sm:w-full max-lg:w-1/3 lg:w-1/2"
                         )}>
                             <h1 className="text-accent font-extrabold text-3xl">
                                 Unique dynamically generated character portrait NFTs
@@ -85,8 +86,7 @@ function Home() {
                         <div className={cl(
                             "flex max-sm:justify-center justify-end items-center w-1/2 max-sm:w-full sm:w-1/3"
                         )}>
-                            {/* NOTE: mock */}
-                            <img className="rounded-xl max-w-64 max-h-64" src={convertToIfpsURL(nftSources.find((nft) => nft.attributes[0].value < 5)?.image || fallbackNFT.image)} />
+                            <AutoBlockNFT />
                         </div>
                     </SectionContainer>
 
@@ -163,18 +163,18 @@ function Home() {
                         </div>
                     </SectionContainer>
 
-                    <SectionContainer>
+                    <SectionContainer additionalClasses="my-12">
                         <SectionTitle
-                            title="Unique and Versatile"
-                            secondaryContent={`From humans to goblins, cats and aliens - Graviola is constantly evolving,
-                                                and we want Users to choose the theme we're going for. Each season has its own
-                                                limited keywords chosen by all token holders. Voting panel coming soon!
+                            title="Limited and Rare keywords!"
+                            // TODO: Fix this text a little, this is just a demo
+                            secondaryContent={`Graviola is driven by the Hodlers, who have the power to vote on the upcoming new seasonal keywords.
+                                After each season ends, all of its Rare, Very Rare and Legendary keywords will be banned forever.
+                                This ensures your Legendary Graviola NFT is forever rare and grows value with time!
                             `}
                         />
-
                     </SectionContainer>
 
-                    <SectionContainer additionalClasses="flex-col mt-24">
+                    <SectionContainer additionalClasses="flex-col">
                         <SectionTitle
                             title="Ready to test your luck?"
                             secondaryContent="Discover your odds for each rarity tier!"
@@ -191,14 +191,16 @@ function Home() {
                                 const rarityLevel = rLevel as RarityLevel // Object.entries always returns string keys
                                 return (
                                     <div
-                                        className="flex flex-col gap-2 justify-center items-center"
+                                        className="flex flex-col gap-2 justify-center items-center hover:scale-105 transition-transform duration-300"
                                         key={i}
                                     >
-                                        <BlockNFT
-                                            nftData={nftSources[i]}
-                                            glowColor={rarityLevel}
-                                            additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
-                                        />
+                                        <div >
+                                            <BlockNFT
+                                                nftData={nftSources[i]}
+                                                glowColor={rarityLevel}
+                                                additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
+                                            />
+                                        </div>
                                         <div className="flex flex-col justify-center items-center w-fit h-fit p-2 my-1">
                                             <p
                                                 className="font-bold"
@@ -223,10 +225,8 @@ function Home() {
                             title="How does Graviola work?"
                             secondaryContent={`
                                 Graviola uses Ora, a verifiable oracle protocol, alongside Stable Diffusion 2 to create NFTs on-chain.
-                                Unlike traditional systems, Ora doesn't just add features to existing oracles;
-                                it rebuilds and replaces them to enhance trust and verifiability.
-                                Ora ensures that all processes are decentralized, open-source, and transparent.
-                                By leveraging Ora's deterministic machine learning capabilities,
+                                All processes are decentralized, open-source, and transparent.
+                                By leveraging opML capabilities,
                                 Graviola can generate NFTs in a trustless manner, meaning you can verify every step of the process.
                                 The NFTs are securely stored using decentralized networks like IPFS, making them easily accessible and tamper-proof.
                             `}

@@ -1,4 +1,4 @@
-import BlockNFT, { BlockNFTProps } from "./BlockNFT"
+import BlockNFT, { BlockNFTProps } from "../BlockNFT"
 import { clsx as cl } from "clsx"
 
 interface NFTDetailsProps {
