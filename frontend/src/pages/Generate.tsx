@@ -186,9 +186,7 @@ const Generate = () => {
                 </div>
 
                 <SectionTitle
-                    mainText={{
-                        content: "Keywords",
-                    }}
+                    title={"Keywords"}
                 />
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
                     {Object.entries(rGroups).map(([, rGroup], i) => (

@@ -1,43 +1,29 @@
-import HorizontalLine from "../HorizontalLine"
+import { cn } from "../../../utils/cn"
 
-interface SectionTitleHeader {
-    content: string
+interface SectionTitleProps {
+    title: string
+    secondaryContent?: string | React.ReactNode
     additionalClasses?: string
 }
 
-interface SectionTitleProps {
-    mainText: SectionTitleHeader
-    secondaryText?: SectionTitleHeader
-    additionalText?: SectionTitleHeader
-    horizontalLineAfter?: boolean
-}
-
 const SectionTitle = ({
-    mainText,
-    secondaryText,
-    additionalText,
-    horizontalLineAfter = true,
+    title, secondaryContent, additionalClasses
 }: SectionTitleProps) => {
     return (
-        <div className="flex flex-col gap-1">
-            <h1 className={`font-bold text-2xl ${mainText.additionalClasses}`}>
-                {mainText.content}
-            </h1>
-            {secondaryText && (
-                <h2
-                    className={`font-bold text-xl opacity-85 ${secondaryText.additionalClasses}`}
-                >
-                    {secondaryText.content}
-                </h2>
-            )}
-            {additionalText && (
-                <h3
-                    className={`font-bold text-xl opacity-85 ${additionalText.additionalClasses}`}
-                >
-                    {additionalText.content}
-                </h3>
-            )}
-            {horizontalLineAfter && <HorizontalLine />}
+        <div className={cn("flex w-full flex-col gap-1 justify-start items-start", additionalClasses)}>
+            <p className="text-2xl font-bold">
+                {title}
+            </p>
+            {secondaryContent &&
+                (typeof secondaryContent === "string") ?
+                <p className="text-xl">
+                    {secondaryContent}
+                </p>
+                :
+                <div>
+                    {secondaryContent}
+                </div>
+            }
         </div>
     )
 }

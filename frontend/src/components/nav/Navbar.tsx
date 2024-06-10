@@ -76,12 +76,14 @@ const Navbar = () => {
                     <div
                         className={cl(
                             "flex items-center gap-0.5 cursor-pointer",
+                            "px-3 py-1 rounded-xl",
+                            "hover:bg-accent/25",
                         )}
                         onClick={() => navigate(routerPaths.home)}
                     >
                         <div className={cl(
                             "flex justify-center items-center",
-                            "w-8 h-8 p-1 rounded-lg",
+                            "w-8 h-8 p-1 rounded-xl",
                         )}>
                             <img className="w-full h-auto mb-1" src={Logo} />
                         </div>

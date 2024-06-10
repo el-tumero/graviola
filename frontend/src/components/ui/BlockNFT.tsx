@@ -6,6 +6,7 @@ import { convertToIfpsURL } from "../../utils/convertToIpfsURL"
 import { RarityLevel } from "../../types/Rarity"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
+
 interface BlockNFTProps {
     nftData: NFT               // Pass full NFT object to preview meta object on hover
     glowColor: NFTGlowColor    // 'Auto' will inherit color from NFT data. Can be overwritten

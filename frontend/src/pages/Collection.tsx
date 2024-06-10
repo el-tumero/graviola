@@ -106,9 +106,7 @@ const Collection = () => {
                 ) : (
                     <>
                         <SectionTitle
-                            mainText={{
-                                content: `Dropped NFTs`,
-                            }}
+                            title={"Dropped NFTs"}
                         />
 
                         <div className="flex justify-between items-center mb-4 max-sm:flex-col max-sm:gap-2">
