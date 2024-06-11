@@ -8,5 +8,5 @@ interface AppContextInterface {
 
 export const AppContext = createContext<AppContextInterface>({
     theme: null,
-    toggleTheme: () => { }
+    toggleTheme: () => {},
 })

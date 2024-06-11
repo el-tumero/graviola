@@ -8,9 +8,7 @@ import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import { RaritiesData } from "../types/RarityGroup"
 import { ethers, toBigInt } from "ethers"
-import {
-    getRarityFromPerc,
-} from "../utils/getRarityData"
+import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import BlockNFT from "../components/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
@@ -72,7 +70,9 @@ const TradeUp = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value))
+            const [rarityLevel, rarityData] = getRarityFromPerc(
+                formatBpToPercentage(nft.attributes[0].value),
+            )
 
             setProgressState("DONE")
             setProgressBarVal(100)
@@ -97,7 +97,7 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             let userOwnedTokens
             if (address) {
                 userOwnedTokens = await graviolaContext.contract?.ownedTokens(
@@ -165,12 +165,15 @@ const TradeUp = () => {
                                                 const [
                                                     rarityLevel,
                                                     rarityData,
-                                                ] = getRarityFromPerc(percRarity)
+                                                ] =
+                                                    getRarityFromPerc(
+                                                        percRarity,
+                                                    )
 
                                                 if (
                                                     selectedGroup !== null &&
                                                     selectedGroup !==
-                                                    rarityLevel
+                                                        rarityLevel
                                                 ) {
                                                     return null
                                                 } else if (
@@ -200,12 +203,13 @@ const TradeUp = () => {
                                                             <div
                                                                 className={`
                                                                         p-px hover:cursor-pointer
-                                                                        ${selectedIds.includes(
-                                                                    i,
-                                                                )
-                                                                        ? "brightness-50 hover:brightness-50"
-                                                                        : "hover:brightness-110"
-                                                                    }
+                                                                        ${
+                                                                            selectedIds.includes(
+                                                                                i,
+                                                                            )
+                                                                                ? "brightness-50 hover:brightness-50"
+                                                                                : "hover:brightness-110"
+                                                                        }
                                                                         `}
                                                                 style={{
                                                                     borderRadius: 16,
@@ -260,9 +264,9 @@ const TradeUp = () => {
                                                                         (
                                                                             prev,
                                                                         ) => [
-                                                                                ...prev,
-                                                                                i,
-                                                                            ],
+                                                                            ...prev,
+                                                                            i,
+                                                                        ],
                                                                     )
                                                                 }}
                                                             >
@@ -345,9 +349,7 @@ const TradeUp = () => {
                                                         .attributes[0].value,
                                                 )
                                             const [, rarityData] =
-                                                getRarityFromPerc(
-                                                    percRarity,
-                                                )
+                                                getRarityFromPerc(percRarity)
                                             return (
                                                 <div
                                                     key={i}

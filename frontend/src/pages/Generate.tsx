@@ -10,9 +10,7 @@ import {
     useWeb3ModalAccount,
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
-import {
-    getRarityFromPerc,
-} from "../utils/getRarityData"
+import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
 import SectionTitle from "../components/ui/layout/SectionTitle"
@@ -76,7 +74,7 @@ const Generate = () => {
             // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
 
             const [rarityLevel, rarityData] = getRarityFromPerc(
-                formatBpToPercentage(nft.attributes[0].value)
+                formatBpToPercentage(nft.attributes[0].value),
             )
 
             // console.log("rarityLevel from conv:  ", rarityLevel)
@@ -185,9 +183,7 @@ const Generate = () => {
                     )}
                 </div>
 
-                <SectionTitle
-                    title={"Keywords"}
-                />
+                <SectionTitle title={"Keywords"} />
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
                     {Object.entries(rGroups).map(([, rGroup], i) => (
                         <div

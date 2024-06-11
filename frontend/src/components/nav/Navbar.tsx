@@ -15,7 +15,6 @@ const Navbar = () => {
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
 
     const navItems: React.ReactNode[] = [
-
         <NavElement onClick={() => navigate(routerPaths.generate)}>
             <NavItemText text="Generate" />
         </NavElement>,
@@ -29,12 +28,20 @@ const Navbar = () => {
         </NavElement>,
 
         <NavElement>
-            <div className={cl(
-                "flex w-min hover:cursor-pointer",
-                "opacity-75 hover:opacity-100",
-                "max-lg:w-full justify-center items-center"
-            )}
-                onClick={() => window.open('https://github.com/el-tumero/graviola', '_blank', 'noopener,noreferrer')}>
+            <div
+                className={cl(
+                    "flex w-min hover:cursor-pointer",
+                    "opacity-75 hover:opacity-100",
+                    "max-lg:w-full justify-center items-center",
+                )}
+                onClick={() =>
+                    window.open(
+                        "https://github.com/el-tumero/graviola",
+                        "_blank",
+                        "noopener,noreferrer",
+                    )
+                }
+            >
                 {icons.github}
             </div>
         </NavElement>,
@@ -49,30 +56,32 @@ const Navbar = () => {
                 )}
                 onClick={() => toggleTheme()}
             >
-                {theme === "dark" ? (
-                    icons.darkTheme
-                ) : (
-                    icons.lightTheme
-                )}
+                {theme === "dark" ? icons.darkTheme : icons.lightTheme}
             </div>
-        </NavElement>
+        </NavElement>,
     ]
 
     return (
         <div className="sticky top-0 z-30">
-            <div className={cl(
-                "flex flex-col",
-                "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
-                "w-screen backdrop-blur-lg",
-                "bg-transparent",
-                mobileListVisible && "border-b border-light-border dark:border-dark-border"
-            )}>
-                <div className={cl(
-                    "flex justify-between items-center",
-                    "py-3 px-[2.5%]",
-                    "select-none font-content",
-                    !mobileListVisible && "border-b border-light-border dark:border-dark-border"
-                )}>
+            <div
+                className={cl(
+                    "flex flex-col",
+                    "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
+                    "w-screen backdrop-blur-lg",
+                    "bg-transparent",
+                    mobileListVisible &&
+                        "border-b border-light-border dark:border-dark-border",
+                )}
+            >
+                <div
+                    className={cl(
+                        "flex justify-between items-center",
+                        "py-3 px-[2.5%]",
+                        "select-none font-content",
+                        !mobileListVisible &&
+                            "border-b border-light-border dark:border-dark-border",
+                    )}
+                >
                     <div
                         className={cl(
                             "flex items-center gap-0.5 cursor-pointer",
@@ -81,20 +90,27 @@ const Navbar = () => {
                         )}
                         onClick={() => navigate(routerPaths.home)}
                     >
-                        <div className={cl(
-                            "flex justify-center items-center",
-                            "w-8 h-8 p-1 rounded-xl",
-                        )}>
+                        <div
+                            className={cl(
+                                "flex justify-center items-center",
+                                "w-8 h-8 p-1 rounded-xl",
+                            )}
+                        >
                             <img className="w-full h-auto mb-1" src={Logo} />
                         </div>
                         <NavItemText
                             text={"GraviolaNFT"}
-                            additionalClasses={"font-bold text-accent opacity-100"}
+                            additionalClasses={
+                                "font-bold text-accent opacity-100"
+                            }
                         />
                     </div>
 
                     <div className="max-lg:hidden lg:visible">
-                        <NavListDesktop navItems={navItems} mobileStyles={false} />
+                        <NavListDesktop
+                            navItems={navItems}
+                            mobileStyles={false}
+                        />
                     </div>
 
                     {/* Mobile navbar icon */}
@@ -102,7 +118,7 @@ const Navbar = () => {
                         className={cl(
                             "max-lg:visible lg:hidden",
                             "flex items-center w-12 h-max px-2",
-                            "text-light-text dark:text-dark-text hover:cursor-pointer"
+                            "text-light-text dark:text-dark-text hover:cursor-pointer",
                         )}
                         onClick={() => setMobileListVisible(!mobileListVisible)}
                     >
@@ -111,11 +127,16 @@ const Navbar = () => {
                 </div>
 
                 {mobileListVisible && (
-                    <div className={cl(
-                        "flex flex-col w-full h-fit",
-                        "bg-transparent"
-                    )}>
-                        <NavListDesktop navItems={navItems} mobileStyles={true} />
+                    <div
+                        className={cl(
+                            "flex flex-col w-full h-fit",
+                            "bg-transparent",
+                        )}
+                    >
+                        <NavListDesktop
+                            navItems={navItems}
+                            mobileStyles={true}
+                        />
                     </div>
                 )}
             </div>

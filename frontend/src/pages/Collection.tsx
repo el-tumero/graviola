@@ -8,9 +8,7 @@ import { NFT } from "../types/NFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import Button from "../components/ui/Button"
 import BlockNFT from "../components/BlockNFT"
-import {
-    getRarityFromPerc,
-} from "../utils/getRarityData"
+import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import { ethers } from "ethers"
 import { RaritiesData } from "../types/RarityGroup"
@@ -105,9 +103,7 @@ const Collection = () => {
                     </p>
                 ) : (
                     <>
-                        <SectionTitle
-                            title={"Dropped NFTs"}
-                        />
+                        <SectionTitle title={"Dropped NFTs"} />
 
                         <div className="flex justify-between items-center mb-4 max-sm:flex-col max-sm:gap-2">
                             <p className="text-xl">

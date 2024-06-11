@@ -12,15 +12,21 @@ import { RarityLevel } from "../types/Rarity"
 type NFTGlowColor = "auto" | "none" | RarityLevel
 
 interface BlockNFTProps {
-    nftData: NFT               // Pass full NFT object to preview meta object on hover
-    glowColor: NFTGlowColor    // 'Auto' will inherit color from NFT data. Can be overwritten
+    nftData: NFT // Pass full NFT object to preview meta object on hover
+    glowColor: NFTGlowColor // 'Auto' will inherit color from NFT data. Can be overwritten
     additionalClasses?: string // Extra classes for the div, not for the img tag
     disableMetadataOnHover?: true // Disable metadata object element on hover
 }
 
-const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasses }: BlockNFTProps) => {
-
-    const [, rData] = getRarityFromPerc(formatBpToPercentage(nftData.attributes[0].value))
+const BlockNFT = ({
+    nftData,
+    glowColor,
+    disableMetadataOnHover,
+    additionalClasses,
+}: BlockNFTProps) => {
+    const [, rData] = getRarityFromPerc(
+        formatBpToPercentage(nftData.attributes[0].value),
+    )
     let style: React.CSSProperties = {}
     if (glowColor !== "none") {
         if (glowColor === "auto") style = getRarityBorder(rData).style
@@ -49,7 +55,7 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
                 draggable={false}
                 className={cl(
                     "w-full h-full rounded-lg",
-                    `nft-${nftData.image}`
+                    `nft-${nftData.image}`,
                 )}
                 src={convertToIfpsURL(nftData.image)}
                 alt="NFT"
@@ -66,11 +72,15 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
 }
 
 const BlockNFTMetadata = (props: { metadata: NFTAttributes[] }) => {
-    return <div>
-        {props.metadata.map((attr) => (
-            <p>{attr.trait_type}: '{attr.value}'</p>
-        ))}
-    </div>
+    return (
+        <div>
+            {props.metadata.map((attr) => (
+                <p>
+                    {attr.trait_type}: '{attr.value}'
+                </p>
+            ))}
+        </div>
+    )
 }
 
 export default BlockNFT

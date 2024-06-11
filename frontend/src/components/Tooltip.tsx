@@ -5,13 +5,12 @@ import { ITooltip } from "react-tooltip"
 import tailwindColors from "../../tailwind.config"
 
 const Tooltip = (props: ITooltip) => {
-
-    const { theme, } = useContext(AppContext)
+    const { theme } = useContext(AppContext)
 
     const coreStyles = {
         fontSize: "0.75rem",
         lineHeight: "1rem",
-        padding: "1rem"
+        padding: "1rem",
     }
 
     const twPalette = tailwindColors.theme.extend.colors
@@ -29,17 +28,18 @@ const Tooltip = (props: ITooltip) => {
 
     const themeStyles = {
         ...coreStyles,
-        ...(theme === "dark") ? darkStyles : lightStyles
+        ...(theme === "dark" ? darkStyles : lightStyles),
     }
 
     return (
         <BaseTooltip
             {...props}
             noArrow={true}
-            border={`1px solid ${(theme === "dark")
-                ? twPalette.dark.border
-                : twPalette.light.border
-                }`}
+            border={`1px solid ${
+                theme === "dark"
+                    ? twPalette.dark.border
+                    : twPalette.light.border
+            }`}
             style={{
                 ...themeStyles,
                 userSelect: "none",

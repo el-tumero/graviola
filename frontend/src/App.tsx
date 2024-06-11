@@ -86,7 +86,7 @@ const App = (props: { children: ReactNode }) => {
 
     const appContextValue = {
         theme,
-        toggleTheme
+        toggleTheme,
     }
 
     // Fetch contract data

@@ -13,7 +13,6 @@ const NavElement = ({ children, onClick }: NavElementProps) => {
                 "max-lg:flex max-lg:justify-center max-lg:w-full",
                 "max-lg:bg-light-border/75 max-lg:dark:bg-dark-border/75",
                 "hover:bg-light-border/20 dark:hover-bg-dark-border/20",
-
             )}
             onClick={onClick}
         >

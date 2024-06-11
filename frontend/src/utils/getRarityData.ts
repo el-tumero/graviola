@@ -7,7 +7,9 @@ import { RaritiesData } from "../types/RarityGroup"
 export function getRarityFromPerc(
     threshold: number,
 ): [RarityLevel, RarityGroupData] {
-    const { rarities } = useContext(GraviolaContext) as { rarities: RaritiesData }
+    const { rarities } = useContext(GraviolaContext) as {
+        rarities: RaritiesData
+    }
 
     // Clamp input
     threshold = Math.max(0, Math.min(threshold, 100))
@@ -31,11 +33,15 @@ export function getRarityFromPerc(
 
 // Get RarityLevel, RGroupData from RarityLevel enum type value
 export function getRarityFromLevel(
-    rarityLevel: RarityLevel
+    rarityLevel: RarityLevel,
 ): [RarityLevel, RarityGroupData] {
-    const { rarities } = useContext(GraviolaContext) as { rarities: RaritiesData }
+    const { rarities } = useContext(GraviolaContext) as {
+        rarities: RaritiesData
+    }
     if (rarityLevel in rarities) {
         return [rarityLevel, rarities[rarityLevel]]
     }
-    throw new Error(`Rarity level ${rarityLevel} does not exist in the rarities data.`)
+    throw new Error(
+        `Rarity level ${rarityLevel} does not exist in the rarities data.`,
+    )
 }
