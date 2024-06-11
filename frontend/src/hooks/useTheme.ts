@@ -1,12 +1,13 @@
 import { useWeb3ModalTheme } from "@web3modal/ethers/react"
 import { useEffect, useState } from "react"
+import { Theme } from "../types/Theme"
 
 export default function useTheme(
     web3ModalLoaded: boolean,
-): [string, () => void] {
+): [Theme, () => void] {
     const { setThemeMode } = useWeb3ModalTheme()
-    const [theme, setTheme] = useState<string | null>(
-        localStorage.getItem("theme"),
+    const [theme, setTheme] = useState<Theme | null>(
+        localStorage.getItem("theme") as Theme,
     )
 
     useEffect(() => {

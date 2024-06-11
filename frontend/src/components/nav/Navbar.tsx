@@ -1,6 +1,5 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import Logo from "../../assets/logo.webp"
-import useTheme from "../../hooks/useTheme"
 import NavItemText from "./NavItemText"
 import NavElement from "./NavElement"
 import { useNavigate } from "react-router-dom"
@@ -8,10 +7,11 @@ import { routerPaths } from "../../router"
 import { clsx as cl } from "clsx"
 import NavListDesktop from "./NavList"
 import icons from "../../icons"
+import { AppContext } from "../../contexts/AppContext"
 
 const Navbar = () => {
     const navigate = useNavigate()
-    const [theme, toggleTheme] = useTheme(true)
+    const { theme, toggleTheme } = useContext(AppContext)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
 
     const navItems: React.ReactNode[] = [

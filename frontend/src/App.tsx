@@ -9,6 +9,7 @@ import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from "ethers"
 import { Graviola } from "../../contracts/typechain-types/Graviola"
 import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/Graviola__factory"
 import { GraviolaContext } from "./contexts/GraviolaContext"
+import { AppContext } from "./contexts/AppContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
@@ -67,7 +68,7 @@ const App = (props: { children: ReactNode }) => {
     })
 
     const { walletProvider } = useWeb3ModalProvider()
-    const [,] = useTheme(modal === undefined)
+    const [theme, toggleTheme] = useTheme(modal === undefined)
 
     const [graviola, setGraviola] = useState<Graviola | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -81,6 +82,11 @@ const App = (props: { children: ReactNode }) => {
         contract: graviola,
         collection: collection,
         rarities: rarities,
+    }
+
+    const appContextValue = {
+        theme,
+        toggleTheme
     }
 
     // Fetch contract data
@@ -164,7 +170,9 @@ const App = (props: { children: ReactNode }) => {
         <Loading />
     ) : (
         <GraviolaContext.Provider value={graviolaContextValue}>
-            {props.children}
+            <AppContext.Provider value={appContextValue}>
+                {props.children}
+            </AppContext.Provider>
         </GraviolaContext.Provider>
     )
 }
