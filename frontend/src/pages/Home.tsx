@@ -109,8 +109,10 @@ function Home() {
                             </div>
                             <div onClick={() => navigate(routerPaths.collection)} className={cl(
                                 "flex justify-between items-center gap-1.5 p-3 select-none",
-                                "rounded-xl transition-transform duration-300",
+                                "rounded-xl transition-all duration-300",
                                 "hover:translate-x-2 hover:cursor-pointer",
+                                "border border-transparent",
+                                "hover:border-light-border hover:dark:border-dark-border"
                             )}>
                                 <p>Browse Collection</p>
                                 {icons.arrowRight}
@@ -143,15 +145,15 @@ function Home() {
                             <div className={cl(
                                 "font-mono rounded-xl break-words",
                                 "bg-light-border/50 dark:bg-dark-border/50",
-                                "p-6",
+                                "px-6 py-9",
                             )}>
                                 {/* NOTE: mock */}
                                 {"{"}
                                 {mockMetadataObject.map((property, idx) => (
                                     <div className="ml-6" key={idx}>
                                         <p>
-                                            <span className="text-violet-600 font-semibold">"{property.name}":{" "}
-                                                <span className="text-sky-400">"{property.val}"{" "}</span>
+                                            <span className="text-violet-600">"{property.name}":{" "}
+                                                <span className="text-sky-600 dark:text-sky-300">"{property.val}"{" "}</span>
                                             </span>
                                             {property.comment &&
                                                 <span className="text-stone-500">{`// ${property.comment}`}</span>

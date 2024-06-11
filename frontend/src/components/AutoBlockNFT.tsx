@@ -47,9 +47,9 @@ const AutoBlockNFT = () => {
             ? <div>
                 <p>...</p>
             </div>
-            : <div className="flex gap-1 h-full justify-center items-center">
+            : <div className="flex max-sm:flex-col gap-1 h-full justify-center items-center">
                 <div className={cl(
-                    "flex flex-col flex-grow gap-5 justify-center items-center px-3 py-6 mr-1",
+                    "flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1",
                     "rounded-2xl border border-light-border dark:border-dark-border",
                 )}>
                     {randomNFTs.map((_, idx) => (
@@ -72,7 +72,7 @@ const AutoBlockNFT = () => {
                         <div
                             key={idx}
                             className={cl(
-                                "absolute top-0 left-0 w-full h-full transition-opacity duration-1000 p-4",
+                                "absolute top-0 left-0 w-full h-full transition-opacity duration-600 p-4",
                                 idx === activeNFT ? "opacity-100" : "opacity-0",
                             )}
                         >
