@@ -49,7 +49,7 @@ export default {
                 dark: {
                     text: "#fff",
                     textSecondary: "#e3e3e3",
-                    bgPrimary: "#111111",
+                    bgPrimary: "#0c0c0d",
                     bgLight: "#252625",
                     bgDark: "#111211",
                     border: "#1e1e1e",

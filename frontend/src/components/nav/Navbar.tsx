@@ -49,6 +49,25 @@ const Navbar = () => {
         <NavElement>
             <div
                 className={cl(
+                    "flex w-auto h-6 hover:cursor-pointer",
+                    "opacity-75 hover:opacity-100",
+                    "max-lg:w-full justify-center items-center",
+                )}
+                onClick={() =>
+                    window.open(
+                        "https://github.com/el-tumero/graviola",
+                        "_blank",
+                        "noopener,noreferrer",
+                    )
+                }
+            >
+                {icons.discordLogo}
+            </div>
+        </NavElement>,
+
+        <NavElement>
+            <div
+                className={cl(
                     "flex justify-center items-center",
                     "w-full h-6 cursor-pointer",
                     "opacity-75 hover:opacity-100",

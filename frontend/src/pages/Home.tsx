@@ -17,6 +17,7 @@ import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import MetadataMock, {
     MetadataMockProperty,
 } from "../components/ui/MetadataMock"
+import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
 
 function Home() {
     const navigate = useNavigate()
@@ -69,17 +70,15 @@ function Home() {
                                 "max-sm:w-full max-lg:w-1/3 lg:w-1/2",
                             )}
                         >
-                            <h1 className="text-accent font-extrabold text-3xl">
-                                Unique dynamically generated character portrait
+                            <h1 className="text-accent font-title font-semibold text-3xl">
+                                Unique, dynamically generated character portrait
                                 NFTs
                             </h1>
                             <h2 className="text-light-text dark:text-dark-text text-lg">
-                                {/* NOTE: mock */}
-                                Lorem ipsum dolor, sit amet consectetur
-                                adipisicing elit. Nisi tenetur placeat laborum
-                                at assumenda nobis? Ipsa animi et, fugiat
-                                voluptatibus accusamus, iure quidem voluptatum
-                                perferendis neque a voluptates amet ipsum?
+                                Own a piece of our limited-time, algorithmically generated character NFTs!
+                                Each one is a fun, unique creation blending art and tech.
+                                It's like collecting digital trading cards with a twist.
+                                Dive in, grab a quirky NFT, and join our chill community of enthusiasts.
                             </h2>
                         </div>
 
@@ -162,15 +161,16 @@ function Home() {
                         </div>
                     </SectionContainer>
 
-                    <SectionContainer additionalClasses="my-12">
+                    <SectionContainer additionalClasses="flex-col my-12">
                         <SectionTitle
-                            title="Limited and Rare keywords!"
-                            // TODO: Fix this text a little, this is just a demo
-                            secondaryContent={`Graviola is driven by the Hodlers, who have the power to vote on the upcoming new seasonal keywords.
-                                After each season ends, all of its Rare, Very Rare and Legendary keywords will be banned forever.
-                                This ensures your Legendary Graviola NFT is forever rare and grows value with time!
+                            title="Seasonal Keywords"
+                            secondaryContent={`Token holders have the power to shape the future of Graviola. 
+                                Every season, you can vote on and suggest new keywords. 
+                                At the end of each season, all Rare, Very Rare, and Legendary keywords will be retired, 
+                                guaranteeing the exclusivity and increasing the value of your Graviola NFTs over time!
                             `}
                         />
+                        <LimitedKeywordsScale />
                     </SectionContainer>
 
                     <SectionContainer additionalClasses="flex-col">
@@ -184,7 +184,7 @@ function Home() {
                                 "max-xl:justify-items-center w-fit px-12 pt-12 pb-6 rounded-xl",
                                 "max-xl:grid max-sm:grid-cols-1 max-lg:grid-cols-2 max-xl:grid-cols-3",
                                 "xl:gap-12 max-xl:gap-9 max-sm:gap-6",
-                                "bg-light-border/50 dark:bg-dark-border/50",
+                                "bg-light-border/30 dark:bg-dark-border/30",
                             )}
                         >
                             {/* TODO: Since blockNFTs have metadata on hover, these should be hardcoded with valid data */}
@@ -230,7 +230,7 @@ function Home() {
                         </div>
                     </SectionContainer>
 
-                    <SectionContainer>
+                    <SectionContainer additionalClasses="flex-col my-12">
                         <SectionTitle
                             title="How does Graviola work?"
                             secondaryContent={`
@@ -238,10 +238,58 @@ function Home() {
                                 All processes are decentralized, open-source, and transparent.
                                 By leveraging opML capabilities,
                                 Graviola can generate NFTs in a trustless manner, meaning you can verify every step of the process.
-                                The NFTs are securely stored using decentralized networks like IPFS, making them easily accessible and tamper-proof.
+                                The NFTs are securely stored using decentralized networks like IPFS, making them easily accessible and tamperproof
                             `}
                         />
+                        <div className="flex w-full justify-end items-center">
+                            <div
+                                onClick={() =>
+                                    window.open(
+                                        "https://github.com/el-tumero/graviola",
+                                        "_blank",
+                                        "noopener,noreferrer",
+                                    )
+                                }
+                                className={cl(
+                                    "flex gap-2 justify-center items-center cursor-pointer",
+                                    "p-3 rounded-xl hover:bg-light-border/30 dark:hover:bg-dark-border/30",
+                                    "border border-light-border dark:border-dark-border",
+                                    "transition-colors duration-300",
+                                    "hover:border-cyan-400 dark:hover:border-cyan-400"
+                                )}>
+                                <p>read more about</p>
+                                {icons.oraLogo}
+                            </div>
+                        </div>
                     </SectionContainer>
+
+                    <SectionContainer additionalClasses="my-12">
+                        <SectionTitle
+                            title="Join our community!"
+                            secondaryContent={`
+                                Join our Discord and become part of an exciting community of NFT enthusiasts!
+                                Whether you're a seasoned collector or just getting started, we want you to have fun and connect with others
+                            `}
+                        />
+                        <div
+                            onClick={() =>
+                                window.open(
+                                    "https://github.com/el-tumero/graviola",
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                )
+                            }
+                            className={cl(
+                                "w-fit h-fit p-3 rounded-xl cursor-pointer",
+                                "hover:bg-light-border/30 dark:hover:bg-dark-border/30",
+                                "border border-light-border dark:border-dark-border",
+                                "transition-colors duration-300",
+                                "hover:border-blue-500 dark:hover:border-blue-500"
+                            )}>
+                            {icons.discordBannerLogo}
+                        </div>
+                    </SectionContainer>
+
                 </div>
             </ContentContainer>
         </FullscreenContainer>
