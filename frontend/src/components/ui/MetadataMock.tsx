@@ -11,7 +11,7 @@ const MetadataMock = (props: { metadata: MetadataMockProperty[] }) => {
         <div
             className={cl(
                 "font-mono rounded-xl break-words",
-                "bg-light-border/50 dark:bg-dark-border/50",
+                "bg-light-border/30 dark:bg-dark-border/30",
                 "px-6 py-9",
             )}
         >
@@ -20,14 +20,14 @@ const MetadataMock = (props: { metadata: MetadataMockProperty[] }) => {
                 (property: MetadataMockProperty, idx: number) => (
                     <div className="ml-6" key={idx}>
                         <p>
-                            <span className="text-violet-600">
+                            <span className="font-semibold text-violet-600">
                                 "{property.name}":{" "}
                                 <span className="text-sky-600 dark:text-sky-300">
                                     "{property.val}"{" "}
                                 </span>
                             </span>
                             {property.comment && (
-                                <span className="text-stone-500">{`// ${property.comment}`}</span>
+                                <span className="font-thin text-stone-500">{`// ${property.comment}`}</span>
                             )}
                         </p>
                     </div>

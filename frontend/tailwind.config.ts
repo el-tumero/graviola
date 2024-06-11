@@ -3,6 +3,11 @@ export default {
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     theme: {
         extend: {
+            fontFamily: {
+                title: ['"Noto Sans Mono"', 'monospace'],
+                content: ['"Public Sans"', 'sans-serif']
+            },
+
             transitionDuration: {
                 4000: "4000ms",
             },
@@ -44,7 +49,7 @@ export default {
                 dark: {
                     text: "#fff",
                     textSecondary: "#e3e3e3",
-                    bgPrimary: "#111112",
+                    bgPrimary: "#111111",
                     bgLight: "#252625",
                     bgDark: "#111211",
                     border: "#1e1e1e",

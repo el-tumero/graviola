@@ -1,4 +1,5 @@
 import { cn } from "../../../utils/cn"
+import { clsx as cl } from "clsx"
 
 interface SectionTitleProps {
     title: string
@@ -18,7 +19,9 @@ const SectionTitle = ({
                 additionalClasses,
             )}
         >
-            <p className="text-2xl font-bold">{title}</p>
+            <p className={cl(
+                "text-2xl font-title font-semibold"
+            )}>{title}</p>
             {secondaryContent && typeof secondaryContent === "string" ? (
                 <p className="text-xl">{secondaryContent}</p>
             ) : (

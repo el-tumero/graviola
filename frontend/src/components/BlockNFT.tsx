@@ -76,7 +76,7 @@ const BlockNFTMetadata = (props: { metadata: NFTAttributes[] }) => {
         <div>
             {props.metadata.map((attr) => (
                 <p>
-                    {attr.trait_type}: '{attr.value}'
+                    {attr.trait_type}: "{attr.value}"
                 </p>
             ))}
         </div>

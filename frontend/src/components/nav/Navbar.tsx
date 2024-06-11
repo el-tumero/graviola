@@ -70,7 +70,7 @@ const Navbar = () => {
                     "w-screen backdrop-blur-lg",
                     "bg-transparent",
                     mobileListVisible &&
-                        "border-b border-light-border dark:border-dark-border",
+                    "border-b border-light-border dark:border-dark-border",
                 )}
             >
                 <div
@@ -79,7 +79,7 @@ const Navbar = () => {
                         "py-3 px-[2.5%]",
                         "select-none font-content",
                         !mobileListVisible &&
-                            "border-b border-light-border dark:border-dark-border",
+                        "border-b border-light-border dark:border-dark-border",
                     )}
                 >
                     <div
@@ -101,7 +101,7 @@ const Navbar = () => {
                         <NavItemText
                             text={"GraviolaNFT"}
                             additionalClasses={
-                                "font-bold text-accent opacity-100"
+                                "font-bold font-mono text-accent opacity-100"
                             }
                         />
                     </div>
