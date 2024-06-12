@@ -9,20 +9,19 @@ const Error = () => {
 
     return (
         <FullscreenContainer additionalClasses="justify-center">
-            <div className={cl(
-                "flex flex-col justify-center items-center",
-                "p-3 gap-3 rounded-xl",
-                "border border-light-border dark:border-dark-border"
-            )}>
+            <div
+                className={cl(
+                    "flex flex-col justify-center items-center",
+                    "p-3 gap-3 rounded-xl",
+                    "border border-light-border dark:border-dark-border",
+                )}
+            >
                 <div>
                     <p>Oops!</p>
                     <p>Something went wrong.</p>
                 </div>
                 <div className="w-full h-px bg-light-border dark:bg-dark-border"></div>
-                <Button
-                    onClick={() => navigate(routerPaths.home)}
-                    text="Go home"
-                />
+                <Button onClick={() => navigate(routerPaths.home)} text="Go home" />
             </div>
         </FullscreenContainer>
     )

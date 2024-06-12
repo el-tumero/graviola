@@ -15,27 +15,14 @@ interface GenerateContainerProps {
     rGroups: RaritiesData
 }
 
-const GenerateContainer = ({
-    rolledNFT,
-    isPulsating,
-    isGenerating,
-    rGroups,
-}: GenerateContainerProps) => {
+const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating, rGroups }: GenerateContainerProps) => {
     const rarityAnimBorder = useRandomRarityBorder(isGenerating, 750, rGroups)
     const [resOpacity, setResOpacity] = useState<number>(0)
 
     // Dynamic styles based on passed rolledNFT
-    const {
-        style: breathingBorderStyle = {},
-        className: breathingBorderClassNames = "",
-    } = rolledNFT
-            ? getRarityBorder(
-                getRarityFromPerc(
-                    formatBpToPercentage(rolledNFT.attributes[0].value),
-                )[1],
-                true,
-            )
-            : {}
+    const { style: breathingBorderStyle = {}, className: breathingBorderClassNames = "" } = rolledNFT
+        ? getRarityBorder(getRarityFromPerc(formatBpToPercentage(rolledNFT.attributes[0].value))[1], true)
+        : {}
 
     useEffect(() => {
         if (!rolledNFT) return
@@ -44,13 +31,7 @@ const GenerateContainer = ({
 
     return (
         <div
-            style={
-                rolledNFT
-                    ? breathingBorderStyle
-                    : isGenerating
-                        ? rarityAnimBorder
-                        : {}
-            }
+            style={rolledNFT ? breathingBorderStyle : isGenerating ? rarityAnimBorder : {}}
             className={cn(
                 "flex justify-center items-center",
                 "w-64 h-64 p-4 rounded-xl",

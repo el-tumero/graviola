@@ -9,13 +9,7 @@ interface ButtonProps {
     arrowIcon?: boolean
 }
 
-const Button = ({
-    text,
-    onClick,
-    disabled = false,
-    arrowIcon = false,
-    additionalClasses,
-}: ButtonProps) => {
+const Button = ({ text, onClick, disabled = false, arrowIcon = false, additionalClasses }: ButtonProps) => {
     return (
         <div
             onClick={() => onClick()}
@@ -25,15 +19,13 @@ const Button = ({
                 "cursor-pointer hover:cursor-pointer",
                 "hover:bg-light-border/75 dark:hover:bg-dark-border/75",
                 disabled && "opacity-50 pointer-events-none",
-                additionalClasses
+                additionalClasses,
             )}
         >
-            <button disabled={disabled} >
+            <button disabled={disabled}>
                 <p className="font-content">{text}</p>
             </button>
-            {arrowIcon &&
-                icons.arrowRight
-            }
+            {arrowIcon && icons.arrowRight}
         </div>
     )
 }

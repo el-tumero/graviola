@@ -7,31 +7,14 @@ interface NFTDetailsProps {
     lowerBubbleChildren?: React.ReactNode
 }
 
-const NFTDetails = ({
-    nftProps,
-    upperBubbleChildren,
-    lowerBubbleChildren,
-}: NFTDetailsProps) => {
+const NFTDetails = ({ nftProps, upperBubbleChildren, lowerBubbleChildren }: NFTDetailsProps) => {
     return (
-        <div
-            className={cl(
-                "max-sm:flex-col",
-                "w-full h-fit my-2 px-4 py-16 rounded-xl bg-light-bgDark/50 dark:bg-dark-bgDark/50 mb-36",
-            )}
-        >
-            <div
-                className={cl(
-                    "max-sm:flex max-sm:flex-col max-sm:gap-8 max-sm:jusitfy-center",
-                    "relative h-full items-center",
-                )}
-            >
+        <div className={cl("max-sm:flex-col", "w-full h-fit my-2 px-4 py-16 rounded-xl bg-light-bgDark/50 dark:bg-dark-bgDark/50 mb-36")}>
+            <div className={cl("max-sm:flex max-sm:flex-col max-sm:gap-8 max-sm:jusitfy-center", "relative h-full items-center")}>
                 <BlockNFT
                     {...nftProps}
                     disableMargin={true}
-                    additionalClasses={cl(
-                        "sm:w-64 sm:h-64 sm:mx-8",
-                        "max-sm:w-1/2 max-sm:h-1/2 max-sm:mx-2",
-                    )}
+                    additionalClasses={cl("sm:w-64 sm:h-64 sm:mx-8", "max-sm:w-1/2 max-sm:h-1/2 max-sm:mx-2")}
                 />
 
                 <div

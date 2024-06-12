@@ -34,8 +34,7 @@ const AutoBlockNFT = () => {
         if (status !== "ready" || blockAutoChange) return
 
         const autoChangeInterval = setInterval(() => {
-            const nextIdx =
-                activeNFT === randomNFTs.length - 1 ? 0 : activeNFT + 1
+            const nextIdx = activeNFT === randomNFTs.length - 1 ? 0 : activeNFT + 1
             setActiveNFT(nextIdx)
         }, AUTO_CHANGE_TIME_INTERVAL_MS)
 
@@ -48,11 +47,7 @@ const AutoBlockNFT = () => {
         </div>
     ) : (
         <div className="flex max-sm:flex-col gap-1 h-full justify-center items-center">
-            <div
-                className={cl(
-                    "flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1",
-                )}
-            >
+            <div className={cl("flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1")}>
                 {randomNFTs.map((_, idx) => (
                     <div
                         key={idx}
@@ -60,9 +55,7 @@ const AutoBlockNFT = () => {
                             "w-3 h-3 rounded-full cursor-pointer",
                             "transition-colors duration-300",
                             "hover:bg-light-text dark:hover:bg-dark-text",
-                            idx === activeNFT
-                                ? "bg-light-text dark:bg-dark-text"
-                                : "bg-light-text/25 dark:bg-dark-text/25",
+                            idx === activeNFT ? "bg-light-text dark:bg-dark-text" : "bg-light-text/25 dark:bg-dark-text/25",
                         )}
                         onClick={() => {
                             setActiveNFT(idx)
@@ -80,11 +73,7 @@ const AutoBlockNFT = () => {
                             idx === activeNFT ? "opacity-100" : "opacity-0",
                         )}
                     >
-                        <BlockNFT
-                            nftData={nft}
-                            glowColor="auto"
-                            additionalClasses="w-full h-full"
-                        />
+                        <BlockNFT nftData={nft} glowColor="auto" additionalClasses="w-full h-full" />
                     </div>
                 ))}
             </div>

@@ -1,9 +1,6 @@
 import { cn } from "../../../utils/cn"
 
-const SectionContainer = (props: {
-    children: React.ReactNode
-    additionalClasses?: string
-}) => {
+const SectionContainer = (props: { children: React.ReactNode; additionalClasses?: string }) => {
     return (
         <div
             className={cn(

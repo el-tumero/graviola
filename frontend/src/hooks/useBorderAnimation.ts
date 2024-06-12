@@ -2,11 +2,7 @@ import { useState, useEffect } from "react"
 import { getRandomRarity } from "../utils/getRarityBorder"
 import { RaritiesData } from "../types/RarityGroup"
 
-const useRandomRarityBorder = (
-    run: boolean,
-    ms: number,
-    rGroups: RaritiesData,
-): React.CSSProperties => {
+const useRandomRarityBorder = (run: boolean, ms: number, rGroups: RaritiesData): React.CSSProperties => {
     const [rarityBorder, setRarityBorder] = useState<React.CSSProperties>({})
 
     useEffect(() => {

@@ -35,16 +35,11 @@ const TradeUp = () => {
 
     const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
-    const [progressState, setProgressState] =
-        useState<TransactionStatus>("NONE")
-    const [progressMessage, setProgressMessage] = useState<string>(
-        tradeUpTxStatusMessages["NONE"],
-    )
+    const [progressState, setProgressState] = useState<TransactionStatus>("NONE")
+    const [progressMessage, setProgressMessage] = useState<string>(tradeUpTxStatusMessages["NONE"])
     const [progressBarVal, setProgressBarVal] = useState<number>(0)
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
-    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(
-        progressState,
-    )
+    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
 
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
@@ -70,9 +65,7 @@ const TradeUp = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromPerc(
-                formatBpToPercentage(nft.attributes[0].value),
-            )
+            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value))
 
             setProgressState("DONE")
             setProgressBarVal(100)
@@ -100,9 +93,7 @@ const TradeUp = () => {
         ; (async () => {
             let userOwnedTokens
             if (address) {
-                userOwnedTokens = await graviolaContext.contract?.ownedTokens(
-                    ethers.getAddress(address),
-                )
+                userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
             }
             userOwnedTokens &&
                 userOwnedTokens.forEach((token: bigint) => {
@@ -127,238 +118,129 @@ const TradeUp = () => {
         <FullscreenContainer>
             <Navbar />
             <ContentContainer additionalClasses="flex-col gap-4 h-full flex-grow">
-
                 <PageTitle title="Trade Up" />
 
-                {!contentReady
-                    ? (
-                        <SectionContainer additionalClasses="self-center w-fit justify-center">
-                            {isLoading
-                                ? <p>Loading...</p>
-                                : <p>You need to connect your wallet first!</p>
-                            }
-                        </SectionContainer>
-                    ) : (
-                        <div className="flex flex-col gap-3 justify-between items-center h-full flex-grow">
-                            <div className={cl(
+                {!contentReady ? (
+                    <SectionContainer additionalClasses="self-center w-fit justify-center">
+                        {isLoading ? <p>Loading...</p> : <p>You need to connect your wallet first!</p>}
+                    </SectionContainer>
+                ) : (
+                    <div className="flex flex-col gap-3 justify-between items-center h-full flex-grow">
+                        <div
+                            className={cl(
                                 "flex w-full h-full",
                                 "divide-x divide-light-border dark:divide-dark-border",
                                 "border border-light-border dark:border-dark-border",
-                                "rounded-xl"
-                            )}>
+                                "rounded-xl",
+                            )}
+                        >
+                            {/* Owned NFTs (Left panel) */}
+                            <div className={cl("flex basis-2/3", "flex-col", "p-6 max-sm:p-3")}>
+                                <div className={cl("flex-grow w-full h-0 overflow-auto", "rounded-xl")}>
+                                    <div
+                                        className={cl(
+                                            "grid gap-3 auto-rows-min",
+                                            "max-sm:grid-cols-2",
+                                            "max-md:grid-cols-3 md:grid-cols-4 xl:grid-cols-5",
+                                        )}
+                                    >
+                                        {contractNFTs.map((nft: NFT, i) => {
+                                            const percRarity = formatBpToPercentage(nft.attributes[0].value)
+                                            const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
+                                            const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
+                                            const [rarityLevel, rarityData] = getRarityFromPerc(percRarity)
 
-                                {/* Owned NFTs (Left panel) */}
-                                <div className={cl(
-                                    "flex basis-2/3",
-                                    "flex-col",
-                                    "p-6 max-sm:p-3",
-                                )}>
-
-                                    <div className="flex-grow w-full h-0 overflow-auto rounded-xl">
-                                        <div className="grid grid-cols-3 auto-rows-min gap-4">
-                                            {contractNFTs.map((nft: NFT, i) => {
-                                                const percRarity =
-                                                    formatBpToPercentage(
-                                                        nft.attributes[0].value,
-                                                    )
-                                                const keywordsArray: string[] =
-                                                    nft.description
-                                                        .split(":")
-                                                        .pop()!
-                                                        .trim()
-                                                        .split(",")
-                                                const keywords: string[] =
-                                                    keywordsArray.map(
-                                                        (keyword) =>
-                                                            keyword.trim(),
-                                                    )
-                                                const [
-                                                    rarityLevel,
-                                                    rarityData,
-                                                ] = getRarityFromPerc(
-                                                    percRarity
-                                                )
-
-                                                if (
-                                                    selectedGroup !== null &&
-                                                    selectedGroup !==
-                                                    rarityLevel
-                                                ) {
-                                                    return null
-                                                    // } else if (
-                                                    // !ownedTokenIds.includes(i)
-                                                    // ) {
-                                                    // return null
-                                                } else {
-                                                    return (
+                                            if (selectedGroup !== null && selectedGroup !== rarityLevel) {
+                                                return null
+                                                // } else if (
+                                                // !ownedTokenIds.includes(i)
+                                                // ) {
+                                                // return null
+                                            } else {
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className={cl(
+                                                            "relative flex w-fit h-fit flex-col justify-center items-center",
+                                                            "border border-light-border dark:border-dark-border rounded-xl gap-2",
+                                                        )}
+                                                    >
                                                         <div
-                                                            key={i}
                                                             className={`
-                                                                    relative flex w-fit h-fit flex-col justify-center items-center
-                                                                    gap-2 bg-light-bgLight/50 dark:bg-dark-bgLight/50
-                                                                    border-2 border-light-border dark:border-dark-border
-                                                                    p-4 rounded-xl
-                                                                `}
-                                                        >
-                                                            <p
-                                                                className={`
-                                                                    absolute top-0 left-0 p-2 z-10
-                                                                    rounded-xl bg-light-bgPrimary dark:bg-dark-bgPrimary
-                                                                    border border-light-border dark:border-dark-border
-                                                                `}
-                                                            >
-                                                                id: {i}
-                                                            </p>
-                                                            <div
-                                                                className={`
-                                                                        p-px hover:cursor-pointer
-                                                                        ${selectedIds.includes(
-                                                                    i,
-                                                                )
-                                                                        ? "brightness-50 hover:brightness-50"
-                                                                        : "hover:brightness-110"
-                                                                    }
+                                                                        m-3 hover:cursor-pointer
+                                                                        ${selectedIds.includes(i)
+                                                                    ? "brightness-50 hover:brightness-50"
+                                                                    : "hover:brightness-110"
+                                                                }
                                                                         `}
-                                                                style={{
-                                                                    borderRadius: 16,
-                                                                    borderWidth: 2,
-                                                                    borderColor:
-                                                                        rarityData.color,
-                                                                }}
-                                                                onClick={() => {
-                                                                    const indexOf =
-                                                                        selectedIds.indexOf(
-                                                                            i,
-                                                                        )
-                                                                    if (
-                                                                        indexOf !==
-                                                                        -1
-                                                                    ) {
-                                                                        if (
-                                                                            selectedIds.length ===
-                                                                            1
-                                                                        )
-                                                                            setSelectedGroup(
-                                                                                null,
-                                                                            )
-                                                                        setSelectedIds(
-                                                                            (
-                                                                                prev,
-                                                                            ) =>
-                                                                                prev.filter(
-                                                                                    (
-                                                                                        _id,
-                                                                                    ) =>
-                                                                                        i !==
-                                                                                        _id,
-                                                                                ),
-                                                                        )
-                                                                        return
-                                                                    }
-                                                                    if (
-                                                                        selectedIds.length ===
-                                                                        0
-                                                                    ) {
-                                                                        setSelectedGroup(
-                                                                            rarityLevel,
-                                                                        )
-                                                                    }
-                                                                    if (
-                                                                        selectedIds.length >=
-                                                                        3
-                                                                    )
-                                                                        return
-                                                                    setSelectedIds(
-                                                                        (
-                                                                            prev,
-                                                                        ) => [
-                                                                                ...prev,
-                                                                                i,
-                                                                            ],
-                                                                    )
-                                                                }}
-                                                            >
-                                                                <BlockNFT
-                                                                    nftData={nft}
-                                                                    glowColor={"auto"}
-                                                                // additionalClasses={`w-fit h-fit max-w-[14em]`}
-                                                                />
-                                                            </div>
-                                                            <div className="flex flex-col gap-2 justify-center items-center">
-                                                                {/* Keywords */}
-                                                                <div className="flex flex-wrap gap-1 justify-center items-center">
-                                                                    {keywords.map(
-                                                                        (
-                                                                            keyword: string,
-                                                                            i,
-                                                                        ) => {
-                                                                            return (
-                                                                                <div
-                                                                                    key={
-                                                                                        i
-                                                                                    }
-                                                                                    className={`
+                                                            style={{
+                                                                borderRadius: 16,
+                                                                borderWidth: 1,
+                                                                borderColor: rarityData.color,
+                                                            }}
+                                                            onClick={() => {
+                                                                const indexOf = selectedIds.indexOf(i)
+                                                                if (indexOf !== -1) {
+                                                                    if (selectedIds.length === 1) setSelectedGroup(null)
+                                                                    setSelectedIds((prev) => prev.filter((_id) => i !== _id))
+                                                                    return
+                                                                }
+                                                                if (selectedIds.length === 0) {
+                                                                    setSelectedGroup(rarityLevel)
+                                                                }
+                                                                if (selectedIds.length >= 3) return
+                                                                setSelectedIds((prev) => [...prev, i])
+                                                            }}
+                                                        >
+                                                            <BlockNFT
+                                                                nftData={nft}
+                                                                glowColor={"auto"}
+                                                                disableMetadataOnHover
+                                                                additionalClasses={`w-fit h-fit max-w-[12em]`}
+                                                            />
+                                                        </div>
+                                                        <div className="flex flex-col gap-2 justify-center items-center">
+                                                            {/* Keywords */}
+                                                            <div className="flex flex-wrap gap-1 justify-center items-center text-sm mb-3">
+                                                                {keywords.map((keyword: string, i) => {
+                                                                    return (
+                                                                        <div
+                                                                            key={i}
+                                                                            className={`
                                                                                     rounded-lg py-1 px-2 border
                                                                                     bg-light-bgPrimary dark:bg-dark-bgPrimary
                                                                                     border-light-border dark:border-dark-border
                                                                                 `}
-                                                                                >
-                                                                                    <p>
-                                                                                        {
-                                                                                            keyword
-                                                                                        }
-                                                                                    </p>
-                                                                                </div>
-                                                                            )
-                                                                        },
-                                                                    )}
-                                                                </div>
+                                                                        >
+                                                                            <p>{keyword}</p>
+                                                                        </div>
+                                                                    )
+                                                                })}
                                                             </div>
                                                         </div>
-                                                    )
-                                                }
-                                            })}
-                                        </div>
+                                                    </div>
+                                                )
+                                            }
+                                        })}
                                     </div>
-
-
-
-
                                 </div>
-
-                                {/* TradeUp Result (Right panel) */}
-                                <div className={cl(
-                                    "flex basis-1/3",
-                                    "justify-center items-center",
-                                    "p-6 max-sm:p-3"
-                                )}>
-                                    The panel thing
-                                </div>
-
                             </div>
 
-                            {/* Controls & Info (Bottom panel) */}
-                            <SectionContainer additionalClasses="justify-between items-center">
-
-                                <p>
-                                    <span>Status: </span>
-                                    <span className={cl(
-                                        "p-3 rounded-xl",
-                                        "bg-light-border/75 dark:bg-dark-border/75"
-                                    )}>
-                                        STATUS_TEXT
-                                    </span>
-                                </p>
-
-                                <Button
-                                    text="Trade"
-                                    disabled={false}
-                                    onClick={() => { }}
-                                />
-                            </SectionContainer>
+                            {/* TradeUp Result (Right panel) */}
+                            <div className={cl("flex basis-1/3", "justify-center items-center", "p-6 max-sm:p-3")}>The panel thing</div>
                         </div>
-                    )
-                }
+
+                        {/* Controls & Info (Bottom panel) */}
+                        <SectionContainer additionalClasses="justify-between items-center">
+                            <p>
+                                <span>Status: </span>
+                                <span className={cl("p-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>STATUS_TEXT</span>
+                            </p>
+
+                            <Button text="Trade" disabled={false} onClick={() => { }} />
+                        </SectionContainer>
+                    </div>
+                )}
             </ContentContainer>
         </FullscreenContainer>
     )

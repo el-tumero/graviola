@@ -1,10 +1,6 @@
 import "./App.css"
 import { useEffect, useState, ReactNode } from "react"
-import {
-    createWeb3Modal,
-    defaultConfig,
-    useWeb3ModalProvider,
-} from "@web3modal/ethers/react"
+import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from "@web3modal/ethers/react"
 import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from "ethers"
 import { Graviola } from "../../contracts/typechain-types/Graviola"
 import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/Graviola__factory"
@@ -23,18 +19,14 @@ import { fallbackNFT } from "./utils/fallbackNFT"
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[readonly] connecting to contract...")
-    const provider = new JsonRpcProvider(
-        "https://ethereum-sepolia-rpc.publicnode.com",
-    )
+    const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
     console.log("[readonly] connected")
     return graviola as unknown as Graviola
 }
 
 // Conn to contract with wallet
-async function connectContractWallet(
-    walletProvider: Eip1193Provider,
-): Promise<Graviola> {
+async function connectContractWallet(walletProvider: Eip1193Provider): Promise<Graviola> {
     console.log("[wallet] connecting to contract...")
     const provider = new BrowserProvider(walletProvider)
     const signer = await provider.getSigner()
@@ -118,18 +110,14 @@ const App = (props: { children: ReactNode }) => {
             console.log("[info] fetched collection ", collection)
             setCollection((prev) => [...prev, ...collection])
 
-            const raritiesData = rarityGroupsData.reduce<
-                Record<RarityLevel, RarityGroupData>
-            >(
+            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>(
                 (acc, groupData, index) => {
                     // Cast keywords
-                    const keywords: Keyword[] = groupData.keywords.map(
-                        (keyword) => ({
-                            name: keyword[0],
-                            lowerRange: Number(keyword[1]),
-                            upperRange: Number(keyword[2]),
-                        }),
-                    )
+                    const keywords: Keyword[] = groupData.keywords.map((keyword) => ({
+                        name: keyword[0],
+                        lowerRange: Number(keyword[1]),
+                        upperRange: Number(keyword[2]),
+                    }))
 
                     const rarityGroupData: RarityGroupData = {
                         name: groupData.name,
@@ -155,24 +143,16 @@ const App = (props: { children: ReactNode }) => {
     }, [graviola])
 
     useEffect(() => {
-        if (walletProvider)
-            connectContractWallet(walletProvider).then((contract) =>
-                setGraviola(contract),
-            )
+        if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
         // override readonly contract conn
-        else
-            connectContract().then((noWalletContract) =>
-                setGraviola(noWalletContract),
-            )
+        else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
     }, [walletProvider])
 
     return loading ? (
         <Loading />
     ) : (
         <GraviolaContext.Provider value={graviolaContextValue}>
-            <AppContext.Provider value={appContextValue}>
-                {props.children}
-            </AppContext.Provider>
+            <AppContext.Provider value={appContextValue}>{props.children}</AppContext.Provider>
         </GraviolaContext.Provider>
     )
 }

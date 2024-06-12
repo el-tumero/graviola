@@ -7,21 +7,10 @@ interface SectionTitleProps {
     additionalClasses?: string
 }
 
-const SectionTitle = ({
-    title,
-    secondaryContent,
-    additionalClasses,
-}: SectionTitleProps) => {
+const SectionTitle = ({ title, secondaryContent, additionalClasses }: SectionTitleProps) => {
     return (
-        <div
-            className={cn(
-                "flex w-full flex-col gap-1 justify-start items-start",
-                additionalClasses,
-            )}
-        >
-            <p className={cl(
-                "text-2xl font-title font-semibold"
-            )}>{title}</p>
+        <div className={cn("flex w-full flex-col gap-1 justify-start items-start", additionalClasses)}>
+            <p className={cl("text-2xl font-title font-semibold")}>{title}</p>
             {secondaryContent && typeof secondaryContent === "string" ? (
                 <p className="text-xl">{secondaryContent}</p>
             ) : (

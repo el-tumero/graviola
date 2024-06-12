@@ -16,14 +16,7 @@ const Link = ({ text, href, openInNewTab, additionalClasses }: LinkProps) => {
             rel={openInNewTab ? "noopener noreferrer" : ""}
             tabIndex={0}
         >
-            <p
-                className={cn(
-                    "hover:underline hover:cursor-pointer",
-                    additionalClasses,
-                )}
-            >
-                {text}
-            </p>
+            <p className={cn("hover:underline hover:cursor-pointer", additionalClasses)}>{text}</p>
         </a>
     )
 }

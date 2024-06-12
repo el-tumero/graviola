@@ -7,10 +7,7 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import {
-    useWeb3ModalAccount,
-    useWeb3ModalProvider,
-} from "@web3modal/ethers/react"
+import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import { generateTxStatusMessages } from "../utils/statusMessages"
@@ -32,7 +29,6 @@ export interface NFTExt extends NFT {
 }
 
 const Generate = () => {
-
     const navigate = useNavigate()
     const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
@@ -40,14 +36,9 @@ const Generate = () => {
 
     const { isConnected, address } = useWeb3ModalAccount()
 
-    const [progressState, setProgressState] =
-        useState<TransactionStatus>(isConnected ? "NONE" : "WALLET_NOT_CONNECTED")
-    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(
-        progressState,
-    )
-    const [progressMessage, setProgressMessage] = useState<string>(
-        generateTxStatusMessages["NONE"],
-    )
+    const [progressState, setProgressState] = useState<TransactionStatus>(isConnected ? "NONE" : "WALLET_NOT_CONNECTED")
+    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
+    const [progressMessage, setProgressMessage] = useState<string>(generateTxStatusMessages["NONE"])
     const [progressBarVal, setProgressBarVal] = useState<number>(0)
 
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
@@ -78,9 +69,7 @@ const Generate = () => {
             // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
             // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
 
-            const [rarityLevel, rarityData] = getRarityFromPerc(
-                formatBpToPercentage(nft.attributes[0].value),
-            )
+            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value))
 
             // console.log("rarityLevel from conv:  ", rarityLevel)
 
@@ -123,7 +112,6 @@ const Generate = () => {
 
             <ContentContainer additionalClasses="flex-col gap-4">
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
-
                     <PageTitle title="NFT Generator" additionalClasses="" />
 
                     <GenerateContainer
@@ -135,9 +123,7 @@ const Generate = () => {
 
                     {/* Progress bar */}
                     {progressBarVal !== 0 && (
-                        <div
-                            className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:-dark-border shadow-inner`}
-                        >
+                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:-dark-border shadow-inner`}>
                             <div
                                 style={{
                                     width: `${progressBarVal}%`,
@@ -147,31 +133,21 @@ const Generate = () => {
                         </div>
                     )}
 
-                    <div className={cl(
-                        "flex w-fit h-fit p-3 rounded-xl",
-                        "border border-light-border dark:border-dark-border",
-                        "text-lg"
-                    )}>
+                    <div className={cl("flex w-fit h-fit p-3 rounded-xl", "border border-light-border dark:border-dark-border", "text-lg")}>
                         {progressMessage}
                     </div>
 
                     {progressState === "NONE" && (
                         <Button
-                            text={
-                                isConnected
-                                    ? "Generate!"
-                                    : "Connect your wallet first"
-                            }
+                            text={isConnected ? "Generate!" : "Connect your wallet first"}
                             disabled={!isConnected || progressState !== "NONE"}
                             onClick={async () => {
                                 setProgressState("CONFIRM_TX")
-                                const estFee =
-                                    (await graviolaContext.contract?.estimateFee()) as bigint
+                                const estFee = (await graviolaContext.contract?.estimateFee()) as bigint
                                 try {
-                                    const tx =
-                                        await graviolaContext.contract?.mint({
-                                            value: estFee + parseEther("0.01"),
-                                        })
+                                    const tx = await graviolaContext.contract?.mint({
+                                        value: estFee + parseEther("0.01"),
+                                    })
                                     const receipt = await tx?.wait()
                                     if (receipt) {
                                         console.log("OK")
@@ -180,10 +156,7 @@ const Generate = () => {
                                     }
                                 } catch (err) {
                                     setProgressState("TX_REJECTED")
-                                    setTimeout(
-                                        () => setProgressState("NONE"),
-                                        3000,
-                                    )
+                                    setTimeout(() => setProgressState("NONE"), 3000)
                                     return
                                 }
                             }}
@@ -201,7 +174,7 @@ const Generate = () => {
                                     className="text-lg w-fit font-thin font-content"
                                     style={{
                                         borderBottomWidth: 1,
-                                        borderBottomColor: rGroup.color
+                                        borderBottomColor: rGroup.color,
                                     }}
                                 >
                                     {rGroup.name}
@@ -233,16 +206,14 @@ const Generate = () => {
                     ))}
                 </div>
 
-                <div className={cl(
-                    "flex w-full h-fit justify-end items-center p-3 mt-3",
-                    "rounded-xl border border-light-border dark:border-dark-border"
-                )}>
-                    <Button
-                        text="See all Keywords"
-                        onClick={() => navigate(routerPaths.home)}
-                    />
+                <div
+                    className={cl(
+                        "flex w-full h-fit justify-end items-center p-3 mt-3",
+                        "rounded-xl border border-light-border dark:border-dark-border",
+                    )}
+                >
+                    <Button text="See all Keywords" onClick={() => navigate(routerPaths.home)} />
                 </div>
-
             </ContentContainer>
         </FullscreenContainer>
     )

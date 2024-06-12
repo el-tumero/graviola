@@ -18,15 +18,8 @@ interface BlockNFTProps {
     disableMetadataOnHover?: true // Disable metadata object element on hover
 }
 
-const BlockNFT = ({
-    nftData,
-    glowColor,
-    disableMetadataOnHover,
-    additionalClasses,
-}: BlockNFTProps) => {
-    const [, rData] = getRarityFromPerc(
-        formatBpToPercentage(nftData.attributes[0].value),
-    )
+const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasses }: BlockNFTProps) => {
+    const [, rData] = getRarityFromPerc(formatBpToPercentage(nftData.attributes[0].value))
     let style: React.CSSProperties = {}
     if (glowColor !== "none") {
         if (glowColor === "auto") style = getRarityBorder(rData).style
@@ -53,19 +46,13 @@ const BlockNFT = ({
         >
             <img
                 draggable={false}
-                className={cl(
-                    "w-full h-full rounded-lg",
-                    `nft-${nftData.image}`,
-                )}
+                className={cl("w-full h-full rounded-lg", `nft-${nftData.image}`)}
                 src={convertToIfpsURL(nftData.image)}
                 alt="NFT"
             />
 
             {!disableMetadataOnHover && (
-                <Tooltip
-                    children={<BlockNFTMetadata metadata={metadata} />}
-                    anchorSelect={`.nft-${nftData.image}`}
-                />
+                <Tooltip children={<BlockNFTMetadata metadata={metadata} />} anchorSelect={`.nft-${nftData.image}`} />
             )}
         </div>
     )

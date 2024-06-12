@@ -4,8 +4,8 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                title: ['"Noto Sans Mono"', 'monospace'],
-                content: ['"Public Sans"', 'sans-serif']
+                title: ['"Noto Sans Mono"', "monospace"],
+                content: ['"Public Sans"', "sans-serif"],
             },
 
             transitionDuration: {

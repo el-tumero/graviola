@@ -4,9 +4,7 @@ import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 
 // Get RarityLevel and RGroupData from NFT rarity percentage (formatted)
-export function getRarityFromPerc(
-    threshold: number,
-): [RarityLevel, RarityGroupData] {
+export function getRarityFromPerc(threshold: number): [RarityLevel, RarityGroupData] {
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
@@ -17,9 +15,7 @@ export function getRarityFromPerc(
         prevPerc = 100
 
     for (const rarityLevel of Object.keys(rarities).sort(
-        (a, b) =>
-            rarities[b as RarityLevel].rarityPerc -
-            rarities[a as RarityLevel].rarityPerc,
+        (a, b) => rarities[b as RarityLevel].rarityPerc - rarities[a as RarityLevel].rarityPerc,
     ) as RarityLevel[]) {
         const data = rarities[rarityLevel]
         perc += data.rarityPerc
@@ -32,16 +28,12 @@ export function getRarityFromPerc(
 }
 
 // Get RarityLevel, RGroupData from RarityLevel enum type value
-export function getRarityFromLevel(
-    rarityLevel: RarityLevel,
-): [RarityLevel, RarityGroupData] {
+export function getRarityFromLevel(rarityLevel: RarityLevel): [RarityLevel, RarityGroupData] {
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
     if (rarityLevel in rarities) {
         return [rarityLevel, rarities[rarityLevel]]
     }
-    throw new Error(
-        `Rarity level ${rarityLevel} does not exist in the rarities data.`,
-    )
+    throw new Error(`Rarity level ${rarityLevel} does not exist in the rarities data.`)
 }

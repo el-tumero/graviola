@@ -35,10 +35,7 @@ const Tooltip = (props: ITooltip) => {
         <BaseTooltip
             {...props}
             noArrow={true}
-            border={`1px solid ${theme === "dark"
-                ? twPalette.dark.border
-                : twPalette.light.border
-                }`}
+            border={`1px solid ${theme === "dark" ? twPalette.dark.border : twPalette.light.border}`}
             style={{
                 ...themeStyles,
                 userSelect: "none",
