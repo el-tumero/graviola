@@ -5,6 +5,7 @@ import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
+import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import {
     useWeb3ModalAccount,
@@ -12,15 +13,16 @@ import {
 } from "@web3modal/ethers/react"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
-import { nftCreationStatusMessages } from "../types/NFTCreationStatus"
+import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
-import { NFTCreationStatus } from "../types/NFTCreationStatus"
+import { TransactionStatus } from "../types/TransactionStatus"
 import { parseEther } from "ethers"
 import { Graviola } from "../../../contracts/typechain-types/Graviola"
-// import { Graviola } from "../../../contracts/typechain-types/contracts/Graviola"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import ResultText from "../components/ui/ResultText"
 import { RaritiesData } from "../types/RarityGroup"
+import router, { routerPaths } from "../router"
+import { useNavigate } from "react-router-dom"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -29,6 +31,8 @@ export interface NFTExt extends NFT {
 }
 
 const Generate = () => {
+
+    const navigate = useNavigate()
     const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
     const rGroups = graviolaContext.rarities as RaritiesData
@@ -36,12 +40,12 @@ const Generate = () => {
     const { isConnected, address } = useWeb3ModalAccount()
 
     const [progressState, setProgressState] =
-        useState<NFTCreationStatus>("NONE")
+        useState<TransactionStatus>(isConnected ? "NONE" : "WALLET_NOT_CONNECTED")
     const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(
         progressState,
     )
     const [progressMessage, setProgressMessage] = useState<string>(
-        nftCreationStatusMessages["NONE"],
+        generateTxStatusMessages["NONE"],
     )
     const [progressBarVal, setProgressBarVal] = useState<number>(0)
 
@@ -105,7 +109,11 @@ const Generate = () => {
     }, [])
 
     useEffect(() => {
-        setProgressMessage(nftCreationStatusMessages[progressState])
+        if (!isConnected) setProgressState("WALLET_NOT_CONNECTED")
+    }, [isConnected])
+
+    useEffect(() => {
+        setProgressMessage(generateTxStatusMessages[progressState])
     }, [progressState])
 
     return (
@@ -113,10 +121,9 @@ const Generate = () => {
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col gap-4">
-                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
-                    <h1 className="font-bold text-2xl">NFT Generator</h1>
+                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center mt-12">
+                    <h1 className="font-bold font-title text-2xl">NFT Generator</h1>
 
-                    {/* Img container */}
                     <GenerateContainer
                         rolledNFT={rolledNFT}
                         isPulsating={!isConnected}
@@ -127,7 +134,7 @@ const Generate = () => {
                     {/* Progress bar */}
                     {progressBarVal !== 0 && (
                         <div
-                            className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border shadow-inner`}
+                            className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:-dark-border shadow-inner`}
                         >
                             <div
                                 style={{
@@ -138,14 +145,13 @@ const Generate = () => {
                         </div>
                     )}
 
-                    {/* State/Progress text */}
-                    {progressState === "DONE" ? (
-                        <ResultText rGroup={rolledNFT!.rarityData} />
-                    ) : (
-                        <span className="text-lg font-bold">
-                            {progressMessage}
-                        </span>
-                    )}
+                    <div className={cl(
+                        "flex w-fit h-fit p-3 rounded-xl",
+                        "border border-light-border dark:border-dark-border",
+                        "text-lg"
+                    )}>
+                        {progressMessage}
+                    </div>
 
                     {progressState === "NONE" && (
                         <Button
@@ -154,7 +160,7 @@ const Generate = () => {
                                     ? "Generate!"
                                     : "Connect your wallet first"
                             }
-                            enabled={isConnected && progressState === "NONE"}
+                            disabled={!isConnected || progressState !== "NONE"}
                             onClick={async () => {
                                 setProgressState("CONFIRM_TX")
                                 const estFee =
@@ -183,38 +189,58 @@ const Generate = () => {
                     )}
                 </div>
 
-                <SectionTitle title={"Keywords"} />
-                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center p-4">
+                <SectionTitle additionalClasses="max-sm:justify-center max-sm:items-center" title={"Keywords"} />
+
+                <div className="sm:inline-grid md:grid-cols-5 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-auto font-bold mx-auto">
                     {Object.entries(rGroups).map(([, rGroup], i) => (
-                        <div
-                            key={i}
-                            className="flex flex-col gap-4 w-full h-full"
-                        >
-                            <div className="flex flex-col gap-2 mb-6">
-                                <p className="font-bold text-xl mb-2">
+                        <div key={i} className="flex flex-col gap-3 w-full h-full items-center">
+                            <div className="flex flex-col w-fit h-fit gap-3">
+                                <p
+                                    className="text-lg w-fit font-thin font-content"
+                                    style={{
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: rGroup.color
+                                    }}
+                                >
                                     {rGroup.name}
                                 </p>
-                                <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
-                                    {rGroup.keywords.map(
-                                        (keyword, keywordIndex) => (
+                                <div className="flex flex-wrap gap-2">
+                                    {rGroup.keywords.slice(0, 6).map((keyword, idx, arr) => {
+                                        const isLastItem = idx === arr.length - 1
+                                        return (
                                             <span
-                                                key={keywordIndex}
-                                                className="flex justify-center items-center py-2 px-3 rounded-md bg-light-bgLight/75 dark:bg-dark-bgLight/75"
+                                                key={idx}
+                                                className={cl(
+                                                    "flex justify-center items-center w-fit p-2",
+                                                    "font-thin font-content",
+                                                    "rounded-xl bg-light-bgPrimary/25 dark:bg-dark-bgPrimary/25",
+                                                )}
                                                 style={{
-                                                    borderWidth: 2,
-                                                    borderRadius: 8,
+                                                    borderWidth: 1,
+                                                    borderRadius: 6,
                                                     borderColor: rGroup.color,
                                                 }}
                                             >
-                                                {keyword.name}
+                                                {isLastItem ? "..." : keyword.name}
                                             </span>
-                                        ),
-                                    )}
+                                        )
+                                    })}
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
+
+                <div className={cl(
+                    "flex w-full h-fit justify-end items-center p-3 mt-3",
+                    "rounded-xl border border-light-border dark:border-dark-border"
+                )}>
+                    <Button
+                        text="See all Keywords"
+                        onClick={() => navigate(routerPaths.home)}
+                    />
+                </div>
+
             </ContentContainer>
         </FullscreenContainer>
     )

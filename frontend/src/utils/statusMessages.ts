@@ -1,16 +1,10 @@
-export type NFTCreationStatus =
-    | "NONE"
-    | "CONFIRM_TX"
-    | "TX_REJECTED"
-    | "BEFORE_MINT"
-    | "MINTED"
-    | "WAIT_IMAGE"
-    | "DONE"
+import { TransactionStatus } from "../types/TransactionStatus"
 
-export const nftCreationTradeUpStatusMessages: Record<
-    NFTCreationStatus,
+export const generateTxStatusMessages: Record<
+    TransactionStatus,
     string
 > = {
+    WALLET_NOT_CONNECTED: "Connect your wallet first!",
     NONE: "Are you ready for some upgrade?",
     CONFIRM_TX: "Waiting for transaction confirmation...",
     TX_REJECTED:
@@ -21,8 +15,9 @@ export const nftCreationTradeUpStatusMessages: Record<
     DONE: "",
 }
 
-export const nftCreationStatusMessages: Record<NFTCreationStatus, string> = {
-    NONE: "Are you ready to try your luck?",
+export const tradeUpTxStatusMessages: Record<TransactionStatus, string> = {
+    WALLET_NOT_CONNECTED: "Connect your wallet fist!",
+    NONE: "Ready to roll?",
     CONFIRM_TX: "Waiting for transaction confirmation...",
     TX_REJECTED:
         "Either something went wrong or the transaction was rejected. Care to try again?",

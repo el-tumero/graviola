@@ -106,6 +106,7 @@ const Navbar = () => {
                             "flex items-center gap-0.5 cursor-pointer",
                             "px-3 py-1 rounded-xl",
                             "hover:bg-accent/25",
+                            "transition-colors duration-300"
                         )}
                         onClick={() => navigate(routerPaths.home)}
                     >

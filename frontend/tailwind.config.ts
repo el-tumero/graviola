@@ -51,7 +51,7 @@ export default {
                     textSecondary: "#e3e3e3",
                     bgPrimary: "#0c0c0d",
                     bgLight: "#252625",
-                    bgDark: "#111211",
+                    bgDark: "#000000",
                     border: "#1e1e1e",
                 },
             },

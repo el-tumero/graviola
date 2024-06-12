@@ -6,7 +6,7 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import AutoBlockNFT from "../components/AutoBlockNFT"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-import { routerPaths } from "../router"
+import router, { routerPaths } from "../router"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import BlockNFT from "../components/BlockNFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
@@ -18,6 +18,7 @@ import MetadataMock, {
     MetadataMockProperty,
 } from "../components/ui/MetadataMock"
 import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
+import Button from "../components/ui/Button"
 
 function Home() {
     const navigate = useNavigate()
@@ -78,7 +79,7 @@ function Home() {
                                 Own a piece of our limited-time, algorithmically generated character NFTs!
                                 Each one is a fun, unique creation blending art and tech.
                                 It's like collecting digital trading cards with a twist.
-                                Dive in, grab a quirky NFT, and join our chill community of enthusiasts.
+                                Dive in, grab a quirky NFT, and join our chill community of enthusiasts
                             </h2>
                         </div>
 
@@ -99,31 +100,24 @@ function Home() {
                                 "max-sm:flex-col mt-4 mb-8",
                             ])}
                         >
-                            <div
+                            <Button
+                                text="Get yours now!"
                                 onClick={() => navigate(routerPaths.generate)}
-                                className={cl(
-                                    "flex justify-between items-center gap-1.5 p-3 select-none",
-                                    "rounded-xl transition-transform duration-300",
-                                    "hover:translate-x-2 hover:cursor-pointer",
-                                    "border border-accent bg-gradient-to-tr from-accent/25 to-accent/40",
-                                )}
-                            >
-                                <p>Get yours now!</p>
-                                {icons.arrowRight}
-                            </div>
-                            <div
+                                additionalClasses={`
+                                    hover:translate-x-2 hover:cursor-pointer
+                                    border border-accent bg-gradient-to-tr from-accent/25 to-accent/40
+                                    hover:border-accent dark:hover:border-accent
+                                `}
+                                arrowIcon={true}
+                            />
+                            <Button
+                                text="Browse Collection"
                                 onClick={() => navigate(routerPaths.collection)}
-                                className={cl(
-                                    "flex justify-between items-center gap-1.5 p-3 select-none",
-                                    "rounded-xl transition-all duration-300",
-                                    "hover:translate-x-2 hover:cursor-pointer",
-                                    "border border-transparent",
-                                    "hover:border-light-border hover:dark:border-dark-border",
-                                )}
-                            >
-                                <p>Browse Collection</p>
-                                {icons.arrowRight}
-                            </div>
+                                additionalClasses={`
+                                    hover:translate-x-2 hover:cursor-pointer
+                                `}
+                                arrowIcon={true}
+                            />
                         </div>
                     </div>
 
