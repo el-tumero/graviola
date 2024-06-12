@@ -2,6 +2,7 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useContext, useEffect, useRef, useState } from "react"
+import { clsx as cl } from "clsx"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
@@ -13,16 +14,17 @@ import { formatBpToPercentage } from "../utils/format"
 import { ethers } from "ethers"
 import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
+import PageTitle from "../components/ui/layout/PageTitle"
 
-type CollectionMode = "Everyone" | "My Drops"
+type DropFilterMode = "Everyone's Drops" | "My Drops"
 
-const Collection = () => {
+const Drops = () => {
     const { isConnected, address } = useWeb3ModalAccount()
     const graviolaContext = useContext(GraviolaContext)
     const contractNFTs = graviolaContext.collection as NFT[]
     const rGroups = graviolaContext.rarities as RaritiesData
-    const [collectionMode, setCollectionMode] =
-        useState<CollectionMode>("Everyone")
+    const [filterMode, setFilterMode] =
+        useState<DropFilterMode>("Everyone's Drops")
     const [ownedTokensIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [fetchingCollection, setFetchingCollection] = useState<boolean>(false)
@@ -91,41 +93,49 @@ const Collection = () => {
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col gap-4">
-                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center my-28">
-                    <h1 className="font-bold text-2xl">Collection</h1>
-                </div>
+
+                <PageTitle title="Drops" />
 
                 {isLoading ? (
                     <p>Fetching data...</p>
                 ) : !isConnected ? (
-                    <p className="self-center">
-                        You need to connect your wallet to see your drops
-                    </p>
+                    <div className={cl(
+                        "flex w-full h-fit justify-center items-center mt-3",
+                    )}>
+                        <p className={"p-3 rounded-xl border border-light-border dark:border-dark-border"}>
+                            You need to connect your wallet to see Drops
+                        </p>
+                    </div>
                 ) : (
                     <>
-                        <SectionTitle title={"Dropped NFTs"} />
-
-                        <div className="flex justify-between items-center mb-4 max-sm:flex-col max-sm:gap-2">
-                            <p className="text-xl">
+                        <div className={cl(
+                            "flex justify-between items-center",
+                            "max-sm:flex-col max-sm:gap-3 max-sm:mt-3 p-3 rounded-xl",
+                            "border border-light-border dark:border-dark-border"
+                        )}>
+                            <p>
                                 Showing:{" "}
-                                <span className="font-bold">
-                                    {collectionMode.toLowerCase()}
+                                <span className={cl(
+                                    "font-normal font-content p-3 rounded-xl",
+                                    "bg-light-border/50 dark:bg-dark-border/50"
+                                )}>
+                                    {filterMode.toLowerCase()}
                                 </span>
                             </p>
                             <div className="flex gap-3">
                                 <Button
                                     text="Refresh"
                                     onClick={() => fetchCollectionTokens()}
-                                    enabled={!fetchingCollection}
+                                    disabled={fetchingCollection}
                                 />
                                 <Button
-                                    text={`Change to ${collectionMode === "My Drops" ? "all drops" : "my drops only"}`}
+                                    text={`See ${filterMode === "My Drops" ? "all drops" : "my drops only"}`}
                                     onClick={() => {
                                         const invertedCollectionMode =
-                                            collectionMode === "My Drops"
-                                                ? "Everyone"
+                                            filterMode === "My Drops"
+                                                ? "Everyone's Drops"
                                                 : "My Drops"
-                                        setCollectionMode(
+                                        setFilterMode(
                                             invertedCollectionMode,
                                         )
                                     }}
@@ -133,10 +143,15 @@ const Collection = () => {
                             </div>
                         </div>
 
-                        <div className="sm:grid md:grid-cols-4 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-full font-bold">
+                        <div className={cl(
+                            "grid gap-4 w-full",
+                            "max-sm:grid-cols-2",
+                            "max-md:grid-cols-3 md:grid-cols-4",
+                            "xl:grid-cols-6",
+                        )}>
                             <CollectionList
                                 contractNFTs={contractNFTs}
-                                collectionMode={collectionMode}
+                                collectionMode={filterMode}
                                 ownedTokenIds={ownedTokensIds}
                                 rGroups={rGroups}
                             />
@@ -180,7 +195,7 @@ const Collection = () => {
 
 const CollectionList = (props: {
     contractNFTs: Array<NFT>
-    collectionMode: CollectionMode
+    collectionMode: DropFilterMode
     ownedTokenIds: Array<number>
     rGroups: RaritiesData
 }) => {
@@ -223,12 +238,11 @@ const CollectionList = (props: {
                                 }}
                             >
                                 {/* TODO: Fix */}
-                                {/* <BlockNFT
-                                    src={convertToIfpsURL(nft.image)}
-                                    glow={false}
-                                    disableMargin={true}
+                                <BlockNFT
+                                    nftData={nft}
+                                    glowColor={"auto"}
                                     additionalClasses={`w-fit h-fit max-w-[14em]`}
-                                /> */}
+                                />
                             </div>
                             <div className="flex flex-col gap-2 justify-center items-center">
                                 {/* Id */}
@@ -276,4 +290,4 @@ const CollectionList = (props: {
         </>
     )
 }
-export default Collection
+export default Drops

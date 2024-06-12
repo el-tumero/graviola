@@ -37,7 +37,7 @@ export default {
             },
 
             colors: {
-                accent: "#28b03d",
+                accent: "#2cde59",
                 light: {
                     text: "#000",
                     textSecondary: "#1f1f1f",

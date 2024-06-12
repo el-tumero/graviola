@@ -1,6 +1,6 @@
 import { TransactionStatus } from "../types/TransactionStatus"
 
-export const generateTxStatusMessages: Record<
+export const tradeUpTxStatusMessages: Record<
     TransactionStatus,
     string
 > = {
@@ -15,9 +15,9 @@ export const generateTxStatusMessages: Record<
     DONE: "",
 }
 
-export const tradeUpTxStatusMessages: Record<TransactionStatus, string> = {
+export const generateTxStatusMessages: Record<TransactionStatus, string> = {
     WALLET_NOT_CONNECTED: "Connect your wallet fist!",
-    NONE: "Ready to roll?",
+    NONE: "Ready to mint your new NFT?",
     CONFIRM_TX: "Waiting for transaction confirmation...",
     TX_REJECTED:
         "Either something went wrong or the transaction was rejected. Care to try again?",

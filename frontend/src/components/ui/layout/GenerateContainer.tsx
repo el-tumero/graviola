@@ -53,7 +53,7 @@ const GenerateContainer = ({
             }
             className={cn(
                 "flex justify-center items-center",
-                "w-64 h-64 p-4 m-8 rounded-xl",
+                "w-64 h-64 p-4 rounded-xl",
                 "bg-light-bgDark dark:bg-dark-bgDark",
                 "border-2 border-light-border dark:border-dark-border",
                 rolledNFT && breathingBorderClassNames,

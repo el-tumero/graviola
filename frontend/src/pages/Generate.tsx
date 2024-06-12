@@ -23,6 +23,7 @@ import ResultText from "../components/ui/ResultText"
 import { RaritiesData } from "../types/RarityGroup"
 import router, { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
+import PageTitle from "../components/ui/layout/PageTitle"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -121,8 +122,9 @@ const Generate = () => {
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col gap-4">
-                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center mt-12">
-                    <h1 className="font-bold font-title text-2xl">NFT Generator</h1>
+                <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
+
+                    <PageTitle title="NFT Generator" additionalClasses="" />
 
                     <GenerateContainer
                         rolledNFT={rolledNFT}

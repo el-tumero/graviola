@@ -1,10 +1,10 @@
 import { useState, useContext } from "react"
 import Logo from "../../assets/logo.webp"
-import NavItemText from "./NavItemText"
 import NavElement from "./NavElement"
 import { useNavigate } from "react-router-dom"
 import { routerPaths } from "../../router"
 import { clsx as cl } from "clsx"
+import { openURL } from "../../utils/openURL"
 import NavListDesktop from "./NavList"
 import icons from "../../icons"
 import { AppContext } from "../../contexts/AppContext"
@@ -16,64 +16,47 @@ const Navbar = () => {
 
     const navItems: React.ReactNode[] = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
-            <NavItemText text="Generate" />
+            <p>Generate</p>
         </NavElement>,
 
-        <NavElement onClick={() => navigate(routerPaths.collection)}>
-            <NavItemText text="Collection" />
+        <NavElement onClick={() => navigate(routerPaths.drops)}>
+            <p>Drops</p>
         </NavElement>,
 
         <NavElement onClick={() => navigate(routerPaths.tradeup)}>
-            <NavItemText text="Trade Up" />
+            <p>Trade Up</p>
         </NavElement>,
 
-        <NavElement>
+        <NavElement onClick={() => openURL("https://github.com/el-tumero/graviola")}>
             <div
                 className={cl(
                     "flex w-min hover:cursor-pointer",
-                    "opacity-75 hover:opacity-100",
                     "max-lg:w-full justify-center items-center",
                 )}
-                onClick={() =>
-                    window.open(
-                        "https://github.com/el-tumero/graviola",
-                        "_blank",
-                        "noopener,noreferrer",
-                    )
-                }
+
             >
                 {icons.github}
             </div>
         </NavElement>,
 
-        <NavElement>
+        <NavElement onClick={() => openURL("https://github.com/el-tumero/graviola")}>
             <div
                 className={cl(
                     "flex w-auto h-6 hover:cursor-pointer",
-                    "opacity-75 hover:opacity-100",
                     "max-lg:w-full justify-center items-center",
                 )}
-                onClick={() =>
-                    window.open(
-                        "https://github.com/el-tumero/graviola",
-                        "_blank",
-                        "noopener,noreferrer",
-                    )
-                }
             >
                 {icons.discordLogo}
             </div>
         </NavElement>,
 
-        <NavElement>
+        <NavElement onClick={() => toggleTheme()}>
             <div
                 className={cl(
                     "flex justify-center items-center",
                     "w-full h-6 cursor-pointer",
-                    "opacity-75 hover:opacity-100",
                     "text-light-text dark:text-dark-text",
                 )}
-                onClick={() => toggleTheme()}
             >
                 {theme === "dark" ? icons.darkTheme : icons.lightTheme}
             </div>
@@ -118,12 +101,9 @@ const Navbar = () => {
                         >
                             <img className="w-full h-auto mb-1" src={Logo} />
                         </div>
-                        <NavItemText
-                            text={"GraviolaNFT"}
-                            additionalClasses={
-                                "font-bold font-mono text-accent opacity-100"
-                            }
-                        />
+                        <p className="font-semibold font-mono text-accent opacity-100">
+                            GraviolaNFT
+                        </p>
                     </div>
 
                     <div className="max-lg:hidden lg:visible">

@@ -111,8 +111,8 @@ function Home() {
                                 arrowIcon={true}
                             />
                             <Button
-                                text="Browse Collection"
-                                onClick={() => navigate(routerPaths.collection)}
+                                text="Browse Drops"
+                                onClick={() => navigate(routerPaths.drops)}
                                 additionalClasses={`
                                     hover:translate-x-2 hover:cursor-pointer
                                 `}
@@ -206,14 +206,14 @@ function Home() {
                                             </div>
                                             <div className="flex flex-col justify-center items-center w-fit h-fit">
                                                 <p
-                                                    className="font-bold"
+                                                    className="mt-2 font-normal font-content"
                                                     style={{
                                                         color: rarityGroup.color,
                                                     }}
                                                 >
                                                     {rarityGroup.name}
                                                 </p>
-                                                <span className="font-bold">
+                                                <span>
                                                     {rarityGroup.rarityPerc}%
                                                 </span>
                                             </div>
