@@ -15,6 +15,7 @@ import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
 import PageTitle from "../components/ui/layout/PageTitle"
 import icons from "../icons"
+import SectionContainer from "../components/ui/layout/SectionContainer"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"
 
@@ -102,20 +103,12 @@ const Drops = () => {
                 <PageTitle title="Drops" />
 
                 {!contentReady ? (
-                    <div className={cl(
-                        "flex w-full h-fit justify-center items-center mt-3",
-                    )}>
-                        <p className={cl(
-                            "p-3 rounded-xl",
-                            "border border-light-border dark:border-dark-border"
-                        )}>
-                            {isLoading ?
-                                <p>Fetching drops...</p>
-                                :
-                                <p>You need to connect your wallet to see Drops</p>
-                            }
-                        </p>
-                    </div>
+                    <SectionContainer additionalClasses="self-center w-fit justify-center">
+                        {isLoading
+                            ? <p>Fetching drops...</p>
+                            : <p>You need to connect your wallet to see Drops</p>
+                        }
+                    </SectionContainer>
                 ) : (
                     <>
                         <div className={cl(
@@ -272,7 +265,7 @@ const CollectionList = (props: {
                                         <span
                                             className={cl(
                                                 "py-1 px-2 rounded-md text-sm",
-                                                "bg-light-bgLight dark:bg-dark-bgLight"
+                                                "bg-light-bgLight/75 dark:bg-dark-bgLight/75"
                                             )}
                                             key={i}
                                         >
