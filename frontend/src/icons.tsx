@@ -94,6 +94,23 @@ const icons = {
         </svg>
     ),
 
+    arrowUp: (
+        <svg
+            className="w-10 h-10"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+        >
+            <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1"
+                d="M10 18V2m0 0l7 7m-7-7L3 9"
+            />
+        </svg>
+    ),
+
     oraLogo: (
         <svg className="w-fit h-6" width="206" height="66" viewBox="0 0 206 66" fill="none" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
             <rect width="206" height="66" fill="url(#pattern0)" />

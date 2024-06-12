@@ -6,7 +6,6 @@ import { clsx as cl } from "clsx"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
-import SectionTitle from "../components/ui/layout/SectionTitle"
 import Button from "../components/ui/Button"
 import BlockNFT from "../components/BlockNFT"
 import { getRarityFromPerc } from "../utils/getRarityData"
@@ -15,19 +14,29 @@ import { ethers } from "ethers"
 import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
 import PageTitle from "../components/ui/layout/PageTitle"
+import icons from "../icons"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"
 
 const Drops = () => {
+
+    // TODO: Add options to filter by Rarity, or by included Keywords.
+
     const { isConnected, address } = useWeb3ModalAccount()
     const graviolaContext = useContext(GraviolaContext)
+
     const contractNFTs = graviolaContext.collection as NFT[]
     const rGroups = graviolaContext.rarities as RaritiesData
+
     const [filterMode, setFilterMode] =
         useState<DropFilterMode>("Everyone's Drops")
     const [ownedTokensIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [fetchingCollection, setFetchingCollection] = useState<boolean>(false)
+    const [backToTopVisible, setBackToTopVisible] = useState<boolean>(false)
+
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    const contentReady = !isLoading && isConnected
 
     const fetchCollectionTokens = async () => {
         setFetchingCollection(true)
@@ -49,10 +58,6 @@ const Drops = () => {
     useEffect(() => {
         fetchCollectionTokens()
     }, [])
-
-    // Scroll to top stuff
-    const scrollContainerRef = useRef<HTMLDivElement>(null)
-    const [backToTopVisible, setBackToTopVisible] = useState<boolean>(false)
 
     const scrollToTop = () => {
         scrollContainerRef.current?.scrollTo({
@@ -96,14 +101,19 @@ const Drops = () => {
 
                 <PageTitle title="Drops" />
 
-                {isLoading ? (
-                    <p>Fetching data...</p>
-                ) : !isConnected ? (
+                {!contentReady ? (
                     <div className={cl(
                         "flex w-full h-fit justify-center items-center mt-3",
                     )}>
-                        <p className={"p-3 rounded-xl border border-light-border dark:border-dark-border"}>
-                            You need to connect your wallet to see Drops
+                        <p className={cl(
+                            "p-3 rounded-xl",
+                            "border border-light-border dark:border-dark-border"
+                        )}>
+                            {isLoading ?
+                                <p>Fetching drops...</p>
+                                :
+                                <p>You need to connect your wallet to see Drops</p>
+                            }
                         </p>
                     </div>
                 ) : (
@@ -113,15 +123,17 @@ const Drops = () => {
                             "max-sm:flex-col max-sm:gap-3 max-sm:mt-3 p-3 rounded-xl",
                             "border border-light-border dark:border-dark-border"
                         )}>
-                            <p>
-                                Showing:{" "}
-                                <span className={cl(
-                                    "font-normal font-content p-3 rounded-xl",
-                                    "bg-light-border/50 dark:bg-dark-border/50"
-                                )}>
-                                    {filterMode.toLowerCase()}
-                                </span>
-                            </p>
+                            <div className="flex flex-wrap gap-1.5 max-sm:mt-3">
+                                <p>Showing:</p>
+                                <p>
+                                    <span className={cl(
+                                        "font-normal font-content p-3 rounded-xl",
+                                        "bg-light-border/50 dark:bg-dark-border/50"
+                                    )}>
+                                        {filterMode.toLowerCase()}
+                                    </span>
+                                </p>
+                            </div>
                             <div className="flex gap-3">
                                 <Button
                                     text="Refresh"
@@ -158,30 +170,17 @@ const Drops = () => {
 
                             {/* Scroll to Top Button */}
                             {backToTopVisible && (
-                                <div className="flex absolute bottom-0 right-0 w-16 h-16 m-8 bg-transparent">
+                                <div className="flex absolute bottom-0 right-0 w-12 h-12 mx-10 my-6 bg-transparent">
                                     <div
                                         className={cn(
-                                            "flex w-16 h-16 p-3 justify-center items-center hover:cursor-pointer border",
-                                            "rounded-lg bg-light-bgLight dark:bg-dark-bgLight border-light-border dark:border-dark-border",
-                                            "stroke-accent/40 hover:border hover:border-accent/80 dark:hover:border-accent/80",
+                                            "flex w-12 h-12 p-3 justify-center items-center hover:cursor-pointer",
+                                            "rounded-lg bg-light-bgPrimary dark:bg-dark-bgPrimary",
+                                            "border border-light-border dark:border-dark-border",
+                                            "hover:bg-light-border/75 dark:hover:bg-dark-border/75",
                                         )}
                                         onClick={() => scrollToTop()}
                                     >
-                                        <svg
-                                            className="w-min h-min"
-                                            width="800px"
-                                            height="800px"
-                                            viewBox="0 0 20 20"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            fill="none"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                d="M10 18V2m0 0l7 7m-7-7L3 9"
-                                            />
-                                        </svg>
+                                        {icons.arrowUp}
                                     </div>
                                 </div>
                             )}
@@ -222,66 +221,65 @@ const CollectionList = (props: {
                     return (
                         <div
                             key={i}
-                            className={`
-                            flex flex-col justify-center items-center
-                            gap-2 bg-light-bgLight/50 dark:bg-dark-bgLight/50
-                            border-2 border-light-border dark:border-dark-border
-                            p-4 rounded-xl
-                            `}
+                            className={cl(
+                                "flex flex-col justify-between items-center",
+                                "gap-3 p-3 rounded-xl",
+                                "border border-light-border dark:border-dark-border",
+                            )}
                         >
+                            {/* Preview */}
                             <div
                                 className="p-px"
                                 style={{
                                     borderRadius: 16,
-                                    borderWidth: 2,
+                                    borderWidth: 1,
                                     borderColor: rarityData.color,
                                 }}
                             >
-                                {/* TODO: Fix */}
                                 <BlockNFT
                                     nftData={nft}
                                     glowColor={"auto"}
                                     additionalClasses={`w-fit h-fit max-w-[14em]`}
                                 />
                             </div>
-                            <div className="flex flex-col gap-2 justify-center items-center">
-                                {/* Id */}
-                                <p className="font-bold">Id: {i}</p>
 
-                                {/* Rarity name */}
-                                <p className="flex gap-1 font-normal">
-                                    Rarity:{" "}
-                                    <span
-                                        style={{
-                                            color: rarityData.color,
-                                        }}
-                                        className="font-bold"
-                                    >
-                                        {rarityData.name}
-                                    </span>
-                                </p>
-                                {/* Rarity perc */}
-                                <p
-                                    style={{
-                                        color: rarityData.color,
-                                    }}
-                                    className="text-xs opacity-75"
-                                >
-                                    ({percRarity}
-                                    %)
-                                </p>
-                            </div>
-                            <div className="w-full h-1 bg-light-bgLight dark:bg-dark-bgLight"></div>
-                            <div className="flex flex-wrap w-full h-full gap-2 justify-center items-center">
-                                {/* Keywords */}
-                                {keywords.map((keyword, i) => (
-                                    <span
-                                        className="py-1 px-2 rounded-lg bg-light-bgLight dark:bg-dark-bgLight text-sm"
-                                        key={i}
-                                    >
-                                        {keyword}
-                                    </span>
-                                ))}
+                            {/* Stats, info */}
+                            <div className={cl(
+                                "flex flex-col gap-2",
+                            )}>
+                                <div className={cl(
+                                    "flex flex-col w-full h-fit gap-1",
+                                    "justify-start items-start",
+                                )}>
+                                    <p>id: {i}</p>
+                                    <p>
+                                        Rarity:{" "}
+                                        <span
+                                            className={"font-normal"}
+                                            style={{
+                                                color: rarityData.color,
+                                            }}
+                                        >
+                                            {rarityData.name}
+                                        </span>
+                                    </p>
+                                </div>
+                                <div className={cl(
+                                    "flex flex-wrap w-full h-full",
+                                    "gap-2 justify-start items-start"
+                                )}>
+                                    {keywords.map((keyword, i) => (
+                                        <span
+                                            className={cl(
+                                                "py-1 px-2 rounded-md text-sm",
+                                                "bg-light-bgLight dark:bg-dark-bgLight"
+                                            )}
+                                            key={i}
+                                        >
+                                            {keyword}
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )

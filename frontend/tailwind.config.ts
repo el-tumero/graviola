@@ -42,7 +42,7 @@ export default {
                     text: "#000",
                     textSecondary: "#1f1f1f",
                     bgPrimary: "#e6ede8",
-                    bgLight: "#ffffff",
+                    bgLight: "#f7f7f7",
                     bgDark: "#d5dbd7",
                     border: "#cbd1cd",
                 },

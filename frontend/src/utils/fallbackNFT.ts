@@ -7,7 +7,7 @@ export const fallbackNFT: NFT = {
     attributes: [
         {
             trait_type: "Rarity",
-            value: 0.01,
+            value: 1,
         },
     ],
 }
