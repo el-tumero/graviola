@@ -24,6 +24,7 @@ import { parseEther } from "ethers"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { cn } from "../utils/cn"
+import { getRarityBorder } from "../utils/getRarityBorder"
 
 const TradeUp = () => {
     const graviolaContext = useContext(GraviolaContext)
@@ -233,16 +234,19 @@ const TradeUp = () => {
                                                 const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
                                                 const randSign = (randBase < 0.5) ? -1 : 1
                                                 const percRarity = formatBpToPercentage(contractNFTs[id].attributes[0].value)
-                                                const [rarityLevel, rarityData] = getRarityFromPerc(percRarity, rGroups)
+                                                const [rLevel, rGroupData] = getRarityFromPerc(percRarity, rGroups)
                                                 return (
                                                     <div
                                                         key={i}
                                                         className={cl(
                                                             "flex justify-center items-center",
                                                             "w-16 h-16 rounded-xl",
+                                                            "bg-light-bgPrimary dark:bg-dark-bgPrimary",
                                                             "border border-light-border dark:border-dark-border",
+                                                            "hover:cursor-pointer"
                                                         )}
                                                         style={{
+                                                            ...getRarityBorder(rGroupData, true).style,
                                                             zIndex: `${selectedIds.length}`,
                                                             rotate: `${randSign * randRotate}deg`
                                                         }}
@@ -250,7 +254,7 @@ const TradeUp = () => {
                                                     >
                                                         <BlockNFT
                                                             nftData={contractNFTs[id]}
-                                                            glowColor="auto"
+                                                            glowColor="none"
                                                             additionalClasses="w-12 h-12"
                                                             disableMetadataOnHover
                                                         />
@@ -284,9 +288,9 @@ const TradeUp = () => {
 const TradeUpGenerateContainer = (props: { children: React.ReactNode }) => {
     return (
         <div className={cl(
-            "flex justify-center items-center",
-            "w-full h-auto aspect-square p-4 rounded-xl",
-            "bg-light-bgDark dark:bg-dark-bgDark",
+            "flex w-full h-full justify-center items-center",
+            "p-3 rounded-xl",
+            "bg-light-bgLight/25 dark:bg-dark-bgLight/25",
             "border border-light-border dark:border-dark-border border-dashed",
         )}>
             {props.children}
