@@ -4,11 +4,7 @@ import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 
 // Get RarityLevel and RGroupData from NFT rarity percentage (formatted)
-export function getRarityFromPerc(threshold: number): [RarityLevel, RarityGroupData] {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-
+export function getRarityFromPerc(threshold: number, rarities: RaritiesData): [RarityLevel, RarityGroupData] {
     // Clamp input
     threshold = Math.max(0, Math.min(threshold, 100))
     let perc = 0,
@@ -28,10 +24,7 @@ export function getRarityFromPerc(threshold: number): [RarityLevel, RarityGroupD
 }
 
 // Get RarityLevel, RGroupData from RarityLevel enum type value
-export function getRarityFromLevel(rarityLevel: RarityLevel): [RarityLevel, RarityGroupData] {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
+export function getRarityFromLevel(rarityLevel: RarityLevel, rarities: RaritiesData): [RarityLevel, RarityGroupData] {
     if (rarityLevel in rarities) {
         return [rarityLevel, rarities[rarityLevel]]
     }

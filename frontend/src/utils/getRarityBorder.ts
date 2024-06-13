@@ -6,7 +6,7 @@ export function getRarityBorder(
     breathingEffect?: boolean,
 ): {
     style: React.CSSProperties
-    className?: string
+    className: string
 } {
     const baseStyle = {
         boxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
@@ -20,7 +20,7 @@ export function getRarityBorder(
             className: "breathing-effect",
         }
     } else {
-        return { style: baseStyle }
+        return { style: baseStyle, className: "" }
     }
 }
 

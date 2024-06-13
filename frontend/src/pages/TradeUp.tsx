@@ -11,7 +11,7 @@ import { clsx as cl } from "clsx"
 import { ethers, isCallException, toBigInt } from "ethers"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
-import BlockNFT from "../components/BlockNFT"
+import BlockNFT, { BlockNFTProps } from "../components/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import ResultText from "../components/ui/ResultText"
 import { RarityLevel } from "../types/Rarity"
@@ -23,7 +23,7 @@ import { Graviola } from "../../../contracts/typechain-types/Graviola"
 import { parseEther } from "ethers"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-// import { fallbackNFT } from "../utils/fallbackNFT";
+import { cn } from "../utils/cn"
 
 const TradeUp = () => {
     const graviolaContext = useContext(GraviolaContext)
@@ -31,7 +31,6 @@ const TradeUp = () => {
     const rGroups = graviolaContext.rarities as RaritiesData
     const contractNFTs = graviolaContext.collection as NFT[]
 
-    // const contractNFTs: NFT[] = Array(16).fill(fallbackNFT) // DEBUG
 
     const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -44,6 +43,32 @@ const TradeUp = () => {
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
     const contentReady = !isLoading && isConnected
+
+    // Select an NFT as a trade component
+    const handleNFTClick = (idx: number, rarityLevel: RarityLevel) => {
+        const indexOf = selectedIds.indexOf(idx)
+        if (indexOf !== -1) {
+            if (selectedIds.length === 1) setSelectedGroup(null)
+            setSelectedIds((prev) => prev.filter((_id) => idx !== _id))
+            return
+        }
+        if (selectedIds.length === 0) {
+            setSelectedGroup(rarityLevel)
+        }
+        if (selectedIds.length >= 3) return
+        setSelectedIds((prev) => [...prev, idx])
+    }
+
+    // Clicking an active trade component in the right panel should unselect it
+    const handleSelectedNFTClick = (idx: number) => {
+        const indexOf = selectedIds.indexOf(idx)
+        console.log(indexOf)
+        if (indexOf !== -1) {
+            if (selectedIds.length === 1) setSelectedGroup(null)
+            setSelectedIds(prev => prev.filter((_id) => idx !== _id))
+            return
+        }
+    }
 
     // Generation state listener
     const progressListener = () => {
@@ -65,7 +90,7 @@ const TradeUp = () => {
             const uri = await graviola.tokenURI(tokenId)
             const response = await fetch(uri)
             const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value))
+            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
 
             setProgressState("DONE")
             setProgressBarVal(100)
@@ -148,7 +173,7 @@ const TradeUp = () => {
                                             const percRarity = formatBpToPercentage(nft.attributes[0].value)
                                             const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
                                             const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
-                                            const [rarityLevel, rarityData] = getRarityFromPerc(percRarity)
+                                            const [rarityLevel, rarityData] = getRarityFromPerc(percRarity, rGroups)
 
                                             if (selectedGroup !== null && selectedGroup !== rarityLevel) {
                                                 return null
@@ -160,38 +185,18 @@ const TradeUp = () => {
                                                 return (
                                                     <div
                                                         key={i}
-                                                        className={cl(
-                                                            "relative flex w-fit h-fit flex-col justify-center items-center",
-                                                            "border border-light-border dark:border-dark-border rounded-xl gap-2",
+                                                        onClick={() => handleNFTClick(i, rarityLevel)}
+                                                        className={cn(
+                                                            // Fancy NFT hover selection animations & borders
+                                                            "flex flex-col justify-center items-center rounded-xl",
+                                                            "gap-2 cursor-pointer hover:cursor-pointer",
+                                                            "border border-light-border dark:border-dark-border rounded-xl",
+                                                            "hover:border-light-text/40 dark:hover:border-dark-text/40",
+                                                            "hover:scale-95 transition-transform duration-300",
+                                                            selectedIds.includes(i) ? "opacity-50 scale-95" : "opacity-100"
                                                         )}
                                                     >
-                                                        <div
-                                                            className={`
-                                                                        m-3 hover:cursor-pointer
-                                                                        ${selectedIds.includes(i)
-                                                                    ? "brightness-50 hover:brightness-50"
-                                                                    : "hover:brightness-110"
-                                                                }
-                                                                        `}
-                                                            style={{
-                                                                borderRadius: 16,
-                                                                borderWidth: 1,
-                                                                borderColor: rarityData.color,
-                                                            }}
-                                                            onClick={() => {
-                                                                const indexOf = selectedIds.indexOf(i)
-                                                                if (indexOf !== -1) {
-                                                                    if (selectedIds.length === 1) setSelectedGroup(null)
-                                                                    setSelectedIds((prev) => prev.filter((_id) => i !== _id))
-                                                                    return
-                                                                }
-                                                                if (selectedIds.length === 0) {
-                                                                    setSelectedGroup(rarityLevel)
-                                                                }
-                                                                if (selectedIds.length >= 3) return
-                                                                setSelectedIds((prev) => [...prev, i])
-                                                            }}
-                                                        >
+                                                        <div className={cl("m-4")}>
                                                             <BlockNFT
                                                                 nftData={nft}
                                                                 glowColor={"auto"}
@@ -201,22 +206,7 @@ const TradeUp = () => {
                                                         </div>
                                                         <div className="flex flex-col gap-2 justify-center items-center">
                                                             {/* Keywords */}
-                                                            <div className="flex flex-wrap gap-1 justify-center items-center text-sm mb-3">
-                                                                {keywords.map((keyword: string, i) => {
-                                                                    return (
-                                                                        <div
-                                                                            key={i}
-                                                                            className={`
-                                                                                    rounded-lg py-1 px-2 border
-                                                                                    bg-light-bgPrimary dark:bg-dark-bgPrimary
-                                                                                    border-light-border dark:border-dark-border
-                                                                                `}
-                                                                        >
-                                                                            <p>{keyword}</p>
-                                                                        </div>
-                                                                    )
-                                                                })}
-                                                            </div>
+                                                            <KeywordBlocks keywords={keywords} />
                                                         </div>
                                                     </div>
                                                 )
@@ -227,7 +217,51 @@ const TradeUp = () => {
                             </div>
 
                             {/* TradeUp Result (Right panel) */}
-                            <div className={cl("flex basis-1/3", "justify-center items-center", "p-6 max-sm:p-3")}>The panel thing</div>
+                            <div className={cl(
+                                "flex max-md:flex-col basis-1/3",
+                                "justify-center items-center",
+                                "p-6 max-sm:p-3"
+                            )}>
+
+                                {(selectedIds.length === 0)
+                                    ? (
+                                        <p>Select the NFTs you want to trade</p>
+                                    ) : (
+                                        <TradeUpGenerateContainer>
+                                            {selectedIds.map((id, i) => {
+                                                const randBase = Math.random()
+                                                const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
+                                                const randSign = (randBase < 0.5) ? -1 : 1
+                                                const percRarity = formatBpToPercentage(contractNFTs[id].attributes[0].value)
+                                                const [rarityLevel, rarityData] = getRarityFromPerc(percRarity, rGroups)
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className={cl(
+                                                            "flex justify-center items-center",
+                                                            "w-16 h-16 rounded-xl",
+                                                            "border border-light-border dark:border-dark-border",
+                                                        )}
+                                                        style={{
+                                                            zIndex: `${selectedIds.length}`,
+                                                            rotate: `${randSign * randRotate}deg`
+                                                        }}
+                                                        onClick={() => handleSelectedNFTClick(id)}
+                                                    >
+                                                        <BlockNFT
+                                                            nftData={contractNFTs[id]}
+                                                            glowColor="auto"
+                                                            additionalClasses="w-12 h-12"
+                                                            disableMetadataOnHover
+                                                        />
+                                                    </div>
+                                                )
+                                            })}
+                                        </TradeUpGenerateContainer>
+                                    )
+                                }
+
+                            </div>
                         </div>
 
                         {/* Controls & Info (Bottom panel) */}
@@ -244,6 +278,40 @@ const TradeUp = () => {
             </ContentContainer>
         </FullscreenContainer>
     )
+}
+
+// Wrapper
+const TradeUpGenerateContainer = (props: { children: React.ReactNode }) => {
+    return (
+        <div className={cl(
+            "flex justify-center items-center",
+            "w-full h-auto aspect-square p-4 rounded-xl",
+            "bg-light-bgDark dark:bg-dark-bgDark",
+            "border border-light-border dark:border-dark-border border-dashed",
+        )}>
+            {props.children}
+        </div>
+    )
+}
+
+const KeywordBlocks = (props: { keywords: string[] }) => {
+    return (
+        <div className="flex flex-wrap gap-1 justify-center items-center text-sm mx-1 mb-3">
+            {props.keywords.map((keyword: string, idx: number) => {
+                return (
+                    <div
+                        key={idx}
+                        className={cl(
+                            "rounded-lg py-1 px-1.5 border",
+                            "border-light-border dark:border-dark-border",
+                        )}>
+                        <p>{keyword}</p>
+                    </div>
+                )
+            })}
+        </div>
+    )
+
 }
 
 export default TradeUp

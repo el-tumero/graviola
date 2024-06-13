@@ -122,8 +122,8 @@ const Generate = () => {
                     />
 
                     {/* Progress bar */}
-                    {progressBarVal !== 0 && (
-                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:-dark-border shadow-inner`}>
+                    {/* {progressBarVal !== 0 && (
+                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border shadow-inner`}>
                             <div
                                 style={{
                                     width: `${progressBarVal}%`,
@@ -131,7 +131,7 @@ const Generate = () => {
                                 className="flex h-full bg-accent rounded-xl transition-all duration-150"
                             ></div>
                         </div>
-                    )}
+                    )} */}
 
                     <div className={cl("flex w-fit h-fit p-3 rounded-xl", "border border-light-border dark:border-dark-border", "text-lg")}>
                         {progressMessage}

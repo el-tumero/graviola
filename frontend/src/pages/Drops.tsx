@@ -175,18 +175,18 @@ const CollectionList = (props: {
 }) => {
     return (
         <>
-            {props.contractNFTs.map((nft: NFT, i) => {
+            {props.contractNFTs.map((nft: NFT, idx) => {
                 const percRarity = formatBpToPercentage(nft.attributes[0].value)
                 const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
                 const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
 
-                const [, rarityData] = getRarityFromPerc(percRarity)
-                if (props.collectionMode === "My Drops" && !props.ownedTokenIds.includes(i)) {
+                const [, rarityData] = getRarityFromPerc(percRarity, props.rGroups)
+                if (props.collectionMode === "My Drops" && !props.ownedTokenIds.includes(idx)) {
                     return null
                 } else {
                     return (
                         <div
-                            key={i}
+                            key={idx}
                             className={cl(
                                 "flex flex-col justify-between items-center",
                                 "gap-3 p-3 rounded-xl",
@@ -208,7 +208,7 @@ const CollectionList = (props: {
                             {/* Stats, info */}
                             <div className={cl("flex flex-col gap-2")}>
                                 <div className={cl("flex flex-col w-full h-fit gap-1", "justify-start items-start")}>
-                                    <p>id: {i}</p>
+                                    <p>id: {idx}</p>
                                     <p>
                                         Rarity:{" "}
                                         <span
@@ -222,10 +222,10 @@ const CollectionList = (props: {
                                     </p>
                                 </div>
                                 <div className={cl("flex flex-wrap w-full h-full", "gap-2 justify-start items-start")}>
-                                    {keywords.map((keyword, i) => (
+                                    {keywords.map((keyword, idx) => (
                                         <span
                                             className={cl("py-1 px-2 rounded-md text-sm", "bg-light-bgLight/75 dark:bg-dark-bgLight/75")}
-                                            key={i}
+                                            key={idx}
                                         >
                                             {keyword}
                                         </span>
