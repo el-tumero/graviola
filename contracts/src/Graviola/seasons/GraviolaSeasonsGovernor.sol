@@ -2,8 +2,9 @@
 pragma solidity ^0.8.24;
 
 import "./IGraviolaSeasonsArchive.sol";
+import "./Sorter.sol";
 
-contract GraviolaSeasonsGovernor{
+contract GraviolaSeasonsGovernor is Sorter{
 
     error WrongWordFormat();
     error WordExpired();
@@ -54,12 +55,17 @@ contract GraviolaSeasonsGovernor{
 
         if(isUpvote) currentVoting.votes[word] = currentVoting.votes[word] + int256(votingPower); // TODO: check overflow
         else currentVoting.votes[word] = currentVoting.votes[word] - int256(votingPower);
-
     }   
 
 
     function getCurrentVotingId() external view returns(uint256) {
         return currentVotingId;
     }
+
+    function getVotes(uint256 votingId) external view returns(string[] memory, int256[] memory) {
+        
+    }
+
+
 
 }
