@@ -2,9 +2,9 @@ import { useWeb3ModalTheme } from "@web3modal/ethers/react"
 import { useEffect, useState } from "react"
 import { Theme } from "../types/Theme"
 
-export default function useTheme(web3ModalLoaded: boolean): [Theme, () => void] {
+export default function useTheme(web3ModalLoaded: boolean): { theme: Theme, toggleTheme: () => void } {
     const { setThemeMode } = useWeb3ModalTheme()
-    const [theme, setTheme] = useState<Theme | null>(localStorage.getItem("theme") as Theme)
+    const [theme, setTheme] = useState<Theme>(localStorage.getItem("theme") as Theme || "dark")
 
     useEffect(() => {
         detectTheme()
@@ -31,5 +31,8 @@ export default function useTheme(web3ModalLoaded: boolean): [Theme, () => void] 
         localStorage.setItem("theme", invertedTheme)
     }
 
-    return [theme!, toggleTheme]
+    return {
+        theme,
+        toggleTheme
+    }
 }

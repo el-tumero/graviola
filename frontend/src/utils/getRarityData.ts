@@ -1,5 +1,3 @@
-import { useContext } from "react"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 

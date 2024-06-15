@@ -33,78 +33,74 @@ const Generate = () => {
     const { walletProvider } = useWeb3ModalProvider()
     const graviolaContext = useContext(GraviolaContext)
     const rGroups = graviolaContext.rarities as RaritiesData
-
     const { isConnected, address } = useWeb3ModalAccount()
 
-    const [progressState, setProgressState] = useState<TransactionStatus>(isConnected ? "NONE" : "WALLET_NOT_CONNECTED")
-    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
-    const [progressMessage, setProgressMessage] = useState<string>(generateTxStatusMessages["NONE"])
-    const [progressBarVal, setProgressBarVal] = useState<number>(0)
+    // Gen data
+    const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
+    const [txMsg, setTxMsg] = useState<string>(generateTxStatusMessages["NONE"])
+    // const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes()
+    const [progress, setProgress] = useState<number>(0)
 
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
 
     // Generation state listener
-    const progressListener = () => {
-        if (!walletProvider) return
-        const graviola = graviolaContext.contract as Graviola
+    // const progressListener = () => {
+    //     if (!walletProvider) return
+    //     const graviola = graviolaContext.contract as Graviola
 
-        const onMint = (addr: string, tokenId: bigint) => {
-            if (addr != address) return
-            console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
-            setProgressState("MINTED")
-            setProgressBarVal(50)
-        }
+    //     const onMint = (addr: string, tokenId: bigint) => {
+    //         if (addr != address) return
+    //         console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
+    //         setProgressState("MINTED")
+    //         setProgressBarVal(50)
+    //     }
 
-        const onTokenReady = async (addr: string, tokenId: bigint) => {
-            if (addr != address) return
+    //     const onTokenReady = async (addr: string, tokenId: bigint) => {
+    //         if (addr != address) return
 
-            console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
+    //         console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
 
-            const uri = await graviola.tokenURI(tokenId)
-            const response = await fetch(uri)
-            const nft: NFT = await response.json()
+    //         const uri = await graviola.tokenURI(tokenId)
+    //         const response = await fetch(uri)
+    //         const nft: NFT = await response.json()
 
-            // DEBUG
-            // console.log("raw val ", nft.attributes[0].value)
-            // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
-            // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
+    //         // DEBUG
+    //         // console.log("raw val ", nft.attributes[0].value)
+    //         // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
+    //         // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
 
-            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
+    //         const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
 
-            // console.log("rarityLevel from conv:  ", rarityLevel)
+    //         // console.log("rarityLevel from conv:  ", rarityLevel)
 
-            setProgressState("DONE")
-            setProgressBarVal(100)
+    //         setProgressState("DONE")
+    //         setProgressBarVal(100)
 
-            const nftRes: NFTExt = {
-                ...nft,
-                rarityLevel: rarityLevel,
-                rarityData: rarityData,
-            }
+    //         const nftRes: NFTExt = {
+    //             ...nft,
+    //             rarityLevel: rarityLevel,
+    //             rarityData: rarityData,
+    //         }
 
-            setRolledNFT(nftRes)
-        }
+    //         setRolledNFT(nftRes)
+    //     }
 
-        graviola.on(graviola.filters.Mint, onMint)
-        graviola.on(graviola.filters.TokenReady, onTokenReady)
+    //     graviola.on(graviola.filters.Mint, onMint)
+    //     graviola.on(graviola.filters.TokenReady, onTokenReady)
 
-        return () => {
-            graviola.off(graviola.filters.Mint, onMint)
-            graviola.off(graviola.filters.TokenReady, onTokenReady)
-        }
-    }
+    //     return () => {
+    //         graviola.off(graviola.filters.Mint, onMint)
+    //         graviola.off(graviola.filters.TokenReady, onTokenReady)
+    //     }
+    // }
 
-    useEffect(() => {
-        progressListener()
-    }, [])
-
-    useEffect(() => {
-        if (!isConnected) setProgressState("WALLET_NOT_CONNECTED")
-    }, [isConnected])
+    // useEffect(() => {
+    //     progressListener()
+    // }, [])
 
     useEffect(() => {
-        setProgressMessage(generateTxStatusMessages[progressState])
-    }, [progressState])
+        setTxMsg(generateTxStatusMessages[txStatus])
+    }, [txStatus])
 
     return (
         <FullscreenContainer>
@@ -116,8 +112,7 @@ const Generate = () => {
 
                     <GenerateContainer
                         rolledNFT={rolledNFT}
-                        isPulsating={!isConnected}
-                        isGenerating={!isPreGenerationState}
+                        runBorderAnim={!rolledNFT}
                         rGroups={rGroups}
                     />
 
@@ -133,16 +128,20 @@ const Generate = () => {
                         </div>
                     )} */}
 
-                    <div className={cl("flex w-fit h-fit p-3 rounded-xl", "border border-light-border dark:border-dark-border", "text-lg")}>
-                        {progressMessage}
+                    {/* Tx status text */}
+                    <div className={cl(
+                        "flex w-fit h-fit p-3 rounded-xl text-lg",
+                        "border border-light-border dark:border-dark-border"
+                    )}>
+                        {txMsg}
                     </div>
 
-                    {progressState === "NONE" && (
+                    {txStatus === "NONE" && (
                         <Button
                             text={isConnected ? "Generate!" : "Connect your wallet first"}
-                            disabled={!isConnected || progressState !== "NONE"}
+                            disabled={!isConnected || txStatus !== "NONE"}
                             onClick={async () => {
-                                setProgressState("CONFIRM_TX")
+                                setTxStatus("AWAIT_CONFIRM")
                                 const estFee = (await graviolaContext.contract?.estimateFee()) as bigint
                                 try {
                                     const tx = await graviolaContext.contract?.mint({
@@ -150,13 +149,13 @@ const Generate = () => {
                                     })
                                     const receipt = await tx?.wait()
                                     if (receipt) {
-                                        console.log("OK")
-                                        setProgressState("BEFORE_MINT")
-                                        setProgressBarVal(25)
+                                        console.log("receipt OK")
+                                        setTxStatus("BEFORE_MINT")
+                                        setProgress(25)
                                     }
                                 } catch (err) {
-                                    setProgressState("TX_REJECTED")
-                                    setTimeout(() => setProgressState("NONE"), 3000)
+                                    setTxStatus("REJECTED")
+                                    setTimeout(() => setTxStatus("NONE"), 3000)
                                     return
                                 }
                             }}
@@ -212,7 +211,10 @@ const Generate = () => {
                         "rounded-xl border border-light-border dark:border-dark-border",
                     )}
                 >
-                    <Button text="See all Keywords" onClick={() => navigate(routerPaths.home)} />
+                    <Button
+                        text="See all Keywords"
+                        onClick={() => navigate(routerPaths.home)}
+                    />
                 </div>
             </ContentContainer>
         </FullscreenContainer>

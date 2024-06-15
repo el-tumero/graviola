@@ -11,17 +11,15 @@ const icons = {
                 className="fill-current"
                 d="M3 21.32L21 3.32001"
                 stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
             <path
                 className="fill-current"
                 d="M3 3.32001L21 21.32"
                 stroke="currentColor"
-                stroke-width="1.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
         </svg>
     ),

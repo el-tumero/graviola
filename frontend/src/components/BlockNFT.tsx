@@ -4,13 +4,13 @@ import { clsx as cl } from "clsx"
 import { NFT, NFTAttributes } from "../types/NFT"
 import { getRarityFromLevel, getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
-import { useContext } from "react"
+import { useContext, useState } from "react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { ITooltip } from "react-tooltip"
 import Tooltip from "./Tooltip"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
+import { Status } from "../types/Status"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
 
@@ -27,6 +27,7 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
         rarities: RaritiesData
     }
     const [, rData] = getRarityFromPerc(formatBpToPercentage(nftData.attributes[0].value), rarities)
+    const [status, setStatus] = useState<Status>("loading")
 
     const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto";
     const glowLevelData = shouldGetRarityLevel ? getRarityFromLevel(glowColor, rarities)[1] : null
@@ -49,20 +50,35 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
             style={style}
             className={cn(
                 "flex w-36 h-36 shadow-sm",
-                "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border-2",
+                "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
                 "border-light-border dark:border-dark-border select-none",
                 additionalClasses,
             )}
         >
             <img
+                onLoad={() => setStatus("ready")}
                 draggable={false}
-                className={cl("w-full h-full rounded-lg", `nft-${nftData.image}`)}
+                className={cn(
+                    "w-full h-full rounded-lg",
+                    (status !== "ready") && "hidden",
+                    `nft-${nftData.id}-${nftData.image}`
+                )}
                 src={convertToIfpsURL(nftData.image)}
                 alt="NFT"
             />
 
+            {/* Loading skeleton */}
+            <div className={cl(
+                "flex w-36 h-36 rounded-lg",
+                "bg-light-bgLight/75 dark:bg-dark-bgLight/50",
+                "animate-pulse",
+                (status !== "loading") && "hidden"
+            )} />
+
             {!disableMetadataOnHover && (
-                <Tooltip children={<BlockNFTMetadata metadata={metadata} />} anchorSelect={`.nft-${nftData.image}`} />
+                <Tooltip children={<BlockNFTMetadata metadata={metadata} />}
+                    anchorSelect={`.nft-${nftData.id}-${nftData.image}`}
+                />
             )}
         </div>
     )

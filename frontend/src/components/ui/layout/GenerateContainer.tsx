@@ -11,18 +11,17 @@ import { cn } from "../../../utils/cn"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
-    isPulsating: boolean
-    isGenerating: boolean
+    runBorderAnim: boolean
     rGroups: RaritiesData
 }
 
-const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating, rGroups }: GenerateContainerProps) => {
+const GenerateContainer = ({ rolledNFT, runBorderAnim, rGroups }: GenerateContainerProps) => {
 
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
 
-    const rarityAnimBorder = useRandomRarityBorder(isGenerating, 750, rGroups)
+    const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750, rGroups)
     const [resOpacity, setResOpacity] = useState<number>(0)
 
     // Dynamic styles based on rolledNFT
@@ -46,7 +45,7 @@ const GenerateContainer = ({ rolledNFT, isPulsating, isGenerating, rGroups }: Ge
 
     return (
         <div
-            style={rolledNFT ? breathingBorderStyle : isGenerating ? rarityAnimBorder : {}}
+            style={rolledNFT ? breathingBorderStyle : runBorderAnim ? rarityAnimBorder : {}}
             className={cn(
                 "flex justify-center items-center",
                 "w-64 h-64 p-4 rounded-xl",
