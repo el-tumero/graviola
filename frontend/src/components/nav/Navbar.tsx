@@ -86,8 +86,10 @@ const Navbar = () => {
                     <div
                         className={cl(
                             "max-lg:visible lg:hidden",
-                            "flex items-center w-12 h-max px-2",
+                            "flex items-center w-10 h-10 rounded-xl p-1",
                             "text-light-text dark:text-dark-text hover:cursor-pointer",
+                            "hover:bg-light-text/10 dark:hover:bg-dark-text/10",
+                            "transition-colors duration-300",
                         )}
                         onClick={() => setMobileListVisible(!mobileListVisible)}
                     >
@@ -96,7 +98,11 @@ const Navbar = () => {
                 </div>
 
                 {mobileListVisible && (
-                    <div className={cl("flex flex-col w-full h-fit", "bg-transparent")}>
+                    <div className={cl(
+                        "flex flex-col w-full h-fit",
+                        "bg-transparent",
+                        "transition-all duration-300",
+                    )}>
                         <NavListDesktop navItems={navItems} mobileStyles={true} />
                     </div>
                 )}
