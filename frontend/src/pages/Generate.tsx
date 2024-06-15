@@ -69,7 +69,7 @@ const Generate = () => {
             // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
             // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
 
-            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value))
+            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
 
             // console.log("rarityLevel from conv:  ", rarityLevel)
 

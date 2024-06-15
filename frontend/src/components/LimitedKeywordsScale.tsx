@@ -18,7 +18,7 @@ const LimitedKeywordsScale = () => {
                 </div>
             </div>
             <div className="select-none flex relative w-full h-fit bg-green-500">
-                <p className="absolute max-sm:text-xs max-sm:left-[7.5%] left-[34%]">Permanent keywords</p>
+                <p className="absolute max-sm:text-xs max-sm:left-[7.5%] left-[34%]">Basic keywords</p>
                 <p className="absolute max-sm:text-xs left-[83.5%]">Seasonal keywords</p>
             </div>
         </div>

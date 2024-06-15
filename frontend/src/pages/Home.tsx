@@ -135,8 +135,11 @@ function Home() {
                         <SectionTitle
                             title="Seasonal Keywords"
                             secondaryContent={`Token holders have the power to shape the future of Graviola. 
-                                Every season, you can vote on and suggest new keywords. 
-                                At the end of each season, all Rare, Very Rare, and Legendary keywords will be retired, 
+                                Every season, you can vote on and suggest new keywords in the Voting Panel.
+                                The top hundred keywords will be introduced in the next Season of GraviolaNFT.
+                                Basic keywords can move between Common and Uncommon groups. They can also occur in multiple seasons,
+                                if the Hodlers choose to keep them.
+                                At the end of each season, all Rare, Very Rare, and Legendary keywords will be retired forever, 
                                 guaranteeing the exclusivity and increasing the value of your Graviola NFTs over time!
                             `}
                         />

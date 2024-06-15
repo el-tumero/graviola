@@ -14,7 +14,7 @@ import { formatBpToPercentage } from "../utils/format"
 import BlockNFT, { BlockNFTProps } from "../components/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import ResultText from "../components/ui/ResultText"
-import { RarityLevel } from "../types/Rarity"
+import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { tradeUpTxStatusMessages } from "../utils/statusMessages"
@@ -25,6 +25,7 @@ import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { cn } from "../utils/cn"
 import { getRarityBorder } from "../utils/getRarityBorder"
+import useRandomRarityBorder from "../hooks/useBorderAnimation"
 
 const TradeUp = () => {
     const graviolaContext = useContext(GraviolaContext)
@@ -228,7 +229,7 @@ const TradeUp = () => {
                                     ? (
                                         <p>Select the NFTs you want to trade</p>
                                     ) : (
-                                        <TradeUpGenerateContainer>
+                                        <TradeUpGenerateContainer active={(selectedIds.length === 3)} rGroups={rGroups}>
                                             {selectedIds.map((id, i) => {
                                                 const randBase = Math.random()
                                                 const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
@@ -272,10 +273,23 @@ const TradeUp = () => {
                         <SectionContainer additionalClasses="justify-between items-center">
                             <p>
                                 <span>Status: </span>
-                                <span className={cl("p-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>STATUS_TEXT</span>
+                                <span className={cl(
+                                    "p-3 rounded-xl",
+                                    "bg-light-border/75 dark:bg-dark-border/75"
+                                )}>
+                                    STATUS_TEXT
+                                </span>
                             </p>
 
-                            <Button text="Trade" disabled={false} onClick={() => { }} />
+                            <Button
+                                text="Trade"
+                                disabled={false}
+                                onClick={() => { }}
+                                additionalClasses={(selectedIds.length === 3)
+                                    ? "border border-light-text/25 dark:border-dark-text/25"
+                                    : "border-none"
+                                }
+                            />
                         </SectionContainer>
                     </div>
                 )}
@@ -284,15 +298,17 @@ const TradeUp = () => {
     )
 }
 
-// Wrapper
-const TradeUpGenerateContainer = (props: { children: React.ReactNode }) => {
+// Wrapper (ready = 3/3 Tokens selected)
+const TradeUpGenerateContainer = (props: { children: React.ReactNode, active: boolean, rGroups: RaritiesData }) => {
+    const rarityAnimBorder = useRandomRarityBorder(true, 750, props.rGroups)
     return (
         <div className={cl(
             "flex w-full h-full justify-center items-center",
             "p-3 rounded-xl",
             "bg-light-bgLight/25 dark:bg-dark-bgLight/25",
             "border border-light-border dark:border-dark-border border-dashed",
-        )}>
+        )}
+            style={props.active ? rarityAnimBorder : {}}>
             {props.children}
         </div>
     )
