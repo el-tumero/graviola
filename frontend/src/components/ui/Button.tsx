@@ -1,33 +1,32 @@
+import icons from "../../data/icons"
 import { cn } from "../../utils/cn"
 
 interface ButtonProps {
     text: string
     onClick: () => void
     additionalClasses?: string
-    enabled?: boolean
+    disabled?: boolean
+    arrowIcon?: boolean
 }
 
-const Button = ({
-    text,
-    onClick,
-    enabled = true,
-    additionalClasses,
-}: ButtonProps) => {
+const Button = ({ text, onClick, disabled = false, arrowIcon = false, additionalClasses }: ButtonProps) => {
     return (
-        <button
-            onClick={enabled ? () => onClick() : () => {}}
+        <div
+            onClick={() => onClick()}
             className={cn(
-                "w-fit min-w-[14em] h-auto py-3 my-1 px-2",
-                "text-md font-semibold rounded-xl",
-                "bg-light-bgLight dark:bg-dark-bgLight border border-opacity-50",
-                enabled &&
-                    "active:opacity-60 hover:opacity-80 border-accent cursor-pointer",
+                "flex w-fit p-3 select-none",
+                "rounded-xl transition-all duration-300",
+                "cursor-pointer hover:cursor-pointer",
+                "hover:bg-light-border/75 dark:hover:bg-dark-border/75",
+                disabled && "opacity-50 pointer-events-none",
                 additionalClasses,
             )}
-            tabIndex={0}
         >
-            <span className="select-none">{text}</span>
-        </button>
+            <button disabled={disabled}>
+                <p className="font-content">{text}</p>
+            </button>
+            {arrowIcon && icons.arrowRight}
+        </div>
     )
 }
 

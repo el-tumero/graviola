@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.dark {
+    color-scheme: dark;
+}
+
+.breathing-effect {
+    animation: breathing 2s infinite alternate;
+}
+
+@keyframes breathing {
+    from {
+        box-shadow: 0px 0px 24px 6px var(--rarity-color);
+    }
+
+    to {
+        box-shadow: 0px 0px 28px 16px var(--rarity-color);
+    }
+}

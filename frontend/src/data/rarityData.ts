@@ -1,4 +1,4 @@
-import { RarityLevel } from "./types/Rarity"
+import { RarityLevel } from "../types/Rarity"
 
 export const rarityScale: Array<RarityLevel> = [
     RarityLevel.Common,

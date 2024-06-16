@@ -4,7 +4,8 @@ export interface NFTAttributes {
 }
 
 export interface NFT {
+    id: number
     image: string
     description: string
-    attributes: Array<NFTAttributes>
+    attributes: Array<NFTAttributes> // Meta attributes object (ERC721 opensea metadata standard)
 }

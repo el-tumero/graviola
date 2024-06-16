@@ -3,6 +3,11 @@ export default {
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     theme: {
         extend: {
+            fontFamily: {
+                title: ['"Noto Sans Mono"', "monospace"],
+                content: ['"Public Sans"', "sans-serif"],
+            },
+
             transitionDuration: {
                 4000: "4000ms",
             },
@@ -32,22 +37,23 @@ export default {
             },
 
             colors: {
-                accent: "#28b03d",
+                accent: "#2cde59",
+                accentDark: "#19b540",
                 light: {
                     text: "#000",
                     textSecondary: "#1f1f1f",
                     bgPrimary: "#e6ede8",
-                    bgLight: "#ffffff",
+                    bgLight: "#f7f7f7",
                     bgDark: "#d5dbd7",
                     border: "#cbd1cd",
                 },
                 dark: {
                     text: "#fff",
                     textSecondary: "#e3e3e3",
-                    bgPrimary: "#1b1c1b",
+                    bgPrimary: "#0c0c0d",
                     bgLight: "#252625",
-                    bgDark: "#111211",
-                    border: "#2e2e2e",
+                    bgDark: "#000000",
+                    border: "#1e1e1e",
                 },
             },
         },

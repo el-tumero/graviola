@@ -2,14 +2,14 @@ import { createBrowserRouter } from "react-router-dom"
 // pages
 import Home from "./pages/Home"
 import Generate from "./pages/Generate"
-import Collection from "./pages/Collection"
+import Drops from "./pages/Drops"
 import Error from "./pages/Error"
 import TradeUp from "./pages/TradeUp"
 
 export const routerPaths = {
     home: "/",
     generate: "/generate",
-    collection: "/collection",
+    drops: "/drops",
     tradeup: "/tradeup",
 }
 
@@ -24,8 +24,8 @@ const router = createBrowserRouter(
             element: <Generate />,
         },
         {
-            path: routerPaths.collection,
-            element: <Collection />,
+            path: routerPaths.drops,
+            element: <Drops />,
         },
         {
             path: routerPaths.tradeup,
