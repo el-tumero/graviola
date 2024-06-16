@@ -38,6 +38,7 @@ export default {
 
             colors: {
                 accent: "#2cde59",
+                accentDark: "#19b540",
                 light: {
                     text: "#000",
                     textSecondary: "#1f1f1f",

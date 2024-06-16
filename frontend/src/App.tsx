@@ -1,5 +1,6 @@
 import "./App.css"
 import { useEffect, useState, ReactNode } from "react"
+import tailwindConfig from "../tailwind.config"
 import {
     createWeb3Modal,
     defaultConfig,
@@ -60,6 +61,9 @@ const App = (props: { children: ReactNode }) => {
     }
 
     const modal = createWeb3Modal({
+        themeVariables: {
+            '--w3m-accent': tailwindConfig.theme.extend.colors.accentDark,
+        },
         ethersConfig: defaultConfig({
             metadata,
         }),

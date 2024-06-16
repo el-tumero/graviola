@@ -9,7 +9,7 @@ const NavList = (props: { navItems: React.ReactNode[]; mobileStyles: boolean }) 
             {props.navItems.map((item, i) => {
                 return <Fragment key={i}>{item}</Fragment>
             })}
-            <w3m-button />
+            <w3m-button size="sm" />
         </div>
     )
 }

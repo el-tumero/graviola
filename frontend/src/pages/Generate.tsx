@@ -8,8 +8,7 @@ import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
-import { getRarityFromPerc } from "../utils/getRarityData"
-import { formatBpToPercentage } from "../utils/format"
+import { getRarityFromLevel, } from "../utils/getRarityData"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { TransactionStatus } from "../types/TransactionStatus"
@@ -21,6 +20,8 @@ import { RaritiesData } from "../types/RarityGroup"
 import router, { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
+import { fallbackNFT, fallbackNFTRarityLevel } from "../utils/fallbackNFT"
+import { getRarityBorder } from "../utils/getRarityBorder"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -40,8 +41,29 @@ const Generate = () => {
     const [txMsg, setTxMsg] = useState<string>(generateTxStatusMessages["NONE"])
     // const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes()
     const [progress, setProgress] = useState<number>(0)
-
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
+
+    const shouldDisplayProgressBar = (progress !== 0)
+
+    const handleGenerate = async () => {
+        setTxStatus("AWAIT_CONFIRM")
+        const estFee = (await graviolaContext.contract?.estimateFee()) as bigint
+        try {
+            const tx = await graviolaContext.contract?.mint({
+                value: estFee + parseEther("0.01"),
+            })
+            const receipt = await tx?.wait()
+            if (receipt) {
+                console.log("receipt OK")
+                setTxStatus("BEFORE_MINT")
+                setProgress(25)
+            }
+        } catch (err) {
+            setTxStatus("REJECTED")
+            setTimeout(() => setTxStatus("NONE"), 3000)
+            return
+        }
+    }
 
     // Generation state listener
     // const progressListener = () => {
@@ -98,6 +120,45 @@ const Generate = () => {
     //     progressListener()
     // }, [])
 
+
+    // Only for testing
+    const mockHandleGenerate = () => {
+
+        const TICK_TIMEOUT_MS = 500
+
+        setTxStatus("AWAIT_CONFIRM")
+
+        setTimeout(() => {
+            setProgress(20)
+            setTxStatus("BEFORE_MINT")
+        }, TICK_TIMEOUT_MS)
+
+        setTimeout(() => {
+            setProgress(45)
+            setTxStatus("MINTED")
+        }, TICK_TIMEOUT_MS * 2);
+
+        setTimeout(() => {
+            setProgress(75)
+            setTxStatus("FINISHING")
+        }, TICK_TIMEOUT_MS * 3);
+
+        setTimeout(() => {
+
+            const mockRarityLevel = getRarityFromLevel(fallbackNFTRarityLevel, rGroups)
+            const mockRolled: NFTExt = {
+                rarityLevel: fallbackNFTRarityLevel,
+                rarityData: mockRarityLevel,
+                ...fallbackNFT
+            }
+            setProgress(100)
+            setTxStatus("DONE")
+            setRolledNFT(mockRolled)
+
+        }, TICK_TIMEOUT_MS * 4);
+
+    }
+
     useEffect(() => {
         setTxMsg(generateTxStatusMessages[txStatus])
     }, [txStatus])
@@ -108,7 +169,7 @@ const Generate = () => {
 
             <ContentContainer additionalClasses="flex-col gap-4">
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
-                    <PageTitle title="NFT Generator" additionalClasses="" />
+                    <PageTitle title="NFT Generator" />
 
                     <GenerateContainer
                         rolledNFT={rolledNFT}
@@ -116,49 +177,50 @@ const Generate = () => {
                         rGroups={rGroups}
                     />
 
-                    {/* Progress bar */}
-                    {/* {progressBarVal !== 0 && (
-                        <div className={`w-1/2 h-5 rounded-xl border-2 border-light-border dark:border-dark-border shadow-inner`}>
-                            <div
-                                style={{
-                                    width: `${progressBarVal}%`,
-                                }}
-                                className="flex h-full bg-accent rounded-xl transition-all duration-150"
-                            ></div>
-                        </div>
-                    )} */}
-
-                    {/* Tx status text */}
+                    {/* Status text */}
                     <div className={cl(
                         "flex w-fit h-fit p-3 rounded-xl text-lg",
                         "border border-light-border dark:border-dark-border"
                     )}>
-                        {txMsg}
+                        {rolledNFT
+                            ? (
+                                <p>
+                                    Congratulations! You rolled a&nbsp;
+                                    <span style={{
+                                        color: rolledNFT.rarityData.color,
+                                        borderBottomWidth: 1,
+                                        borderBottomColor: rolledNFT.rarityData.color
+                                    }} className="font-bold">
+                                        {rolledNFT.rarityLevel}
+                                    </span>
+                                    &nbsp;NFT!!!
+                                </p>
+                            ) : isConnected
+                                ? <p>{txMsg}</p>
+                                : <p>Connect your wallet first</p>
+                        }
                     </div>
 
-                    {txStatus === "NONE" && (
+                    {/* Progress bar */}
+                    {shouldDisplayProgressBar
+                        &&
+                        <div className={`w-1/2 h-3 rounded-xl border border-light-border dark:border-dark-border`}>
+                            <div
+                                style={{ width: `${progress}%` }}
+                                className={cl(
+                                    "flex h-full rounded-xl",
+                                    "bg-gradient-to-r from-accentDark via-accent to-accentDark",
+                                    "transition-all duration-300"
+                                )} />
+                        </div>
+                    }
+
+                    {(isConnected && (txStatus === "NONE")) && (
                         <Button
-                            text={isConnected ? "Generate!" : "Connect your wallet first"}
+                            text={"Generate!"}
                             disabled={!isConnected || txStatus !== "NONE"}
-                            onClick={async () => {
-                                setTxStatus("AWAIT_CONFIRM")
-                                const estFee = (await graviolaContext.contract?.estimateFee()) as bigint
-                                try {
-                                    const tx = await graviolaContext.contract?.mint({
-                                        value: estFee + parseEther("0.01"),
-                                    })
-                                    const receipt = await tx?.wait()
-                                    if (receipt) {
-                                        console.log("receipt OK")
-                                        setTxStatus("BEFORE_MINT")
-                                        setProgress(25)
-                                    }
-                                } catch (err) {
-                                    setTxStatus("REJECTED")
-                                    setTimeout(() => setTxStatus("NONE"), 3000)
-                                    return
-                                }
-                            }}
+                            // onClick={() => handleGenerate()}
+                            onClick={() => mockHandleGenerate()}
                         />
                     )}
                 </div>

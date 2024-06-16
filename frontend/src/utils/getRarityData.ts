@@ -22,9 +22,9 @@ export function getRarityFromPerc(threshold: number, rarities: RaritiesData): [R
 }
 
 // Get RarityLevel, RGroupData from RarityLevel enum type value
-export function getRarityFromLevel(rarityLevel: RarityLevel, rarities: RaritiesData): [RarityLevel, RarityGroupData] {
+export function getRarityFromLevel(rarityLevel: RarityLevel, rarities: RaritiesData): RarityGroupData {
     if (rarityLevel in rarities) {
-        return [rarityLevel, rarities[rarityLevel]]
+        return rarities[rarityLevel]
     }
     throw new Error(`Rarity level ${rarityLevel} does not exist in the rarities data.`)
 }

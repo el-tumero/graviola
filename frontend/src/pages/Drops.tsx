@@ -212,7 +212,7 @@ const CollectionList = (props: {
                             {/* Stats, info */}
                             <div className={cl("flex flex-col gap-1 h-full justify-between items-between")}>
                                 <div className={cl("flex flex-col w-full h-fit gap-1", "justify-start items-start")}>
-                                    <p>id: {idx}</p>
+                                    <p>id: {nft.id}</p>
                                     <p>
                                         Rarity:{" "}
                                         <span

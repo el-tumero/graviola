@@ -13,4 +13,4 @@ export const fallbackNFT: NFT = {
     ],
 }
 
-export const fallbackNFTRarity = RarityLevel.Legendary
+export const fallbackNFTRarityLevel = RarityLevel.Legendary
