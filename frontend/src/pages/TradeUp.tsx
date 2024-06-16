@@ -2,47 +2,58 @@ import Button from "../components/ui/Button"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
-import { useWeb3ModalAccount } from "@web3modal/ethers/react"
+import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
 import { useContext, useEffect, useState } from "react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import { RaritiesData } from "../types/RarityGroup"
 import { clsx as cl } from "clsx"
-import { ethers, isCallException, toBigInt } from "ethers"
+import { ethers, parseEther } from "ethers"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
-import BlockNFT, { BlockNFTProps } from "../components/BlockNFT"
-import { convertToIfpsURL } from "../utils/convertToIpfsURL"
-import { RarityGroupData, RarityLevel } from "../types/Rarity"
-import GenerateContainer from "../components/ui/layout/GenerateContainer"
+import BlockNFT from "../components/BlockNFT"
+import { RarityLevel } from "../types/Rarity"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { tradeUpTxStatusMessages } from "../utils/statusMessages"
 import { NFTExt } from "./Generate"
 import { Graviola } from "../../../contracts/typechain-types/Graviola"
-import { parseEther } from "ethers"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { cn } from "../utils/cn"
 import { getRarityBorder } from "../utils/getRarityBorder"
 import useRandomRarityBorder from "../hooks/useBorderAnimation"
+import { Status } from "../types/Status"
+
+const ERR_TIMEOUT_MS = 5000
 
 const TradeUp = () => {
-    const graviolaContext = useContext(GraviolaContext)
+
     const { isConnected, address } = useWeb3ModalAccount()
-    const rGroups = graviolaContext.rarities as RaritiesData
-    const contractNFTs = graviolaContext.collection as NFT[]
+    const { walletProvider } = useWeb3ModalProvider()
+    const { contract, rarities: rGroups, collection } = useContext(GraviolaContext) as {
+        contract: Graviola,
+        rarities: RaritiesData,
+        collection: NFT[]
+    }
 
     const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
-    const [isLoading, setIsLoading] = useState<boolean>(true)
-    const [progressState, setProgressState] = useState<TransactionStatus>("NONE")
-    const [progressMessage, setProgressMessage] = useState<string>(tradeUpTxStatusMessages["NONE"])
-    const [progressBarVal, setProgressBarVal] = useState<number>(0)
+    const [status, setStatus] = useState<Status>("loading")
+
+    // Gen data
+    const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
+    const [txMsg, setTxMsg] = useState<string>(tradeUpTxStatusMessages["NONE"])
+    // const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes()
+    const [progress, setProgress] = useState<number>(0)
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
-    const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
+
+    // const [progressMessage, setProgressMessage] = useState<string>(tradeUpTxStatusMessages["NONE"])
+    // const [progressBarVal, setProgressBarVal] = useState<number>(0)
+    // const [rolledNFT, setRolledNFT] = useState<NFTExt>()
+    // const isPreGenerationState = ["NONE", "CONFIRM_TX", "TX_REJECTED"].includes(progressState)
 
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
-    const contentReady = !isLoading && isConnected
+    const contentReady = status === "ready" && isConnected
 
     // Select an NFT as a trade component
     const handleNFTClick = (idx: number, rarityLevel: RarityLevel) => {
@@ -70,46 +81,76 @@ const TradeUp = () => {
         }
     }
 
+    const handleTradeUp = async () => {
+        setTxStatus("AWAIT_CONFIRM")
+        const estFee = (await contract.estimateFee()) as bigint
+        try {
+            const tx = await contract.mint({
+                value: estFee + parseEther("0.01"),
+            })
+            const receipt = await tx?.wait()
+            if (receipt) {
+                console.log("receipt OK")
+                setTxStatus("BEFORE_MINT")
+                setProgress(25)
+            }
+        } catch (err) {
+            setTxStatus("REJECTED")
+            setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
+            return
+        }
+    }
+
     // Generation state listener
     const progressListener = () => {
-        if (!isConnected) return
-        const graviola = graviolaContext.contract as Graviola
-
+        if (!walletProvider) return
         const onMint = (addr: string, tokenId: bigint) => {
             if (addr != address) return
-
             console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
-            setProgressState("MINTED")
-            setProgressBarVal(50)
+            setTxStatus("MINTED")
+            setProgress(50)
         }
 
+        // TODO: Better err handling. Add some kind of pop-up and try-catch
         const onTokenReady = async (addr: string, tokenId: bigint) => {
             if (addr != address) return
 
             console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
-            const uri = await graviola.tokenURI(tokenId)
+
+            const uri = await contract.tokenURI(tokenId)
             const response = await fetch(uri)
-            const nft: NFT = await response.json()
-            const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
+            const nextIdx = collection.length
+            const nftData = await response.json()
+            const [rLevel, rData] = getRarityFromPerc(nftData.attributes[0].value, rGroups)
 
-            setProgressState("DONE")
-            setProgressBarVal(100)
-
-            const nftRes: NFTExt = {
-                ...nft,
-                rarityLevel: rarityLevel,
-                rarityData: rarityData,
+            const nftBase: NFT = {
+                id: nextIdx,
+                ...nftData
             }
 
+            const nftRes: NFTExt = {
+                rarityLevel: rLevel,
+                rarityData: rData,
+                ...nftBase
+            }
+
+            console.log('[DEBUG] - tradeup Res: ', JSON.stringify(nftRes, null, 4))
+
+            // DEBUG
+            // console.log("raw val ", nft.attributes[0].value)
+            // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
+            // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
+            setTxStatus("DONE")
+            setProgress(100)
             setRolledNFT(nftRes)
         }
 
-        graviola.on(graviola.filters.Mint, onMint)
-        graviola.on(graviola.filters.TokenReady, onTokenReady)
+        contract.on(contract.filters.Mint, onMint)
+        contract.on(contract.filters.TokenReady, onTokenReady)
 
         return () => {
-            graviola.off(graviola.filters.Mint, onMint)
-            graviola.off(graviola.filters.TokenReady, onTokenReady)
+            contract.off(contract.filters.Mint, onMint)
+            contract.off(contract.filters.TokenReady, onTokenReady)
         }
     }
 
@@ -118,14 +159,14 @@ const TradeUp = () => {
         ; (async () => {
             let userOwnedTokens
             if (address) {
-                userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
+                userOwnedTokens = await contract.ownedTokens(ethers.getAddress(address))
             }
             userOwnedTokens &&
                 userOwnedTokens.forEach((token: bigint) => {
                     setOwnedTokensIds((prev) => [...prev, Number(token)])
                 })
             // console.log(ownedTokensIds)
-            setIsLoading(false)
+            setStatus("ready")
         })()
     }, [isConnected, address])
 
@@ -136,8 +177,8 @@ const TradeUp = () => {
 
     // Progress state text updater
     useEffect(() => {
-        setProgressMessage(tradeUpTxStatusMessages[progressState])
-    }, [progressState])
+        setTxMsg(tradeUpTxStatusMessages[txStatus])
+    }, [txStatus])
 
     return (
         <FullscreenContainer>
@@ -147,7 +188,7 @@ const TradeUp = () => {
 
                 {!contentReady ? (
                     <SectionContainer additionalClasses="self-center w-fit justify-center">
-                        {isLoading
+                        {(status === "loading")
                             ? <p>Loading...</p>
                             : <p>You need to connect your wallet first!</p>
                         }
@@ -179,18 +220,16 @@ const TradeUp = () => {
                                             "max-md:grid-cols-4 md:grid-cols-5",
                                         )}
                                     >
-                                        {contractNFTs.map((nft: NFT, i) => {
+                                        {collection.map((nft: NFT, i) => {
                                             const percRarity = formatBpToPercentage(nft.attributes[0].value)
                                             const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
                                             const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
-                                            const [rarityLevel, rarityData] = getRarityFromPerc(percRarity, rGroups)
+                                            const [rarityLevel] = getRarityFromPerc(percRarity, rGroups)
 
                                             if (selectedGroup !== null && selectedGroup !== rarityLevel) {
                                                 return null
-                                                // } else if (
-                                                // !ownedTokenIds.includes(i)
-                                                // ) {
-                                                // return null
+                                                // } else if (!ownedTokenIds.includes(i)) {
+                                                //     return null
                                             } else {
                                                 return (
                                                     <div
@@ -236,8 +275,8 @@ const TradeUp = () => {
                                             const randBase = Math.random()
                                             const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
                                             const randSign = randBase < 0.5 ? -1 : 1
-                                            const percRarity = formatBpToPercentage(contractNFTs[id].attributes[0].value)
-                                            const [rLevel, rGroupData] = getRarityFromPerc(percRarity, rGroups)
+                                            const percRarity = formatBpToPercentage(collection[id].attributes[0].value)
+                                            const [, rGroupData] = getRarityFromPerc(percRarity, rGroups)
                                             return (
                                                 <div
                                                     key={i}
@@ -256,7 +295,7 @@ const TradeUp = () => {
                                                     onClick={() => handleSelectedNFTClick(id)}
                                                 >
                                                     <BlockNFT
-                                                        nftData={contractNFTs[id]}
+                                                        nftData={collection[id]}
                                                         glowColor="none"
                                                         additionalClasses="w-12 h-12"
                                                         disableMetadataOnHover
@@ -273,13 +312,13 @@ const TradeUp = () => {
                         <SectionContainer additionalClasses="justify-between items-center">
                             <p>
                                 <span>Status: </span>
-                                <span className={cl("p-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>STATUS_TEXT</span>
+                                <span className={cl("p-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>{txMsg}</span>
                             </p>
 
                             <Button
                                 text="Trade"
                                 disabled={false}
-                                onClick={() => { }}
+                                onClick={() => handleTradeUp()}
                                 additionalClasses={
                                     selectedIds.length === 3 ? "border border-light-text/25 dark:border-dark-text/25" : "border-none"
                                 }

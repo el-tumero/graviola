@@ -7,7 +7,7 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
+import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
@@ -30,7 +30,7 @@ export interface NFTExt extends NFT {
 
 const Generate = () => {
     const navigate = useNavigate()
-    const { walletProvider } = useWeb3ModalProvider()
+    // const { walletProvider } = useWeb3ModalProvider()
     const { contract, rarities: rGroups, collection } = useContext(GraviolaContext) as {
         contract: Graviola,
         rarities: RaritiesData,
@@ -71,7 +71,7 @@ const Generate = () => {
 
     // Generation state listener
     const progressListener = () => {
-        if (!walletProvider) return
+        // if (!walletProvider) return
         const onMint = (addr: string, tokenId: bigint) => {
             if (addr != address) return
             console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
