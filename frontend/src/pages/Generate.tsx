@@ -8,20 +8,19 @@ import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
-import { getRarityFromLevel } from "../utils/getRarityData"
+import { getRarityFromPerc } from "../utils/getRarityData"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { parseEther } from "ethers"
 import { Graviola } from "../../../contracts/typechain-types/Graviola"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
-import ResultText from "../components/ui/ResultText"
 import { RaritiesData } from "../types/RarityGroup"
-import router, { routerPaths } from "../router"
+import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
-import { fallbackNFT, fallbackNFTRarityLevel } from "../utils/fallbackNFT"
-import { getRarityBorder } from "../utils/getRarityBorder"
+
+const ERR_TIMEOUT_MS = 5000 // How long should display message on err (e.g. rejected tx)
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -32,8 +31,11 @@ export interface NFTExt extends NFT {
 const Generate = () => {
     const navigate = useNavigate()
     const { walletProvider } = useWeb3ModalProvider()
-    const graviolaContext = useContext(GraviolaContext)
-    const rGroups = graviolaContext.rarities as RaritiesData
+    const { contract, rarities: rGroups, collection } = useContext(GraviolaContext) as {
+        contract: Graviola,
+        rarities: RaritiesData,
+        collection: NFT[]
+    }
     const { isConnected, address } = useWeb3ModalAccount()
 
     // Gen data
@@ -47,9 +49,9 @@ const Generate = () => {
 
     const handleGenerate = async () => {
         setTxStatus("AWAIT_CONFIRM")
-        const estFee = (await graviolaContext.contract?.estimateFee()) as bigint
+        const estFee = (await contract.estimateFee()) as bigint
         try {
-            const tx = await graviolaContext.contract?.mint({
+            const tx = await contract.mint({
                 value: estFee + parseEther("0.01"),
             })
             const receipt = await tx?.wait()
@@ -60,99 +62,105 @@ const Generate = () => {
             }
         } catch (err) {
             setTxStatus("REJECTED")
-            setTimeout(() => setTxStatus("NONE"), 3000)
+            setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
             return
         }
     }
 
     // Generation state listener
-    // const progressListener = () => {
-    //     if (!walletProvider) return
-    //     const graviola = graviolaContext.contract as Graviola
-
-    //     const onMint = (addr: string, tokenId: bigint) => {
-    //         if (addr != address) return
-    //         console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
-    //         setProgressState("MINTED")
-    //         setProgressBarVal(50)
-    //     }
-
-    //     const onTokenReady = async (addr: string, tokenId: bigint) => {
-    //         if (addr != address) return
-
-    //         console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
-
-    //         const uri = await graviola.tokenURI(tokenId)
-    //         const response = await fetch(uri)
-    //         const nft: NFT = await response.json()
-
-    //         // DEBUG
-    //         // console.log("raw val ", nft.attributes[0].value)
-    //         // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
-    //         // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
-
-    //         const [rarityLevel, rarityData] = getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups)
-
-    //         // console.log("rarityLevel from conv:  ", rarityLevel)
-
-    //         setProgressState("DONE")
-    //         setProgressBarVal(100)
-
-    //         const nftRes: NFTExt = {
-    //             ...nft,
-    //             rarityLevel: rarityLevel,
-    //             rarityData: rarityData,
-    //         }
-
-    //         setRolledNFT(nftRes)
-    //     }
-
-    //     graviola.on(graviola.filters.Mint, onMint)
-    //     graviola.on(graviola.filters.TokenReady, onTokenReady)
-
-    //     return () => {
-    //         graviola.off(graviola.filters.Mint, onMint)
-    //         graviola.off(graviola.filters.TokenReady, onTokenReady)
-    //     }
-    // }
-
-    // useEffect(() => {
-    //     progressListener()
-    // }, [])
-
-    // Only for testing
-    const mockHandleGenerate = () => {
-        const TICK_TIMEOUT_MS = 500
-
-        setTxStatus("AWAIT_CONFIRM")
-
-        setTimeout(() => {
-            setProgress(20)
-            setTxStatus("BEFORE_MINT")
-        }, TICK_TIMEOUT_MS)
-
-        setTimeout(() => {
-            setProgress(45)
+    const progressListener = () => {
+        if (!walletProvider) return
+        const onMint = (addr: string, tokenId: bigint) => {
+            if (addr != address) return
+            console.log(`[info] onMint: addr ${addr}, tokenId ${tokenId}`)
             setTxStatus("MINTED")
-        }, TICK_TIMEOUT_MS * 2)
+            setProgress(50)
+        }
 
-        setTimeout(() => {
-            setProgress(75)
-            setTxStatus("FINISHING")
-        }, TICK_TIMEOUT_MS * 3)
+        // TODO: Better err handling. Add some kind of pop-up
+        const onTokenReady = async (addr: string, tokenId: bigint) => {
+            if (addr != address) return
 
-        setTimeout(() => {
-            const mockRarityLevel = getRarityFromLevel(fallbackNFTRarityLevel, rGroups)
-            const mockRolled: NFTExt = {
-                rarityLevel: fallbackNFTRarityLevel,
-                rarityData: mockRarityLevel,
-                ...fallbackNFT,
+            console.log(`[info] onTokenReady: addr ${addr}, tokenId ${tokenId}`)
+
+            const uri = await contract.tokenURI(tokenId)
+            const response = await fetch(uri)
+            const nextIdx = collection.length
+            const nftData = await response.json()
+            const [rLevel, rData] = getRarityFromPerc(nftData.attributes[0].value, rGroups)
+
+            const nftBase: NFT = {
+                id: nextIdx,
+                ...nftData
             }
-            setProgress(100)
+
+            const nftRes: NFTExt = {
+                rarityLevel: rLevel,
+                rarityData: rData,
+                ...nftBase
+            }
+
+            console.log('[DEBUG] - drop: ', JSON.stringify(nftRes, null, 4))
+
+            // DEBUG
+            // console.log("raw val ", nft.attributes[0].value)
+            // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
+            // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
+
+
+            // console.log("rarityLevel from conv:  ", rarityLevel)
+
             setTxStatus("DONE")
-            setRolledNFT(mockRolled)
-        }, TICK_TIMEOUT_MS * 4)
+            setProgress(100)
+            setRolledNFT(nftRes)
+        }
+
+        contract.on(contract.filters.Mint, onMint)
+        contract.on(contract.filters.TokenReady, onTokenReady)
+
+        return () => {
+            contract.off(contract.filters.Mint, onMint)
+            contract.off(contract.filters.TokenReady, onTokenReady)
+        }
     }
+
+    useEffect(() => {
+        progressListener()
+    }, [])
+
+    // (MOCK LOGIC FOR TESTING) ======================
+    // const mockHandleGenerate = () => {
+    //     const TICK_TIMEOUT_MS = 500
+
+    //     setTxStatus("AWAIT_CONFIRM")
+
+    //     setTimeout(() => {
+    //         setProgress(20)
+    //         setTxStatus("BEFORE_MINT")
+    //     }, TICK_TIMEOUT_MS)
+
+    //     setTimeout(() => {
+    //         setProgress(45)
+    //         setTxStatus("MINTED")
+    //     }, TICK_TIMEOUT_MS * 2)
+
+    //     setTimeout(() => {
+    //         setProgress(75)
+    //         setTxStatus("FINISHING")
+    //     }, TICK_TIMEOUT_MS * 3)
+
+    //     setTimeout(() => {
+    //         const mockRarityLevel = getRarityFromLevel(fallbackNFTRarityLevel, rGroups)
+    //         const mockRolled: NFTExt = {
+    //             rarityLevel: fallbackNFTRarityLevel,
+    //             rarityData: mockRarityLevel,
+    //             ...fallbackNFT,
+    //         }
+    //         setProgress(100)
+    //         setTxStatus("DONE")
+    //         setRolledNFT(mockRolled)
+    //     }, TICK_TIMEOUT_MS * 4)
+    // }
 
     useEffect(() => {
         setTxMsg(generateTxStatusMessages[txStatus])
@@ -210,8 +218,8 @@ const Generate = () => {
                         <Button
                             text={"Generate!"}
                             disabled={!isConnected || txStatus !== "NONE"}
-                            // onClick={() => handleGenerate()}
-                            onClick={() => mockHandleGenerate()}
+                            onClick={() => handleGenerate()}
+                        // onClick={() => mockHandleGenerate()} // MOCK FOR TESTING
                         />
                     )}
                 </div>
