@@ -1,5 +1,5 @@
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
-import { rarityScale } from "../rarityData"
+import { rarityScale } from "../data/rarityData"
 
 export function getRarityBorder(
     rarityGroup: RarityGroupData,

@@ -47,6 +47,8 @@ const Generate = () => {
 
     const shouldDisplayProgressBar = progress !== 0
 
+    // TODO: The exact same function is used in TradeUp page.
+    // Could be a hook, same with the Progress Listener below.
     const handleGenerate = async () => {
         setTxStatus("AWAIT_CONFIRM")
         const estFee = (await contract.estimateFee()) as bigint
@@ -77,7 +79,7 @@ const Generate = () => {
             setProgress(50)
         }
 
-        // TODO: Better err handling. Add some kind of pop-up
+        // TODO: Better err handling. Add some kind of pop-up and try-catch
         const onTokenReady = async (addr: string, tokenId: bigint) => {
             if (addr != address) return
 

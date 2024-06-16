@@ -29,7 +29,7 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
     const [status, setStatus] = useState<Status>("loading")
 
     const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto"
-    const glowLevelData = shouldGetRarityLevel ? getRarityFromLevel(glowColor, rarities)[1] : null
+    const glowLevelData = shouldGetRarityLevel ? getRarityFromLevel(glowColor, rarities) : null
 
     let style: React.CSSProperties = {}
     if (glowColor !== "none") {

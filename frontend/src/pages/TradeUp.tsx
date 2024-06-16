@@ -13,7 +13,6 @@ import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import BlockNFT, { BlockNFTProps } from "../components/BlockNFT"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
-import ResultText from "../components/ui/ResultText"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import { TransactionStatus } from "../types/TransactionStatus"
@@ -116,7 +115,7 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             let userOwnedTokens
             if (address) {
                 userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
@@ -148,26 +147,36 @@ const TradeUp = () => {
 
                 {!contentReady ? (
                     <SectionContainer additionalClasses="self-center w-fit justify-center">
-                        {isLoading ? <p>Loading...</p> : <p>You need to connect your wallet first!</p>}
+                        {isLoading
+                            ? <p>Loading...</p>
+                            : <p>You need to connect your wallet first!</p>
+                        }
                     </SectionContainer>
                 ) : (
                     <div className="flex flex-col gap-3 justify-between items-center h-full flex-grow">
                         <div
                             className={cl(
-                                "flex w-full h-full",
+                                "flex w-full h-full rounded-xl",
                                 "divide-x divide-light-border dark:divide-dark-border",
                                 "border border-light-border dark:border-dark-border",
-                                "rounded-xl",
+                                "max-sm:flex-wrap max-sm:flex-col"
                             )}
                         >
                             {/* Owned NFTs (Left panel) */}
-                            <div className={cl("flex basis-2/3", "flex-col", "p-6 max-sm:p-3")}>
-                                <div className={cl("flex-grow w-full h-0 overflow-auto", "rounded-xl")}>
+                            <div className={cl(
+                                "flex basis-2/3",
+                                "flex-col",
+                                "p-6 max-sm:p-3"
+                            )}>
+                                <div className={cl(
+                                    "flex-grow w-full h-0 overflow-auto",
+                                    "rounded-xl"
+                                )}>
                                     <div
                                         className={cl(
                                             "grid gap-3 auto-rows-min",
-                                            "max-sm:grid-cols-2",
-                                            "max-md:grid-cols-3 md:grid-cols-4 xl:grid-cols-5",
+                                            "max-sm:grid-cols-3",
+                                            "max-md:grid-cols-4 md:grid-cols-5",
                                         )}
                                     >
                                         {contractNFTs.map((nft: NFT, i) => {
@@ -270,7 +279,7 @@ const TradeUp = () => {
                             <Button
                                 text="Trade"
                                 disabled={false}
-                                onClick={() => {}}
+                                onClick={() => { }}
                                 additionalClasses={
                                     selectedIds.length === 3 ? "border border-light-text/25 dark:border-dark-text/25" : "border-none"
                                 }

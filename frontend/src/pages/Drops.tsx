@@ -14,7 +14,7 @@ import { ethers } from "ethers"
 import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
 import PageTitle from "../components/ui/layout/PageTitle"
-import icons from "../icons"
+import icons from "../data/icons"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"

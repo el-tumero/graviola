@@ -6,7 +6,7 @@ import { routerPaths } from "../../router"
 import { clsx as cl } from "clsx"
 import { openURL } from "../../utils/openURL"
 import NavListDesktop from "./NavList"
-import icons from "../../icons"
+import icons from "../../data/icons"
 import { AppContext } from "../../contexts/AppContext"
 
 const Navbar = () => {

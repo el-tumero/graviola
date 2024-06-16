@@ -1,4 +1,4 @@
-import icons from "../../icons"
+import icons from "../../data/icons"
 import { cn } from "../../utils/cn"
 
 interface ButtonProps {
