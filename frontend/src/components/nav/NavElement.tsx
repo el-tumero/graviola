@@ -16,7 +16,7 @@ const NavElement = ({ children, onClick, additionalClasses }: NavElementProps) =
                 "max-lg:bg-light-border/75 max-lg:dark:bg-dark-border/75",
                 "hover:bg-light-text/10 dark:hover:bg-dark-text/10",
                 "transition-colors duration-300",
-                additionalClasses
+                additionalClasses,
             )}
             onClick={onClick}
         >

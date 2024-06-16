@@ -8,7 +8,7 @@ import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount, useWeb3ModalProvider } from "@web3modal/ethers/react"
-import { getRarityFromLevel, } from "../utils/getRarityData"
+import { getRarityFromLevel } from "../utils/getRarityData"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { TransactionStatus } from "../types/TransactionStatus"
@@ -43,7 +43,7 @@ const Generate = () => {
     const [progress, setProgress] = useState<number>(0)
     const [rolledNFT, setRolledNFT] = useState<NFTExt>()
 
-    const shouldDisplayProgressBar = (progress !== 0)
+    const shouldDisplayProgressBar = progress !== 0
 
     const handleGenerate = async () => {
         setTxStatus("AWAIT_CONFIRM")
@@ -120,10 +120,8 @@ const Generate = () => {
     //     progressListener()
     // }, [])
 
-
     // Only for testing
     const mockHandleGenerate = () => {
-
         const TICK_TIMEOUT_MS = 500
 
         setTxStatus("AWAIT_CONFIRM")
@@ -136,27 +134,24 @@ const Generate = () => {
         setTimeout(() => {
             setProgress(45)
             setTxStatus("MINTED")
-        }, TICK_TIMEOUT_MS * 2);
+        }, TICK_TIMEOUT_MS * 2)
 
         setTimeout(() => {
             setProgress(75)
             setTxStatus("FINISHING")
-        }, TICK_TIMEOUT_MS * 3);
+        }, TICK_TIMEOUT_MS * 3)
 
         setTimeout(() => {
-
             const mockRarityLevel = getRarityFromLevel(fallbackNFTRarityLevel, rGroups)
             const mockRolled: NFTExt = {
                 rarityLevel: fallbackNFTRarityLevel,
                 rarityData: mockRarityLevel,
-                ...fallbackNFT
+                ...fallbackNFT,
             }
             setProgress(100)
             setTxStatus("DONE")
             setRolledNFT(mockRolled)
-
-        }, TICK_TIMEOUT_MS * 4);
-
+        }, TICK_TIMEOUT_MS * 4)
     }
 
     useEffect(() => {
@@ -171,51 +166,47 @@ const Generate = () => {
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
                     <PageTitle title="NFT Generator" />
 
-                    <GenerateContainer
-                        rolledNFT={rolledNFT}
-                        runBorderAnim={!rolledNFT}
-                        rGroups={rGroups}
-                    />
+                    <GenerateContainer rolledNFT={rolledNFT} runBorderAnim={!rolledNFT} rGroups={rGroups} />
 
                     {/* Status text */}
-                    <div className={cl(
-                        "flex w-fit h-fit p-3 rounded-xl text-lg",
-                        "border border-light-border dark:border-dark-border"
-                    )}>
-                        {rolledNFT
-                            ? (
-                                <p>
-                                    Congratulations! You rolled a&nbsp;
-                                    <span style={{
+                    <div className={cl("flex w-fit h-fit p-3 rounded-xl text-lg", "border border-light-border dark:border-dark-border")}>
+                        {rolledNFT ? (
+                            <p>
+                                Congratulations! You rolled a&nbsp;
+                                <span
+                                    style={{
                                         color: rolledNFT.rarityData.color,
                                         borderBottomWidth: 1,
-                                        borderBottomColor: rolledNFT.rarityData.color
-                                    }} className="font-bold">
-                                        {rolledNFT.rarityLevel}
-                                    </span>
-                                    &nbsp;NFT!!!
-                                </p>
-                            ) : isConnected
-                                ? <p>{txMsg}</p>
-                                : <p>Connect your wallet first</p>
-                        }
+                                        borderBottomColor: rolledNFT.rarityData.color,
+                                    }}
+                                    className="font-bold"
+                                >
+                                    {rolledNFT.rarityLevel}
+                                </span>
+                                &nbsp;NFT!!!
+                            </p>
+                        ) : isConnected ? (
+                            <p>{txMsg}</p>
+                        ) : (
+                            <p>Connect your wallet first</p>
+                        )}
                     </div>
 
                     {/* Progress bar */}
-                    {shouldDisplayProgressBar
-                        &&
+                    {shouldDisplayProgressBar && (
                         <div className={`w-1/2 h-3 rounded-xl border border-light-border dark:border-dark-border`}>
                             <div
                                 style={{ width: `${progress}%` }}
                                 className={cl(
                                     "flex h-full rounded-xl",
                                     "bg-gradient-to-r from-accentDark via-accent to-accentDark",
-                                    "transition-all duration-300"
-                                )} />
+                                    "transition-all duration-300",
+                                )}
+                            />
                         </div>
-                    }
+                    )}
 
-                    {(isConnected && (txStatus === "NONE")) && (
+                    {isConnected && txStatus === "NONE" && (
                         <Button
                             text={"Generate!"}
                             disabled={!isConnected || txStatus !== "NONE"}
@@ -273,10 +264,7 @@ const Generate = () => {
                         "rounded-xl border border-light-border dark:border-dark-border",
                     )}
                 >
-                    <Button
-                        text="See all Keywords"
-                        onClick={() => navigate(routerPaths.home)}
-                    />
+                    <Button text="See all Keywords" onClick={() => navigate(routerPaths.home)} />
                 </div>
             </ContentContainer>
         </FullscreenContainer>

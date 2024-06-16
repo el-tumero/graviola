@@ -98,11 +98,7 @@ const Navbar = () => {
                 </div>
 
                 {mobileListVisible && (
-                    <div className={cl(
-                        "flex flex-col w-full h-fit",
-                        "bg-transparent",
-                        "transition-all duration-300",
-                    )}>
+                    <div className={cl("flex flex-col w-full h-fit", "bg-transparent", "transition-all duration-300")}>
                         <NavListDesktop navItems={navItems} mobileStyles={true} />
                     </div>
                 )}

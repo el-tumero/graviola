@@ -33,7 +33,6 @@ const TradeUp = () => {
     const rGroups = graviolaContext.rarities as RaritiesData
     const contractNFTs = graviolaContext.collection as NFT[]
 
-
     const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [progressState, setProgressState] = useState<TransactionStatus>("NONE")
@@ -67,7 +66,7 @@ const TradeUp = () => {
         console.log(indexOf)
         if (indexOf !== -1) {
             if (selectedIds.length === 1) setSelectedGroup(null)
-            setSelectedIds(prev => prev.filter((_id) => idx !== _id))
+            setSelectedIds((prev) => prev.filter((_id) => idx !== _id))
             return
         }
     }
@@ -117,7 +116,7 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             let userOwnedTokens
             if (address) {
                 userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
@@ -195,7 +194,7 @@ const TradeUp = () => {
                                                             "border border-light-border dark:border-dark-border rounded-xl",
                                                             "hover:border-light-text/40 dark:hover:border-dark-text/40",
                                                             "hover:scale-95 transition-transform duration-300",
-                                                            selectedIds.includes(i) ? "opacity-50 scale-95" : "opacity-100"
+                                                            selectedIds.includes(i) ? "opacity-50 scale-95" : "opacity-100",
                                                         )}
                                                     >
                                                         <div className={cl("m-4")}>
@@ -219,53 +218,45 @@ const TradeUp = () => {
                             </div>
 
                             {/* TradeUp Result (Right panel) */}
-                            <div className={cl(
-                                "flex max-md:flex-col basis-1/3",
-                                "justify-center items-center",
-                                "p-6 max-sm:p-3"
-                            )}>
-
-                                {(selectedIds.length === 0)
-                                    ? (
-                                        <p>Select the NFTs you want to trade</p>
-                                    ) : (
-                                        <TradeUpGenerateContainer active={(selectedIds.length === 3)} rGroups={rGroups}>
-                                            {selectedIds.map((id, i) => {
-                                                const randBase = Math.random()
-                                                const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
-                                                const randSign = (randBase < 0.5) ? -1 : 1
-                                                const percRarity = formatBpToPercentage(contractNFTs[id].attributes[0].value)
-                                                const [rLevel, rGroupData] = getRarityFromPerc(percRarity, rGroups)
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        className={cl(
-                                                            "flex justify-center items-center",
-                                                            "w-16 h-16 rounded-xl",
-                                                            "bg-light-bgPrimary dark:bg-dark-bgPrimary",
-                                                            "border border-light-border dark:border-dark-border",
-                                                            "hover:cursor-pointer"
-                                                        )}
-                                                        style={{
-                                                            ...getRarityBorder(rGroupData, true).style,
-                                                            zIndex: `${selectedIds.length}`,
-                                                            rotate: `${randSign * randRotate}deg`
-                                                        }}
-                                                        onClick={() => handleSelectedNFTClick(id)}
-                                                    >
-                                                        <BlockNFT
-                                                            nftData={contractNFTs[id]}
-                                                            glowColor="none"
-                                                            additionalClasses="w-12 h-12"
-                                                            disableMetadataOnHover
-                                                        />
-                                                    </div>
-                                                )
-                                            })}
-                                        </TradeUpGenerateContainer>
-                                    )
-                                }
-
+                            <div className={cl("flex max-md:flex-col basis-1/3", "justify-center items-center", "p-6 max-sm:p-3")}>
+                                {selectedIds.length === 0 ? (
+                                    <p>Select the NFTs you want to trade</p>
+                                ) : (
+                                    <TradeUpGenerateContainer active={selectedIds.length === 3} rGroups={rGroups}>
+                                        {selectedIds.map((id, i) => {
+                                            const randBase = Math.random()
+                                            const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
+                                            const randSign = randBase < 0.5 ? -1 : 1
+                                            const percRarity = formatBpToPercentage(contractNFTs[id].attributes[0].value)
+                                            const [rLevel, rGroupData] = getRarityFromPerc(percRarity, rGroups)
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    className={cl(
+                                                        "flex justify-center items-center",
+                                                        "w-16 h-16 rounded-xl",
+                                                        "bg-light-bgPrimary dark:bg-dark-bgPrimary",
+                                                        "border border-light-border dark:border-dark-border",
+                                                        "hover:cursor-pointer",
+                                                    )}
+                                                    style={{
+                                                        ...getRarityBorder(rGroupData, true).style,
+                                                        zIndex: `${selectedIds.length}`,
+                                                        rotate: `${randSign * randRotate}deg`,
+                                                    }}
+                                                    onClick={() => handleSelectedNFTClick(id)}
+                                                >
+                                                    <BlockNFT
+                                                        nftData={contractNFTs[id]}
+                                                        glowColor="none"
+                                                        additionalClasses="w-12 h-12"
+                                                        disableMetadataOnHover
+                                                    />
+                                                </div>
+                                            )
+                                        })}
+                                    </TradeUpGenerateContainer>
+                                )}
                             </div>
                         </div>
 
@@ -273,21 +264,15 @@ const TradeUp = () => {
                         <SectionContainer additionalClasses="justify-between items-center">
                             <p>
                                 <span>Status: </span>
-                                <span className={cl(
-                                    "p-3 rounded-xl",
-                                    "bg-light-border/75 dark:bg-dark-border/75"
-                                )}>
-                                    STATUS_TEXT
-                                </span>
+                                <span className={cl("p-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>STATUS_TEXT</span>
                             </p>
 
                             <Button
                                 text="Trade"
                                 disabled={false}
-                                onClick={() => { }}
-                                additionalClasses={(selectedIds.length === 3)
-                                    ? "border border-light-text/25 dark:border-dark-text/25"
-                                    : "border-none"
+                                onClick={() => {}}
+                                additionalClasses={
+                                    selectedIds.length === 3 ? "border border-light-text/25 dark:border-dark-text/25" : "border-none"
                                 }
                             />
                         </SectionContainer>
@@ -299,16 +284,18 @@ const TradeUp = () => {
 }
 
 // Wrapper (ready = 3/3 Tokens selected)
-const TradeUpGenerateContainer = (props: { children: React.ReactNode, active: boolean, rGroups: RaritiesData }) => {
+const TradeUpGenerateContainer = (props: { children: React.ReactNode; active: boolean; rGroups: RaritiesData }) => {
     const rarityAnimBorder = useRandomRarityBorder(true, 750, props.rGroups)
     return (
-        <div className={cl(
-            "flex w-full h-full justify-center items-center",
-            "p-3 rounded-xl",
-            "bg-light-bgLight/25 dark:bg-dark-bgLight/25",
-            "border border-light-border dark:border-dark-border border-dashed",
-        )}
-            style={props.active ? rarityAnimBorder : {}}>
+        <div
+            className={cl(
+                "flex w-full h-full justify-center items-center",
+                "p-3 rounded-xl",
+                "bg-light-bgLight/25 dark:bg-dark-bgLight/25",
+                "border border-light-border dark:border-dark-border border-dashed",
+            )}
+            style={props.active ? rarityAnimBorder : {}}
+        >
             {props.children}
         </div>
     )
@@ -319,19 +306,13 @@ const KeywordBlocks = (props: { keywords: string[] }) => {
         <div className="flex flex-wrap gap-1 justify-center items-center text-sm mx-1 mb-3">
             {props.keywords.map((keyword: string, idx: number) => {
                 return (
-                    <div
-                        key={idx}
-                        className={cl(
-                            "rounded-lg py-1 px-1.5 border",
-                            "border-light-border dark:border-dark-border",
-                        )}>
+                    <div key={idx} className={cl("rounded-lg py-1 px-1.5 border", "border-light-border dark:border-dark-border")}>
                         <p>{keyword}</p>
                     </div>
                 )
             })}
         </div>
     )
-
 }
 
 export default TradeUp

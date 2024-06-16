@@ -16,7 +16,6 @@ interface GenerateContainerProps {
 }
 
 const GenerateContainer = ({ rolledNFT, runBorderAnim, rGroups }: GenerateContainerProps) => {
-
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
@@ -33,10 +32,7 @@ const GenerateContainer = ({ rolledNFT, runBorderAnim, rGroups }: GenerateContai
         rarityBorderObject = getRarityBorder(rarity, true)
     }
 
-    const {
-        style: breathingBorderStyle = {},
-        className: breathingBorderClassNames = ""
-    } = rarityBorderObject
+    const { style: breathingBorderStyle = {}, className: breathingBorderClassNames = "" } = rarityBorderObject
 
     useEffect(() => {
         if (!rolledNFT) return

@@ -22,14 +22,13 @@ export interface BlockNFTProps {
 }
 
 const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasses }: BlockNFTProps) => {
-
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
     const [, rData] = getRarityFromPerc(formatBpToPercentage(nftData.attributes[0].value), rarities)
     const [status, setStatus] = useState<Status>("loading")
 
-    const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto";
+    const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto"
     const glowLevelData = shouldGetRarityLevel ? getRarityFromLevel(glowColor, rarities)[1] : null
 
     let style: React.CSSProperties = {}
@@ -58,27 +57,23 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
             <img
                 onLoad={() => setStatus("ready")}
                 draggable={false}
-                className={cn(
-                    "w-full h-full rounded-lg",
-                    (status !== "ready") && "hidden",
-                    `nft-${nftData.id}-${nftData.image}`
-                )}
+                className={cn("w-full h-full rounded-lg", status !== "ready" && "hidden", `nft-${nftData.id}-${nftData.image}`)}
                 src={convertToIfpsURL(nftData.image)}
                 alt="NFT"
             />
 
             {/* Loading skeleton */}
-            <div className={cl(
-                "flex w-36 h-36 rounded-lg",
-                "bg-light-bgLight/75 dark:bg-dark-bgLight/50",
-                "animate-pulse",
-                (status !== "loading") && "hidden"
-            )} />
+            <div
+                className={cl(
+                    "flex w-36 h-36 rounded-lg",
+                    "bg-light-bgLight/75 dark:bg-dark-bgLight/50",
+                    "animate-pulse",
+                    status !== "loading" && "hidden",
+                )}
+            />
 
             {!disableMetadataOnHover && (
-                <Tooltip children={<BlockNFTMetadata metadata={metadata} />}
-                    anchorSelect={`.nft-${nftData.id}-${nftData.image}`}
-                />
+                <Tooltip children={<BlockNFTMetadata metadata={metadata} />} anchorSelect={`.nft-${nftData.id}-${nftData.image}`} />
             )}
         </div>
     )

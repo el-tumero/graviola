@@ -202,11 +202,7 @@ const CollectionList = (props: {
                                     borderColor: rarityData.color,
                                 }}
                             >
-                                <BlockNFT
-                                    nftData={nft}
-                                    glowColor={"auto"}
-                                    additionalClasses={`w-fit h-fit max-w-[14em]`}
-                                />
+                                <BlockNFT nftData={nft} glowColor={"auto"} additionalClasses={`w-fit h-fit max-w-[14em]`} />
                             </div>
 
                             {/* Stats, info */}
