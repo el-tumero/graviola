@@ -65,7 +65,7 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
             {/* Loading skeleton */}
             <div
                 className={cl(
-                    "flex w-36 h-36 rounded-lg",
+                    "flex flex-grow rounded-lg",
                     "bg-light-bgLight/75 dark:bg-dark-bgLight/50",
                     "animate-pulse",
                     status !== "loading" && "hidden",

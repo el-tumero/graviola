@@ -200,7 +200,7 @@ const TradeUp = () => {
                                 "flex w-full h-full rounded-xl",
                                 "divide-x divide-light-border dark:divide-dark-border",
                                 "border border-light-border dark:border-dark-border",
-                                "max-sm:flex-wrap max-sm:flex-col"
+                                "max-sm:flex-wrap max-sm:flex-col max-sm:divide-y"
                             )}
                         >
                             {/* Owned NFTs (Left panel) */}
@@ -310,10 +310,10 @@ const TradeUp = () => {
 
                         {/* Controls & Info (Bottom panel) */}
                         <SectionContainer additionalClasses="justify-between items-center">
-                            <p>
+                            <div className="flex flex-wrap justify-center items-center">
                                 <span>Status: </span>
-                                <span className={cl("p-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>{txMsg}</span>
-                            </p>
+                                <span className={cl("p-3 max-sm:mt-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>{txMsg}</span>
+                            </div>
 
                             <Button
                                 text="Trade"
