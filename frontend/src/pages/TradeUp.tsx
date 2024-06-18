@@ -27,12 +27,15 @@ import { Status } from "../types/Status"
 const ERR_TIMEOUT_MS = 5000
 
 const TradeUp = () => {
-
     const { isConnected, address } = useWeb3ModalAccount()
     const { walletProvider } = useWeb3ModalProvider()
-    const { contract, rarities: rGroups, collection } = useContext(GraviolaContext) as {
-        contract: Graviola,
-        rarities: RaritiesData,
+    const {
+        contract,
+        rarities: rGroups,
+        collection,
+    } = useContext(GraviolaContext) as {
+        contract: Graviola
+        rarities: RaritiesData
         collection: NFT[]
     }
 
@@ -125,16 +128,16 @@ const TradeUp = () => {
 
             const nftBase: NFT = {
                 id: nextIdx,
-                ...nftData
+                ...nftData,
             }
 
             const nftRes: NFTExt = {
                 rarityLevel: rLevel,
                 rarityData: rData,
-                ...nftBase
+                ...nftBase,
             }
 
-            console.log('[DEBUG] - tradeup Res: ', JSON.stringify(nftRes, null, 4))
+            console.log("[DEBUG] - tradeup Res: ", JSON.stringify(nftRes, null, 4))
 
             // DEBUG
             // console.log("raw val ", nft.attributes[0].value)
@@ -188,10 +191,7 @@ const TradeUp = () => {
 
                 {!contentReady ? (
                     <SectionContainer additionalClasses="self-center w-fit justify-center">
-                        {(status === "loading")
-                            ? <p>Loading...</p>
-                            : <p>You need to connect your wallet first!</p>
-                        }
+                        {status === "loading" ? <p>Loading...</p> : <p>You need to connect your wallet first!</p>}
                     </SectionContainer>
                 ) : (
                     <div className="flex flex-col gap-3 justify-between items-center h-full flex-grow">
@@ -200,19 +200,12 @@ const TradeUp = () => {
                                 "flex w-full h-full rounded-xl",
                                 "divide-x divide-light-border dark:divide-dark-border",
                                 "border border-light-border dark:border-dark-border",
-                                "max-sm:flex-wrap max-sm:flex-col max-sm:divide-y"
+                                "max-sm:flex-wrap max-sm:flex-col max-sm:divide-y",
                             )}
                         >
                             {/* Owned NFTs (Left panel) */}
-                            <div className={cl(
-                                "flex basis-2/3",
-                                "flex-col",
-                                "p-6 max-sm:p-3"
-                            )}>
-                                <div className={cl(
-                                    "flex-grow w-full h-0 overflow-auto",
-                                    "rounded-xl"
-                                )}>
+                            <div className={cl("flex basis-2/3", "flex-col", "p-6 max-sm:p-3")}>
+                                <div className={cl("flex-grow w-full h-0 overflow-auto", "rounded-xl")}>
                                     <div
                                         className={cl(
                                             "grid gap-3 auto-rows-min",
@@ -228,8 +221,8 @@ const TradeUp = () => {
 
                                             if (selectedGroup !== null && selectedGroup !== rarityLevel) {
                                                 return null
-                                                // } else if (!ownedTokenIds.includes(i)) {
-                                                //     return null
+                                            } else if (!ownedTokenIds.includes(i)) {
+                                                return null
                                             } else {
                                                 return (
                                                     <div
@@ -312,7 +305,9 @@ const TradeUp = () => {
                         <SectionContainer additionalClasses="justify-between items-center">
                             <div className="flex flex-wrap justify-center items-center">
                                 <span>Status: </span>
-                                <span className={cl("p-3 max-sm:mt-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>{txMsg}</span>
+                                <span className={cl("p-3 max-sm:mt-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>
+                                    {txMsg}
+                                </span>
                             </div>
 
                             <Button

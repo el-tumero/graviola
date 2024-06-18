@@ -31,9 +31,13 @@ export interface NFTExt extends NFT {
 const Generate = () => {
     const navigate = useNavigate()
     // const { walletProvider } = useWeb3ModalProvider()
-    const { contract, rarities: rGroups, collection } = useContext(GraviolaContext) as {
-        contract: Graviola,
-        rarities: RaritiesData,
+    const {
+        contract,
+        rarities: rGroups,
+        collection,
+    } = useContext(GraviolaContext) as {
+        contract: Graviola
+        rarities: RaritiesData
         collection: NFT[]
     }
     const { isConnected, address } = useWeb3ModalAccount()
@@ -93,22 +97,21 @@ const Generate = () => {
 
             const nftBase: NFT = {
                 id: nextIdx,
-                ...nftData
+                ...nftData,
             }
 
             const nftRes: NFTExt = {
                 rarityLevel: rLevel,
                 rarityData: rData,
-                ...nftBase
+                ...nftBase,
             }
 
-            console.log('[DEBUG] - drop: ', JSON.stringify(nftRes, null, 4))
+            console.log("[DEBUG] - drop: ", JSON.stringify(nftRes, null, 4))
 
             // DEBUG
             // console.log("raw val ", nft.attributes[0].value)
             // console.log("conv bp -> perc ", formatBpToPercentage(nft.attributes[0].value))
             // console.log("rarity ", getRarityFromPerc(formatBpToPercentage(nft.attributes[0].value), rGroups))
-
 
             // console.log("rarityLevel from conv:  ", rarityLevel)
 
@@ -221,7 +224,7 @@ const Generate = () => {
                             text={"Generate!"}
                             disabled={!isConnected || txStatus !== "NONE"}
                             onClick={() => handleGenerate()}
-                        // onClick={() => mockHandleGenerate()} // MOCK FOR TESTING
+                            // onClick={() => mockHandleGenerate()} // MOCK FOR TESTING
                         />
                     )}
                 </div>
