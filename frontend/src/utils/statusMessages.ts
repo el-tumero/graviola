@@ -1,6 +1,8 @@
-import { TransactionStatus } from "../types/TransactionStatus"
+import { TransactionStatus } from "../types/TransactionStatus";
 
-export const tradeUpTxStatusMessages: Record<TransactionStatus, string> = {
+export type TxStatusMessagesMap = Record<TransactionStatus, string>
+
+export const tradeUpTxStatusMessages: TxStatusMessagesMap = {
     NONE: "Select TradeUp components and click 'Trade'",
     AWAIT_CONFIRM: "Waiting for transaction confirmation...",
     REJECTED: "Either something went wrong or the transaction was rejected. Care to try again?",
@@ -10,7 +12,7 @@ export const tradeUpTxStatusMessages: Record<TransactionStatus, string> = {
     DONE: "",
 }
 
-export const generateTxStatusMessages: Record<TransactionStatus, string> = {
+export const generateTxStatusMessages: TxStatusMessagesMap = {
     NONE: "Ready to roll your new NFT?",
     AWAIT_CONFIRM: "Waiting for transaction confirmation...",
     REJECTED: "Either something went wrong or the transaction was rejected. Care to try again?",
