@@ -48,8 +48,6 @@ const Generate = () => {
         disableCallbacks,
     } = useGenerateNFT(generateTxStatusMessages)
 
-    const shouldDisplayProgressBar = (progress !== 0)
-
     // Handle generate callbacks
     useEffect(() => {
         initCallbacks()
@@ -91,7 +89,7 @@ const Generate = () => {
                     </div>
 
                     {/* Progress bar */}
-                    {shouldDisplayProgressBar && (
+                    {(progress !== 0) && (
                         <div className={`w-1/2 h-3 rounded-xl border border-light-border dark:border-dark-border`}>
                             <div
                                 style={{ width: `${progress}%` }}

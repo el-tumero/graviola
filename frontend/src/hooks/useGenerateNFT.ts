@@ -1,4 +1,4 @@
-import { parseEther } from "ethers";
+import { parseEther, toBigInt } from "ethers";
 import { Graviola } from "../../../contracts/typechain-types/Graviola";
 import { GraviolaContext } from "../contexts/GraviolaContext";
 import { NFTExt } from "../pages/Generate";
@@ -9,6 +9,9 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { NFT } from "../types/NFT";
 import { getRarityFromPerc } from "../utils/getRarityData";
 import { RaritiesData } from "../types/RarityGroup";
+import { ContractTransactionResponse } from "ethers";
+
+type TradeUpArgs = number[]
 
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
@@ -32,25 +35,40 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         setTxMsg(txMessages[txStatus])
     }, [txStatus])
 
-    // Trigger a tx popup and handle user action
-    const requestGen = async () => {
-        setTxStatus("AWAIT_CONFIRM")
+    // Tx function
+    const txFunc = async (tradeupArgs?: TradeUpArgs) => {
         const estFee: bigint = await contract.estimateFee()
+        let tx: ContractTransactionResponse | null = null
+        console.log("[useGenerate] tx init. mode: ", tradeupArgs ? "trade up" : "generate")
         try {
-            const tx = await contract.mint({
-                value: estFee + parseEther("0.01"),
-            })
+            if (tradeupArgs) {
+                const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
+                tx = await contract.tradeUp(
+                    [args[0], args[1], args[2]],
+                    { value: estFee + parseEther("0.015") }
+                )
+            } else {
+                tx = await contract.mint({
+                    value: estFee + parseEther("0.015"),
+                })
+            }
             const receipt = await tx.wait()
             if (receipt) {
-                console.log("[useGenerate] tx.receipt OK")
+                console.log("[useGenerate] tx receipt OK")
                 setTxStatus("BEFORE_MINT")
                 setProgress(20)
             }
-        } catch (err) {
-            setTxStatus("REJECTED")
+        } catch (error) {
+            console.error("[useGenerate] err during tx init: ", error as string)
             setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
-            return
+            setTxStatus("REJECTED")
         }
+    }
+
+    // This should be called by main button: "Generate" or "Trade up"
+    const requestGen = async (tradeupData?: TradeUpArgs) => {
+        setTxStatus("AWAIT_CONFIRM")
+        await txFunc(tradeupData)
     }
 
     const initCallbacks = () => {
