@@ -9,26 +9,32 @@ contract GraviolaSeasonsGovernor is Sorter{
     error WrongWordFormat();
     error WordExpired();
 
+    event NewCandidateAdded();
+    event OldCandidate
+
     IGraviolaSeasonsArchive immutable archive;
 
     constructor(address archiveAddress){
         archive = IGraviolaSeasonsArchive(archiveAddress);
     }
 
-    uint256 private currentVotingId = 0;
+    struct Candidate {
+        string word;
+        int256 votes;
+    }
 
-    mapping(uint256=>Voting) private votings;
-
+    enum VotingState { PENDING, OPENED, CLOSED }
+    
     struct Voting {
-        mapping(string=>int256) votes;
+        uint256 startTimestamp;
+        VotingState state;
         mapping(string=>bool) nominated;
-        string[] oldCandidates;
-        string[] newCandidates;
+        Candidate[] oldCandidates;
+        Candidate[] newCandidates;
     }
 
-    function isCandidate(string calldata word, uint256 votingId) external view returns (bool) {
-        return votings[votingId].nominated[word];
-    }
+    uint256 private currentVotingId = 0;    
+    mapping(uint256=>Voting) private votings;
 
 
     function validateWord(string calldata str) private pure returns (bool) {
@@ -41,31 +47,61 @@ contract GraviolaSeasonsGovernor is Sorter{
         return true;
     }
 
-    function voteForWord(string calldata word, uint256 votingPower, bool isUpvote) external {
+    function sort(Candidate[] memory arr) private pure returns (Candidate[] memory) {
+        uint n = arr.length;
+        for (uint i = 0; i < n - 1; i++) {
+            for (uint j = 0; j < n - i - 1; j++) {
+                if (arr[j].votes > arr[j + 1].votes) {
+                    (arr[j], arr[j + 1]) = (arr[j + 1], arr[j]);
+                }
+            }
+        }
+        return arr;
+    }
+
+    function addCandidate(string calldata word) external {
         if (!validateWord(word)) revert WrongWordFormat();
         if(archive.isWordExpired(word)) revert WordExpired();
-        
+
         Voting storage currentVoting = votings[currentVotingId];
+        Candidate memory c = Candidate(word, 0);
 
         if(!currentVoting.nominated[word]) {
-            if(archive.isWordUsed(word)) currentVoting.oldCandidates.push(word);
-            else currentVoting.newCandidates.push(word);
+            if(archive.isWordUsed(word)) currentVoting.oldCandidates.push(c);
+            else currentVoting.newCandidates.push(c);
             currentVoting.nominated[word] = true;
         }
+    }
 
-        if(isUpvote) currentVoting.votes[word] = currentVoting.votes[word] + int256(votingPower); // TODO: check overflow
-        else currentVoting.votes[word] = currentVoting.votes[word] - int256(votingPower);
-    }   
+    function voteForNewCandidate(uint256 candidateId, uint256 votingPower, bool isUpvote) external {
+        Voting storage currentVoting = votings[currentVotingId];
+        if(isUpvote) currentVoting.newCandidates[candidateId].votes += int(votingPower);
+        else currentVoting.newCandidates[candidateId].votes -= int(votingPower);
+    }
 
+    function voteForOldCandidate(uint256 candidateId, uint256 votingPower, bool isUpvote) external {
+        Voting storage currentVoting = votings[currentVotingId];
+        if(isUpvote) currentVoting.oldCandidates[candidateId].votes += int(votingPower);
+        else currentVoting.oldCandidates[candidateId].votes -= int(votingPower);
+    }
+
+    // == Getters ==
 
     function getCurrentVotingId() external view returns(uint256) {
         return currentVotingId;
     }
 
-    function getVotes(uint256 votingId) external view returns(string[] memory, int256[] memory) {
-        
+    function getVotingState(uint256 votingId) external view returns(VotingState) {
+        return votings[votingId].state;
     }
 
+    function isVotingCandidate(string calldata word, uint256 votingId) external view returns (bool) {
+        return votings[votingId].nominated[word];
+    } 
 
+    function getVotingCandidates(uint256 votingId) external view returns(Candidate[] memory, Candidate[] memory) {
+        Voting storage voting = votings[votingId];
+        return (voting.oldCandidates, voting.newCandidates);
+    }
 
 }
