@@ -52,6 +52,12 @@ const TradeUp = () => {
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
     const contentReady = status === "ready" && isConnected
 
+    // Handle generate callbacks
+    useEffect(() => {
+        initCallbacks()
+        return () => disableCallbacks()
+    }, [])
+
     // Select an NFT as a trade component
     const handleNFTClick = (idx: number, rarityLevel: RarityLevel) => {
         const indexOf = selectedIds.indexOf(idx)

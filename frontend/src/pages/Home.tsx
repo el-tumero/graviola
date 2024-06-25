@@ -205,7 +205,7 @@ function Home() {
                             <div
                                 onClick={() => window.open("https://github.com/el-tumero/graviola", "_blank", "noopener,noreferrer")}
                                 className={cl(
-                                    "flex gap-2 justify-center items-center cursor-pointer",
+                                    "flex w-full h-fit gap-2 justify-center items-center cursor-pointer",
                                     "p-3 rounded-xl hover:bg-light-border/30 dark:hover:bg-dark-border/30",
                                     "border border-light-border dark:border-dark-border",
                                     "transition-colors duration-300",
@@ -229,7 +229,7 @@ function Home() {
                         <div
                             onClick={() => window.open("https://github.com/el-tumero/graviola", "_blank", "noopener,noreferrer")}
                             className={cl(
-                                "w-fit h-fit p-3 rounded-xl cursor-pointer",
+                                "flex w-fit h-fit p-3 rounded-xl cursor-pointer",
                                 "hover:bg-light-border/30 dark:hover:bg-dark-border/30",
                                 "border border-light-border dark:border-dark-border",
                                 "transition-colors duration-300",
