@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/src/Script.sol";
-import {Graviola} from "../src/Graviola/Graviola.sol";
+import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 import {Metadata} from "../src/Graviola/GraviolaMetadata.sol";
 
 
