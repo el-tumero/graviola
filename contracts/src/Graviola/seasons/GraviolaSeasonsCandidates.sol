@@ -9,6 +9,11 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
     error CandidateAlreadyAdded();
     error CandidateNonExistent();
     error VoteNotAllowed(uint256 code);
+
+    struct Votes {
+        int256 score;
+        bool exists;
+    }
     
     StructuredLinkedList.List internal list;
     mapping(uint256=>uint256) internal votes;
