@@ -19,21 +19,21 @@ import { AppContext } from "./contexts/AppContext"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
-    console.log("[readonly] connecting to contract...")
+    console.log("[App] connecting to contract... (read-only)")
     const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
-    console.log("[readonly] connected")
-    return graviola as unknown as Graviola
+    console.log("[App] connected (read-only)")
+    return graviola
 }
 
 // Conn to contract with wallet
 async function connectContractWallet(walletProvider: Eip1193Provider): Promise<Graviola> {
-    console.log("[wallet] connecting to contract...")
+    console.log("[App] connecting to contract... (wallet)")
     const provider = new BrowserProvider(walletProvider)
     const signer = await provider.getSigner()
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, signer)
-    console.log("[wallet] connected")
-    return graviola as unknown as Graviola
+    console.log("[App] connected (wallet)")
+    return graviola
 }
 
 const App = (props: { children: ReactNode }) => {
@@ -48,8 +48,8 @@ const App = (props: { children: ReactNode }) => {
     const metadata = {
         name: "Graviola NFT",
         description: "NFT generator powered by opML",
-        url: "https://mywebsite.com", // origin must match your domain & subdomain
-        icons: ["https://avatars.mywebsite.com/"],
+        url: "https://el-tumero.github.io/graviola/",
+        icons: [],
     }
 
     const modal = createWeb3Modal({
@@ -92,7 +92,7 @@ const App = (props: { children: ReactNode }) => {
         const fetchCollection = async () => {
             const rarityGroupsData = await graviola.getRarityGroups()
             const nftTotalSupply = await graviola.totalSupply()
-            console.log("[info] totalSupply: ", Number(nftTotalSupply))
+            console.log("[App] totalSupply: ", Number(nftTotalSupply))
             const promises = Array.from(
                 {
                     length: Number(nftTotalSupply),
@@ -103,12 +103,11 @@ const App = (props: { children: ReactNode }) => {
                         const response = await fetch(uri)
                         const nftData = await response.json()
                         return {
-                            // NFT interface needs unique `id`
                             id: idx,
                             ...nftData,
                         }
                     } catch (error) {
-                        // console.warn(`[warn] err while fetching collection: ${error}`)
+                        console.warn('[App]', (error as Error).message.substring(0, 72) + "...")
                         return fallbackNFT
                     }
                 },
@@ -116,7 +115,7 @@ const App = (props: { children: ReactNode }) => {
 
             // Nfts
             const collection: NFT[] = await Promise.all(promises)
-            console.log("[info] fetched collection ", collection)
+            // console.log("[App] fetched collection ", collection) // DEBUG
 
             setCollection((prev) => [...prev, ...collection])
 
@@ -136,16 +135,15 @@ const App = (props: { children: ReactNode }) => {
                         keywords,
                     }
 
-                    acc[rarityScale[index] as RarityLevel] = rarityGroupData
+                    acc[rarityScale[index]] = rarityGroupData
                     return acc
                 },
                 {} as Record<RarityLevel, RarityGroupData>,
             )
-
-            console.log("[info] raritiesData: ", raritiesData)
+            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
             setRarities(raritiesData)
-
             setLoading(false)
+            console.log('[App] collection loaded!')
         }
 
         fetchCollection()

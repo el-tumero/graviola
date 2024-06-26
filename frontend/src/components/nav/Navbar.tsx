@@ -31,7 +31,7 @@ const Navbar = () => {
             <div className={cl("flex w-min hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>{icons.github}</div>
         </NavElement>,
 
-        <NavElement onClick={() => openURL("https://github.com/el-tumero/graviola")}>
+        <NavElement onClick={() => openURL("https://discord.gg/FsMWpsqsG7")}>
             <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
                 {icons.discordLogo}
             </div>

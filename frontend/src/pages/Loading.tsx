@@ -7,7 +7,7 @@ const Loading = () => {
             <picture>
                 <img className="w-16 animate-pulse" src={Logo} />
             </picture>
-            <p className="font-bold text-xl">Loading...</p>
+            <p className="font-thin text-xl">Loading...</p>
         </FullscreenContainer>
     )
 }
