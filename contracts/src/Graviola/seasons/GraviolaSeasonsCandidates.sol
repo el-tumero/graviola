@@ -8,6 +8,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
 
     error CandidateAlreadyAdded();
     error CandidateNonExistent();
+    error VoteNotAllowed(uint256 code);
     
     StructuredLinkedList.List internal list;
     mapping(uint256=>uint256) internal votes;
@@ -30,12 +31,32 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
 
     }
 
-    // function voteForCandidateNoMove(uint256 id, uint256 votingPower) external {
-    //     (bool isExising, uint256 prev, uint256 next)= list.getNode(id);
-    //     if(!isExising) revert CandidateNonExistent();
-    //     // if()
+    // prev (before) -> head (false)
+    // next (after) -> tail (true)
 
-    // }
+    function voteForCandidateNoMove(uint256 id, uint256 votingPower) external {
+        (bool isExising, uint256 prev, uint256 next)= list.getNode(id);
+        if(!isExising) revert CandidateNonExistent();
+        uint256 afterVote = votes[id] + votingPower;
+        uint256 nextVotes = votes[next];
+        uint256 prevVotes = votes[prev];
+        // if((votes[next] == 0 && afterVote < votes[prev]) ||
+        //    (votes[prev] == 0 && afterVote > votes[next]) ||
+        //    (votes[next] < afterVote) ||
+        //    (votes[prev] > afterVote)
+        // ) revert VoteNotAllowed();
+        
+        if(nextVotes == 0 && afterVote < prevVotes) revert VoteNotAllowed(0);
+        if(prevVotes == 0 && afterVote > nextVotes) revert VoteNotAllowed(1);
+        if(nextVotes != 0 && nextVotes < afterVote) revert VoteNotAllowed(2);
+        if(prevVotes != 0 && prevVotes > afterVote) revert VoteNotAllowed(3);
+        votes[id] = afterVote;
+    }
+
+    function debugGetNode(uint256 id) external view returns (bool, uint256, uint256) {
+        return list.getNode(id);
+    }
+
 
     function voteForCandidate(uint256 id, uint256 votingPower) external {
         list.remove(id); // remove from old pos

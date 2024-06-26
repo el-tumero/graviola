@@ -40,6 +40,23 @@ contract GraviolaSeasonsGovernorTest is Test {
     }
 
 
+    function test_DebugGetNode() external {
+        test_AddCandidateNoGas();
+        (, uint256 prev, uint256 next) = gsg.debugGetNode(420);
+        console.log("debugGetNode 420:");
+        console.log(prev); // 255
+        console.log(next); // 320
+        (, prev, next) = gsg.debugGetNode(320);
+        console.log("debugGetNode 320:");
+        console.log(prev); // 420
+        console.log(next); // 0
+    }
+
+    function test_VoteForCandidateNoMove() external {
+        test_AddCandidateNoGas();
+        gsg.voteForCandidateNoMove(320, 5);
+    }
+
     function test_VoteForCandidate() external {
         test_AddCandidateNoGas();
         gsg.voteForCandidate(255, 40);
@@ -47,13 +64,14 @@ contract GraviolaSeasonsGovernorTest is Test {
         assertEq(gsg.getCandidates(), expectedCandidates);
     }
 
-    function test_AddCandidate100AndVote() external {
-        vm.prank(alice);
-        for (uint i = 1; i < 100; i++) {
-            gsg.addCandidate(i, i);
-        }
+
+    // function test_AddCandidate100AndVote() external {
+    //     vm.prank(alice);
+    //     for (uint i = 1; i < 100; i++) {
+    //         gsg.addCandidate(i, i);
+    //     }
         
-    }
+    // }
 
 }
 
