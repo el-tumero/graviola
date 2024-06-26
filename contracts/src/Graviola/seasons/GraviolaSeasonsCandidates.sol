@@ -40,11 +40,6 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         uint256 afterVote = votes[id] + votingPower;
         uint256 nextVotes = votes[next];
         uint256 prevVotes = votes[prev];
-        // if((votes[next] == 0 && afterVote < votes[prev]) ||
-        //    (votes[prev] == 0 && afterVote > votes[next]) ||
-        //    (votes[next] < afterVote) ||
-        //    (votes[prev] > afterVote)
-        // ) revert VoteNotAllowed();
         
         if(nextVotes == 0 && afterVote < prevVotes) revert VoteNotAllowed(0);
         if(prevVotes == 0 && afterVote > nextVotes) revert VoteNotAllowed(1);

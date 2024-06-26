@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Test, console} from "forge-std/src/Test.sol";
 import {GraviolaSeasonsGovernor} from "../src/Graviola/seasons/GraviolaSeasonsGovernor.sol";
 import {GraviolaSeasonsArchive} from "../src/Graviola/seasons/GraviolaSeasonsArchive.sol";
-
+import {GraviolaSeasonsCandidates} from "../src/Graviola/seasons/GraviolaSeasonsCandidates.sol";
 
 
 contract GraviolaSeasonsGovernorTest is Test {
@@ -42,19 +42,33 @@ contract GraviolaSeasonsGovernorTest is Test {
 
     function test_DebugGetNode() external {
         test_AddCandidateNoGas();
-        (, uint256 prev, uint256 next) = gsg.debugGetNode(420);
-        console.log("debugGetNode 420:");
-        console.log(prev); // 255
-        console.log(next); // 320
-        (, prev, next) = gsg.debugGetNode(320);
+        (, uint256 prev, uint256 next) = gsg.debugGetNode(320);
         console.log("debugGetNode 320:");
-        console.log(prev); // 420
         console.log(next); // 0
+        console.log(prev); // 420
+        (, prev, next) = gsg.debugGetNode(420);
+        console.log("debugGetNode 420:");
+        console.log(next); // 320
+        console.log(prev); // 255
+        (, prev, next) = gsg.debugGetNode(255);
+        console.log("debugGetNode 255:");
+        console.log(next); // 420
+        console.log(prev); // 0
     }
 
     function test_VoteForCandidateNoMove() external {
         test_AddCandidateNoGas();
-        gsg.voteForCandidateNoMove(320, 5);
+        gsg.voteForCandidateNoMove(320, 2);
+        gsg.voteForCandidateNoMove(420, 2);
+        gsg.voteForCandidateNoMove(255, 2);
+
+        vm.expectRevert(abi.encodeWithSelector(GraviolaSeasonsCandidates.VoteNotAllowed.selector, 1));
+        gsg.voteForCandidateNoMove(255, 100);
+
+        vm.expectRevert(abi.encodeWithSelector(GraviolaSeasonsCandidates.VoteNotAllowed.selector, 2));
+        gsg.voteForCandidateNoMove(420, 100);
+
+
     }
 
     function test_VoteForCandidate() external {
