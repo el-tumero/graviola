@@ -190,7 +190,7 @@ function Home() {
                         </div>
                     </SectionContainer>
 
-                    <SectionContainer additionalClasses="flex-col my-12">
+                    <SectionContainer additionalClasses="my-12">
                         <SectionTitle
                             title="How does Graviola work?"
                             secondaryContent={`
@@ -201,18 +201,17 @@ function Home() {
                                 The NFTs are securely stored using decentralized networks like IPFS, making them easily accessible and tamperproof
                             `}
                         />
-                        <div className="flex w-full justify-end items-center">
+                        <div className="w-min justify-end items-center">
                             <div
                                 onClick={() => window.open("https://github.com/el-tumero/graviola", "_blank", "noopener,noreferrer")}
                                 className={cl(
-                                    "flex w-full h-fit gap-2 justify-center items-center cursor-pointer",
-                                    "p-3 rounded-xl hover:bg-light-border/30 dark:hover:bg-dark-border/30",
+                                    "flex w-fit h-fit gap-1 justify-center items-center cursor-pointer",
+                                    "py-6 px-3 rounded-xl hover:bg-light-border/30 dark:hover:bg-dark-border/30",
                                     "border border-light-border dark:border-dark-border",
                                     "transition-colors duration-300",
                                     "hover:border-cyan-400 dark:hover:border-cyan-400",
                                 )}
                             >
-                                <p>read more about</p>
                                 {icons.oraLogo}
                             </div>
                         </div>
