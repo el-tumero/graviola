@@ -20,8 +20,7 @@ import { AppContext } from "./contexts/AppContext"
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[App] connecting to contract... (read-only)")
-    // const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
-    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC)
+    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC || "https://ethereum-sepolia-rpc.publicnode.com")
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
     console.log("[App] connected (read-only)")
     return graviola
@@ -39,13 +38,13 @@ async function connectContractWallet(walletProvider: Eip1193Provider): Promise<G
 
 const App = (props: { children: ReactNode }) => {
     const projectId = "a09890b34dc1551c2534337dbc22de8c"
-    // const sepolia = {
-    //     chainId: 11155111,
-    //     name: "Sepolia testnet",
-    //     currency: "ETH",
-    //     explorerUrl: "https://sepolia.etherscan.io/",
-    //     rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
-    // }
+    const sepolia = {
+        chainId: 11155111,
+        name: "Sepolia testnet",
+        currency: "ETH",
+        explorerUrl: "https://sepolia.etherscan.io/",
+        rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
+    }
     const mock = {
         chainId: 1337,
         name: "Graviola Devnet",
@@ -67,8 +66,7 @@ const App = (props: { children: ReactNode }) => {
         ethersConfig: defaultConfig({
             metadata,
         }),
-        // chains: [sepolia],
-        chains: [mock],
+        chains: [import.meta.env.VITE_DEV_RPC ? mock : sepolia],
         projectId,
     })
 
@@ -161,6 +159,7 @@ const App = (props: { children: ReactNode }) => {
 
     useEffect(() => {
         console.log('walletProvider ', walletProvider)
+        console.log("env rpc?: ", import.meta.env.VITE_DEV_RPC)
         if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
         // override readonly contract conn
         else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
