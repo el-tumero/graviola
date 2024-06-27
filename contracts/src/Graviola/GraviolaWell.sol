@@ -177,6 +177,21 @@ contract GraviolaWell {
         return (_numerator * 100) / _denumerator;
     }
 
+    /// @notice Get all rarities in a list (frontend)
+    function getRarityGroups() public view returns (RarityGroup[UNIQUE_RARITY_GROUPS_COUNT] memory) {
+        RarityGroup[UNIQUE_RARITY_GROUPS_COUNT] memory res;
+        for (uint i = 0; i < UNIQUE_RARITY_GROUPS_COUNT; i++) {
+            RarityGroup memory group = RarityGroup(
+                rarities[i].name,
+                rarities[i].keywords,
+                (i == 0) ? 0 : (rarities[i -1].endRange + 1),
+                rarities[i].endRange
+            );
+            res[i] = group;
+        }
+        return res;
+    }
+
     function getRarityGroupFromIdx(
         uint _idx,
         RarityGroupSetting memory _raritySetting
