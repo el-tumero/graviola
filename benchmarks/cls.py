@@ -30,7 +30,8 @@ class RolledWord:
         return f"RolledWord group={self.group}, absoluteIdx={self.abs_idx}"
 
     def get_rel_idx(self):
-        return self.abs_idx - self.group.endRange
+        # return self.abs_idx - self.group.endRange
+        return self.group.endRange - self.abs_idx
 
     def get_keyword(self):
         return self.group.keywords[self.get_rel_idx()]
