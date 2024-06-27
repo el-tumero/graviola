@@ -167,11 +167,12 @@ function Home() {
                                         key={i}
                                     >
                                         <div>
-                                            <BlockNFT
+                                            <p>TEMP</p>
+                                            {/* <BlockNFT
                                                 nftData={nftSources[i]}
                                                 glowColor={rarityLevel}
                                                 additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
-                                            />
+                                            /> */}
                                         </div>
                                         <div className="flex flex-col justify-center items-center w-fit h-fit">
                                             <p

@@ -37,7 +37,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
-        const estFee: bigint = await contract.estimateFee()
+        // const estFee: bigint = await contract.estimateFee()
+        const estFee = 0n
+        console.log('estfee ', estFee)
         let tx: ContractTransactionResponse | null = null
         console.log("[useGenerate] tx init. mode: ", tradeupArgs ? "trade up" : "generate")
         try {
@@ -45,11 +47,13 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
                 tx = await contract.tradeUp(
                     [args[0], args[1], args[2]],
+                    // { value: estFee + parseEther("0.015") }
                     { value: estFee + parseEther("0.015") }
                 )
             } else {
                 tx = await contract.mint({
-                    value: estFee + parseEther("0.015"),
+                    gasLimit: 3000000000n
+                    // value: estFee + parseEther("0.015"), gasLimit: 3000000000n
                 })
             }
             const receipt = await tx.wait()
