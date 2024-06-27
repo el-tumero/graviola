@@ -22,8 +22,6 @@ export interface BlockNFTProps {
 }
 
 const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasses }: BlockNFTProps) => {
-
-    console.log('test ', nftData)
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
@@ -59,7 +57,7 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
             <img
                 onLoad={() => setStatus("ready")}
                 draggable={false}
-                // className={cn("w-full h-full rounded-lg", status !== "ready" && "hidden", `nft-${nftData.id}-${nftData.image}`)}
+                className={cn("w-full h-full rounded-lg", status !== "ready" && "hidden", `nft-${nftData.id}-${nftData.image}`)}
                 src={convertToIfpsURL(nftData.image)}
                 alt="NFT"
             />

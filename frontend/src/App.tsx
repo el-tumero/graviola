@@ -21,7 +21,7 @@ import { AppContext } from "./contexts/AppContext"
 async function connectContract(): Promise<Graviola> {
     console.log("[App] connecting to contract... (read-only)")
     // const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
-    const provider = new JsonRpcProvider()
+    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC)
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
     console.log("[App] connected (read-only)")
     return graviola
@@ -47,11 +47,11 @@ const App = (props: { children: ReactNode }) => {
     //     rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
     // }
     const mock = {
-        chainId: 31337,
-        name: "Graviola Testnet",
-        currency: "GO",
+        chainId: 1337,
+        name: "Graviola Devnet",
+        currency: "ETH",
         explorerUrl: "",
-        rpcUrl: "",
+        rpcUrl: import.meta.env.VITE_DEV_RPC,
     }
     const metadata = {
         name: "Graviola NFT",
