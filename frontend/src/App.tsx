@@ -46,7 +46,7 @@ const App = (props: { children: ReactNode }) => {
         rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
     }
     const mock = {
-        chainId: 1337,
+        chainId: 3151908,
         name: "Graviola Devnet",
         currency: "ETH",
         explorerUrl: "",
