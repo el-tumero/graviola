@@ -1,5 +1,4 @@
 import { clsx as cl } from "clsx"
-import { useEffect, useState } from "react"
 import icons from "../data/icons"
 
 type PopupType = "err" | "warn" | "neutral"
@@ -11,17 +10,6 @@ interface PopupProps {
 }
 
 const Popup = ({ type, onClickClose, message }: PopupProps) => {
-
-    // const [active, setActive] = useState<boolean>(message ? true : false)
-
-    useEffect(() => {
-        if (!message) {
-            console.log("hiding")
-            // setActive(false)
-        }
-        console.log('show. active: ', message ? true : false)
-        // setActive(true)
-    }, [message])
 
     const getTypeBorderStyles = () => {
         return (type === "neutral") ? "border-light-border dark:border-dark-border"
