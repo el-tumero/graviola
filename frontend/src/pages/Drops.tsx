@@ -179,7 +179,6 @@ const CollectionList = (props: {
                 const percRarity = formatBpToPercentage(nft.attributes[0].value)
                 const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
                 const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
-
                 const [, rarityData] = getRarityFromPerc(percRarity, props.rGroups)
                 if (props.collectionMode === "My Drops" && !props.ownedTokenIds.includes(idx)) {
                     return null

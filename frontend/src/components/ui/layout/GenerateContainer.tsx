@@ -44,7 +44,7 @@ const GenerateContainer = ({ rolledNFT, runBorderAnim, rGroups }: GenerateContai
             style={rolledNFT ? breathingBorderStyle : runBorderAnim ? rarityAnimBorder : {}}
             className={cn(
                 "flex justify-center items-center",
-                "w-64 h-64 p-4 mb-4 rounded-xl",
+                "w-64 h-64 p-4 rounded-xl",
                 "bg-light-bgDark dark:bg-dark-bgDark",
                 "border border-light-border dark:border-dark-border border-dashed",
                 rolledNFT && breathingBorderClassNames,

@@ -17,6 +17,7 @@ import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
+import useGenerateMock from "../hooks/useGenerateMock"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -37,22 +38,36 @@ const Generate = () => {
     }
     const { isConnected } = useWeb3ModalAccount()
 
-    // Gen data
+
+    // MOCK
+    const mockBehavior = {
+        performSteps: [true, false, true, true],
+        doNotResetOnError: false
+    }
     const {
         txStatus,
         txMsg,
         progress,
         rolledNFT,
         requestGen,
-        initCallbacks,
-        disableCallbacks,
-    } = useGenerateNFT(generateTxStatusMessages)
+    } = useGenerateMock(generateTxStatusMessages, mockBehavior)
 
-    // Handle generate callbacks
-    useEffect(() => {
-        initCallbacks()
-        return () => disableCallbacks()
-    }, [])
+    // // Gen data
+    // const {
+    //     txStatus,
+    //     txMsg,
+    //     progress,
+    //     rolledNFT,
+    //     requestGen,
+    //     initCallbacks,
+    //     disableCallbacks,
+    // } = useGenerateNFT(generateTxStatusMessages)
+
+    // // Handle generate callbacks
+    // useEffect(() => {
+    //     initCallbacks()
+    //     return () => disableCallbacks()
+    // }, [])
 
     return (
         <FullscreenContainer>
@@ -62,10 +77,17 @@ const Generate = () => {
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
                     <PageTitle title="NFT Generator" />
 
-                    <GenerateContainer rolledNFT={rolledNFT} runBorderAnim={!rolledNFT} rGroups={rGroups} />
+                    <div className={cl("my-3")}>
+                        <GenerateContainer rolledNFT={rolledNFT} runBorderAnim={!rolledNFT} rGroups={rGroups} />
+                    </div>
 
-                    {/* Status text */}
-                    <div className={cl("flex w-fit h-fit p-3 rounded-xl text-lg", "border border-light-border dark:border-dark-border")}>
+                    <div
+                        className={cl(
+                            "flex w-full h-fit justify-between items-center p-3 mt-3",
+                            "rounded-xl border border-light-border dark:border-dark-border",
+                            "mb-3",
+                        )}>
+
                         {rolledNFT ? (
                             <p>
                                 Congratulations! You rolled a&nbsp;
@@ -86,10 +108,17 @@ const Generate = () => {
                         ) : (
                             <p>Connect your wallet first</p>
                         )}
+
+                        {isConnected && txStatus === "NONE" && (
+                            <Button
+                                text={"Generate!"}
+                                disabled={!isConnected || txStatus !== "NONE"}
+                                onClick={() => requestGen()}
+                            />
+                        )}
                     </div>
 
-                    {/* Progress bar */}
-                    {(progress !== 0) && (
+                    {/* {(progress !== 0) && (
                         <div className={`w-1/2 h-3 rounded-xl border border-light-border dark:border-dark-border`}>
                             <div
                                 style={{ width: `${progress}%` }}
@@ -100,22 +129,15 @@ const Generate = () => {
                                 )}
                             />
                         </div>
-                    )}
+                    )} */}
 
-                    {isConnected && txStatus === "NONE" && (
-                        <Button
-                            text={"Generate!"}
-                            disabled={!isConnected || txStatus !== "NONE"}
-                            onClick={() => requestGen()}
-                        />
-                    )}
                 </div>
 
                 <SectionTitle additionalClasses="max-sm:justify-center max-sm:items-center" title={"Keywords"} />
 
                 <div className="sm:inline-grid md:grid-cols-5 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-auto font-bold mx-auto">
                     {Object.entries(rGroups).map(([, rGroup], i) => (
-                        <div key={i} className="flex flex-col gap-3 w-full h-full items-center">
+                        <div key={i} className="flex flex-col gap-3 w-full h-full items-start">
                             <div className="flex flex-col w-fit h-fit gap-3">
                                 <p
                                     className="text-lg w-fit font-thin font-content"
@@ -128,7 +150,7 @@ const Generate = () => {
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {rGroup.keywords.slice(0, 6).map((keyword, idx, arr) => {
-                                        const isLastItem = idx === arr.length - 1
+                                        const isLastItem = (arr.length > 2 && idx === arr.length - 1)
                                         return (
                                             <span
                                                 key={idx}
@@ -143,7 +165,7 @@ const Generate = () => {
                                                     borderColor: rGroup.color,
                                                 }}
                                             >
-                                                {isLastItem ? "..." : keyword.name}
+                                                {isLastItem ? "..." : keyword}
                                             </span>
                                         )
                                     })}
@@ -153,12 +175,7 @@ const Generate = () => {
                     ))}
                 </div>
 
-                <div
-                    className={cl(
-                        "flex w-full h-fit justify-end items-center p-3 mt-3",
-                        "rounded-xl border border-light-border dark:border-dark-border",
-                    )}
-                >
+                <div className={cl("flex w-full h-fit justify-end items-center p-3 mt-3", "rounded-xl")}>
                     <Button text="See all Keywords" onClick={() => navigate(routerPaths.home)} />
                 </div>
             </ContentContainer>

@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { mockMetaBannerData } from "../data/mock"
 import { useContext, useEffect, useState } from "react"
-import { NFT } from "../types/NFT"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import AutoBlockNFT from "../components/AutoBlockNFT"
@@ -160,8 +159,7 @@ function Home() {
                                             >
                                                 {rarityGroup.name}
                                             </p>
-                                            {/* TODO: Util func for this? */}
-                                            <span>{(rarityGroup.endRange - rarityGroup.startRange) + ((i === 0) ? 0 : 1)}%</span>
+                                            <span>{rarityGroup.endRange - rarityGroup.startRange + 1}%</span>
                                         </div>
                                     </div>
                                 )
