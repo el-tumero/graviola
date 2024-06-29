@@ -13,7 +13,7 @@ import { GRAVIOLA_ADDRESS } from "../../contracts/addresses.json"
 import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { RaritiesData } from "./types/RarityGroup"
-import { fallbackNFT } from "./data/fallbackNFT"
+import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
 
 // No wallet connected (read-only)
@@ -122,14 +122,10 @@ const App = (props: { children: ReactNode }) => {
             // Nfts
             const collection: NFT[] = await Promise.all(promises)
             console.log("[App] fetched collection ", collection) // DEBUG
-
             collection.length === 0 ? setCollection([fallbackNFT]) : setCollection((prev) => [...prev, ...collection])
-
-            console.log('de ', rarityGroupsData)
 
             const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((acc, groupData, idx) => {
                 const obj = groupData as unknown as RarityGroupData
-                // console.log(obj)
                 const gData: RarityGroupData = {
                     name: obj.name,
                     color: rarityGroupColors[rarityScale[idx]],
