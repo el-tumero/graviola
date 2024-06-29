@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import "./IGraviolaSeasonsArchive.sol";
-import "./Sorter.sol";
 import "./GraviolaSeasonsCandidates.sol";
 
 import {StructuredLinkedList} from "solidity-linked-list/contracts/StructuredLinkedList.sol";
