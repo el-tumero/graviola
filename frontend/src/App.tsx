@@ -12,9 +12,8 @@ import useTheme from "./hooks/useTheme"
 import { GRAVIOLA_ADDRESS } from "../../contracts/addresses.json"
 import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
-import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
-import { fallbackNFT } from "./utils/fallbackNFT"
+import { fallbackNFT } from "./data/fallbackNFT"
 import { AppContext } from "./contexts/AppContext"
 
 // No wallet connected (read-only)
@@ -126,28 +125,23 @@ const App = (props: { children: ReactNode }) => {
 
             collection.length === 0 ? setCollection([fallbackNFT]) : setCollection((prev) => [...prev, ...collection])
 
-            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>(
-                (acc, groupData, index) => {
-                    // Cast keywords
-                    const keywords: Keyword[] = groupData.keywords.map((keyword) => ({
-                        name: keyword[0],
-                        lowerRange: Number(keyword[1]),
-                        upperRange: Number(keyword[2]),
-                    }))
+            console.log('de ', rarityGroupsData)
 
-                    const rarityGroupData: RarityGroupData = {
-                        name: groupData.name,
-                        rarityPerc: Number(groupData[2]),
-                        color: rarityGroupColors[rarityScale[index]],
-                        keywords,
-                    }
+            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((acc, groupData, idx) => {
+                const obj = groupData as unknown as RarityGroupData
+                // console.log(obj)
+                const gData: RarityGroupData = {
+                    name: obj.name,
+                    color: rarityGroupColors[rarityScale[idx]],
+                    keywords: obj.keywords.map(kword => kword),
+                    startRange: Number(obj.startRange),
+                    endRange: Number(obj.endRange)
+                }
+                acc[rarityScale[idx]] = gData
+                return acc
+            }, {} as Record<RarityLevel, RarityGroupData>)
 
-                    acc[rarityScale[index]] = rarityGroupData
-                    return acc
-                },
-                {} as Record<RarityLevel, RarityGroupData>,
-            )
-            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
+            console.log("[App] raritiesData: ", raritiesData) // DEBUG
             setRarities(raritiesData)
             setLoading(false)
             console.log('[App] collection loaded!')
@@ -163,7 +157,6 @@ const App = (props: { children: ReactNode }) => {
         if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
         // override readonly contract conn
         else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
-        // connectContract().then((noWalletContract) => setGraviola(noWalletContract))
     }, [walletProvider])
 
     return loading ? (
