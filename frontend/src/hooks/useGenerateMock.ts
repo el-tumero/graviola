@@ -29,7 +29,7 @@ interface MockBehaviorSettings {
 export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavior: MockBehaviorSettings) {
 
     const MOCK_STEP_TIMEOUT_MS = 7000 // Time between steps
-    const RESET_ON_ERR_TIMEOUT_MS = 15000
+    const RESET_ON_ERR_TIMEOUT_MS = 4000
 
     const {
         rarities: rGroups,
@@ -39,6 +39,7 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
+    const [txErr, setTxErr] = useState<string>("")
     const [progress, setProgress] = useState<number>(0)
     const [rolledNFT, setRolledNFT] = useState<NFTExt | undefined>()
 
@@ -97,8 +98,11 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
 
     const requireStep = (i: number, errStatus: TransactionStatus): boolean => {
         if (!behavior.performSteps[i]) {
-            console.error(`[useGenerate MOCK] Err (behavior[${i}] is 'false')`)
+            // const err = `[useGenerate MOCK] Err (behavior[${i}] is 'false')`
+            const err = "This is a very long error kjdfghdfklhfdkjghjfgdfkjhgkjdfngklhrdtiklbnikldfhn;kigbhkidfhkibhdfkuihgbk;hrdfgkbh klsdklfg sdgf dsfg dslkjg lkdslkfgjj lkdjkljkjlljdfkg d dfkjlg kjldfjk glkdfjg "
+            console.error(err)
             setTxStatus(errStatus)
+            setTxErr(err)
             if (behavior.doNotResetOnError) return false
             cleanup()
             return false
@@ -122,11 +126,17 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
         txFunc()
     }
 
+    const closeTxErr = () => {
+        setTxErr("")
+    }
+
     return {
         txStatus,
         txMsg,
+        txErr,
         progress,
         rolledNFT,
         requestGen,
+        closeTxErr
     }
 }

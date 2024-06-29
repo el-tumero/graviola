@@ -8,6 +8,7 @@ import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
+import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { Graviola } from "../../../contracts/typechain-types/Graviola"
@@ -41,15 +42,17 @@ const Generate = () => {
 
     // MOCK
     const mockBehavior = {
-        performSteps: [true, false, true, true],
+        performSteps: [false, true, true, true],
         doNotResetOnError: false
     }
     const {
         txStatus,
         txMsg,
+        txErr,
         progress,
         rolledNFT,
         requestGen,
+        closeTxErr
     } = useGenerateMock(generateTxStatusMessages, mockBehavior)
 
     // // Gen data
@@ -72,6 +75,8 @@ const Generate = () => {
     return (
         <FullscreenContainer>
             <Navbar />
+
+            <Popup type="err" onClickClose={closeTxErr} message={txErr} />
 
             <ContentContainer additionalClasses="flex-col gap-4">
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
