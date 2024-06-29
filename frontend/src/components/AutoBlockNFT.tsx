@@ -4,6 +4,7 @@ import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import BlockNFT from "./BlockNFT"
+import { nftRarityScaleArr } from "../data/fallbacks"
 
 const NFT_AMOUNT = 5 // 5 is sweet spot
 const AUTO_CHANGE_TIME_INTERVAL_MS = 5000 // 5s
@@ -12,12 +13,15 @@ const AutoBlockNFT = () => {
     const { collection } = useContext(GraviolaContext) as {
         collection: NFT[]
     }
+
+    const shouldUseFallbackNFTList = collection.length < NFT_AMOUNT
     const [status, setStatus] = useState<Status>("loading")
     const [randomNFTs, setRandomNFTs] = useState<NFT[]>([])
     const [activeNFT, setActiveNFT] = useState<number>(-1)
     const [blockAutoChange, setBlockAutoChange] = useState<boolean>(false)
 
     useEffect(() => {
+        if (shouldUseFallbackNFTList) return
         const clonedCollection = JSON.parse(JSON.stringify(collection))
         const shuffled = clonedCollection.sort(() => 0.5 - Math.random())
         const randNfts = shuffled.slice(0, NFT_AMOUNT)
@@ -41,6 +45,9 @@ const AutoBlockNFT = () => {
         return () => clearInterval(autoChangeInterval)
     }, [status, activeNFT, blockAutoChange, randomNFTs.length])
 
+    // If the contract has less than NFT_AMOUNT nfts, show the fallbacks instead.
+    const targetNFTList = shouldUseFallbackNFTList ? nftRarityScaleArr : randomNFTs
+
     return status !== "ready" ? (
         <div>
             <p>...</p>
@@ -48,7 +55,24 @@ const AutoBlockNFT = () => {
     ) : (
         <div className="flex max-sm:flex-col gap-1 h-full justify-center items-center">
             <div className={cl("flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1")}>
-                {randomNFTs.map((_, idx) => (
+                {targetNFTList.map((_, idx) => {
+                    return (
+                        <div
+                            key={idx}
+                            className={cl(
+                                "w-3 h-3 rounded-full cursor-pointer",
+                                "transition-colors duration-300",
+                                "hover:bg-light-text dark:hover:bg-dark-text",
+                                idx === activeNFT ? "bg-light-text dark:bg-dark-text" : "bg-light-text/25 dark:bg-dark-text/25",
+                            )}
+                            onClick={() => {
+                                setActiveNFT(idx)
+                                setBlockAutoChange(true)
+                            }}
+                        />
+                    )
+                })}
+                {/* {randomNFTs.map((_, idx) => (
                     <div
                         key={idx}
                         className={cl(
@@ -62,7 +86,7 @@ const AutoBlockNFT = () => {
                             setBlockAutoChange(true)
                         }}
                     />
-                ))}
+                ))} */}
             </div>
             <div className="w-64 h-64 relative">
                 {randomNFTs.map((nft, idx) => (
@@ -73,7 +97,12 @@ const AutoBlockNFT = () => {
                             idx === activeNFT ? "opacity-100" : "opacity-0",
                         )}
                     >
-                        <BlockNFT nftData={nft} glowColor="auto" additionalClasses="w-full h-full" />
+                        <BlockNFT
+                            nftData={nft}
+                            glowColor="auto"
+                            additionalClasses="w-full h-full"
+                            disableMetadataOnHover
+                        />
                     </div>
                 ))}
             </div>
