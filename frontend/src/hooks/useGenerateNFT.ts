@@ -8,11 +8,14 @@ import { useState, useEffect, useContext } from "react";
 import { useWeb3ModalAccount } from "@web3modal/ethers/react";
 import { NFT } from "../types/NFT";
 import { getRarityFromPerc } from "../utils/getRarityData";
+import { PopupBase } from "../components/Popup";
 import { RaritiesData } from "../types/RarityGroup";
 import { ContractTransactionResponse } from "ethers";
 
 type TradeUpArgs = number[]
 
+// TODO: Add a timer feature after the tx.receit() arrives. If we go beyond 4-5 mintues,
+// Display a warning popup or provide a link to tx explorer
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
@@ -27,7 +30,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
-    const [progress, setProgress] = useState<number>(0)
+    const [txPopup, setTxPopup] = useState<PopupBase>()
     const [rolledNFT, setRolledNFT] = useState<NFTExt | undefined>()
 
     // Automatically update Tx status messages based on status
@@ -46,7 +49,6 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
                 tx = await contract.tradeUp(
                     [args[0], args[1], args[2]],
-                    // { value: estFee + parseEther("0.015") }
                     { value: estFee + parseEther("0.015") }
                 )
             } else {
@@ -59,10 +61,16 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             if (receipt) {
                 console.log("[useGenerate] tx receipt OK")
                 setTxStatus("BEFORE_MINT")
-                setProgress(20)
             }
         } catch (error) {
-            console.error("[useGenerate] err during tx init: ", error as string)
+            const errMsg = ((error as Error).message.length > 64)
+                ? (error as Error).message.substring(0, 64) + " (...)"
+                : (error as Error).message
+            console.error("[useGenerate] err during tx init: ", errMsg)
+            setTxPopup({
+                type: "err",
+                message: `An error occurred. Message: ${errMsg}`
+            })
             setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
             setTxStatus("REJECTED")
         }
@@ -97,7 +105,6 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         if (addr != address) return
         console.log(`[useGenerate] onMint: tokenId ${tokenId}`)
         setTxStatus("MINTED")
-        setProgress(50)
     }
 
     const onTokenReady = async (addr: string, tokenId: bigint) => {
@@ -123,18 +130,22 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         console.log("[useGenerate] nftRes: ", JSON.stringify(nftRes, null, 4)) // DEBUG
 
         setTxStatus("DONE")
-        setProgress(100)
         setRolledNFT(nftRes)
+    }
+
+    const closePopup = () => {
+        setTxPopup(undefined)
     }
 
     return {
         txStatus,
         txMsg,
-        progress,
+        txPopup,
         rolledNFT,
 
         requestGen,
         initCallbacks,
         disableCallbacks,
+        closePopup,
     }
 }

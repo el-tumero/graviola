@@ -4,10 +4,13 @@ import { useEffect, useState } from "react"
 
 type PopupType = "err" | "warn" | "neutral"
 
-interface PopupProps {
+export interface PopupBase {
     type: PopupType
-    onClickClose: () => void
     message?: string
+}
+
+interface PopupProps extends PopupBase {
+    onClickClose: () => void
 }
 
 const Popup = ({ type, onClickClose, message }: PopupProps) => {
@@ -27,7 +30,6 @@ const Popup = ({ type, onClickClose, message }: PopupProps) => {
 
     useEffect(() => {
         if (!active && message) {
-            console.log('open')
             setActive(true)
         }
     }, [message])
@@ -35,7 +37,8 @@ const Popup = ({ type, onClickClose, message }: PopupProps) => {
     if (!message) return <></>
     else return (
         <div className={cl(
-            "max-w-sm top-20 right-3 self-end flex flex-col w-auto z-30 sticky",
+            "sticky",
+            "max-w-sm top-20 right-3 self-end flex flex-col w-auto z-30",
             "rounded-lg border backdrop-blur-md",
             "transition-all duration-200",
             "bg-light-bgDark/50 dark:bg-dark-bgLight/25",

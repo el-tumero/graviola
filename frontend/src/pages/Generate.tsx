@@ -40,41 +40,44 @@ const Generate = () => {
     const { isConnected } = useWeb3ModalAccount()
 
 
-    // MOCK
-    const mockBehavior = {
-        performSteps: [false, true, true, true],
-        doNotResetOnError: false
-    }
-    const {
-        txStatus,
-        txMsg,
-        txErr,
-        rolledNFT,
-        requestGen,
-        closeTxErr
-    } = useGenerateMock(generateTxStatusMessages, mockBehavior)
-
-    // // Gen data
+    // // MOCK
+    // const mockBehavior = {
+    //     performSteps: [false, true, true, true],
+    //     doNotResetOnError: false
+    // }
     // const {
     //     txStatus,
     //     txMsg,
-    //     progress,
+    //     txErr,
     //     rolledNFT,
     //     requestGen,
-    //     initCallbacks,
-    //     disableCallbacks,
-    // } = useGenerateNFT(generateTxStatusMessages)
+    //     closeTxErr
+    // } = useGenerateMock(generateTxStatusMessages, mockBehavior)
 
-    // // Handle generate callbacks
-    // useEffect(() => {
-    //     initCallbacks()
-    //     return () => disableCallbacks()
-    // }, [])
+    // Gen data
+    const {
+        txStatus,
+        txMsg,
+        txPopup,
+        rolledNFT,
+        requestGen,
+        initCallbacks,
+        disableCallbacks,
+        closePopup
+    } = useGenerateNFT(generateTxStatusMessages)
+
+    // Handle generate callbacks
+    useEffect(() => {
+        initCallbacks()
+        return () => disableCallbacks()
+    }, [])
 
     return (
         <FullscreenContainer>
             <Navbar />
-            <Popup type="err" onClickClose={closeTxErr} message={txErr} />
+
+            <Popup type="err" onClickClose={closePopup} message={txPopup?.message} />
+
             <ContentContainer additionalClasses="flex-col gap-4">
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
@@ -131,7 +134,7 @@ const Generate = () => {
                         <div key={i} className="flex flex-col gap-3 w-full h-full items-start">
                             <div className="flex flex-col w-fit h-fit gap-3">
                                 <p
-                                    className="text-lg w-fit font-thin font-content"
+                                    className="text-md w-fit font-thin font-content"
                                     style={{
                                         borderBottomWidth: 1,
                                         borderBottomColor: rGroup.color,
