@@ -40,7 +40,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
     const [txErr, setTxErr] = useState<string>("")
-    const [progress, setProgress] = useState<number>(0)
     const [rolledNFT, setRolledNFT] = useState<NFTExt | undefined>()
 
     // Automatically update Tx status messages based on status
@@ -60,7 +59,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
             if (!run) return
             console.log("[useGenerate MOCK] tx receipt OK")
             setTxStatus("BEFORE_MINT")
-            setProgress(20)
             run = requireStep(1, "ERROR")
         }, MOCK_STEP_TIMEOUT_MS)
 
@@ -68,7 +66,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
             if (!run) return
             console.log("[useGenerate MOCK] onMint tick")
             setTxStatus("MINTED")
-            setProgress(50)
             run = requireStep(2, "ERROR")
         }, MOCK_STEP_TIMEOUT_MS * 2);
 
@@ -76,7 +73,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
             if (!run) return
             console.log("[useGenerate MOCK] onFinishing")
             setTxStatus("FINISHING")
-            setProgress(75)
             run = requireStep(3, "ERROR")
         }, MOCK_STEP_TIMEOUT_MS * 3);
 
@@ -84,7 +80,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
             if (!run) return
             console.log("[useGenerate MOCK] nft Res")
             setTxStatus("DONE")
-            setProgress(100)
             const perc = formatBpToPercentage(fallbackNFT.attributes[0].value)
             const [rLevel, rData] = getRarityFromPerc(perc, rGroups)
             const mockNFTRes: NFTExt = {
@@ -98,8 +93,10 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
 
     const requireStep = (i: number, errStatus: TransactionStatus): boolean => {
         if (!behavior.performSteps[i]) {
-            // const err = `[useGenerate MOCK] Err (behavior[${i}] is 'false')`
-            const err = "This is a very long error kjdfghdfklhfdkjghjfgdfkjhgkjdfngklhrdtiklbnikldfhn;kigbhkidfhkibhdfkuihgbk;hrdfgkbh klsdklfg sdgf dsfg dslkjg lkdslkfgjj lkdjkljkjlljdfkg d dfkjlg kjldfjk glkdfjg "
+            const err = `[useGenerate MOCK] Err (behavior[${i}] is 'false')`
+            // const err = `This is a very long error kjdfghdfklhfdkjghjfgdfkjhgkjdfngklhrdtiklb.
+            //             nikldfhn;kigbhkidfhkibhdfkuihgbk;hrdfgkbh klsdklfg sdgf dsfg dslkjg
+            //             lkdslkfgjj lkdjkljkjlljdfkg d dfkjlg kjldfjk glkdfjg`
             console.error(err)
             setTxStatus(errStatus)
             setTxErr(err)
@@ -134,7 +131,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
         txStatus,
         txMsg,
         txErr,
-        progress,
         rolledNFT,
         requestGen,
         closeTxErr

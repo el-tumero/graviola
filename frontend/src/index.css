@@ -2,6 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
+/* html {
+    overflow-x: hidden;
+} */
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 .dark {
     color-scheme: dark;
 }

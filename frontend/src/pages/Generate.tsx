@@ -49,7 +49,6 @@ const Generate = () => {
         txStatus,
         txMsg,
         txErr,
-        progress,
         rolledNFT,
         requestGen,
         closeTxErr
@@ -76,9 +75,10 @@ const Generate = () => {
         <FullscreenContainer>
             <Navbar />
 
-            <Popup type="err" onClickClose={closeTxErr} message={txErr} />
+            <ContentContainer additionalClasses="flex-col gap-4 overflow-hidden">
 
-            <ContentContainer additionalClasses="flex-col gap-4">
+                <Popup type="err" onClickClose={closeTxErr} message={txErr} />
+
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
                     <PageTitle title="NFT Generator" />
 
@@ -93,48 +93,36 @@ const Generate = () => {
                             "mb-3",
                         )}>
 
-                        {rolledNFT ? (
-                            <p>
-                                Congratulations! You rolled a&nbsp;
-                                <span
-                                    style={{
-                                        color: rolledNFT.rarityData.color,
-                                        borderBottomWidth: 1,
-                                        borderBottomColor: rolledNFT.rarityData.color,
-                                    }}
-                                    className="font-bold"
-                                >
-                                    {rolledNFT.rarityLevel}
-                                </span>
-                                &nbsp;NFT!!!
-                            </p>
-                        ) : isConnected ? (
-                            <p>{txMsg}</p>
-                        ) : (
-                            <p>Connect your wallet first</p>
-                        )}
-
-                        {isConnected && txStatus === "NONE" && (
-                            <Button
-                                text={"Generate!"}
-                                disabled={!isConnected || txStatus !== "NONE"}
-                                onClick={() => requestGen()}
-                            />
-                        )}
-                    </div>
-
-                    {/* {(progress !== 0) && (
-                        <div className={`w-1/2 h-3 rounded-xl border border-light-border dark:border-dark-border`}>
-                            <div
-                                style={{ width: `${progress}%` }}
-                                className={cl(
-                                    "flex h-full rounded-xl",
-                                    "bg-gradient-to-r from-accentDark via-accent to-accentDark",
-                                    "transition-all duration-300",
-                                )}
-                            />
+                        <div>
+                            {rolledNFT ? (
+                                <p>
+                                    Congratulations! You rolled a&nbsp;
+                                    <span
+                                        style={{
+                                            color: rolledNFT.rarityData.color,
+                                            borderBottomWidth: 1,
+                                            borderBottomColor: rolledNFT.rarityData.color,
+                                        }}
+                                        className="font-bold"
+                                    >
+                                        {rolledNFT.rarityLevel}
+                                    </span>
+                                    &nbsp;NFT!!!
+                                </p>
+                            ) : isConnected ? (
+                                <p>{txMsg}</p>
+                            ) : (
+                                <p>Connect your wallet first</p>
+                            )
+                            }
                         </div>
-                    )} */}
+
+                        <Button
+                            text={"Generate!"}
+                            disabled={!isConnected || txStatus !== "NONE"}
+                            onClick={() => requestGen()}
+                        />
+                    </div>
 
                 </div>
 

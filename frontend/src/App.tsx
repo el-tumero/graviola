@@ -1,4 +1,3 @@
-import "./App.css"
 import { useEffect, useState, ReactNode } from "react"
 import tailwindConfig from "../tailwind.config"
 import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from "@web3modal/ethers/react"

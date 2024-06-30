@@ -1,5 +1,6 @@
 import { clsx as cl } from "clsx"
 import icons from "../data/icons"
+import { useEffect, useState } from "react"
 
 type PopupType = "err" | "warn" | "neutral"
 
@@ -11,26 +12,42 @@ interface PopupProps {
 
 const Popup = ({ type, onClickClose, message }: PopupProps) => {
 
+    const [active, setActive] = useState<boolean>(message ? true : false)
+
     const getTypeBorderStyles = () => {
         return (type === "neutral") ? "border-light-border dark:border-dark-border"
             : (type === "err") ? "border-red-500/75 dark:border-red-500/75" :
                 "border-yellow-400/75 dark:border-yellow-400/75"
     }
 
+    const handleClose = () => {
+        setActive(false)
+        setTimeout(() => onClickClose(), 200)
+    }
+
+    useEffect(() => {
+        if (!active && message) {
+            console.log('open')
+            setActive(true)
+        }
+    }, [message])
+
     if (!message) return <></>
     else return (
         <div className={cl(
-            "max-w-sm absolute top-20 right-3 flex flex-col w-auto z-[9999]",
+            "max-w-sm absolute top-20 right-3 flex flex-col w-auto z-30",
             "rounded-lg border backdrop-blur-md",
+            "transition-all duration-200",
             "bg-light-bgDark/50 dark:bg-dark-bgLight/25",
-            getTypeBorderStyles()
+            getTypeBorderStyles(),
+            active ? "opacity-100" : "translate-x-full opacity-0"
         )}>
             <div className="flex w-full h-fit justify-between items-center font-bold font-mono p-3">
                 <p>{type === "err" ? "Error" : (type === "warn") ? "Warning" : "Info"}</p>
-                <div onClick={onClickClose} className={cl(
+                <div onClick={handleClose} className={cl(
                     "h-6 w-6 cursor-pointer rounded-md",
-                    "text-light-text/75 dark:text-dark-text/75 stroke-[0.3em]",
-                    "border-2 border-light-text/75 dark:border-dark-text/75",
+                    "text-light-text/50 dark:text-dark-text/50 stroke-[0.25em]",
+                    "border-2 border-light-text/50 dark:border-dark-text/50",
                     "hover:opacity-90 active:opacity-60"
                 )}>
                     {icons.close}
@@ -44,7 +61,6 @@ const Popup = ({ type, onClickClose, message }: PopupProps) => {
                 {message}
             </div>
         </div>
-
     )
 }
 
