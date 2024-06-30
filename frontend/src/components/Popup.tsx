@@ -35,7 +35,7 @@ const Popup = ({ type, onClickClose, message }: PopupProps) => {
     if (!message) return <></>
     else return (
         <div className={cl(
-            "max-w-sm absolute top-20 right-3 flex flex-col w-auto z-30",
+            "max-w-sm top-20 right-3 self-end flex flex-col w-auto z-30 sticky",
             "rounded-lg border backdrop-blur-md",
             "transition-all duration-200",
             "bg-light-bgDark/50 dark:bg-dark-bgLight/25",

@@ -74,10 +74,8 @@ const Generate = () => {
     return (
         <FullscreenContainer>
             <Navbar />
-
-            <ContentContainer additionalClasses="flex-col gap-4 overflow-hidden">
-
-                <Popup type="err" onClickClose={closeTxErr} message={txErr} />
+            <Popup type="err" onClickClose={closeTxErr} message={txErr} />
+            <ContentContainer additionalClasses="flex-col gap-4">
 
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
                     <PageTitle title="NFT Generator" />
