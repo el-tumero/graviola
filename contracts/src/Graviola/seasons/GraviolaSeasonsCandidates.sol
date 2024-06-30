@@ -22,6 +22,12 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         address creator;
         bool exists;
     }
+
+    struct CandidateExternal {
+        uint256 id;
+        int256 score;
+        address creator;
+    }
     
     StructuredLinkedList.List internal list;
     mapping(uint256=>Candidate) internal candidates;
@@ -135,8 +141,17 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         return list.nodeExists(id);
     }
 
+    function getTopCandidatesInfo(uint256 size) external view returns (CandidateExternal[] memory c) {
+        c = new CandidateExternal[](size);
+        uint256 next;
+        for (uint i = 0; i < size; i++) {
+            (, next) = list.getAdjacent(next, false);
+            c[i] = CandidateExternal(next, candidates[next].score, candidates[next].creator);
+        }
+        
+    }
+
     function getTopCandidates(uint256 size) external view returns (uint256[] memory c) {
-        // uint256 size = list.sizeOf();
         c = new uint256[](size);
         uint256 next;
         for (uint i = 0; i < size; i++) {
