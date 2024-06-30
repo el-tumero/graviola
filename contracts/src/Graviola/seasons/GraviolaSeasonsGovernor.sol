@@ -7,7 +7,7 @@ import "./GraviolaSeasonsCandidates.sol";
 import {StructuredLinkedList} from "solidity-linked-list/contracts/StructuredLinkedList.sol";
 // import {VotingList} from "./VotingList.sol";
 
-contract GraviolaSeasonsGovernor is GraviolaSeasonsCandidates{
+contract GraviolaSeasonsGovernor{
 
    
 
