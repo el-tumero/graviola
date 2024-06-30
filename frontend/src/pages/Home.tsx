@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
+import { mockMetaBannerData } from "../data/mock"
 import { useContext, useEffect, useState } from "react"
-import { NFT } from "../types/NFT"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import AutoBlockNFT from "../components/AutoBlockNFT"
@@ -14,8 +14,9 @@ import { RaritiesData } from "../types/RarityGroup"
 import { clsx as cl } from "clsx"
 import icons from "../data/icons"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
-import MetadataMock, { MetadataMockProperty } from "../components/ui/MetadataMock"
+import MetadataMock from "../components/ui/MetadataMock"
 import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
+import { nftRarityScaleArr } from "../data/fallbacks"
 import Button from "../components/ui/Button"
 
 function Home() {
@@ -24,36 +25,12 @@ function Home() {
 
     const graviolaContext = useContext(GraviolaContext)
     const rGroups = graviolaContext.rarities as RaritiesData
-    const nftSources = graviolaContext.collection as NFT[]
 
     // Init NFT marquee opacity animation
     useEffect(() => {
         if (marqueeInit) return
         setMarqueeInit(true)
     })
-
-    const mockMetaBannerData: MetadataMockProperty[] = [
-        {
-            name: "image",
-            val: "QmQiHyuPLdC49vKDt1rJ1iyFC4SpFFmF7yoDWEXWPfRF7Z",
-            comment: "IPFS cid of NFT",
-        },
-        {
-            name: "rarity",
-            val: "681472",
-            comment: "NFT rarity with 6 digits of precision",
-        },
-        {
-            name: "season",
-            val: "Summer 2024",
-            comment: "Season during which the NFT was created",
-        },
-        {
-            name: "description",
-            val: "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: cyborg, human, android",
-            comment: "The prompt used for generation",
-        },
-    ]
 
     return (
         <FullscreenContainer>
@@ -157,10 +134,10 @@ function Home() {
                                 "bg-light-border/30 dark:bg-dark-border/30",
                             )}
                         >
-                            {/* TODO: Since blockNFTs have metadata on hover, these should be hardcoded with valid data */}
-                            {/* (respective to the rarity levels below them) */}
+
+                            {/* Display one preview NFT of each Rarity Level */}
                             {Object.entries(rGroups).map(([rLevel, rarityGroup]: [string, RarityGroupData], i) => {
-                                const rarityLevel = rLevel as RarityLevel // Object.entries always returns string keys
+                                const rarityLevel = rLevel as RarityLevel
                                 return (
                                     <div
                                         className="flex flex-col gap-2 justify-center items-center hover:scale-105 transition-transform duration-300"
@@ -168,7 +145,7 @@ function Home() {
                                     >
                                         <div>
                                             <BlockNFT
-                                                nftData={nftSources[i]}
+                                                nftData={nftRarityScaleArr[i]}
                                                 glowColor={rarityLevel}
                                                 additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
                                             />
@@ -182,7 +159,7 @@ function Home() {
                                             >
                                                 {rarityGroup.name}
                                             </p>
-                                            <span>{rarityGroup.rarityPerc}%</span>
+                                            <span>{rarityGroup.endRange - rarityGroup.startRange + 1}%</span>
                                         </div>
                                     </div>
                                 )

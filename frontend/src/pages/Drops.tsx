@@ -179,7 +179,6 @@ const CollectionList = (props: {
                 const percRarity = formatBpToPercentage(nft.attributes[0].value)
                 const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
                 const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
-
                 const [, rarityData] = getRarityFromPerc(percRarity, props.rGroups)
                 if (props.collectionMode === "My Drops" && !props.ownedTokenIds.includes(idx)) {
                     return null
@@ -224,7 +223,7 @@ const CollectionList = (props: {
                                 <div className={cl("flex flex-wrap w-full h-fit", "gap-1 justify-start items-start")}>
                                     {keywords.map((keyword, idx) => (
                                         <span
-                                            className={cl("py-1 px-2 rounded-md text-sm", "bg-light-bgLight/75 dark:bg-dark-bgLight/75")}
+                                            className={cl("py-1 px-2 rounded-md", "bg-light-bgLight/75 dark:bg-dark-bgLight/75")}
                                             key={idx}
                                         >
                                             {keyword}

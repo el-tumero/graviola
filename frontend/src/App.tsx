@@ -1,4 +1,3 @@
-import "./App.css"
 import { useEffect, useState, ReactNode } from "react"
 import tailwindConfig from "../tailwind.config"
 import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from "@web3modal/ethers/react"
@@ -12,15 +11,14 @@ import useTheme from "./hooks/useTheme"
 import { GRAVIOLA_ADDRESS } from "../../contracts/addresses.json"
 import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
-import { Keyword } from "./types/Keyword"
 import { RaritiesData } from "./types/RarityGroup"
-import { fallbackNFT } from "./utils/fallbackNFT"
+import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[App] connecting to contract... (read-only)")
-    const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
+    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC || "https://ethereum-sepolia-rpc.publicnode.com")
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
     console.log("[App] connected (read-only)")
     return graviola
@@ -45,6 +43,13 @@ const App = (props: { children: ReactNode }) => {
         explorerUrl: "https://sepolia.etherscan.io/",
         rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
     }
+    const mock = {
+        chainId: 3151908,
+        name: "Graviola Devnet",
+        currency: "ETH",
+        explorerUrl: "",
+        rpcUrl: import.meta.env.VITE_DEV_RPC,
+    }
     const metadata = {
         name: "Graviola NFT",
         description: "NFT generator powered by opML",
@@ -59,7 +64,7 @@ const App = (props: { children: ReactNode }) => {
         ethersConfig: defaultConfig({
             metadata,
         }),
-        chains: [sepolia],
+        chains: [import.meta.env.VITE_DEV_RPC ? mock : sepolia],
         projectId,
     })
 
@@ -115,32 +120,23 @@ const App = (props: { children: ReactNode }) => {
 
             // Nfts
             const collection: NFT[] = await Promise.all(promises)
-            // console.log("[App] fetched collection ", collection) // DEBUG
+            console.log("[App] fetched collection ", collection) // DEBUG
+            collection.length === 0 ? setCollection([fallbackNFT]) : setCollection((prev) => [...prev, ...collection])
 
-            setCollection((prev) => [...prev, ...collection])
+            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((acc, groupData, idx) => {
+                const obj = groupData as unknown as RarityGroupData
+                const gData: RarityGroupData = {
+                    name: obj.name,
+                    color: rarityGroupColors[rarityScale[idx]],
+                    keywords: obj.keywords.map(kword => kword),
+                    startRange: Number(obj.startRange),
+                    endRange: Number(obj.endRange)
+                }
+                acc[rarityScale[idx]] = gData
+                return acc
+            }, {} as Record<RarityLevel, RarityGroupData>)
 
-            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>(
-                (acc, groupData, index) => {
-                    // Cast keywords
-                    const keywords: Keyword[] = groupData.keywords.map((keyword) => ({
-                        name: keyword[0],
-                        lowerRange: Number(keyword[1]),
-                        upperRange: Number(keyword[2]),
-                    }))
-
-                    const rarityGroupData: RarityGroupData = {
-                        name: groupData.name,
-                        rarityPerc: Number(groupData.rarityPerc),
-                        color: rarityGroupColors[rarityScale[index]],
-                        keywords,
-                    }
-
-                    acc[rarityScale[index]] = rarityGroupData
-                    return acc
-                },
-                {} as Record<RarityLevel, RarityGroupData>,
-            )
-            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
+            console.log("[App] raritiesData: ", raritiesData) // DEBUG
             setRarities(raritiesData)
             setLoading(false)
             console.log('[App] collection loaded!')
@@ -151,6 +147,8 @@ const App = (props: { children: ReactNode }) => {
     }, [graviola])
 
     useEffect(() => {
+        console.log('walletProvider ', walletProvider)
+        console.log("env rpc?: ", import.meta.env.VITE_DEV_RPC)
         if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
         // override readonly contract conn
         else connectContract().then((noWalletContract) => setGraviola(noWalletContract))

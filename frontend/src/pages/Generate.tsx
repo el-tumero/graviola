@@ -8,6 +8,7 @@ import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
+import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { Graviola } from "../../../contracts/typechain-types/Graviola"
@@ -17,6 +18,7 @@ import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
+import useGenerateMock from "../hooks/useGenerateMock"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -37,15 +39,31 @@ const Generate = () => {
     }
     const { isConnected } = useWeb3ModalAccount()
 
+
+    // // MOCK
+    // const mockBehavior = {
+    //     performSteps: [false, true, true, true],
+    //     doNotResetOnError: false
+    // }
+    // const {
+    //     txStatus,
+    //     txMsg,
+    //     txErr,
+    //     rolledNFT,
+    //     requestGen,
+    //     closeTxErr
+    // } = useGenerateMock(generateTxStatusMessages, mockBehavior)
+
     // Gen data
     const {
         txStatus,
         txMsg,
-        progress,
+        txPopup,
         rolledNFT,
         requestGen,
         initCallbacks,
         disableCallbacks,
+        closePopup
     } = useGenerateNFT(generateTxStatusMessages)
 
     // Handle generate callbacks
@@ -58,67 +76,65 @@ const Generate = () => {
         <FullscreenContainer>
             <Navbar />
 
+            <Popup type="err" onClickClose={closePopup} message={txPopup?.message} />
+
             <ContentContainer additionalClasses="flex-col gap-4">
+
                 <div className="flex flex-col gap-4 w-full h-fit justify-center items-center">
                     <PageTitle title="NFT Generator" />
 
-                    <GenerateContainer rolledNFT={rolledNFT} runBorderAnim={!rolledNFT} rGroups={rGroups} />
-
-                    {/* Status text */}
-                    <div className={cl("flex w-fit h-fit p-3 rounded-xl text-lg", "border border-light-border dark:border-dark-border")}>
-                        {rolledNFT ? (
-                            <p>
-                                Congratulations! You rolled a&nbsp;
-                                <span
-                                    style={{
-                                        color: rolledNFT.rarityData.color,
-                                        borderBottomWidth: 1,
-                                        borderBottomColor: rolledNFT.rarityData.color,
-                                    }}
-                                    className="font-bold"
-                                >
-                                    {rolledNFT.rarityLevel}
-                                </span>
-                                &nbsp;NFT!!!
-                            </p>
-                        ) : isConnected ? (
-                            <p>{txMsg}</p>
-                        ) : (
-                            <p>Connect your wallet first</p>
-                        )}
+                    <div className={cl("my-3")}>
+                        <GenerateContainer rolledNFT={rolledNFT} runBorderAnim={!rolledNFT} rGroups={rGroups} />
                     </div>
 
-                    {/* Progress bar */}
-                    {(progress !== 0) && (
-                        <div className={`w-1/2 h-3 rounded-xl border border-light-border dark:border-dark-border`}>
-                            <div
-                                style={{ width: `${progress}%` }}
-                                className={cl(
-                                    "flex h-full rounded-xl",
-                                    "bg-gradient-to-r from-accentDark via-accent to-accentDark",
-                                    "transition-all duration-300",
-                                )}
-                            />
-                        </div>
-                    )}
+                    <div
+                        className={cl(
+                            "flex w-full h-fit justify-between items-center p-3 mt-3",
+                            "rounded-xl border border-light-border dark:border-dark-border",
+                            "mb-3",
+                        )}>
 
-                    {isConnected && txStatus === "NONE" && (
+                        <div>
+                            {rolledNFT ? (
+                                <p>
+                                    Congratulations! You rolled a&nbsp;
+                                    <span
+                                        style={{
+                                            color: rolledNFT.rarityData.color,
+                                            borderBottomWidth: 1,
+                                            borderBottomColor: rolledNFT.rarityData.color,
+                                        }}
+                                        className="font-bold"
+                                    >
+                                        {rolledNFT.rarityLevel}
+                                    </span>
+                                    &nbsp;NFT!!!
+                                </p>
+                            ) : isConnected ? (
+                                <p>{txMsg}</p>
+                            ) : (
+                                <p>Connect your wallet first</p>
+                            )
+                            }
+                        </div>
+
                         <Button
                             text={"Generate!"}
                             disabled={!isConnected || txStatus !== "NONE"}
                             onClick={() => requestGen()}
                         />
-                    )}
+                    </div>
+
                 </div>
 
                 <SectionTitle additionalClasses="max-sm:justify-center max-sm:items-center" title={"Keywords"} />
 
                 <div className="sm:inline-grid md:grid-cols-5 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-auto font-bold mx-auto">
                     {Object.entries(rGroups).map(([, rGroup], i) => (
-                        <div key={i} className="flex flex-col gap-3 w-full h-full items-center">
+                        <div key={i} className="flex flex-col gap-3 w-full h-full items-start">
                             <div className="flex flex-col w-fit h-fit gap-3">
                                 <p
-                                    className="text-lg w-fit font-thin font-content"
+                                    className="text-md w-fit font-thin font-content"
                                     style={{
                                         borderBottomWidth: 1,
                                         borderBottomColor: rGroup.color,
@@ -128,7 +144,7 @@ const Generate = () => {
                                 </p>
                                 <div className="flex flex-wrap gap-2">
                                     {rGroup.keywords.slice(0, 6).map((keyword, idx, arr) => {
-                                        const isLastItem = idx === arr.length - 1
+                                        const isLastItem = (arr.length > 2 && idx === arr.length - 1)
                                         return (
                                             <span
                                                 key={idx}
@@ -143,7 +159,7 @@ const Generate = () => {
                                                     borderColor: rGroup.color,
                                                 }}
                                             >
-                                                {isLastItem ? "..." : keyword.name}
+                                                {isLastItem ? "..." : keyword}
                                             </span>
                                         )
                                     })}
@@ -153,12 +169,7 @@ const Generate = () => {
                     ))}
                 </div>
 
-                <div
-                    className={cl(
-                        "flex w-full h-fit justify-end items-center p-3 mt-3",
-                        "rounded-xl border border-light-border dark:border-dark-border",
-                    )}
-                >
+                <div className={cl("flex w-full h-fit justify-end items-center p-3 mt-3", "rounded-xl")}>
                     <Button text="See all Keywords" onClick={() => navigate(routerPaths.home)} />
                 </div>
             </ContentContainer>

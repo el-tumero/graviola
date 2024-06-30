@@ -10,6 +10,7 @@ export const tradeUpTxStatusMessages: TxStatusMessagesMap = {
     MINTED: "TradeUp complete! Adding metadata...",
     FINISHING: "Hang tight! It's almost ready.",
     DONE: "",
+    ERROR: "An error occurred. Please check the popup for more info."
 }
 
 export const generateTxStatusMessages: TxStatusMessagesMap = {
@@ -20,4 +21,5 @@ export const generateTxStatusMessages: TxStatusMessagesMap = {
     MINTED: "Minting successful. Adding metadata...",
     FINISHING: "Hang tight! It's almost ready.",
     DONE: "",
+    ERROR: "An error occurred. Please check the popup for more info."
 }

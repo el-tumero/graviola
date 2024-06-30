@@ -2,21 +2,16 @@ import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 
 // Get RarityLevel and RGroupData from NFT rarity percentage (formatted)
-export function getRarityFromPerc(threshold: number, rarities: RaritiesData): [RarityLevel, RarityGroupData] {
-    // Clamp input
-    threshold = Math.max(0, Math.min(threshold, 100))
-    let perc = 0,
-        prevPerc = 100
+// return [RarityLevel, RarityGroupData]
+export function getRarityFromPerc(perc: number, rarities: RaritiesData): [RarityLevel, RarityGroupData] {
+    perc = Math.max(0, Math.min(perc, 100)) // Clamp input
 
     for (const rarityLevel of Object.keys(rarities).sort(
-        (a, b) => rarities[b as RarityLevel].rarityPerc - rarities[a as RarityLevel].rarityPerc,
+        (a, b) => rarities[b as RarityLevel].startRange - rarities[a as RarityLevel].endRange,
     ) as RarityLevel[]) {
-        const data = rarities[rarityLevel]
-        perc += data.rarityPerc
-        if (threshold <= prevPerc && threshold > 100 - perc) {
-            return [rarityLevel, data]
+        if (perc >= rarities[rarityLevel].startRange) {
+            return [rarityLevel, rarities[rarityLevel]]
         }
-        prevPerc = 100 - perc
     }
     throw new Error("Threshold does not match any rarity level.")
 }

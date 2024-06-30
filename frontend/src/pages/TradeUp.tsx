@@ -103,7 +103,7 @@ const TradeUp = () => {
     return (
         <FullscreenContainer>
             <Navbar />
-            <ContentContainer additionalClasses="flex-col gap-4 h-full flex-grow">
+            <ContentContainer additionalClasses="flex-col gap-4 h-full">
                 <PageTitle title="Trade Up" />
 
                 {!contentReady ? (

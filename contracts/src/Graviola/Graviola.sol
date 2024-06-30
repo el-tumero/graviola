@@ -111,7 +111,7 @@ contract Graviola is
 
 
         // words well logic
-        (string memory prompt, uint256 rarity, ) = rollWords(randomValue);
+        (string memory prompt, uint256 rarity) = rollWords(randomValue);
 
         string memory fullPrompt = string.concat(promptBase, prompt);
 
@@ -153,7 +153,7 @@ contract Graviola is
 
         uint256 randomValue = uint256(blockhash(block.number - 1)); // temp option
         // console.log("Ok!");
-        (string memory prompt, uint256 rarity,) = _tradeUp(randomValue, rarityId, averageTokenRarity);
+        (string memory prompt, uint256 rarity) = _tradeUp(randomValue, rarityId, averageTokenRarity);
         
         // burns old tokens 
         _burn(_tradeUpTokenIds[0]);        

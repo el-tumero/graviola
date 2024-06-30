@@ -11,7 +11,8 @@ const FullscreenContainer = forwardRef<HTMLDivElement, GenericContainerProps>(({
         <div
             ref={ref}
             className={cn(
-                "w-screen h-screen min-w-screen min-h-screen overflow-x-hidden",
+                "w-screen h-screen min-w-screen min-h-screen",
+                "overflow-x-hidden relative",
                 "flex flex-col items-center",
                 "text-base font-content font-thin",
                 "text-light-text dark:text-dark-text bg-light-bgPrimary dark:bg-dark-bgPrimary",
