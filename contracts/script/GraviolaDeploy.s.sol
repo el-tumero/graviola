@@ -11,7 +11,7 @@ contract GraviolaDeploy is Script {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
 
         AIOracleMock oao = new AIOracleMock();
-        Graviola graviola = new Graviola(address(oao), address(oao));
+        Graviola graviola = new Graviola(address(oao), address(1));
 
         console.log("OAO address:");
         console.log(address(oao));

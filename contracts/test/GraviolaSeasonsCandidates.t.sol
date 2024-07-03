@@ -2,9 +2,6 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/src/Test.sol";
-// import {GraviolaSeasonsGovernor} from "../src/Graviola/seasons/GraviolaSeasonsGovernor.sol";
-// import {GraviolaSeasonsArchive} from "../src/Graviola/seasons/GraviolaSeasonsArchive.sol";
-// import {GraviolaSeasonsCandidates} from "../src/Graviola/seasons/GraviolaSeasonsCandidates.sol";
 import {TGraviolaSeasonsCandidates} from "../src/Graviola/seasons/TGraviolaSeasonsCandidates.sol";
 
 contract GraviolaSeasonsCandidatesTest is Test {
