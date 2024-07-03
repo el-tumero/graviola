@@ -5,8 +5,10 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
 
-contract Graviola is ERC20, ERC20Permit, ERC20Votes {
-    constructor() ERC20("Graviola", "GRVL") ERC20Permit("Graviola") {}
+contract GraviolaToken is ERC20, ERC20Permit, ERC20Votes {
+    constructor(address receiver) ERC20("Graviola", "GRVL") ERC20Permit("Graviola") {
+        _mint(receiver, 1000000000000000000000000);
+    }
 
     function clock() public view override returns (uint48) {
         return uint48(block.timestamp);
