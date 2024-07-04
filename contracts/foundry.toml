@@ -7,3 +7,4 @@
 
 [rpc_endpoints]
     sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
+    arb_sepolia = "https://arbitrum-sepolia.infura.io/v3/${API_KEY_INFURA}"
