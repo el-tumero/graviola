@@ -111,7 +111,7 @@ contract Graviola is
 
 
         // words well logic
-        (string memory prompt, uint256 rarity) = rollWords(randomValue);
+        (string memory prompt,, uint256 rarity) = rollWords(randomValue);
 
         string memory fullPrompt = string.concat(promptBase, prompt);
 
