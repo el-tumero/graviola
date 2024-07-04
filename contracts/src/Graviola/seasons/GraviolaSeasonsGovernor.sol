@@ -40,16 +40,23 @@ contract GraviolaSeasonsGovernor is IGraviolaSeasonsGovernor, GraviolaSeasonsCan
 
     function validateWord(string memory str) private pure returns (bool) {
         bytes memory b = bytes(str);
-        if(b.length > 20 || b.length == 0) return false;
+        if(b.length == 0) return false;
         for (uint256 i = 0; i < b.length; i++) {
             uint8 char = uint8(b[i]);
-            if(char < 97 || char > 122) return false;            
+            if(char == 0) break;            
+            if(char < 97 || char > 122) return false;
         }
         return true;
     }
 
+    function uint256ToBytes(uint256 n) internal pure returns (bytes memory) {
+        bytes memory b = new bytes(32);
+        assembly { mstore(add(b, 32), n) }
+        return b;
+    }
+
     function addCandidate(uint256 word) external {
-        string memory wordStr = Strings.toString(word);
+        string memory wordStr = string(uint256ToBytes(word));
         if (!validateWord(wordStr)) revert WrongWordFormat();
         if(archive.isWordExpired(wordStr)) revert WordExpired();
 
