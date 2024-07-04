@@ -5,12 +5,15 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 
 /// @notice Contract for rolling Graviola tokens and all logic related to keywords
 contract GraviolaWell {
+
     // RarityGroup is a collection of all keywords of one specific Rarity level.
     struct RarityGroup {
         string name;
         string[] keywords;
         uint256 startRange;
-        uint256 endRange;
+        uint256 endRange; 
+        uint256 weight;         // Weight of this Group's keyword (one)
+        uint256 minTokenWeight; // Weight sum needed to classify a Token to be of this Rarity
     }
 
     mapping(uint => RarityGroup) private rarities;
@@ -42,6 +45,8 @@ contract GraviolaWell {
         // Commons
         RarityGroup storage common = rarities[0];
         common.name = "Common";
+        common.weight = 1;
+        common.minTokenWeight = 0;
         common.keywords = [
             "human",
             "android",
@@ -127,6 +132,8 @@ contract GraviolaWell {
         // Uncommons
         RarityGroup storage uncommon = rarities[1];
         uncommon.name = "Uncommon";
+        uncommon.weight = 3;
+        uncommon.minTokenWeight = 4;
         uncommon.keywords = [
             "elf",
             "goblin",
@@ -150,6 +157,8 @@ contract GraviolaWell {
         // Rares
         RarityGroup storage rare = rarities[2];
         rare.name = "Rare";
+        rare.weight = 5;
+        rare.minTokenWeight = 11;
         rare.keywords = ["mercenary", "spy", "hunter", "berserker", "mage"];
         rare.startRange = 92;
         rare.endRange = 96;
@@ -157,6 +166,8 @@ contract GraviolaWell {
         // VeryRare
         RarityGroup storage veryRare = rarities[3];
         veryRare.name = "Very Rare";
+        veryRare.weight = 8;
+        veryRare.minTokenWeight = 15;
         veryRare.keywords = ["shaman", "wizard"];
         veryRare.startRange = 97;
         veryRare.endRange = 98;
@@ -164,6 +175,8 @@ contract GraviolaWell {
         // Legendary RarityGroup
         RarityGroup storage legendary = rarities[4];
         legendary.name = "Legendary";
+        legendary.weight = 12;
+        legendary.minTokenWeight = 20;
         legendary.keywords = ["graviola"];
         legendary.startRange = 99;
         legendary.endRange = 99;
@@ -181,13 +194,7 @@ contract GraviolaWell {
     function getRarityGroups() public view returns (RarityGroup[UNIQUE_RARITY_GROUPS_COUNT] memory) {
         RarityGroup[UNIQUE_RARITY_GROUPS_COUNT] memory res;
         for (uint i = 0; i < UNIQUE_RARITY_GROUPS_COUNT; i++) {
-            RarityGroup memory group = RarityGroup(
-                rarities[i].name,
-                rarities[i].keywords,
-                (i == 0) ? 0 : (rarities[i -1].endRange + 1),
-                rarities[i].endRange
-            );
-            res[i] = group;
+            res[i] = rarities[i];
         }
         return res;
     }
@@ -249,14 +256,16 @@ contract GraviolaWell {
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @param _seed Random input seed
     /// @return keywords String of combined and separated result keywords
-    /// @return probability The total probability (in BP) of getting the result Rarity groups
+    /// @return resWeight       // Weight sum of rolled groups (keywords). This determines the final Rarity level
+    /// @return totalProbability // Probability (in BP) of rolling the EXACT combination of rolled keywords (excluding order)
     /// @dev Classic implementation (non-TradeUp)
     function rollWords(
         uint256 _seed
-    ) public view returns (string memory, uint256) {
+    ) public view returns (string memory, uint256, uint256) {
         uint16 i = 0;
         uint16 j = 0;
-        uint rollProbability = 1;
+        uint totalProbability = 1;
+        uint resWeight = 0;
         int[] memory used = new int[](3);
         string memory result = "";
 
@@ -286,9 +295,9 @@ contract GraviolaWell {
             (RarityGroup memory rGroup,) = getRarityGroupFromIdx(randIdx, defaultRarityGroupSetting);
             // Calc the relative keyword idx inside the Rarity Group
             uint relIdx = getRelativeWordIdx(randIdx, rGroup);
-
             uint rGroupKwordCount = (rGroup.endRange - rGroup.startRange) + 1;
-            rollProbability *= fractionToBasisPoints(rGroupKwordCount, defaultRarityGroupSetting.omega);
+            totalProbability *= fractionToBasisPoints(rGroupKwordCount, defaultRarityGroupSetting.omega);
+            resWeight += rGroup.weight;
 
             result = string(
                 abi.encodePacked(
@@ -300,7 +309,7 @@ contract GraviolaWell {
             i++;
         }
 
-        return (result, rollProbability);
+        return (result, resWeight, totalProbability);
     }
 
     /// @dev TradeUp implementation (Custom RaritySetting)
