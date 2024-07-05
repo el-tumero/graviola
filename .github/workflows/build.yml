@@ -20,18 +20,24 @@ jobs:
       - name: Install Foundry
         run: |
           curl -L https://foundry.paradigm.xyz | bash
-          source ~/.bashrc
+          echo "$HOME/.foundry/bin" >> $GITHUB_PATH
+
+      - name: Run Foundryup
+        run: |
           foundryup
+
+      - name: Install yarn
+        run: npm i -g yarn
 
       - name: Generate types for website
         run: |
           cd contracts
-          yarn install
+          yarn
           yarn build
           yarn types
 
       - name: Run web
         run: |
           cd frontend
-          yarn install
-          yarn dev
+          yarn
+          yarn build
