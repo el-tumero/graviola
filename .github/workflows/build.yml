@@ -1,0 +1,37 @@
+name: "Install and build the app"
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+jobs:
+  install-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Install Foundry
+        run: |
+          curl -L https://foundry.paradigm.xyz | bash
+          source ~/.bashrc
+          foundryup
+
+      - name: Generate types for website
+        run: |
+          cd contracts
+          yarn install
+          yarn build
+          yarn types
+
+      - name: Run web
+        run: |
+          cd frontend
+          yarn install
+          yarn dev
