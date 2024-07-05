@@ -3,7 +3,7 @@ import tailwindConfig from "../tailwind.config"
 import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from "@web3modal/ethers/react"
 import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from "ethers"
 import { Graviola } from "../../contracts/typechain-types/Graviola"
-import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/Graviola__factory"
+import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/GraviolaMain.sol/Graviola__factory"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
@@ -37,11 +37,11 @@ async function connectContractWallet(walletProvider: Eip1193Provider): Promise<G
 const App = (props: { children: ReactNode }) => {
     const projectId = "a09890b34dc1551c2534337dbc22de8c"
     const sepolia = {
-        chainId: 11155111,
-        name: "Sepolia testnet",
+        chainId: 421614,
+        name: "Arbitrum Sepolia",
         currency: "ETH",
         explorerUrl: "https://sepolia.etherscan.io/",
-        rpcUrl: "https://ethereum-sepolia-rpc.publicnode.com",
+        rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
     }
     const mock = {
         chainId: 3151908,

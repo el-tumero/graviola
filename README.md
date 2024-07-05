@@ -12,8 +12,7 @@ Graviola's initiative employs blockchain, AI, and randomness to autonomously pro
 2. download Foundry https://book.getfoundry.sh/getting-started/installation#using-foundryup
 3. generate types for the frontend
    1. `cd contracts && yarn`
-   2. `forge build`
-   3. `yarn types`
+   2. `yarn build && yarn types`
 4. run website
    1. `cd ../frontend && yarn`
    2. `yarn dev`
