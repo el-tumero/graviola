@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Test, console} from "forge-std/src/Test.sol";
-import {Graviola} from "../src/Graviola/Graviola.sol";
+import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 import {AIOracleMock} from "../src/OAO/AIOracleMock.sol";
 
 

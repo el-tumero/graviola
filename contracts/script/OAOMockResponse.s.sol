@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.25;
 
 import {Script, console} from "forge-std/src/Script.sol";
 import {Graviola} from "../src/Graviola/GraviolaMain.sol";
@@ -7,16 +7,15 @@ import {AIOracleMock} from "../src/OAO/AIOracleMock.sol";
 
 
 contract GraviolaDeploy is Script {
+    string constant response = "https://ipfs.io/ipfs/QmTjUY4rQLrgv8tjedXoXDmXRtahL1bcFVK64jnTkiVGEn";
+    uint256 constant requestId = 0;
+    address constant OAOAddress = address(0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512);
+
     function run() public {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
 
-        AIOracleMock oao = new AIOracleMock();
-        Graviola graviola = new Graviola(address(oao), address(1));
-
-        console.log("OAO address:");
-        console.log(address(oao));
-        console.log("Graviola address:");
-        console.log(address(graviola));
+        AIOracleMock oao = AIOracleMock(OAOAddress);
+        oao.invokeCallback(requestId, bytes(response));
         
         vm.stopBroadcast();
     }
