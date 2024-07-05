@@ -2,7 +2,7 @@ name: "Install and build the app"
 
 on:
   pull_request:
-    types: [opened, reopened]
+    types: [opened, reopened, synchronize]
 
 jobs:
   install-and-build:
@@ -15,16 +15,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: "20"
 
       - name: Install Foundry
-        run: |
-          curl -L https://foundry.paradigm.xyz | bash
-          echo "$HOME/.foundry/bin" >> $GITHUB_PATH
-
-      - name: Run Foundryup
-        run: |
-          foundryup
+        uses: foundry-rs/foundry-toolchain@v1
 
       - name: Install yarn
         run: npm i -g yarn
@@ -36,7 +30,7 @@ jobs:
           yarn build
           yarn types
 
-      - name: Run web
+      - name: Build website
         run: |
           cd frontend
           yarn
