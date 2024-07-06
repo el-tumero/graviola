@@ -10,5 +10,3 @@ typechain-types
 !broadcast
 broadcast/*
 broadcast/*/31337/
-
-addresses.json
