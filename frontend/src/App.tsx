@@ -2,8 +2,8 @@ import { useEffect, useState, ReactNode } from "react"
 import tailwindConfig from "../tailwind.config"
 import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from "@web3modal/ethers/react"
 import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from "ethers"
-import { Graviola } from "../../contracts/typechain-types/Graviola"
-import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/GraviolaMain.sol/Graviola__factory"
+import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/GraviolaMain.sol"
+import { Graviola } from "../../contracts/typechain-types/GraviolaMain.sol"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
@@ -18,7 +18,7 @@ import { AppContext } from "./contexts/AppContext"
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[App] connecting to contract... (read-only)")
-    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC || "https://ethereum-sepolia-rpc.publicnode.com")
+    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC || "https://sepolia-rollup.arbitrum.io/rpc")
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
     console.log("[App] connected (read-only)")
     return graviola
