@@ -13,10 +13,8 @@ contract GraviolaDeploy is Script {
         AIOracleMock oao = new AIOracleMock();
         Graviola graviola = new Graviola(address(oao), address(1));
 
-        console.log("OAO address:");
-        console.log(address(oao));
-        console.log("Graviola address:");
-        console.log(address(graviola));
+        console.log("GRAVIOLA_ADDRESS:%s", address(graviola));
+        console.log("OAO_ADDRESS:%s", address(oao));
         
         vm.stopBroadcast();
     }
