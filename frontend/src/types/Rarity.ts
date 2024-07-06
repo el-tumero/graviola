@@ -13,4 +13,6 @@ export interface RarityGroupData {
     keywords: string[]
     startRange: number
     endRange: number
+    weight: number
+    minTokenWeight: number
 }

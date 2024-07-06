@@ -130,7 +130,9 @@ const App = (props: { children: ReactNode }) => {
                     color: rarityGroupColors[rarityScale[idx]],
                     keywords: obj.keywords.map(kword => kword),
                     startRange: Number(obj.startRange),
-                    endRange: Number(obj.endRange)
+                    endRange: Number(obj.endRange),
+                    weight: Number(obj.weight),
+                    minTokenWeight: Number(obj.minTokenWeight),
                 }
                 acc[rarityScale[idx]] = gData
                 return acc
