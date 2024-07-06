@@ -111,13 +111,16 @@ contract Graviola is
 
 
         // words well logic
-        (string memory prompt,, uint256 rarity) = rollWords(randomValue);
+        (string memory prompt, uint256 weightSum, uint256 rarity) = rollWords(randomValue);
+
+
 
         string memory fullPrompt = string.concat(promptBase, prompt);
 
         // metadata
         addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
+        addWeightSum(tokenId, weightSum);
 
         // request to ai oracle
         aiOracleRequest(tokenId, fullPrompt);

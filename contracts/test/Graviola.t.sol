@@ -25,6 +25,8 @@ contract GraviolaTest is Test {
         aiOracle.invokeCallback(0, "image-cid");
         assertEq(graviola.ownerOf(0), alice);
         assertEq(graviola.getMetadata(0).image, "image-cid");
+
+        // console.log(graviola.tokenURI(0));
     }
 
     function test_TradeUp() external {
