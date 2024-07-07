@@ -23,9 +23,14 @@ contract AIOracleMock is IAIOracle {
         return bytes4(0xb0347814);
     }
 
+    function invokeNextCallback(bytes calldata output) external {
+        invokeCallback(requestCounter-1, output);
+    }
+
 
     function invokeCallback(uint256 requestId, bytes calldata output) public {
         AICallbackRequestData storage request = requests[requestId];
+        require(request.account != address(0), "Request does not exist!");
 
         bytes memory payload = abi.encodeWithSelector(
             callbackFunctionSelector(),
