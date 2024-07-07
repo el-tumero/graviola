@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
+    "dotenv": "^16.4.5",
     "solidity-json-writer": "^1.1.0",
     "solidity-linked-list": "^6.0.0"
   },
