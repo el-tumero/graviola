@@ -6,6 +6,10 @@
   - API_KEY_INFURA - infura API key
   - PRIVATE_KEY - private key (EOA), prefixed with `0x`
 
+### Deployment script
 ```bash
-forge script script/GraviolaDeploy.s.sol --rpc-url arb_sepolia --broadcast >> deploy.log
+yarn deploy
 ```
+runs script which deploys main contract, generate typechain types and add contract addresses to addresses.json file
+
+

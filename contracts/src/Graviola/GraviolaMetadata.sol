@@ -8,6 +8,7 @@ struct Metadata {
     string image;
     string prompt;
     uint256 rarity;
+    uint256 weightSum;
     bool filled;
 }
 
@@ -29,6 +30,11 @@ contract GraviolaMetadata {
     function addRarity(uint256 tokenId, uint256 rarity) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].rarity = rarity;
+    }
+
+    function addWeightSum(uint256 tokenId, uint256 sum) internal {
+        require(!metadataStorage[tokenId].filled, "Metadata is filled!");
+        metadataStorage[tokenId].weightSum = sum;
     }
 
     /// @notice Adds image cid to metadata for the token with given tokenId
@@ -54,16 +60,23 @@ contract GraviolaMetadata {
 
     // -- conversions --
 
-    function generateJSON(string memory image, string memory prompt, uint256 rarity) private pure returns (string memory) {
+    function generateJSON(string memory image, string memory prompt, uint256 rarity, uint256 weightSum) private pure returns (string memory) {
         JsonWriter.Json memory writer;
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("image", image);
         writer = writer.writeStringProperty("description", prompt);
         writer = writer.writeStartArray("attributes");
+
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("trait_type", "Rarity");
         writer = writer.writeUintProperty("value", rarity);
         writer = writer.writeEndObject();
+
+        writer = writer.writeStartObject();
+        writer = writer.writeStringProperty("trait_type", "Weight Sum");
+        writer = writer.writeUintProperty("value", weightSum);
+        writer = writer.writeEndObject();
+
         writer = writer.writeEndArray();
         writer = writer.writeEndObject();
 
@@ -89,7 +102,8 @@ contract GraviolaMetadata {
                     generateJSON(
                         metadataStorage[tokenId].image,
                         string.concat(promptBase, metadataStorage[tokenId].prompt),
-                        metadataStorage[tokenId].rarity
+                        metadataStorage[tokenId].rarity,
+                        metadataStorage[tokenId].weightSum
                     )
                 )
             );

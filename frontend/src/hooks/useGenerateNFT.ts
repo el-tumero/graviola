@@ -1,5 +1,5 @@
 import { parseEther, toBigInt } from "ethers";
-import { Graviola } from "../../../contracts/typechain-types/Graviola";
+import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol";
 import { GraviolaContext } from "../contexts/GraviolaContext";
 import { NFTExt } from "../pages/Generate";
 import { TransactionStatus } from "../types/TransactionStatus";
@@ -49,12 +49,12 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
                 tx = await contract.tradeUp(
                     [args[0], args[1], args[2]],
-                    { value: estFee + parseEther("0.015") }
+                    { value: estFee + parseEther("0.006") }
                 )
             } else {
                 tx = await contract.mint({
-                    value: parseEther("0.015"),
-                    gasLimit: 900_000
+                    value: parseEther("0.006"),
+                    // gasLimit: 900_000
                 })
             }
             const receipt = await tx.wait()

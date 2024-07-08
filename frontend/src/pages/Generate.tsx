@@ -11,14 +11,14 @@ import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import SectionTitle from "../components/ui/layout/SectionTitle"
-import { Graviola } from "../../../contracts/typechain-types/Graviola"
+import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-import useGenerateMock from "../hooks/useGenerateMock"
+// import useGenerateMock from "../hooks/useGenerateMock"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
