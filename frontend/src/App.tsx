@@ -121,7 +121,10 @@ const App = (props: { children: ReactNode }) => {
             // Nfts
             const collection: NFT[] = await Promise.all(promises)
             console.log("[App] fetched collection ", collection) // DEBUG
-            collection.length === 0 ? setCollection([fallbackNFT]) : setCollection((prev) => [...prev, ...collection])
+            collection.length < 5 ? (() => {
+                setCollection(new Array(5).fill(fallbackNFT))
+                console.warn('Collection is smaller than (5). Using fallback collection')
+            })() : setCollection((prev) => [...prev, ...collection])
 
             const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((acc, groupData, idx) => {
                 const obj = groupData as unknown as RarityGroupData
@@ -130,7 +133,9 @@ const App = (props: { children: ReactNode }) => {
                     color: rarityGroupColors[rarityScale[idx]],
                     keywords: obj.keywords.map(kword => kword),
                     startRange: Number(obj.startRange),
-                    endRange: Number(obj.endRange)
+                    endRange: Number(obj.endRange),
+                    weight: Number(obj.weight),
+                    minTokenWeight: Number(obj.minTokenWeight),
                 }
                 acc[rarityScale[idx]] = gData
                 return acc

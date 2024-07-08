@@ -66,7 +66,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             const errMsg = ((error as Error).message.length > 64)
                 ? (error as Error).message.substring(0, 64) + " (...)"
                 : (error as Error).message
-            console.error("[useGenerate] err during tx init: ", errMsg)
+            console.error("[useGenerate] err during tx init: ", (error as Error))
             setTxPopup({
                 type: "err",
                 message: `An error occurred. Message: ${errMsg}`
