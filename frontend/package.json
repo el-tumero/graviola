@@ -6,11 +6,14 @@
     "type": "module",
     "scripts": {
         "dev": "cross-env NODE_ENV=dev vite",
+        "dev:test": "concurrently \"cross-env NODE_ENV=dev vite --port 3000 -l silent\" \"ganache -d -q\"",
         "build": "vite build",
         "predeploy": "vite build && cp ./dist/index.html ./dist/404.html",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\" --tab-width 4 --no-semi --jsx-single-quote false --print-width 140",
         "deploy": "gh-pages -d dist",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "synpress": "SKIP_METAMASK_SETUP=true synpress run",
+        "e2e": "start-server-and-test dev:test http://localhost:3000 synpress"
     },
     "dependencies": {
         "@web3modal/ethers": "^4.1.11",
@@ -25,17 +28,21 @@
         "tailwind-merge": "^2.2.2"
     },
     "devDependencies": {
+        "@synthetixio/synpress": "^3.7.3",
         "@types/react": "^18.2.56",
         "@types/react-dom": "^18.2.19",
         "@vitejs/plugin-react": "^4.2.1",
         "autoprefixer": "^10.4.18",
+        "concurrently": "^8.2.2",
         "cross-env": "^7.0.3",
         "eslint-plugin-react": "^7.34.2",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.5",
+        "ganache": "^7.9.2",
         "gh-pages": "^6.1.1",
         "postcss": "^8.4.35",
         "prettier": "3.3.1",
+        "start-server-and-test": "^2.0.4",
         "tailwindcss": "^3.4.1",
         "vite": "^5.1.4"
     },
