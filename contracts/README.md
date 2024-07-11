@@ -8,8 +8,13 @@
 
 ### Deployment script
 ```bash
-yarn deploy
+yarn deploy:testnet
 ```
-runs script which deploys main contract, generate typechain types and add contract addresses to addresses.json file
+runs script which deploys main contract (to testnet), generate typechain types and add contract addresses to addresses.json file
+
+#### Local version
+```bash
+yarn deploy:local
+```
 
 

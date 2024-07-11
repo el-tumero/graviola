@@ -6,6 +6,8 @@ out
 cache
 typechain-types
 
+addresses-local.json
+
 # broadcasts
 !broadcast
 broadcast/*

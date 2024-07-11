@@ -1,13 +1,32 @@
+require("dotenv").config()
 const { exec } = require("child_process");
 const { writeFile } = require("fs");
 const generateContractTypes = require("./types")
 
-const rpc = "arb_sepolia"
 
-const deployForgeCommand = `forge script script/GraviolaDeploy.s.sol --rpc-url ${rpc} --broadcast`
+const config = {
+    local: {
+        rpc: "localhost",
+        privateKey: "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
+        output: "addresses-local.json"
+    },
+    testnet: {
+        rpc: "arb_sepolia",
+        privateKey: process.env.PRIVATE_KEY, 
+        output: "addresses.json",
+    }
+}
 
+const variant = process.argv[2] 
+
+if(!config[variant]) {
+    throw Error("Wrong config variant!")
+}
+
+const {rpc, output, privateKey} = config[variant]
 const logsPath = "deploy.log"
-const outputPath = "addresses.json"
+
+const deployForgeCommand = `forge script script/GraviolaDeploy.s.sol --rpc-url ${rpc} --private-key ${privateKey} --broadcast`
 
 function writeToLog(data) {
     writeFile(logsPath, data, err => {
@@ -46,12 +65,12 @@ async function main() {
     try {
         const addresses = await deployContracts()
         console.log(`Logs saved to ${logsPath}`)
-        writeFile(outputPath, JSON.stringify(addresses), err => {
+        writeFile(output, JSON.stringify(addresses), err => {
             if(err){
                 console.error(err)
                 return
             } else{
-                console.log(`Addresses saved to ${outputPath}`)
+                console.log(`Addresses saved to ${output}`)
             }
         })
         await generateContractTypes()
