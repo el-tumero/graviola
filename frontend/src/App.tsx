@@ -9,17 +9,27 @@ import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 import { GRAVIOLA_ADDRESS } from "../../contracts/addresses.json"
+import { GRAVIOLA_ADDRESS as GRAVIOLA_LOCAL_ADDRESS } from "../../contracts/addresses-local.json"
+
 import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
+import { Signer } from "ethers"
+import useDevWallet from "./hooks/useDevWallet"
 
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[App] connecting to contract... (read-only)")
-    const provider = new JsonRpcProvider(import.meta.env.VITE_DEV_RPC || "https://sepolia-rollup.arbitrum.io/rpc")
-    const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
+    const localMode = import.meta.env.VITE_DEV_PROVIDER === "true"
+
+    const provider = new JsonRpcProvider(
+        localMode ? import.meta.env.VITE_DEV_RPC : "https://sepolia-rollup.arbitrum.io/rpc"
+    )
+    const graviola = GraviolaFactory.connect(
+        localMode ? GRAVIOLA_LOCAL_ADDRESS : GRAVIOLA_ADDRESS, provider
+    )
     console.log("[App] connected (read-only)")
     return graviola
 }
@@ -31,6 +41,14 @@ async function connectContractWallet(walletProvider: Eip1193Provider): Promise<G
     const signer = await provider.getSigner()
     const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, signer)
     console.log("[App] connected (wallet)")
+    return graviola
+}
+
+function connectContractDevWallet(signer:Signer): Graviola {
+    if(!import.meta.env.VITE_DEV_GRAVIOLA_ADDRESS) console.error("No VITE_DEV_GRAVIOLA_ADDRESS env variable provided!")
+    console.log(GRAVIOLA_LOCAL_ADDRESS)
+        const graviola = GraviolaFactory.connect(GRAVIOLA_LOCAL_ADDRESS, signer)
+    console.log("[App] connected (devWallet)")
     return graviola
 }
 
@@ -68,7 +86,11 @@ const App = (props: { children: ReactNode }) => {
         projectId,
     })
 
+
     const { walletProvider } = useWeb3ModalProvider()
+
+    const devWallet = useDevWallet()
+
     const { theme, toggleTheme } = useTheme(modal === undefined)
 
     const [graviola, setGraviola] = useState<Graviola | null>(null)
@@ -154,10 +176,11 @@ const App = (props: { children: ReactNode }) => {
     useEffect(() => {
         console.log('walletProvider ', walletProvider)
         console.log("env rpc?: ", import.meta.env.VITE_DEV_RPC)
+
         if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
-        // override readonly contract conn
+        else if (devWallet) setGraviola(connectContractDevWallet(devWallet))
         else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
-    }, [walletProvider])
+    }, [walletProvider, devWallet])
 
     return loading ? (
         <Loading />
