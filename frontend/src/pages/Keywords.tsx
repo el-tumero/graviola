@@ -3,7 +3,8 @@ import { clsx as cl } from "clsx"
 import ContentContainer from "../components/ui/layout/ContentContainer";
 import Navbar from "../components/nav/Navbar";
 import PageTitle from "../components/ui/layout/PageTitle";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState } from "react";
+import icons from "../data/icons";
 import { GraviolaContext } from "../contexts/GraviolaContext";
 import { RaritiesData } from "../types/RarityGroup";
 import { RarityGroupData } from "../types/Rarity";
@@ -18,40 +19,51 @@ const KeywordGroupBlock = (props: { gData: RarityGroupData, blockState: RarityGr
         <div style={{
             borderWidth: 1,
             borderColor: props.gData.color
-        }} className={
-            cl(
-                "flex flex-col",
-                "p-4 rounded-xl",
-                "h-fit",
-            )
-        } >
+        }} className={cl(
+            "flex flex-col",
+            "p-4 rounded-xl",
+            "h-fit w-fit min-w-32",
+        )}>
+            <div className={cl("flex flex-col gap-1")}>
 
-            {/* Title & Fold Button*/}
-            < div className={
-                cl(
-                    "flex justify-between items-center",
-                    "w-full h-fit gap-9"
-                )
-            } >
-                <p className="font-medium">{props.gData.name} ({props.gData.keywords.length})</p>
-                <button onClick={() => props.blockStateSetter()}>(F)</button>
-            </div >
+                {/* Title & Fold Button*/}
+                <div className={cl("flex justify-between items-center gap-6")}>
+                    <p className="font-medium">{props.gData.name} ({props.gData.keywords.length})</p>
+                    <div className={cl(
+                        "w-4 h-4 cursor-pointer",
+                        props.blockState.unfolded ? "rotate-180" : "rotate-90"
+                    )} onClick={() => props.blockStateSetter()}>{icons.arrowUp}</div>
+                </div>
+
+                {/* Weight, Min NFT Weight sum */}
+                <div className={cl(
+                    "flex justify-between items-center w-full"
+                )}>
+                    <div className="flex">
+                        <div className="w-5 h-5">{icons.weight}</div>
+                        <span>{props.gData.weight}</span>
+                    </div>
+                    <div className="flex">
+                        <div className="flex gap-0.5 font-mono">min:{" "}
+                            <div className="w-5 h-5">{icons.weight}</div>
+                        </div>
+                        <span>{props.gData.minTokenWeight}</span>
+                    </div>
+                </div>
+            </div>
 
             {/* Keyword list (unfolded) */}
             < div className={
-                cl(
-                    "",
-                    props.blockState.unfolded ? "visible mt-3" : "invisible h-0 overflow-hidden"
-                )
+                cl(props.blockState.unfolded ? "visible mt-3" : "invisible h-0 overflow-hidden")
             } >
                 <ul className={cl(
                     "flex flex-col divide-y",
                     "divide-light-text/15 dark:divide-dark-text/15",
-                    "px-3 rounded-xl",
+                    "px-1 rounded-lg",
                     "bg-light-bgLight/50 dark:bg-dark-bgLight/50",
                 )}>
                     {props.gData.keywords.map((keyword: string, idx: number) => (
-                        <li key={idx} className={cl("py-2")}>{keyword}</li>
+                        <li key={idx} className={cl("px-3 py-1.5")}>{keyword}</li>
                     ))}
                 </ul>
             </div >
@@ -78,9 +90,25 @@ const Keywords = () => {
 
                 <PageTitle title="Keywords" additionalClasses="mb-10" />
 
+                <div className={cl("flex w-full h-fit justify-end items-center p-3 mt-3", "rounded-xl")}>
+                    <div className="flex w-full gap-1.5 justify-start items-center">
+                        <div className="p-2 bg-light-border dark:bg-dark-border rounded-lg">
+                            <div className="w-5 h-5">{icons.weight}</div>
+                        </div>
+                        <p>
+                            Weight — this value represents how heavy a keyword is.
+                            Each groups' keywords have their weights.
+                            For an NFT to be of certain Rarity, it needs to have at least the "min" weight sum value.
+                        </p>
+                    </div>
+                </div>
+
                 <div className={cl(
                     "flex gap-3 justify-between items-start",
                     "w-full h-fit p-4",
+                    "max-lg:grid max-lg:grid-cols-3",
+                    "max-md:grid-cols-2",
+                    "max-sm:flex max-sm:flex-col"
                 )}>
 
                     {Object.values(rarities).map((rarityGroupData: RarityGroupData, idx: number) => (
