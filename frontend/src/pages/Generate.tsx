@@ -126,8 +126,10 @@ const Generate = () => {
 
                 </div>
 
+                {/* TODO: Add marquee of randomly-selected keywords with the caption: Keywords you can enroll */}
+
                 <div className={cl("flex w-full h-fit justify-end items-center p-3 mt-3", "rounded-xl")}>
-                    <Button text="See Keyword collection" onClick={() => navigate(routerPaths.keywords)} />
+                    <Button text="See all Keywords" onClick={() => navigate(routerPaths.keywords)} />
                 </div>
             </ContentContainer>
         </FullscreenContainer>

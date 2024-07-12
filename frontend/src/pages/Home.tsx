@@ -98,6 +98,7 @@ const Home = () => {
                                             onClick={() => navigate(routerPaths.generate)}
                                             className={cl("underline underline-offset-2 hover:cursor-pointer hover:decoration-accent")}
                                         >
+                                            {/* TODO: Make static page with All metadata attributes listed and explained */}
                                             here
                                         </span>
                                     </p>
