@@ -8,6 +8,7 @@ import { openURL } from "../../utils/openURL"
 import NavListDesktop from "./NavList"
 import icons from "../../data/icons"
 import { AppContext } from "../../contexts/AppContext"
+import { links } from "../../links"
 
 const Navbar = () => {
     const navigate = useNavigate()
@@ -27,11 +28,11 @@ const Navbar = () => {
             <p>Trade Up</p>
         </NavElement>,
 
-        <NavElement onClick={() => openURL("https://github.com/el-tumero/graviola")}>
+        <NavElement onClick={() => openURL(links.repo)}>
             <div className={cl("flex w-min hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>{icons.github}</div>
         </NavElement>,
 
-        <NavElement onClick={() => openURL("https://discord.gg/FsMWpsqsG7")}>
+        <NavElement onClick={() => openURL(links.discord)}>
             <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
                 {icons.discordLogo}
             </div>
