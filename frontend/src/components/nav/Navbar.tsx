@@ -28,6 +28,10 @@ const Navbar = () => {
             <p>Trade Up</p>
         </NavElement>,
 
+        <NavElement onClick={() => navigate(routerPaths.keywords)}>
+            <p>Keywords</p>
+        </NavElement>,
+
         <NavElement onClick={() => openURL(links.repo)}>
             <div className={cl("flex w-min hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>{icons.github}</div>
         </NavElement>,
