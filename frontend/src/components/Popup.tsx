@@ -1,4 +1,5 @@
 import { clsx as cl } from "clsx"
+import { cn } from "../utils/cn"
 import icons from "../data/icons"
 import { useEffect, useState } from "react"
 
@@ -10,10 +11,12 @@ export interface PopupBase {
 }
 
 interface PopupProps extends PopupBase {
+    additionalClasses?: string
     onClickClose: () => void
+    disableCloseButton?: true
 }
 
-const Popup = ({ type, onClickClose, message }: PopupProps) => {
+const Popup = ({ additionalClasses, type, onClickClose, message, disableCloseButton }: PopupProps) => {
 
     const [active, setActive] = useState<boolean>(message ? true : false)
 
@@ -36,25 +39,28 @@ const Popup = ({ type, onClickClose, message }: PopupProps) => {
 
     if (!message) return <></>
     else return (
-        <div className={cl(
+        <div className={cn(
             "sticky",
             "max-w-sm top-20 right-3 self-end flex flex-col w-auto z-30",
             "rounded-lg border backdrop-blur-md",
             "transition-all duration-200",
             "bg-light-bgDark/50 dark:bg-dark-bgLight/25",
             getTypeBorderStyles(),
-            active ? "opacity-100" : "translate-x-full opacity-0"
+            active ? "opacity-100" : "translate-x-full opacity-0",
+            additionalClasses
         )}>
             <div className="flex w-full h-fit justify-between items-center font-bold font-mono p-3">
                 <p>{type === "err" ? "Error" : (type === "warn") ? "Warning" : "Info"}</p>
-                <div onClick={handleClose} className={cl(
-                    "h-6 w-6 cursor-pointer rounded-md",
-                    "text-light-text/50 dark:text-dark-text/50 stroke-[0.25em]",
-                    "border-2 border-light-text/50 dark:border-dark-text/50",
-                    "hover:opacity-90 active:opacity-60"
-                )}>
-                    {icons.close}
-                </div>
+
+                {!disableCloseButton ?
+                    (<div onClick={handleClose} className={cl(
+                        "h-6 w-6 cursor-pointer rounded-md",
+                        "text-light-text/50 dark:text-dark-text/50 stroke-[0.25em]",
+                        "border-2 border-light-text/50 dark:border-dark-text/50",
+                        "hover:opacity-90 active:opacity-60"
+                    )}> {icons.close}
+                    </div>) : <></>
+                }
             </div>
             <div className={cl(
                 "p-3 font-mono text-sm rounded-b-md m-1",
