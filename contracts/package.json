@@ -7,8 +7,10 @@
     "build": "forge build",
     "deploy": "node deploy.js",
     "test": "forge test -vv",
-    "types": "node types.js"
-  },
+    "types": "node types.js",
+    "pretty": "npx prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
+    "lint": "solhint '**/*.sol'"
+},
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
     "dotenv": "^16.4.5",
@@ -19,7 +21,11 @@
     "@typechain/ethers-v6": "^0.5.1",
     "ethers": "^6.12.0",
     "forge-std": "github:foundry-rs/forge-std#v1.8.1",
+    "prettier": "^3.3.2",
     "typechain": "^8.3.2",
     "typescript": "^5.4.5"
+  },
+  "lint-staged": {
+    "*.{js,css,md}": "prettier --write"
   }
 }

@@ -1,0 +1,12 @@
+{
+    "extends": "solhint:recommended",
+    "plugins": [],
+    "rules": {
+        "avoid-suicide": "error",
+        "no-global-import": "off",
+        "func-visibility": "off",
+        "gas-custom-errors": "off",
+        "avoid-sha3": "warn",
+        "no-unused-vars": "error"
+    }
+}

@@ -6,7 +6,6 @@ interface IGraviolaSeasonsArchive {
         string name;
         string[] well;
     }
-    
 
     function nameSeason(uint256 seasonId, string calldata name) external;
     function nextSeason() external;

@@ -14,7 +14,20 @@ contract GraviolaTest is Test {
     GraviolaSeasonsGovernor public gsg;
     address constant alice = address(1);
 
-    string[] words = ["limping", "harm", "frequent", "remove", "acceptable", "moldy", "serious", "earthy", "efficacious", "minor", "cheap", "two"];
+    string[] words = [
+        "limping",
+        "harm",
+        "frequent",
+        "remove",
+        "acceptable",
+        "moldy",
+        "serious",
+        "earthy",
+        "efficacious",
+        "minor",
+        "cheap",
+        "two"
+    ];
 
     function setUp() public virtual {
         gsa = new GraviolaSeasonsArchive(alice);
@@ -34,7 +47,9 @@ contract GraviolaTest is Test {
         vm.warp(1000);
     }
 
-    function bytesToUint256(bytes memory _bytes) internal pure returns(uint256) {
+    function bytesToUint256(
+        bytes memory _bytes
+    ) internal pure returns (uint256) {
         uint256 tempUint;
         assembly {
             tempUint := mload(add(add(_bytes, 0x20), 0))
@@ -44,10 +59,11 @@ contract GraviolaTest is Test {
 
     function uint256ToBytes(uint256 n) internal pure returns (bytes memory) {
         bytes memory b = new bytes(32);
-        assembly { mstore(add(b, 32), n) }
+        assembly {
+            mstore(add(b, 32), n)
+        }
         return b;
     }
-    
 
     function setup_AddCandidates() internal noGasMetering {
         for (uint i = 0; i < 10; i++) {
@@ -67,13 +83,13 @@ contract GraviolaTest is Test {
         setup_AddCandidates();
 
         uint256 word = bytesToUint256(bytes(words[2]));
-        
+
         vm.prank(alice);
         gsg.upvoteCandidate(word);
 
-        GraviolaSeasonsGovernor.CandidateExternal memory top = gsg.getTopCandidatesInfo(1)[0];
+        GraviolaSeasonsGovernor.CandidateExternal memory top = gsg
+            .getTopCandidatesInfo(1)[0];
         assertEq(top.id, word);
         assertEq(top.score, 1000);
     }
-
 }

@@ -132,7 +132,7 @@ contract Graviola is
                 _ownerOf(_tradeUpTokenIds[2]) == msg.sender,
             "Only the owner of the tokens can trade them up!"
         );
-
+        
         (bool sameRarityGroup, uint rarityGroupId) = raritiesInTheSameGroup(
             _tradeUpTokenIds
         );
