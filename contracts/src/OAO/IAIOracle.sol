@@ -38,7 +38,10 @@ interface IAIOracle {
         bytes memory callbackData
     ) external payable returns (uint256);
 
-    function estimateFee(uint256 modelId, uint256 gasLimit) external view returns (uint256);
+    function estimateFee(
+        uint256 modelId,
+        uint256 gasLimit
+    ) external view returns (uint256);
 
     function isFinalized(uint256 requestId) external view returns (bool);
 }

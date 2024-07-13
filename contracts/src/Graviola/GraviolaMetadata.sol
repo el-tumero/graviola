@@ -15,10 +15,9 @@ struct Metadata {
 contract GraviolaMetadata {
     using JsonWriter for JsonWriter.Json;
 
-
     mapping(uint256 => Metadata) private metadataStorage;
-    string internal constant promptBase = "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
-
+    string internal constant promptBase =
+        "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
     // NOTE: addRarity() should be called after this func
     function addPrompt(uint256 tokenId, string memory prompt) internal {
@@ -46,21 +45,31 @@ contract GraviolaMetadata {
         metadataStorage[tokenId].filled = true;
     }
 
-
-    function getMetadata(uint256 tokenId) public view returns (Metadata memory) {
+    function getMetadata(
+        uint256 tokenId
+    ) public view returns (Metadata memory) {
         return metadataStorage[tokenId];
     }
 
-    function getTokenRarities(uint256 tokenId0, uint256 tokenId1, uint256 tokenId2 ) public view returns (uint256[3] memory rarities, uint256 average) {
+    function getTokenRarities(
+        uint256 tokenId0,
+        uint256 tokenId1,
+        uint256 tokenId2
+    ) public view returns (uint256[3] memory rarities, uint256 average) {
         rarities[0] = metadataStorage[tokenId0].rarity / 10_000;
         rarities[1] = metadataStorage[tokenId1].rarity / 10_000;
         rarities[2] = metadataStorage[tokenId2].rarity / 10_000;
-        average = (rarities[0] + rarities[1] + rarities[2])/3;
+        average = (rarities[0] + rarities[1] + rarities[2]) / 3;
     }
 
     // -- conversions --
 
-    function generateJSON(string memory image, string memory prompt, uint256 rarity, uint256 weightSum) private pure returns (string memory) {
+    function generateJSON(
+        string memory image,
+        string memory prompt,
+        uint256 rarity,
+        uint256 weightSum
+    ) private pure returns (string memory) {
         JsonWriter.Json memory writer;
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("image", image);
@@ -83,7 +92,9 @@ contract GraviolaMetadata {
         return writer.value;
     }
 
-    function convertToBase64URL(bytes memory data) private pure returns (string memory) {
+    function convertToBase64URL(
+        bytes memory data
+    ) private pure returns (string memory) {
         return
             string(
                 abi.encodePacked(
@@ -101,7 +112,10 @@ contract GraviolaMetadata {
                 bytes(
                     generateJSON(
                         metadataStorage[tokenId].image,
-                        string.concat(promptBase, metadataStorage[tokenId].prompt),
+                        string.concat(
+                            promptBase,
+                            metadataStorage[tokenId].prompt
+                        ),
                         metadataStorage[tokenId].rarity,
                         metadataStorage[tokenId].weightSum
                     )

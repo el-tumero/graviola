@@ -1,12 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-
 import {GraviolaSeasonsCandidates} from "./GraviolaSeasonsCandidates.sol";
 
 contract TGraviolaSeasonsCandidates is GraviolaSeasonsCandidates {
     constructor(uint256 listSize) GraviolaSeasonsCandidates(listSize) {}
-
 
     function addCandidate(uint256 id) external {
         _addCandidate(id);

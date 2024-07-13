@@ -24,9 +24,8 @@ contract AIOracleMock is IAIOracle {
     }
 
     function invokeNextCallback(bytes calldata output) external {
-        invokeCallback(requestCounter-1, output);
+        invokeCallback(requestCounter - 1, output);
     }
-
 
     function invokeCallback(uint256 requestId, bytes calldata output) public {
         AICallbackRequestData storage request = requests[requestId];
@@ -38,7 +37,9 @@ contract AIOracleMock is IAIOracle {
             output,
             request.callbackData
         );
-        (bool success, bytes memory data) = request.callbackContract.call{gas: request.gasLimit}(payload);
+        (bool success, bytes memory data) = request.callbackContract.call{
+            gas: request.gasLimit
+        }(payload);
         require(success, "failed to call selector!");
         if (!success) {
             assembly {
