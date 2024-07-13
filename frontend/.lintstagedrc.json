@@ -1,5 +1,5 @@
 {
-    "(*.js|*.jsx|*.tsx|*.json)": [
+    "*.{js,jsx,tsx,json}": [
         "prettier --write --tab-width 4 --no-semi --jsx-single-quote false",
         "eslint"
     ]

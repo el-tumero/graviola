@@ -14,6 +14,12 @@ export default [
     {
         rules: {
             "react/react-in-jsx-scope": "off",
+            "react/no-children-prop": "off",
+        },
+        settings: {
+            react: {
+                version: "detect",
+            },
         },
     },
 ]
