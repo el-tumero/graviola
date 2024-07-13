@@ -19,13 +19,14 @@ contract GraviolaMetadata {
     string internal constant promptBase =
         "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
-    // NOTE: addRarity() should be called after this func
+    /// @dev NOTE: Metadata function execution order:
+    /// @dev addPrompt => addRarity => addWeightSum => requestCallback
+
     function addPrompt(uint256 tokenId, string memory prompt) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].prompt = prompt;
     }
 
-    // NOTE: requestCallback() should be called after this func
     function addRarity(uint256 tokenId, uint256 rarity) internal {
         require(!metadataStorage[tokenId].filled, "Metadata is filled!");
         metadataStorage[tokenId].rarity = rarity;
