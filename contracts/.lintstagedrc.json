@@ -1,0 +1,3 @@
+{
+    "*.sol": "prettier --plugin=prettier-plugin-solidity --write --tab-width 4"
+}

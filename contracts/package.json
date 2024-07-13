@@ -8,7 +8,6 @@
     "deploy": "node deploy.js",
     "test": "forge test -vv",
     "types": "node types.js",
-    "pretty": "npx prettier --write './**/*.sol'",
     "lint": "solhint '**/*.sol'"
 },
   "dependencies": {
