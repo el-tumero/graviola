@@ -16,7 +16,7 @@ contract GraviolaMetadata {
     using JsonWriter for JsonWriter.Json;
 
     mapping(uint256 => Metadata) private metadataStorage;
-    string internal constant promptBase =
+    string internal constant PROMPT_BASE =
         "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
     /// @dev NOTE: Metadata function execution order:
@@ -114,7 +114,7 @@ contract GraviolaMetadata {
                     generateJSON(
                         metadataStorage[tokenId].image,
                         string.concat(
-                            promptBase,
+                            PROMPT_BASE,
                             metadataStorage[tokenId].prompt
                         ),
                         metadataStorage[tokenId].rarity,
