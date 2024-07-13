@@ -140,13 +140,17 @@ contract Graviola is
             sameRarityGroup,
             "Input tokens are of different rarity groups!"
         );
+        require(
+            rarityGroupId != 4, // rarities[4] = legendary
+            "You can't trade up Legendary tokens!"
+        );
 
         uint256 tokenId = _nextTokenId++;
         _safeMint(msg.sender, tokenId);
         emit Mint(msg.sender, tokenId);
 
         uint256 seed = uint256(blockhash(block.number - 1)); // temp option
-        (string memory prompt, uint256 rarity) = _tradeUp(seed, rarityGroupId);
+        (string memory prompt, uint256 weightSum, uint256 rarity) = _tradeUp(seed, rarityGroupId);
 
         _burn(_tradeUpTokenIds[0]);
         _burn(_tradeUpTokenIds[1]);
@@ -157,6 +161,7 @@ contract Graviola is
         // adds metadata
         addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
+        addWeightSum(tokenId, weightSum);
 
         // requests ai oracle
         aiOracleRequest(tokenId, fullPrompt);
