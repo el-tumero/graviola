@@ -8,6 +8,7 @@
     "deploy": "node deploy.js",
     "test": "forge test -vv",
     "types": "node types.js",
+    "pretty": "npx prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
     "lint": "solhint '**/*.sol'"
 },
   "dependencies": {

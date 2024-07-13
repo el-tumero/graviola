@@ -1,6 +1,6 @@
 {
     "*.sol": [
         "prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
-        "solhint"
+        "solhint --save"
     ]
 }
