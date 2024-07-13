@@ -20,6 +20,9 @@ import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 // import useGenerateMock from "../hooks/useGenerateMock"
 
+import { useAppSelector } from '../app/hooks'
+
+
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
     rarityLevel: RarityLevel
@@ -39,6 +42,11 @@ const Generate = () => {
     }
     const { isConnected } = useWeb3ModalAccount()
 
+    const isConnected2 = useAppSelector((state) => state.wallet.isConnected)
+
+    useEffect(() => {
+        console.log("test", isConnected2)
+    }, [isConnected2])
 
     // // MOCK
     // const mockBehavior = {

@@ -19,6 +19,10 @@ import { AppContext } from "./contexts/AppContext"
 import { Signer } from "ethers"
 import useDevWallet from "./hooks/useDevWallet"
 
+
+import { useAppDispatch } from './app/hooks'
+import { setConnectedTrue } from "./features/wallet/walletSlice"
+
 // No wallet connected (read-only)
 async function connectContract(): Promise<Graviola> {
     console.log("[App] connecting to contract... (read-only)")
@@ -90,6 +94,8 @@ const App = (props: { children: ReactNode }) => {
     const { walletProvider } = useWeb3ModalProvider()
 
     const devWallet = useDevWallet()
+
+    const dispatch = useAppDispatch()
 
     const { theme, toggleTheme } = useTheme(modal === undefined)
 
@@ -180,6 +186,8 @@ const App = (props: { children: ReactNode }) => {
         if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
         else if (devWallet) setGraviola(connectContractDevWallet(devWallet))
         else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
+
+        dispatch(setConnectedTrue())
     }, [walletProvider, devWallet])
 
     return loading ? (
