@@ -20,7 +20,7 @@ jobs:
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
-          version: nightly-5902a6fa87600cf0cbe44e689c97479c16fd474e
+          version: nightly-547e9757e37cc970ddae7ba84fb8f501a2367d0d
 
       - name: Install yarn
         run: npm i -g yarn
