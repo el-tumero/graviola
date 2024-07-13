@@ -132,40 +132,26 @@ contract Graviola is
                 _ownerOf(_tradeUpTokenIds[2]) == msg.sender,
             "Only the owner of the tokens can trade them up!"
         );
-
-        (
-            uint256[3] memory tokenRaritiesBp,
-            uint256 averageTokenRarity
-        ) = getTokenRarities(
-                _tradeUpTokenIds[0],
-                _tradeUpTokenIds[1],
-                _tradeUpTokenIds[2]
-            );
-
-        // console.log("still ok");
-        // console.log(tokenRaritiesBp[0], tokenRaritiesBp[1], tokenRaritiesBp[2]);
-
-        // check if the tokens has the same rarity
-        (bool sameRarities, uint rarityId) = raritiesInTheSameGroup(
-            tokenRaritiesBp
+        
+        (bool sameRarityGroup, uint rarityGroupId) = raritiesInTheSameGroup(
+            _tradeUpTokenIds
         );
-        // console.log(sameRarities);
-        require(sameRarities, "Given tokens are from different rarity groups!");
+        require(
+            sameRarityGroup,
+            "Input tokens are of different rarity groups!"
+        );
+        require(
+            rarityGroupId != 4, // rarities[4] = legendary
+            "You can't trade up Legendary tokens!"
+        );
 
-        // mints
         uint256 tokenId = _nextTokenId++;
         _safeMint(msg.sender, tokenId);
         emit Mint(msg.sender, tokenId);
 
-        uint256 randomValue = uint256(blockhash(block.number - 1)); // temp option
-        // console.log("Ok!");
-        (string memory prompt, uint256 rarity) = _tradeUp(
-            randomValue,
-            rarityId,
-            averageTokenRarity
-        );
+        uint256 seed = uint256(blockhash(block.number - 1)); // temp option
+        (string memory prompt, uint256 weightSum, uint256 rarity) = _tradeUp(seed, rarityGroupId);
 
-        // burns old tokens
         _burn(_tradeUpTokenIds[0]);
         _burn(_tradeUpTokenIds[1]);
         _burn(_tradeUpTokenIds[2]);
@@ -175,6 +161,7 @@ contract Graviola is
         // adds metadata
         addPrompt(tokenId, prompt);
         addRarity(tokenId, rarity);
+        addWeightSum(tokenId, weightSum);
 
         // requests ai oracle
         aiOracleRequest(tokenId, fullPrompt);
