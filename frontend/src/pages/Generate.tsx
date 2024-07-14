@@ -7,7 +7,6 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
@@ -17,9 +16,8 @@ import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-// import useGenerateMock from "../hooks/useGenerateMock"
 
-import { useAppSelector } from '../app/hooks'
+import useWeb3 from "../hooks/useWeb3"
 
 
 // Extended NFT interface to avoid computing the same properties multiple times
@@ -39,13 +37,8 @@ const Generate = () => {
         rarities: RaritiesData
         collection: NFT[]
     }
-    const { isConnected } = useWeb3ModalAccount()
 
-    const isConnected2 = useAppSelector((state) => state.wallet.isConnected)
-
-    useEffect(() => {
-        console.log("test", isConnected2)
-    }, [isConnected2])
+    const { isWalletConnected: isConnected } = useWeb3()
 
     // // MOCK
     // const mockBehavior = {

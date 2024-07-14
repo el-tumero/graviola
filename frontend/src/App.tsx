@@ -5,60 +5,21 @@ import {
     defaultConfig,
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
-import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from "ethers"
+
+
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-import { GRAVIOLA_ADDRESS } from "../../contracts/addresses.json"
-import { GRAVIOLA_ADDRESS as GRAVIOLA_LOCAL_ADDRESS } from "../../contracts/addresses-local.json"
 
 import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
 import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
-import { Signer } from "ethers"
-import useDevWallet from "./hooks/useDevWallet"
 
+import useWeb3 from "./hooks/useWeb3"
 
-import { useAppDispatch } from './app/hooks'
-import { setConnectedTrue } from "./features/wallet/walletSlice"
-
-// No wallet connected (read-only)
-async function connectContract(): Promise<Graviola> {
-    console.log("[App] connecting to contract... (read-only)")
-    const localMode = import.meta.env.VITE_DEV_PROVIDER === "true"
-
-    const provider = new JsonRpcProvider(
-        localMode ? import.meta.env.VITE_DEV_RPC : "https://sepolia-rollup.arbitrum.io/rpc"
-    )
-    const graviola = GraviolaFactory.connect(
-        localMode ? GRAVIOLA_LOCAL_ADDRESS : GRAVIOLA_ADDRESS, provider
-    )
-    console.log("[App] connected (read-only)")
-    return graviola
-}
-
-// Conn to contract with wallet
-async function connectContractWallet(
-    walletProvider: Eip1193Provider,
-): Promise<Graviola> {
-    console.log("[App] connecting to contract... (wallet)")
-    const provider = new BrowserProvider(walletProvider)
-    const signer = await provider.getSigner()
-    const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, signer)
-    console.log("[App] connected (wallet)")
-    return graviola
-}
-
-function connectContractDevWallet(signer:Signer): Graviola {
-    if(!import.meta.env.VITE_DEV_GRAVIOLA_ADDRESS) console.error("No VITE_DEV_GRAVIOLA_ADDRESS env variable provided!")
-    console.log(GRAVIOLA_LOCAL_ADDRESS)
-        const graviola = GraviolaFactory.connect(GRAVIOLA_LOCAL_ADDRESS, signer)
-    console.log("[App] connected (devWallet)")
-    return graviola
-}
 
 const App = (props: { children: ReactNode }) => {
     const projectId = "a09890b34dc1551c2534337dbc22de8c"
@@ -94,16 +55,12 @@ const App = (props: { children: ReactNode }) => {
         projectId,
     })
 
-
     const { walletProvider } = useWeb3ModalProvider()
 
-    const devWallet = useDevWallet()
 
-    const dispatch = useAppDispatch()
 
     const { theme, toggleTheme } = useTheme(modal === undefined)
-
-    const [graviola, setGraviola] = useState<Graviola | null>(null)
+    const { graviola, connectWallet } = useWeb3()
     const [loading, setLoading] = useState<boolean>(true)
 
     // Contract data
@@ -196,15 +153,17 @@ const App = (props: { children: ReactNode }) => {
     }, [graviola])
 
     useEffect(() => {
-        console.log("walletProvider ", walletProvider)
-        console.log("env rpc?: ", import.meta.env.VITE_DEV_RPC)
+        // console.log("walletProvider ", walletProvider)
+        if(walletProvider) {
+            connectWallet(walletProvider)
+        }
+        // console.log("env rpc?: ", import.meta.env.VITE_DEV_RPC)
 
-        if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
-        else if (devWallet) setGraviola(connectContractDevWallet(devWallet))
-        else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
+        // if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
+        // else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
 
-        dispatch(setConnectedTrue())
-    }, [walletProvider, devWallet])
+        // dispatch(setConnectedTrue())
+    }, [walletProvider])
 
     return loading ? (
         <Loading />
