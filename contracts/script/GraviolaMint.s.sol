@@ -6,7 +6,7 @@ import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 
 contract GraviolaMintScript is Script {
     address constant graviolaAddress =
-        address(0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0);
+        address(0x5b1869D9A4C187F2EAa108f3062412ecf0526b24);
 
     function run() public {
         vm.startBroadcast(vm.envUint("PRIVATE_KEY"));
