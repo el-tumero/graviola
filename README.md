@@ -19,7 +19,7 @@ Community discord: https://discord.com/invite/FsMWpsqsG7
 ## Contributing
 
 We welcome anyone who brings value to this project. If you'd like to contribute, please read (in order):
-- [CONTRIBUTING.md](https://github.com)
+- [CONTRIBUTING.md](https://github.com/el-tumero/graviola/blob/6067fcb4aba5a7daddc483297612b235f7f335b2/CONTRIBUTING.md)
 - [Our Wiki](https://github.com/el-tumero/graviola/wiki), where we store Development notes and important technical details
 
 
