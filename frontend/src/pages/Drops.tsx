@@ -16,7 +16,7 @@ import { cn } from "../utils/cn"
 import PageTitle from "../components/ui/layout/PageTitle"
 import icons from "../data/icons"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-import useWeb3 from "../hooks/useWeb3"
+import useWeb3 from "../hooks/useWallet"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"
 
@@ -24,7 +24,7 @@ const Drops = () => {
     // TODO: Add options to filter by Rarity, or by included Keywords.
 
     // const { isConnected, address } = useWeb3ModalAccount()
-    const {isWalletConnected: isConnected, walletAddress: address} = useWeb3()
+    const {isConnected, address} = useWeb3()
     
     const graviolaContext = useContext(GraviolaContext)
 

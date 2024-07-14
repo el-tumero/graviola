@@ -11,9 +11,7 @@
         "predeploy": "vite build && cp ./dist/index.html ./dist/404.html",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\" --tab-width 4 --no-semi --jsx-single-quote false",
         "deploy": "gh-pages -d dist",
-        "preview": "vite preview",
-        "synpress": "SKIP_METAMASK_SETUP=true synpress run",
-        "e2e": "start-server-and-test dev:test http://localhost:3000 synpress"
+        "preview": "vite preview"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.6",

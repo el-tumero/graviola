@@ -18,7 +18,8 @@ import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
 
-import useWeb3 from "./hooks/useWeb3"
+
+import useWeb3 from "./hooks/useWallet"
 
 
 const App = (props: { children: ReactNode }) => {
@@ -51,7 +52,7 @@ const App = (props: { children: ReactNode }) => {
         ethersConfig: defaultConfig({
             metadata,
         }),
-        chains: [import.meta.env.VITE_DEV_RPC ? mock : sepolia],
+        chains: [sepolia],
         projectId,
     })
 
@@ -60,7 +61,7 @@ const App = (props: { children: ReactNode }) => {
 
 
     const { theme, toggleTheme } = useTheme(modal === undefined)
-    const { graviola, connectWallet } = useWeb3()
+    const { connectWallet, graviola } = useWeb3()
     const [loading, setLoading] = useState<boolean>(true)
 
     // Contract data
@@ -153,16 +154,9 @@ const App = (props: { children: ReactNode }) => {
     }, [graviola])
 
     useEffect(() => {
-        // console.log("walletProvider ", walletProvider)
         if(walletProvider) {
             connectWallet(walletProvider)
         }
-        // console.log("env rpc?: ", import.meta.env.VITE_DEV_RPC)
-
-        // if (walletProvider) connectContractWallet(walletProvider).then((contract) => setGraviola(contract))
-        // else connectContract().then((noWalletContract) => setGraviola(noWalletContract))
-
-        // dispatch(setConnectedTrue())
     }, [walletProvider])
 
     return loading ? (

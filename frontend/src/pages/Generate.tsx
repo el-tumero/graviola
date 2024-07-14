@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 
-import useWeb3 from "../hooks/useWeb3"
+import useWeb3 from "../hooks/useWallet"
 
 
 // Extended NFT interface to avoid computing the same properties multiple times
@@ -38,7 +38,7 @@ const Generate = () => {
         collection: NFT[]
     }
 
-    const { isWalletConnected: isConnected } = useWeb3()
+    const { isConnected } = useWeb3()
 
     // // MOCK
     // const mockBehavior = {

@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit'
-import web3Reducer from '../features/wallet/web3Slice'
+import walletReducer from '../features/wallet/walletSlice'
 // import counterReducer from '../features/counter/counterSlice'
 
 const store = configureStore({
   reducer: {
-    web3: web3Reducer,
+    wallet: walletReducer,
   },
 })
 
