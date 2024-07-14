@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom"
+import { links } from "../links"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { mockMetaBannerData } from "../data/mock"
-import { useContext, useEffect, useState } from "react"
+import { useContext } from "react"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import AutoBlockNFT from "../components/AutoBlockNFT"
@@ -18,26 +19,26 @@ import MetadataMock from "../components/ui/MetadataMock"
 import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
 import { nftRarityScaleArr } from "../data/fallbacks"
 import Button from "../components/ui/Button"
+import Popup from "../components/Popup"
 
-function Home() {
+const Home = () => {
     const navigate = useNavigate()
-    const [marqueeInit, setMarqueeInit] = useState<boolean>(false)
 
     const graviolaContext = useContext(GraviolaContext)
     const rGroups = graviolaContext.rarities as RaritiesData
-
-    // Init NFT marquee opacity animation
-    useEffect(() => {
-        if (marqueeInit) return
-        setMarqueeInit(true)
-    })
 
     return (
         <FullscreenContainer>
             <Navbar />
 
             <ContentContainer additionalClasses="flex-col">
-                <div className="flex flex-col mt-12 p-4 gap-3">
+                <div className="flex flex-col p-4 gap-3">
+
+                    <Popup additionalClasses="w-full max-w-full relative top-0 right-0 z-2" onClickClose={() => { }} disableCloseButton type="neutral" message={`
+                        Graviola is growing rapidly; we're introducing big changes lately.
+                        If you encounter bugs or unexpected errors, please open an Issue in Github.`
+                    } />
+
                     <SectionContainer>
                         <div
                             className={cl(
@@ -97,6 +98,7 @@ function Home() {
                                             onClick={() => navigate(routerPaths.generate)}
                                             className={cl("underline underline-offset-2 hover:cursor-pointer hover:decoration-accent")}
                                         >
+                                            {/* TODO: Make static page with All metadata attributes listed and explained */}
                                             here
                                         </span>
                                     </p>
@@ -180,7 +182,7 @@ function Home() {
                         />
                         <div className="w-min justify-end items-center">
                             <div
-                                onClick={() => window.open("https://github.com/el-tumero/graviola", "_blank", "noopener,noreferrer")}
+                                onClick={() => window.open(links.ora, "_blank", "noopener,noreferrer")}
                                 className={cl(
                                     "flex w-fit h-fit gap-1 justify-center items-center cursor-pointer",
                                     "py-6 px-3 rounded-xl hover:bg-light-border/30 dark:hover:bg-dark-border/30",
@@ -203,7 +205,7 @@ function Home() {
                             `}
                         />
                         <div
-                            onClick={() => window.open("https://github.com/el-tumero/graviola", "_blank", "noopener,noreferrer")}
+                            onClick={() => window.open(links.discord, "_blank", "noopener,noreferrer")}
                             className={cl(
                                 "flex w-fit h-fit p-3 rounded-xl cursor-pointer",
                                 "hover:bg-light-border/30 dark:hover:bg-dark-border/30",

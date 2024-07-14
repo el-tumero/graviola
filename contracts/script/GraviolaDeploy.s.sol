@@ -5,7 +5,6 @@ import {Script, console} from "forge-std/src/Script.sol";
 import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 import {AIOracleMock} from "../src/OAO/AIOracleMock.sol";
 
-
 contract GraviolaDeploy is Script {
     function run() public {
         vm.startBroadcast();

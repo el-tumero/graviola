@@ -4,26 +4,33 @@ pragma solidity ^0.8.24;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./IGraviolaSeasonsArchive.sol";
 
-contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive{
-
-    constructor(address owner) Ownable(owner){}
+contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
+    constructor(address owner) Ownable(owner) {}
 
     uint16 wellSize = 100; // how many words can be added to single season's well
     uint8 expLen = 8; // how many words expire after season
 
     uint8 constant totalRarityGroups = 5;
 
-    enum Rarity{ COMMON, UNCOMMON, RARE, VERY_RARE, LEGENDARY }
+    enum Rarity {
+        COMMON,
+        UNCOMMON,
+        RARE,
+        VERY_RARE,
+        LEGENDARY
+    }
 
-    mapping(string=>bool) private expiredWords;
-    mapping(string=>bool) private usedWords;
-    mapping(uint256=>Season) private seasons;
+    mapping(string => bool) private expiredWords;
+    mapping(string => bool) private usedWords;
+    mapping(uint256 => Season) private seasons;
 
     uint256 private currentSeasonId;
-    uint8[totalRarityGroups] wordsPerRarityGroup = [77, 15, 5, 2, 1]; 
-    
-    
-    function nameSeason(uint256 seasonId, string calldata name) external onlyOwner {
+    uint8[totalRarityGroups] wordsPerRarityGroup = [77, 15, 5, 2, 1];
+
+    function nameSeason(
+        uint256 seasonId,
+        string calldata name
+    ) external onlyOwner {
         seasons[seasonId].name = name;
     }
 
@@ -39,12 +46,14 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive{
         return currentSeasonId;
     }
 
-
-    function addWordToSeason(uint seasonId, string calldata word) external onlyOwner {
+    function addWordToSeason(
+        uint seasonId,
+        string calldata word
+    ) external onlyOwner {
         Season storage season = seasons[seasonId];
-        require(season.well.length < wellSize);        
+        require(season.well.length < wellSize);
         season.well.push(word);
-        if(season.well.length <= expLen) expiredWords[word] = true;
+        if (season.well.length <= expLen) expiredWords[word] = true;
         else usedWords[word] = true;
     }
 
@@ -56,7 +65,11 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive{
         return usedWords[word];
     }
 
-    function getWordsPerRarityGroup() external view returns (uint8[totalRarityGroups] memory) {
+    function getWordsPerRarityGroup()
+        external
+        view
+        returns (uint8[totalRarityGroups] memory)
+    {
         return wordsPerRarityGroup;
     }
 

@@ -10,7 +10,6 @@ import { GraviolaContext } from "../contexts/GraviolaContext"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
-import SectionTitle from "../components/ui/layout/SectionTitle"
 import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
@@ -135,54 +134,16 @@ const Generate = () => {
 
                 </div>
 
-                <SectionTitle additionalClasses="max-sm:justify-center max-sm:items-center" title={"Keywords"} />
-
-                <div className="sm:inline-grid md:grid-cols-5 max-sm:flex-col max-md:grid-cols-2 max-sm:flex gap-4 w-auto font-bold mx-auto">
-                    {Object.entries(rGroups).map(([, rGroup], i) => (
-                        <div key={i} className="flex flex-col gap-3 w-full h-full items-start">
-                            <div className="flex flex-col w-fit h-fit gap-3">
-                                <p
-                                    className="text-md w-fit font-thin font-content"
-                                    style={{
-                                        borderBottomWidth: 1,
-                                        borderBottomColor: rGroup.color,
-                                    }}
-                                >
-                                    {rGroup.name}
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                    {rGroup.keywords.slice(0, 6).map((keyword, idx, arr) => {
-                                        const isLastItem = (arr.length > 2 && idx === arr.length - 1)
-                                        return (
-                                            <span
-                                                key={idx}
-                                                className={cl(
-                                                    "flex justify-center items-center w-fit p-2",
-                                                    "font-thin font-content",
-                                                    "rounded-xl bg-light-bgPrimary/25 dark:bg-dark-bgPrimary/25",
-                                                )}
-                                                style={{
-                                                    borderWidth: 1,
-                                                    borderRadius: 6,
-                                                    borderColor: rGroup.color,
-                                                }}
-                                            >
-                                                {isLastItem ? "..." : keyword}
-                                            </span>
-                                        )
-                                    })}
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                {/* TODO: Add marquee of randomly-selected keywords with the caption: Keywords you can enroll */}
 
                 <div className={cl("flex w-full h-fit justify-end items-center p-3 mt-3", "rounded-xl")}>
-                    <Button text="See all Keywords" onClick={() => navigate(routerPaths.home)} />
+                    <Button text="See all Keywords" onClick={() => navigate(routerPaths.keywords)} />
                 </div>
             </ContentContainer>
         </FullscreenContainer>
     )
 }
+
+
 
 export default Generate
