@@ -20,12 +20,9 @@
   "devDependencies": {
     "@typechain/ethers-v6": "^0.5.1",
     "ethers": "^6.12.0",
-    "forge-std": "github:foundry-rs/forge-std#v1.8.1",
+    "forge-std": "github:foundry-rs/forge-std",
     "prettier": "^3.3.2",
     "typechain": "^8.3.2",
     "typescript": "^5.4.5"
-  },
-  "lint-staged": {
-    "*.{js,css,md}": "prettier --write"
   }
 }
