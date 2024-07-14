@@ -11,18 +11,6 @@ contract GraviolaSeasonsGovernor is
     IGraviolaSeasonsGovernor,
     GraviolaSeasonsCandidates
 {
-    error WrongWordFormat();
-    error WordExpired();
-    error DoubleVoting();
-    error ZeroVoting();
-    error NoVoteBefore();
-
-    event CandidateAdded(uint256 word);
-    event CandidateUpvoted(uint256 word);
-    event CandidateDownvoted(uint256 word);
-    event CandidateUndoVote(uint256 word);
-    event CandidatePromoted(uint256 word);
-
     IGraviolaSeasonsArchive immutable archive;
     ERC20Votes immutable token;
 
@@ -124,4 +112,36 @@ contract GraviolaSeasonsGovernor is
     ) external view returns (VotingState) {
         return voting[votingId].state;
     }
+
+    function getCandidateScore(uint256 word) external view returns (uint256) {
+        return getValue(word);
+    }
+
+    function getTopCandidates(
+        uint256 size
+    ) external view returns (uint256[] memory) {
+        return _getTopCandidates(size);
+    }
+
+    function getTopCandidatesInfo(
+        uint256 size
+    ) external view returns (CandidateExternal[] memory) {
+        return _getTopCandidatesInfo(size);
+    }
+
+    function isCandidateExist(uint256 id) external view returns (bool) {
+        return _isCandidateExist(id);
+    }
+
+    function getWorstCandidateScore() external view returns (int256) {
+        return _getWorstScoreList();
+    }
+
+    function getCandidateListSize() external view returns (uint256) {
+        return _getListSize();
+    }
+
+
+
+
 }

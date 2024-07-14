@@ -2,6 +2,8 @@
 pragma solidity ^0.8.24;
 
 import {StructuredLinkedList, IStructureInterface} from "solidity-linked-list/contracts/StructuredLinkedList.sol";
+import {CandidateExternal} from "./IGraviolaSeasonsGovernor.sol";
+
 
 contract GraviolaSeasonsCandidates is IStructureInterface {
     using StructuredLinkedList for StructuredLinkedList.List;
@@ -17,14 +19,8 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
 
     struct Candidate {
         int256 score;
-        address creator;
+        address author;
         bool exists;
-    }
-
-    struct CandidateExternal {
-        uint256 id;
-        int256 score;
-        address creator;
     }
 
     StructuredLinkedList.List internal list;
@@ -34,7 +30,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         MAX_LIST_SIZE = listSize;
     }
 
-    function getValue(uint256 _id) external view override returns (uint256) {
+    function getValue(uint256 _id) public view override returns (uint256) {
         int256 score = candidates[_id].score;
         if (score < 0) revert NegativeScore();
         return uint256(score);
@@ -44,20 +40,6 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         if (candidates[id].exists) revert CandidateAlreadyAdded();
         candidates[id] = Candidate(0, msg.sender, true);
     }
-
-    // function debugAddCandidate(uint256 id, uint256 votes) external {
-    //     candidates[id] = Candidate(int256(votes), msg.sender, true);
-    //     uint256 spot = list.getSortedSpot(address(this), votes);
-    //     list.insertBefore(spot, id);
-    // }
-
-    // function debugGetNode(uint256 id) external view returns (bool, uint256, uint256) {
-    //     return list.getNode(id);
-    // }
-
-    // function debugGetSortedSpot(uint256 value) external view returns(uint256) {
-    //     return list.getSortedSpot(address(this), value);
-    // }
 
     function _downvoteCandidate(uint256 id, uint256 votingPower) internal {
         // 1. candidate stays in the list after vote
@@ -69,7 +51,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
 
         if (list.nodeExists(id)) {
             list.remove(id); // remove from old position
-            if (afterVote > getWorstScoreList()) {
+            if (afterVote > _getWorstScoreList()) {
                 uint256 spot = list.getSortedSpot(
                     address(this),
                     uint256(afterVote)
@@ -109,7 +91,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
             ); // calculate spot
             candidates[id].score = afterVote;
             list.insertBefore(spot, id);
-        } else if (afterVote > getWorstScoreList()) {
+        } else if (afterVote > _getWorstScoreList()) {
             list.popFront();
             uint256 spot = list.getSortedSpot(
                 address(this),
@@ -122,30 +104,22 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         }
     }
 
-    function getListSize() external view returns (uint256) {
+    function _getListSize() internal view returns (uint256) {
         return list.sizeOf();
     }
 
-    // function getHead() external view returns (bool, uint256){
-    //     return list.getAdjacent(0, true);
-    // }
-
-    // function getTail() external view returns (bool, uint256){
-    //     return list.getAdjacent(0, false);
-    // }
-
-    function getWorstScoreList() public view returns (int256) {
+    function _getWorstScoreList() internal view returns (int256) {
         (, uint256 id) = list.getAdjacent(0, true);
         return candidates[id].score;
     }
 
-    function isCandidateExist(uint256 id) external view returns (bool) {
+    function _isCandidateExist(uint256 id) internal view returns (bool) {
         return list.nodeExists(id);
     }
 
-    function getTopCandidatesInfo(
+    function _getTopCandidatesInfo(
         uint256 size
-    ) external view returns (CandidateExternal[] memory c) {
+    ) internal view returns (CandidateExternal[] memory c) {
         c = new CandidateExternal[](size);
         uint256 next;
         for (uint i = 0; i < size; i++) {
@@ -153,14 +127,14 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
             c[i] = CandidateExternal(
                 next,
                 candidates[next].score,
-                candidates[next].creator
+                candidates[next].author
             );
         }
     }
 
-    function getTopCandidates(
+    function _getTopCandidates(
         uint256 size
-    ) external view returns (uint256[] memory c) {
+    ) internal view returns (uint256[] memory c) {
         c = new uint256[](size);
         uint256 next;
         for (uint i = 0; i < size; i++) {
