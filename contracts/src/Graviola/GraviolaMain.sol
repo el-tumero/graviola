@@ -110,7 +110,7 @@ contract Graviola is
             randomValue
         );
 
-        string memory fullPrompt = string.concat(promptBase, prompt);
+        string memory fullPrompt = string.concat(PROMPT_BASE, prompt);
 
         // metadata
         addPrompt(tokenId, prompt);
@@ -132,7 +132,7 @@ contract Graviola is
                 _ownerOf(_tradeUpTokenIds[2]) == msg.sender,
             "Only the owner of the tokens can trade them up!"
         );
-        
+
         (bool sameRarityGroup, uint rarityGroupId) = raritiesInTheSameGroup(
             _tradeUpTokenIds
         );
@@ -150,13 +150,16 @@ contract Graviola is
         emit Mint(msg.sender, tokenId);
 
         uint256 seed = uint256(blockhash(block.number - 1)); // temp option
-        (string memory prompt, uint256 weightSum, uint256 rarity) = _tradeUp(seed, rarityGroupId);
+        (string memory prompt, uint256 weightSum, uint256 rarity) = _tradeUp(
+            seed,
+            rarityGroupId
+        );
 
         _burn(_tradeUpTokenIds[0]);
         _burn(_tradeUpTokenIds[1]);
         _burn(_tradeUpTokenIds[2]);
 
-        string memory fullPrompt = string.concat(promptBase, prompt);
+        string memory fullPrompt = string.concat(PROMPT_BASE, prompt);
 
         // adds metadata
         addPrompt(tokenId, prompt);

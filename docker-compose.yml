@@ -1,0 +1,21 @@
+services:
+  contracts:
+    build:
+      context: ./contracts
+      dockerfile: Dockerfile
+    volumes:
+      - shared:/contracts
+    # command: sh -c "tail -f /dev/null" # DEBUG
+
+  website:
+    depends_on:
+      - contracts
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - shared:/contracts
+    command: sh -c "yarn build"
+
+volumes:
+  shared:
