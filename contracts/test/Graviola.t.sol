@@ -5,12 +5,10 @@ import {Test, console} from "forge-std/src/Test.sol";
 import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 import {AIOracleMock} from "../src/OAO/AIOracleMock.sol";
 
-
 contract GraviolaTest is Test {
     Graviola public graviola;
     AIOracleMock public aiOracle;
     address constant alice = address(1);
-
 
     function setUp() public virtual {
         aiOracle = new AIOracleMock();
@@ -44,5 +42,4 @@ contract GraviolaTest is Test {
         assertEq(graviola.getMetadata(3).image, "image-cid-tradeup");
         assertEq(graviola.ownerOf(3), alice);
     }
-
 }

@@ -1,5 +1,11 @@
 # Contract repo
 
+## Dev notice
+
+All Solidity code is automatically linted and verified.
+Contrary to ESLint, this configuration allows to push code with errors.
+Solhint is configured to dump a report.txt file - please review it before committing.
+
 ## Deployment
 
 - Create .env file and add following keys:

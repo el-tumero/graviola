@@ -5,7 +5,6 @@ import {Script, console} from "forge-std/src/Script.sol";
 import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 import {Metadata} from "../src/Graviola/GraviolaMetadata.sol";
 
-
 contract GraviolaMetadataScript is Script {
     function run() public view {
         address graviolaAddress = vm.envAddress("GRAVIOLA_ADDRESS");

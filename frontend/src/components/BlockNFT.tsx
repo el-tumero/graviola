@@ -21,15 +21,25 @@ export interface BlockNFTProps {
     disableMetadataOnHover?: true // Disable metadata object element on hover
 }
 
-const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasses }: BlockNFTProps) => {
+const BlockNFT = ({
+    nftData,
+    glowColor,
+    disableMetadataOnHover,
+    additionalClasses,
+}: BlockNFTProps) => {
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
-    const [, rData] = getRarityFromPerc(formatBpToPercentage(nftData.attributes[0].value), rarities)
+    const [, rData] = getRarityFromPerc(
+        formatBpToPercentage(nftData.attributes[0].value),
+        rarities,
+    )
     const [status, setStatus] = useState<Status>("loading")
 
     const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto"
-    const glowLevelData = shouldGetRarityLevel ? getRarityFromLevel(glowColor, rarities) : null
+    const glowLevelData = shouldGetRarityLevel
+        ? getRarityFromLevel(glowColor, rarities)
+        : null
 
     let style: React.CSSProperties = {}
     if (glowColor !== "none") {
@@ -57,7 +67,11 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
             <img
                 onLoad={() => setStatus("ready")}
                 draggable={false}
-                className={cn("w-full h-full rounded-lg", status !== "ready" && "hidden", `nft-${nftData.id}-${nftData.image}`)}
+                className={cn(
+                    "w-full h-full rounded-lg",
+                    status !== "ready" && "hidden",
+                    `nft-${nftData.id}-${nftData.image}`,
+                )}
                 src={convertToIfpsURL(nftData.image)}
                 alt="NFT"
             />
@@ -73,7 +87,10 @@ const BlockNFT = ({ nftData, glowColor, disableMetadataOnHover, additionalClasse
             />
 
             {!disableMetadataOnHover && (
-                <Tooltip children={<BlockNFTMetadata metadata={metadata} />} anchorSelect={`.nft-${nftData.id}-${nftData.image}`} />
+                <Tooltip
+                    children={<BlockNFTMetadata metadata={metadata} />}
+                    anchorSelect={`.nft-${nftData.id}-${nftData.image}`}
+                />
             )}
         </div>
     )
@@ -84,7 +101,7 @@ const BlockNFTMetadata = (props: { metadata: NFTAttributes[] }) => {
         <div>
             {props.metadata.map((attr, idx) => (
                 <p key={idx}>
-                    {attr.trait_type}: "{attr.value}"
+                    {attr.trait_type}: &quot;{attr.value}&quot;
                 </p>
             ))}
         </div>

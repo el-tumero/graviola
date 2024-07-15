@@ -6,7 +6,6 @@ import "./IAIOracle.sol";
 
 /// @notice A base contract for writing a AIOracle app
 abstract contract AIOracleCallbackReceiver {
-
     // Address of the AIOracle contract
     IAIOracle public immutable aiOracle;
 
@@ -18,7 +17,7 @@ abstract contract AIOracleCallbackReceiver {
         aiOracle = _aiOracle;
     }
 
-    /// @notice Verify this is a callback by the aiOracle contract 
+    /// @notice Verify this is a callback by the aiOracle contract
     modifier onlyAIOracleCallback() {
         IAIOracle foundRelayAddress = IAIOracle(msg.sender);
         if (foundRelayAddress != aiOracle) {
@@ -33,7 +32,11 @@ abstract contract AIOracleCallbackReceiver {
      * @param output AI model's output
      * @param callbackData user-defined data (The same as when the user call aiOracle.requestCallback)
      */
-    function aiOracleCallback(uint256 requestId, bytes calldata output, bytes calldata callbackData) external virtual;
+    function aiOracleCallback(
+        uint256 requestId,
+        bytes calldata output,
+        bytes calldata callbackData
+    ) external virtual;
 
     function isFinalized(uint256 requestId) external view returns (bool) {
         return aiOracle.isFinalized(requestId);
