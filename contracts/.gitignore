@@ -4,6 +4,8 @@ node_modules
 .DS_Store
 out
 cache
+cache_hardhat
+artifacts
 typechain-types
 
 addresses-local.json
