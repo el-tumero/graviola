@@ -22,17 +22,18 @@ async function main() {
         const Addr = await TGraviolaSeasonsCandidates.getAddress();
         console.log("TGraviolaSeasonsCandidates OK. Addr: ", Addr)
 
-        const sorted = Array.apply(null, Array(CANDIDATE_AMOUNT)).map((_, i) => i) // Init sorted array of CANDIDATE_AMOUNT len
+        const sorted = Array.from({length: 100}, (_, i) => i + 1) // Init sorted array of CANDIDATE_AMOUNT len
+        // console.log(sorted)
 
         for (let id of sorted) {
             const d = await TGraviolaSeasonsCandidates.addCandidate(id)
-            await TGraviolaSeasonsCandidates.upvoteCandidate(id, id+1)
+            await TGraviolaSeasonsCandidates.upvoteCandidate(id, id)
         }
 
         console.log(`Added (${CANDIDATE_AMOUNT}) candidates`)
 
         const listSize = await TGraviolaSeasonsCandidates.getListSize()
-        const candidates = await TGraviolaSeasonsCandidates.getTopCandidatesInfo(listSize + 1n)
+        const candidates = await TGraviolaSeasonsCandidates.getTopCandidatesInfo(listSize)
 
         const serialized = JSON.stringify(candidates, (_, v) => typeof v === 'bigint' ? v.toString() : v, 4)
         log(serialized)
