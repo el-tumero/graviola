@@ -6,7 +6,8 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
 
-
+// @ts-ignore
+import { DEPLOY_CONFIG } from "../../contracts/utils/deploy.js"
 import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
@@ -83,6 +84,7 @@ const App = (props: { children: ReactNode }) => {
     // Fetch contract data
     useEffect(() => {
         if (!graviola || dataFetched) return
+        console.log("###################3 ", DEPLOY_CONFIG)
 
         const fetchCollection = async () => {
             const rarityGroupsData = await graviola.getRarityGroups()
@@ -116,11 +118,11 @@ const App = (props: { children: ReactNode }) => {
             console.log("[App] fetched collection ", collection) // DEBUG
             collection.length < 5
                 ? (() => {
-                      setCollection(new Array(5).fill(fallbackNFT))
-                      console.warn(
-                          "Collection is smaller than (5). Using fallback collection",
-                      )
-                  })()
+                    setCollection(new Array(5).fill(fallbackNFT))
+                    console.warn(
+                        "Collection is smaller than (5). Using fallback collection",
+                    )
+                })()
                 : setCollection((prev) => [...prev, ...collection])
 
             const raritiesData = rarityGroupsData.reduce<
@@ -154,7 +156,7 @@ const App = (props: { children: ReactNode }) => {
     }, [graviola])
 
     useEffect(() => {
-        if(walletProvider) {
+        if (walletProvider) {
             connectWallet(walletProvider)
         }
     }, [walletProvider])

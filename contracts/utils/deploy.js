@@ -1,25 +1,18 @@
 require("dotenv").config()
 const { exec } = require("child_process");
-const { writeFile, writeFileSync } = require("fs");
+const { writeFileSync, appendFileSync } = require("fs");
 const generateContractTypes = require("./types")
+const localhostConfig = require("../localhost-config.json")
 
-/**
- * Script for configuration parsing and contract deployment
- * Calls script/GraviolaDeploy.s.sol on success
- * 
- * Usage
- * node deploy.js (local/testnet)
- */
+const LOG_PATH = "deploy.log"
 
 const config = {
-
     // Local dev (ganache)
     local: {
         rpc: "localhost",
-        privateKey: "0x4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d",
+        privateKey: localhostConfig.privKey,
         output: "addresses-local.json"
     },
-
     // Arbitrum Sepolia
     testnet: {
         rpc: "arb_sepolia",
@@ -34,18 +27,19 @@ if (!config[variant]) {
 }
 
 const { rpc, output, privateKey } = config[variant]
-const logsPath = "deploy.log"
-
 const deployForgeCommand = `forge script script/GraviolaDeploy.s.sol --rpc-url ${rpc} --private-key ${privateKey} --broadcast`
 
 function writeToLog(data, logInConsole = true) {
-    writeFileSync(logsPath, data, err => {
+    appendFileSync(LOG_PATH, data, err => {
         if (err) console.log("Can't write to log file!")
         if (logInConsole) console.log(data)
     })
 }
 
 function deployContracts() {
+
+    writeFileSync(LOG_PATH, "")
+    writeToLog(`Deploy config: ${JSON.stringify(config[variant], null, 4)}\n`)
 
     const addresses = {
         GRAVIOLA_ADDRESS: "0x",
@@ -56,12 +50,14 @@ function deployContracts() {
         writeToLog("Starting deploy script...\n")
         exec(deployForgeCommand, (err, stdout, stderr) => {
             if (err || stderr || !stdout) {
-                writeToLog(`Failed to deploy. Err:\n${err.message ?? "No err msg"}`, false)
+                writeToLog(`Failed to deploy. Err:\n${err.message ?? "No err msg"}\n`, false)
                 return reject(stderr ?? "Unknown error")
             }
 
+            console.log(123)
+
             writeToLog(stdout)
-            writeToLog("Deployed!")
+            writeToLog("\nDeployed!\n")
 
             const lines = stdout.split("\n")
             const logsIndex = lines.findIndex(value => value == "== Logs ==")
@@ -79,8 +75,8 @@ function deployContracts() {
 async function main() {
     try {
         const addresses = await deployContracts()
-        console.log(`Logs saved to '${logsPath}'`)
-        writeFile(output, JSON.stringify(addresses, null, 4), err => {
+        console.log(`Logs saved to '${LOG_PATH}'`)
+        writeFileSync(output, JSON.stringify(addresses, null, 4), err => {
             if (err) {
                 console.error(err)
                 return

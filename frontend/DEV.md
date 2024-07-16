@@ -6,5 +6,6 @@
 
 ### Running local blockchain
 
-1. (contracts) - `yarn deploy:local` - Deploy the localhost contract
-2. (frontend) - `yarn dev:test` - This runs ganache in background and starts the website on port `3000`
+1. (frontend) - `yarn dev:test` - This runs ganache in background and starts the website on port `3000`
+2. (contracts) - `yarn deploy:local` - Deploy the localhost contract and types
+3. (frontend) - Refresh website (addresses-local.json should be available by now)

@@ -1,6 +1,6 @@
 const { runTypeChain } = require("typechain")
 
-const BUILD_PATH = "./out"
+const BUILD_PATH = "../out"
 
 const allFiles = [
     `${BUILD_PATH}/GraviolaMain.sol/Graviola.json`,
@@ -18,7 +18,7 @@ async function generateContractTypes() {
 }
 
 if (require.main === module) {
-    (async() => {
+    (async () => {
         await generateContractTypes()
     })()
 }
