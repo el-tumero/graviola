@@ -5,10 +5,10 @@
   "license": "MIT",
   "scripts": {
     "build": "forge build",
-    "deploy:local": "node ./utils/deploy.js local",
-    "deploy:testnet": "node deploy.js testnet",
+    "deploy:local": "node utils/deploy.js local",
+    "deploy:testnet": "node utils/deploy.js testnet",
     "test": "forge test -vv",
-    "types": "node types.js",
+    "types": "node utils/types.js",
     "pretty": "npx prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
     "lint": "solhint '**/*.sol'"
   },
