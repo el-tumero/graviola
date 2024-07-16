@@ -52,12 +52,12 @@ const Navbar = () => {
             </div>
         </NavElement>,
 
-        isDevMode ? 
-        <NavElement onClick={() => connectDevWallet()}>
-            <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
-                DEV
-            </div>
-        </NavElement> : <></>
+        isDevMode ?
+            <NavElement onClick={() => connectDevWallet()}>
+                <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+                    DEV
+                </div>
+            </NavElement> : <></>
     ]
 
     return (
