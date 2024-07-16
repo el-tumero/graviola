@@ -5,12 +5,13 @@
   "license": "MIT",
   "scripts": {
     "build": "forge build",
-    "deploy": "node deploy.js",
+    "deploy:local": "node ./utils/deploy.js local",
+    "deploy:testnet": "node deploy.js testnet",
     "test": "forge test -vv",
     "types": "node types.js",
     "pretty": "npx prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
     "lint": "solhint '**/*.sol'"
-},
+  },
   "dependencies": {
     "@openzeppelin/contracts": "^5.0.2",
     "dotenv": "^16.4.5",
@@ -18,10 +19,27 @@
     "solidity-linked-list": "^6.0.0"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.0",
+    "@nomicfoundation/hardhat-foundry": "^1.1.2",
+    "@nomicfoundation/hardhat-ignition": "^0.15.5",
+    "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
     "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.0.0",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": ">=9.1.0",
+    "chai": "^4.2.0",
     "ethers": "^6.12.0",
     "forge-std": "github:foundry-rs/forge-std",
+    "hardhat": "^2.22.6",
+    "hardhat-gas-reporter": "^1.0.8",
     "prettier": "^3.3.2",
+    "solhint": "^5.0.1",
+    "solidity-coverage": "^0.8.1",
+    "ts-node": ">=8.0.0",
     "typechain": "^8.3.2",
     "typescript": "^5.4.5"
   }

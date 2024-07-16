@@ -2,3 +2,5 @@ node_modules
 .DS_Store
 dist
 .env*
+tests/e2e/videos
+tests/e2e/screenshots

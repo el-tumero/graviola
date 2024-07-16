@@ -18,7 +18,7 @@ async function generateContractTypes() {
 }
 
 if (require.main === module) {
-    (async() => {
+    (async () => {
         await generateContractTypes()
     })()
 }

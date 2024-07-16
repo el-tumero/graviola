@@ -9,11 +9,15 @@ import NavListDesktop from "./NavList"
 import icons from "../../data/icons"
 import { AppContext } from "../../contexts/AppContext"
 import { links } from "../../links"
+import { isDevMode } from "../../app/mode"
+import { useAppDispatch } from "../../app/hooks"
+import useWallet from "../../hooks/useWallet"
 
 const Navbar = () => {
     const navigate = useNavigate()
     const { theme, toggleTheme } = useContext(AppContext)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
+    const { connectDevWallet } = useWallet()
 
     const navItems: React.ReactNode[] = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
@@ -47,6 +51,13 @@ const Navbar = () => {
                 {theme === "dark" ? icons.darkTheme : icons.lightTheme}
             </div>
         </NavElement>,
+
+        isDevMode ?
+            <NavElement onClick={() => connectDevWallet()}>
+                <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+                    DEV
+                </div>
+            </NavElement> : <></>
     ]
 
     return (

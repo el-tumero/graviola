@@ -7,7 +7,6 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import { GraviolaContext } from "../contexts/GraviolaContext"
-import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
 import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
@@ -17,7 +16,9 @@ import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-// import useGenerateMock from "../hooks/useGenerateMock"
+
+import useWeb3 from "../hooks/useWallet"
+
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -36,8 +37,8 @@ const Generate = () => {
         rarities: RaritiesData
         collection: NFT[]
     }
-    const { isConnected } = useWeb3ModalAccount()
 
+    const { isConnected } = useWeb3()
 
     // // MOCK
     // const mockBehavior = {
