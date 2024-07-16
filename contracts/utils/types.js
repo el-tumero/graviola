@@ -1,6 +1,6 @@
 const { runTypeChain } = require("typechain")
 
-const BUILD_PATH = "../out"
+const BUILD_PATH = "./out"
 
 const allFiles = [
     `${BUILD_PATH}/GraviolaMain.sol/Graviola.json`,

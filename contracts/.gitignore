@@ -9,6 +9,7 @@ artifacts
 typechain-types
 
 addresses-local.json
+candidates.json
 
 # broadcasts
 !broadcast

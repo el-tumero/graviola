@@ -1,10 +1,12 @@
 require("dotenv").config()
 const { exec } = require("child_process");
-const { writeFileSync, appendFileSync } = require("fs");
 const generateContractTypes = require("./types")
-const localhostConfig = require("../localhost-config.json")
+const { writeFileSync } = require("fs")
+const localhostConfig = require("../localhost-config.json");
+const { createLogger } = require("./fs");
 
 const LOG_PATH = "deploy.log"
+const log = createLogger(LOG_PATH)
 
 const config = {
     // Local dev (ganache)
@@ -29,17 +31,10 @@ if (!config[variant]) {
 const { rpc, output, privateKey } = config[variant]
 const deployForgeCommand = `forge script script/GraviolaDeploy.s.sol --rpc-url ${rpc} --private-key ${privateKey} --broadcast`
 
-function writeToLog(data, logInConsole = true) {
-    appendFileSync(LOG_PATH, data, err => {
-        if (err) console.log("Can't write to log file!")
-        if (logInConsole) console.log(data)
-    })
-}
-
 function deployContracts() {
 
     writeFileSync(LOG_PATH, "")
-    writeToLog(`Deploy config: ${JSON.stringify(config[variant], null, 4)}\n`)
+    log(`Deploy config: ${JSON.stringify(config[variant], null, 4)}\n`)
 
     const addresses = {
         GRAVIOLA_ADDRESS: "0x",
@@ -47,17 +42,14 @@ function deployContracts() {
     }
 
     return new Promise((resolve, reject) => {
-        writeToLog("Starting deploy script...\n")
+        log("Starting deploy script...\n")
         exec(deployForgeCommand, (err, stdout, stderr) => {
             if (err || stderr || !stdout) {
-                writeToLog(`Failed to deploy. Err:\n${err.message ?? "No err msg"}\n`, false)
+                log(`Failed to deploy. Err:\n${err.message ?? "No err msg"}\n`, false)
                 return reject(stderr ?? "Unknown error")
             }
-
-            console.log(123)
-
-            writeToLog(stdout)
-            writeToLog("\nDeployed!\n")
+            log(stdout)
+            log("\nDeployed!\n")
 
             const lines = stdout.split("\n")
             const logsIndex = lines.findIndex(value => value == "== Logs ==")
