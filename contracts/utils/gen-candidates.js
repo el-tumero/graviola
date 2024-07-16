@@ -26,11 +26,14 @@ async function main() {
 
         for (let id of sorted) {
             const d = await TGraviolaSeasonsCandidates.addCandidate(id)
+            await TGraviolaSeasonsCandidates.upvoteCandidate(id, id+1)
         }
 
         console.log(`Added (${CANDIDATE_AMOUNT}) candidates`)
 
-        const candidates = await TGraviolaSeasonsCandidates.getTopCandidatesInfo(CANDIDATE_AMOUNT)
+        const listSize = await TGraviolaSeasonsCandidates.getListSize()
+        const candidates = await TGraviolaSeasonsCandidates.getTopCandidatesInfo(listSize + 1n)
+
         const serialized = JSON.stringify(candidates, (_, v) => typeof v === 'bigint' ? v.toString() : v, 4)
         log(serialized)
         console.log("Done")
