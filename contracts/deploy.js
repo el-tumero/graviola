@@ -4,7 +4,7 @@ const { writeFile, writeFileSync } = require("fs");
 const generateContractTypes = require("./types")
 
 /**
- * Script for configuration parsing
+ * Script for configuration parsing and contract deployment
  * Calls script/GraviolaDeploy.s.sol on success
  * 
  * Usage
@@ -80,7 +80,7 @@ async function main() {
     try {
         const addresses = await deployContracts()
         console.log(`Logs saved to '${logsPath}'`)
-        writeFile(output, JSON.stringify(addresses), err => {
+        writeFile(output, JSON.stringify(addresses, null, 4), err => {
             if (err) {
                 console.error(err)
                 return
