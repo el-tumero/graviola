@@ -29,7 +29,7 @@ jobs:
         run: |
           cd frontend
           yarn
-          yarn ganache -d
+          yarn ganache -d -D -q
 
       - name: Generate types for website
         run: |

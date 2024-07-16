@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "dev": "cross-env NODE_ENV=dev vite",
-        "dev:test": "concurrently 'cross-env NODE_ENV=dev vite --port 3000 -l silent' 'ganache -d -q'",
+        "dev:test": "concurrently 'cross-env NODE_ENV=dev vite --port 3000 -l silent' 'ganache -D -d -q'",
         "build": "vite build",
         "predeploy": "vite build && cp ./dist/index.html ./dist/404.html",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\" --tab-width 4 --no-semi --jsx-single-quote false",
