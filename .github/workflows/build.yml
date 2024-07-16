@@ -30,6 +30,7 @@ jobs:
           cd contracts
           yarn
           yarn build
+          yarn deploy:local
           yarn types
 
       - name: Build website
