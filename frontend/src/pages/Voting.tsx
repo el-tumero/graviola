@@ -111,6 +111,7 @@ const KeywordVotingPage = () => {
                     <div onClick={() => setInfoVisible(true)} className={cl(
                         "flex justify-center items-center rounded-lg",
                         "border border-light-border dark:border-dark-border",
+                        "bg-light-bgDark/50 dark:bg-dark-bgLight/50 cursor-pointer"
                     )}>
                         <span className="font-mono p-2">info</span>
                     </div>
@@ -121,7 +122,10 @@ const KeywordVotingPage = () => {
                     <div className="flex gap-1 justify-center items-center">
                         <p>Sort by:</p>
                         <select defaultValue={"id"} name="votingSortBy"
-                            className={cl("p-1 rounded-lg border border-light-border dark:border-dark-border")}
+                            className={cl(
+                                "p-1 rounded-lg border border-light-border dark:border-dark-border",
+                                "bg-light-bgDark/50 dark:bg-dark-bgLight/50"
+                            )}
                         >
                             <option value="id">{"Id (Default)"}</option>
                             <option value="scoreAsc">{"Score (Low -> High)"}</option>
@@ -185,10 +189,29 @@ const KeywordCandidate = (props: CandidateInfo) => (
                 <p className="text-gray-600">
                     <span className="text-xs text-light-text/75 dark:text-dark-text/75 font-mono">score: </span>
                     <span className="font-semibold">{props.score}</span>
+
+                    {/* TODO: Clean this. Testing */}
+                    {props.id === 2 &&
+                        <span className="text-accent/75">{" (+4)"}</span>
+                    }
                 </p>
             </div>
-            <div className={cl("rounded-lg w-8 h-8 flex justify-center items-center bg-gray-400/50")}>{'\u2191'}</div>
-            <div className={cl("rounded-lg w-8 h-8 flex justify-center items-center bg-gray-400/50")}>{'\u2193'}</div>
+            <div className={cl(
+                "rounded-lg w-8 h-8 flex justify-center items-center cursor-pointer",
+                "border border-light-border dark:border-dark-border",
+                "bg-light-bgDark dark:bg-dark-bgLight",
+                "hover:bg-accent/50 hover:dark:bg-accent/50 duration-300 transition-colors",
+                "hover:border-accent hover:dark:border-accent"
+            )}>{'\u2191'}
+            </div>
+            <div className={cl(
+                "rounded-lg w-8 h-8 flex justify-center items-center cursor-pointer",
+                "border border-light-border dark:border-dark-border",
+                "bg-light-bgDark dark:bg-dark-bgLight",
+                "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
+                "hover:border-red-500 hover:dark:border-red-500"
+            )}>{'\u2193'}
+            </div>
         </div>
     </div>
 )
