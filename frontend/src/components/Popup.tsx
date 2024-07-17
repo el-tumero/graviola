@@ -49,7 +49,7 @@ const Popup = ({ additionalClasses, type, onClickClose, message, disableCloseBut
             active ? "opacity-100" : "translate-x-full opacity-0",
             additionalClasses
         )}>
-            <div className="flex w-full h-fit justify-between items-center font-bold font-mono p-3">
+            <div className="flex w-full h-fit justify-between items-center font-bold font-mono px-3 py-1.5">
                 <p>{type === "err" ? "Error" : (type === "warn") ? "Warning" : "Info"}</p>
 
                 {!disableCloseButton ?
