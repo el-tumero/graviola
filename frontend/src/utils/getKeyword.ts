@@ -4,7 +4,7 @@ import { RaritiesData } from "../types/RarityGroup";
 // Get sorted keyword data from absolute index (e.g. 80 => 3rd Uncommon keyword)
 export const getKeyword = (absIdx: number, rarities: RaritiesData): [string, RarityGroupData] => {
     if (absIdx < 0 || absIdx > 99) {
-        console.error("Absolute index out of bounds - can't get keyword.")
+        console.error("Absolute index out of bounds - can't get keyword. Defaulting to 99. Input: ", absIdx)
         absIdx = 99
     }
     for (const rarityLevel of Object.keys(rarities).sort(

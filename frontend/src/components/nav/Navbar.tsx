@@ -36,7 +36,7 @@ const Navbar = () => {
             <p>Keywords</p>
         </NavElement>,
 
-        <NavElement additionalClasses="border border-accent" onClick={() => navigate(routerPaths.voting)}>
+        <NavElement onClick={() => navigate(routerPaths.voting)}>
             <p className="font-bold">Vote!</p>
         </NavElement>,
 
