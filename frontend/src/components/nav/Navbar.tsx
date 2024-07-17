@@ -10,7 +10,6 @@ import icons from "../../data/icons"
 import { AppContext } from "../../contexts/AppContext"
 import { links } from "../../links"
 import { isDevMode } from "../../app/mode"
-import { useAppDispatch } from "../../app/hooks"
 import useWallet from "../../hooks/useWallet"
 
 const Navbar = () => {
@@ -21,7 +20,7 @@ const Navbar = () => {
 
     const navItems: React.ReactNode[] = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
-            <p>Generate</p>
+            <p data-testid="generate-nav-btn">Generate</p>
         </NavElement>,
 
         <NavElement onClick={() => navigate(routerPaths.drops)}>
@@ -37,27 +36,54 @@ const Navbar = () => {
         </NavElement>,
 
         <NavElement onClick={() => openURL(links.repo)}>
-            <div className={cl("flex w-min hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>{icons.github}</div>
+            <div
+                className={cl(
+                    "flex w-min hover:cursor-pointer",
+                    "max-lg:w-full justify-center items-center",
+                )}
+            >
+                {icons.github}
+            </div>
         </NavElement>,
 
         <NavElement onClick={() => openURL(links.discord)}>
-            <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+            <div
+                className={cl(
+                    "flex w-auto h-6 hover:cursor-pointer",
+                    "max-lg:w-full justify-center items-center",
+                )}
+            >
                 {icons.discordLogo}
             </div>
         </NavElement>,
 
         <NavElement onClick={() => toggleTheme()}>
-            <div className={cl("flex justify-center items-center", "w-full h-6 cursor-pointer", "text-light-text dark:text-dark-text")}>
+            <div
+                className={cl(
+                    "flex justify-center items-center",
+                    "w-full h-6 cursor-pointer",
+                    "text-light-text dark:text-dark-text",
+                )}
+            >
                 {theme === "dark" ? icons.darkTheme : icons.lightTheme}
             </div>
         </NavElement>,
 
-        isDevMode ?
+        isDevMode ? (
             <NavElement onClick={() => connectDevWallet()}>
-                <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+                <div
+                    data-testid="dev-btn"
+                    className={cl(
+                        "flex w-auto h-6 hover:cursor-pointer",
+                        "max-lg:w-full justify-center items-center",
+                    )}
+                >
                     DEV
                 </div>
-            </NavElement> : <></>
+            </NavElement>
+        ) : (
+            <></>
+        ),
     ]
 
     return (
@@ -68,7 +94,8 @@ const Navbar = () => {
                     "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
                     "w-screen backdrop-blur-lg",
                     "bg-transparent",
-                    mobileListVisible && "border-b border-light-border dark:border-dark-border",
+                    mobileListVisible &&
+                        "border-b border-light-border dark:border-dark-border",
                 )}
             >
                 <div
@@ -76,7 +103,8 @@ const Navbar = () => {
                         "flex justify-between items-center",
                         "py-3 px-[2.5%]",
                         "select-none font-content",
-                        !mobileListVisible && "border-b border-light-border dark:border-dark-border",
+                        !mobileListVisible &&
+                            "border-b border-light-border dark:border-dark-border",
                     )}
                 >
                     <div
@@ -88,14 +116,24 @@ const Navbar = () => {
                         )}
                         onClick={() => navigate(routerPaths.home)}
                     >
-                        <div className={cl("flex justify-center items-center", "w-8 h-8 p-1 rounded-xl")}>
+                        <div
+                            className={cl(
+                                "flex justify-center items-center",
+                                "w-8 h-8 p-1 rounded-xl",
+                            )}
+                        >
                             <img className="w-full h-auto mb-1" src={Logo} />
                         </div>
-                        <p className="font-semibold font-mono text-accent opacity-100">GraviolaNFT</p>
+                        <p className="font-semibold font-mono text-accent opacity-100">
+                            GraviolaNFT
+                        </p>
                     </div>
 
                     <div className="max-lg:hidden lg:visible">
-                        <NavListDesktop navItems={navItems} mobileStyles={false} />
+                        <NavListDesktop
+                            navItems={navItems}
+                            mobileStyles={false}
+                        />
                     </div>
 
                     {/* Mobile navbar icon */}
@@ -114,8 +152,17 @@ const Navbar = () => {
                 </div>
 
                 {mobileListVisible && (
-                    <div className={cl("flex flex-col w-full h-fit", "bg-transparent", "transition-all duration-300")}>
-                        <NavListDesktop navItems={navItems} mobileStyles={true} />
+                    <div
+                        className={cl(
+                            "flex flex-col w-full h-fit",
+                            "bg-transparent",
+                            "transition-all duration-300",
+                        )}
+                    >
+                        <NavListDesktop
+                            navItems={navItems}
+                            mobileStyles={true}
+                        />
                     </div>
                 )}
             </div>
