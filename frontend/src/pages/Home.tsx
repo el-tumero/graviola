@@ -47,7 +47,7 @@ const Home = () => {
                                 "max-sm:w-full max-lg:w-1/3 lg:w-1/2",
                             )}
                         >
-                            <h1 className="text-accent font-title font-semibold text-3xl">
+                            <h1 className="text-accent font-title font-semibold text-2xl">
                                 Unique, dynamically generated character portrait NFTs
                             </h1>
                             <h2 className="text-light-text dark:text-dark-text text-lg">

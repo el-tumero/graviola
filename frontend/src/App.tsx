@@ -142,7 +142,7 @@ const App = (props: { children: ReactNode }) => {
                 {} as Record<RarityLevel, RarityGroupData>,
             )
 
-            console.log("[App] raritiesData: ", raritiesData) // DEBUG
+            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
             setRarities(raritiesData)
             setLoading(false)
             console.log("[App] collection loaded!")

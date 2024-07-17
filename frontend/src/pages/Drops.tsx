@@ -3,7 +3,6 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useContext, useEffect, useRef, useState } from "react"
 import { clsx as cl } from "clsx"
-import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import Button from "../components/ui/Button"
@@ -24,8 +23,8 @@ const Drops = () => {
     // TODO: Add options to filter by Rarity, or by included Keywords.
 
     // const { isConnected, address } = useWeb3ModalAccount()
-    const {isConnected, address} = useWeb3()
-    
+    const { isConnected, address } = useWeb3()
+
     const graviolaContext = useContext(GraviolaContext)
 
     const contractNFTs = graviolaContext.collection as NFT[]

@@ -29,9 +29,7 @@ export interface NFTExt extends NFT {
 const Generate = () => {
     const navigate = useNavigate()
     const {
-        contract,
         rarities: rGroups,
-        collection,
     } = useContext(GraviolaContext) as {
         contract: Graviola
         rarities: RaritiesData

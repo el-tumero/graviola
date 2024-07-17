@@ -6,6 +6,7 @@ import Keywords from "./pages/Keywords"
 import Drops from "./pages/Drops"
 import Error from "./pages/Error"
 import TradeUp from "./pages/TradeUp"
+import Voting from "./pages/Voting"
 
 export const routerPaths = {
     home: "/",
@@ -13,6 +14,7 @@ export const routerPaths = {
     drops: "/drops",
     tradeup: "/tradeup",
     keywords: "/keywords",
+    voting: "/voting",
 }
 
 const router = createBrowserRouter(
@@ -36,6 +38,10 @@ const router = createBrowserRouter(
         {
             path: routerPaths.keywords,
             element: <Keywords />,
+        },
+        {
+            path: routerPaths.voting,
+            element: <Voting />,
         },
         {
             path: "*",
