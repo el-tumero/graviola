@@ -11,7 +11,8 @@
         "predeploy": "vite build && cp ./dist/index.html ./dist/404.html",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\" --tab-width 4 --no-semi --jsx-single-quote false",
         "deploy": "gh-pages -d dist",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "test": "VITE_DEV_PROVIDER=true playwright test"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.6",
