@@ -16,7 +16,7 @@ const Navbar = () => {
     const navigate = useNavigate()
     const { theme, toggleTheme } = useContext(AppContext)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
-    const { connectDevWallet } = useWallet()
+    const { connectDevWallet, isConnected } = useWallet()
 
     const navItems: React.ReactNode[] = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
@@ -76,6 +76,7 @@ const Navbar = () => {
                     className={cl(
                         "flex w-auto h-6 hover:cursor-pointer",
                         "max-lg:w-full justify-center items-center",
+                        isConnected ? "text-green-600" : "",
                     )}
                 >
                     DEV

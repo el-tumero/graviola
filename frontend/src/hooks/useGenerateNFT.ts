@@ -1,31 +1,30 @@
-import { parseEther, toBigInt } from "ethers";
-import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol";
-import { GraviolaContext } from "../contexts/GraviolaContext";
-import { NFTExt } from "../pages/Generate";
-import { TransactionStatus } from "../types/TransactionStatus";
-import { TxStatusMessagesMap } from "../utils/statusMessages";
-import { useState, useEffect, useContext } from "react";
-import { useWeb3ModalAccount } from "@web3modal/ethers/react";
-import { NFT } from "../types/NFT";
-import { getRarityFromPerc } from "../utils/getRarityData";
-import { PopupBase } from "../components/Popup";
-import { RaritiesData } from "../types/RarityGroup";
-import { ContractTransactionResponse } from "ethers";
+import { parseEther, toBigInt } from "ethers"
+import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
+import { GraviolaContext } from "../contexts/GraviolaContext"
+import { NFTExt } from "../pages/Generate"
+import { TransactionStatus } from "../types/TransactionStatus"
+import { TxStatusMessagesMap } from "../utils/statusMessages"
+import { useState, useEffect, useContext } from "react"
+import { NFT } from "../types/NFT"
+import { getRarityFromPerc } from "../utils/getRarityData"
+import { PopupBase } from "../components/Popup"
+import { RaritiesData } from "../types/RarityGroup"
+import { ContractTransactionResponse } from "ethers"
+import useWallet from "./useWallet"
 
 type TradeUpArgs = number[]
 
 // TODO: Add a timer feature after the tx.receit() arrives. If we go beyond 4-5 mintues,
 // Display a warning popup or provide a link to tx explorer
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
-
     const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
     const { contract, rarities, collection } = useContext(GraviolaContext) as {
-        contract: Graviola,
-        rarities: RaritiesData,
+        contract: Graviola
+        rarities: RaritiesData
         collection: NFT[]
     }
-    const { address } = useWeb3ModalAccount()
+    const { address } = useWallet()
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
@@ -41,16 +40,18 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
         const estFee: bigint = await contract.estimateFee()
-        console.log('estfee ', estFee)
+        console.log("estfee ", estFee)
         let tx: ContractTransactionResponse | null = null
-        console.log("[useGenerate] tx init. mode: ", tradeupArgs ? "trade up" : "generate")
+        console.log(
+            "[useGenerate] tx init. mode: ",
+            tradeupArgs ? "trade up" : "generate",
+        )
         try {
             if (tradeupArgs) {
                 const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
-                tx = await contract.tradeUp(
-                    [args[0], args[1], args[2]],
-                    { value: estFee + parseEther("0.006") }
-                )
+                tx = await contract.tradeUp([args[0], args[1], args[2]], {
+                    value: estFee + parseEther("0.006"),
+                })
             } else {
                 tx = await contract.mint({
                     value: parseEther("0.006"),
@@ -63,13 +64,14 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 setTxStatus("BEFORE_MINT")
             }
         } catch (error) {
-            const errMsg = ((error as Error).message.length > 64)
-                ? (error as Error).message.substring(0, 64) + " (...)"
-                : (error as Error).message
-            console.error("[useGenerate] err during tx init: ", (error as Error))
+            const errMsg =
+                (error as Error).message.length > 64
+                    ? (error as Error).message.substring(0, 64) + " (...)"
+                    : (error as Error).message
+            console.error("[useGenerate] err during tx init: ", error as Error)
             setTxPopup({
                 type: "err",
-                message: `An error occurred. Message: ${errMsg}`
+                message: `An error occurred. Message: ${errMsg}`,
             })
             setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
             setTxStatus("REJECTED")
@@ -88,8 +90,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             return
         }
         setCallbacksInit(true)
-        contract.on(contract.filters.Mint, onMint)
-        contract.on(contract.filters.TokenReady, onTokenReady)
+
+        contract.once(contract.filters.Mint, onMint)
+        contract.once(contract.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks init OK")
     }
 
@@ -115,7 +118,10 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         const response = await fetch(uri)
         const nextIdx = collection.length
         const nftData = await response.json()
-        const [rLevel, rData] = getRarityFromPerc(nftData.attributes[0].value, rarities)
+        const [rLevel, rData] = getRarityFromPerc(
+            nftData.attributes[0].value,
+            rarities,
+        )
 
         const nftBase: NFT = {
             id: nextIdx,
