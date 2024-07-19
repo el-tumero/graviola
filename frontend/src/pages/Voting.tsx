@@ -5,12 +5,13 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import candidateMockList from "../../../contracts/candidates.json"
-import { Fragment, ReactNode, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import { getKeyword } from "../utils/getKeyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 
+type CompareSortType = "Ascending" | "Descending"
 type ActivePage = "Voting" | "Archive"
 
 interface CandidateInfo {
@@ -22,43 +23,24 @@ interface CandidateInfo {
     score: number
 }
 
-// interface BubbleCardProps {
-//     header: string
-//     contents: ReactNode
-//     additionalClasses?: string
-// }
+enum SortingType {
+    BY_ID = 1,
+    BY_SCORE_ASC,
+    BY_SCORE_DESC,
+    BY_KEYWORD_ASC,
+    BY_KEYWORD_DESC,
+}
 
-// const BubbleInfoCard = (props: BubbleCardProps) => {
-//     const [isOpen, setIsOpen] = useState<boolean>(false)
-//     return (
-//         <div onClick={() => setIsOpen(isOpen => !isOpen)} className={cl(
-//             "flex justify-start items-start",
-//             "p-3 border border-light-border dark:border-dark-border rounded-lg",
-//             "transition-all duration-300 ease-in-out w-48",
-//             isOpen
-//                 ? "h-64 bg-light-bgDark/50 dark:bg-dark-bgLight/50"
-//                 : "h-12"
-//         )}>
-//             {isOpen
-//                 ? <Fragment>{props.contents}</Fragment>
-//                 : <p>{props.header}</p>
-//             }
-//         </div>
-//     )
-// }
+// SORTING
+// TODO: Find a home for this
+const compareById = (a: CandidateInfo, b: CandidateInfo) => a.id - b.id
+const compareByScore = (t: CompareSortType) => (a: CandidateInfo, b: CandidateInfo) => (t === "Ascending") ? a.score - b.score : b.score - a.score
+const compareAlphabetically = (t: CompareSortType) => (a: CandidateInfo, b: CandidateInfo) => (t === "Ascending") ? a.keyword.localeCompare(b.keyword) : b.keyword.localeCompare(a.keyword)
 
 const Voting = () => {
 
     const [activePage, setActivePage] = useState<ActivePage>("Voting")
     const [infoVisible, setInfoVisible] = useState<boolean>(false)
-
-    // const votingInfoCard: BubbleCardProps = {
-    //     header: "What is this?",
-    //     contents: <p>
-    //         When each graviola season begins, this Voting Panel opens and allows the token holders to add new keyword candidates for the upcoming season.
-    //         The community will judge the ideas and hopefully choose interesting entries for the next season!
-    //     </p>,
-    // }
 
     return (
         <FullscreenContainer>
@@ -66,8 +48,6 @@ const Voting = () => {
             <ContentContainer additionalClasses="flex-col gap-4 h-full">
 
                 <PageTitle title="Voting Panel" additionalClasses="mb-3" />
-
-                {/* <BubbleInfoCard {...votingInfoCard} /> */}
 
                 {/* What is this: Floating Popup */}
                 <div className="relative">
@@ -149,6 +129,17 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
         rarities: RaritiesData
     }
 
+    // Default sort is always by id (same order as we got from the contract)
+    const [sorting, setSorting] = useState<SortingType>(SortingType["BY_ID"])
+    // Map sorting types (enum) to compare fns
+    const sortCompareFns: Record<number, (a: CandidateInfo, b: CandidateInfo) => number> = {
+        1: compareById,                         // BY_ID
+        2: compareByScore("Ascending"),         // BY_SCORE_ASC
+        3: compareByScore("Descending"),        // BY_SCORE_DESC
+        4: compareAlphabetically("Ascending"),  // BY_KEYWORD_ASC
+        5: compareAlphabetically("Descending"), // BY_KEYWORD_ASC
+    }
+
     const mockCandidates = candidateMockList.map((data, i) => {
         const candidateData: CandidateInfo = {
             id: i,
@@ -189,17 +180,18 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
                 <div className="flex gap-3">
                     <div className="flex gap-1 justify-center items-center">
                         <p>Sort by:</p>
-                        <select defaultValue={"id"} name="votingSortBy"
+                        <select onChange={(e) => setSorting(+e.target.value)} defaultValue={sorting} name="votingSortSelect"
                             className={cl(
                                 "p-1 rounded-lg border border-light-border dark:border-dark-border",
-                                "bg-light-bgDark/50 dark:bg-dark-bgLight/50"
+                                "bg-light-bgDark/50 dark:bg-dark-bgLight/50",
+                                "focus:outline-none"
                             )}
                         >
-                            <option value="id">{"Id (Default)"}</option>
-                            <option value="scoreAsc">{"Score (Low -> High)"}</option>
-                            <option value="scoreDesc">{"Score (High -> Low)"}</option>
-                            <option value="alphabetAsc">{"Alphabetically (A -> Z)"}</option>
-                            <option value="alphabetDesc">{"Alphabetically (Z -> A)"}</option>
+                            <option value={SortingType["BY_ID"]}>{"Id (Default)"}</option>
+                            <option value={SortingType["BY_SCORE_ASC"]}>{"Score (Low -> High)"}</option>
+                            <option value={SortingType["BY_SCORE_DESC"]}>{"Score (High -> Low)"}</option>
+                            <option value={SortingType["BY_KEYWORD_ASC"]}>{"Alphabetically (A -> Z)"}</option>
+                            <option value={SortingType["BY_KEYWORD_DESC"]}>{"Alphabetically (Z -> A)"}</option>
                         </select>
                     </div>
                 </div>
@@ -212,7 +204,7 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
             )}>
 
                 <ul role="list" className="w-full divide-y divide-light-border dark:divide-dark-border">
-                    {mockCandidates.map((candInfo, idx) => <KeywordCandidate {...candInfo} key={idx} />)}
+                    {mockCandidates.sort(sortCompareFns[sorting]).map((candInfo, idx) => <KeywordCandidate {...candInfo} key={idx} />)}
                 </ul>
             </div>
 
