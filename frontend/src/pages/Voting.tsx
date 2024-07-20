@@ -54,14 +54,14 @@ const Voting = () => {
                     {infoVisible &&
 
                         <div className={cl(
-                            "flex w-[55%] h-fit top-1/2 left-1/2 -translate-x-1/2 translate-y-1/3 flex-col",
+                            "flex w-[55%] h-fit top-1/2 left-1/2 -translate-x-1/2 translate-y-[40%]",
                             "absolute",
                             "p-3 rounded-lg border border-light-border dark:border-dark-border",
-                            "bg-light-bgDark dark:bg-dark-bgLight",
+                            "bg-light-bgPrimary/75 dark:bg-dark-bgPrimary/75 backdrop-blur-3xl",
                             "shadow-md"
                         )}>
                             <div onClick={() => setInfoVisible(false)} className={cl(
-                                "flex w-6 h-6 justify-center items-center cursor-pointer place-self-end",
+                                "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
                             )}>
                                 {icons.close}
                             </div>
@@ -170,7 +170,9 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
                     <div onClick={props.onClickInfo} className={cl(
                         "flex justify-center items-center rounded-lg",
                         "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/50 cursor-pointer"
+                        "bg-light-bgDark/25 dark:bg-dark-bgLight/25 cursor-pointer",
+                        "hover:bg-light-bgDark/75 hover:dark:bg-dark-bgLight/75",
+                        "transition-colors duration-300 ease-in-out"
                     )}>
                         <span className="font-mono p-2">What is this?</span>
                     </div>
@@ -199,7 +201,7 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
             </div>
 
             <div className={cl(
-                "flex w-full h-fit",
+                "flex w-full h-fit mb-24",
                 "border border-light-border dark:border-dark-border rounded-lg p-1",
             )}>
 
@@ -219,13 +221,14 @@ const KeywordCandidate = (props: CandidateInfo) => (
         "max-md:gap-2 max-md:justify-start max-md:items-start",
         "even:bg-light-border/30 even:dark:bg-dark-border/30",
         "odd:bg-light-bgDark/30 odd:dark:bg-dark-bgLight/30",
-        "last:rounded-b-md"
+        "first:rounded-t-md last:rounded-b-md"
     )}>
-        {/* Left part: Id, Badge, Keyword, Iteration info */}
-        <div className="mr-2 self-center">
+        {/* Pre-left part: global item index */}
+        <div className="mr-2 self-center w-6">
             <span className="font-mono text-light-text/75 dark:text-dark-text/75">{props.id}.</span>
         </div>
-        <div className={cl("flex flex-nowrap gap-3 justify-center items-center w-2/3 h-full", "max-md:w-full")}>
+        {/* Left part: Id, Badge, Keyword, Iteration info */}
+        <div className={cl("flex flex-nowrap gap-3 justify-center items-center w-1/2 h-full", "max-md:w-full")}>
             <div className={cl(
                 "w-8 h-8 flex justify-center items-center",
                 !props.badge && ["border-2 border-light-border dark:border-dark-border", "border-dashed rounded-md"]
@@ -233,41 +236,40 @@ const KeywordCandidate = (props: CandidateInfo) => (
                 {props.badge && <img src={props.badge} />}
             </div>
             <div className="flex w-full flex-1 gap-0.5 justify-start items-center">
-                <p>{props.keyword}</p>
-                <p className="font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
+                <p className="mr-1 font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
                     ({props.iteration})
                 </p>
+                <p>{props.keyword}</p>
             </div>
         </div>
         {/* Right part: Score, Upvote, Downvote */}
         <div className={cl(
-            "w-1/3 flex justify-between items-center h-full gap-3", "max-md:w-full"
+            "w-1/2 flex justify-end items-center h-full gap-3", "max-md:w-full"
         )}>
-            <div className={cl("flex flex-1 justify-end items-center", "max-md:justify-start")}>
-                <p className="text-gray-600">
-                    <span className="text-xs text-light-text/75 dark:text-dark-text/75 font-mono">score: </span>
-                    <span className="font-semibold">{props.score}</span>
-                    {/* TODO: Clean this. Testing */}
-                    {props.id === 2 &&
-                        <span className="text-accent/75">{" (+4)"}</span>
-                    }
-                </p>
+            <div className={cl("flex w-24 justify-end items-center")}>
+                <span className="font-semibold font-mono">{props.score}</span>
             </div>
-            <div className={cl(
-                "rounded-lg w-8 h-8 flex justify-center items-center cursor-pointer",
-                "border border-light-border dark:border-dark-border",
-                "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                "hover:bg-accent/50 hover:dark:bg-accent/50 duration-300 transition-colors",
-                "hover:border-accent hover:dark:border-accent"
-            )}>{'\u2191'}
-            </div>
-            <div className={cl(
-                "rounded-lg w-8 h-8 flex justify-center items-center cursor-pointer",
-                "border border-light-border dark:border-dark-border",
-                "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
-                "hover:border-red-500 hover:dark:border-red-500"
-            )}>{'\u2193'}
+            <div className="flex gap-1.5 flex-nowrap">
+                <div className={cl(
+                    "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer -rotate-90",
+                    "border border-light-border dark:border-dark-border",
+                    "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
+                    "hover:bg-accentDark/50 hover:dark:bg-accent/50 duration-300 transition-colors",
+                    "hover:border-accentDark hover:dark:border-accent",
+                    "text-accentDark dark:text-accent"
+                )}>
+                    {icons.arrow}
+                </div>
+                <div className={cl(
+                    "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer rotate-90",
+                    "border border-light-border dark:border-dark-border",
+                    "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
+                    "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
+                    "hover:border-red-500 hover:dark:border-red-500",
+                    "text-red-500 dark:text-red-500"
+                )}>
+                    {icons.arrow}
+                </div>
             </div>
         </div>
     </div>

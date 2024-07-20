@@ -154,10 +154,11 @@ const Drops = () => {
                                             "rounded-lg bg-light-bgPrimary dark:bg-dark-bgPrimary",
                                             "border border-light-border dark:border-dark-border",
                                             "hover:bg-light-border/75 dark:hover:bg-dark-border/75",
+                                            "-rotate-90"
                                         )}
                                         onClick={() => scrollToTop()}
                                     >
-                                        {icons.arrowUp}
+                                        {icons.arrow}
                                     </div>
                                 </div>
                             )}

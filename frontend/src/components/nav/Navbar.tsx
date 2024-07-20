@@ -95,7 +95,7 @@ const Navbar = () => {
                         <div className={cl("flex justify-center items-center", "h-auto w-fit rounded-xl")}>
                             <img className="w-5 h-auto aspect-auto mb-1 p-0.5" src={Logo} />
                         </div>
-                        <p className="font-semibold font-mono text-accent opacity-100">GraviolaNFT</p>
+                        <p className="font-semibold font-mono text-accentDark dark:text-accent opacity-100">graviolaNFT</p>
                     </div>
 
                     <div className="max-lg:hidden lg:visible">
