@@ -14,7 +14,7 @@ import { formatBpToPercentage } from "../utils/format"
 import BlockNFT from "../components/BlockNFT"
 import { RarityLevel } from "../types/Rarity"
 import { tradeUpTxStatusMessages } from "../utils/statusMessages"
-import { Graviola } from "../../../contracts/typechain-types/Graviola"
+import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { cn } from "../utils/cn"
@@ -39,7 +39,6 @@ const TradeUp = () => {
     const {
         txStatus,
         txMsg,
-        progress,
         rolledNFT,
         requestGen,
         initCallbacks,

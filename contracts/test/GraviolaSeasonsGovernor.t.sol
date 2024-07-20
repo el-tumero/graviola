@@ -6,6 +6,8 @@ import {GraviolaSeasonsArchive} from "../src/Graviola/seasons/GraviolaSeasonsArc
 import {GraviolaToken} from "../src/Graviola/GraviolaToken.sol";
 import {GraviolaTokenFaucet} from "../src/Graviola/GraviolaTokenFaucet.sol";
 import {GraviolaSeasonsGovernor} from "../src/Graviola/seasons/GraviolaSeasonsGovernor.sol";
+import {CandidateExternal} from "../src/Graviola/seasons/IGraviolaSeasonsGovernor.sol";
+
 
 contract GraviolaTest is Test {
     GraviolaSeasonsArchive public gsa;
@@ -87,7 +89,7 @@ contract GraviolaTest is Test {
         vm.prank(alice);
         gsg.upvoteCandidate(word);
 
-        GraviolaSeasonsGovernor.CandidateExternal memory top = gsg
+        CandidateExternal memory top = gsg
             .getTopCandidatesInfo(1)[0];
         assertEq(top.id, word);
         assertEq(top.score, 1000);

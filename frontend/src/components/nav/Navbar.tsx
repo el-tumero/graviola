@@ -9,11 +9,15 @@ import NavListDesktop from "./NavList"
 import icons from "../../data/icons"
 import { AppContext } from "../../contexts/AppContext"
 import { links } from "../../links"
+import { isDevMode } from "../../app/mode"
+import { useAppDispatch } from "../../app/hooks"
+import useWallet from "../../hooks/useWallet"
 
 const Navbar = () => {
     const navigate = useNavigate()
     const { theme, toggleTheme } = useContext(AppContext)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
+    const { connectDevWallet } = useWallet()
 
     const navItems: React.ReactNode[] = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
@@ -32,6 +36,10 @@ const Navbar = () => {
             <p>Keywords</p>
         </NavElement>,
 
+        <NavElement onClick={() => navigate(routerPaths.voting)}>
+            <p className="font-bold">Vote!</p>
+        </NavElement>,
+
         <NavElement onClick={() => openURL(links.repo)}>
             <div className={cl("flex w-min hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>{icons.github}</div>
         </NavElement>,
@@ -47,6 +55,13 @@ const Navbar = () => {
                 {theme === "dark" ? icons.darkTheme : icons.lightTheme}
             </div>
         </NavElement>,
+
+        isDevMode ?
+            <NavElement onClick={() => connectDevWallet()}>
+                <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+                    DEV
+                </div>
+            </NavElement> : <></>
     ]
 
     return (
@@ -63,7 +78,7 @@ const Navbar = () => {
                 <div
                     className={cl(
                         "flex justify-between items-center",
-                        "py-3 px-[2.5%]",
+                        "py-2 px-[2.5%]",
                         "select-none font-content",
                         !mobileListVisible && "border-b border-light-border dark:border-dark-border",
                     )}
@@ -71,16 +86,16 @@ const Navbar = () => {
                     <div
                         className={cl(
                             "flex items-center gap-0.5 cursor-pointer",
-                            "px-3 py-1 rounded-xl",
+                            "py-1 px-1.5 rounded-xl",
                             "hover:bg-accent/25",
                             "transition-colors duration-300",
                         )}
                         onClick={() => navigate(routerPaths.home)}
                     >
-                        <div className={cl("flex justify-center items-center", "w-8 h-8 p-1 rounded-xl")}>
-                            <img className="w-full h-auto mb-1" src={Logo} />
+                        <div className={cl("flex justify-center items-center", "h-auto w-fit rounded-xl")}>
+                            <img className="w-5 h-auto aspect-auto mb-1 p-0.5" src={Logo} />
                         </div>
-                        <p className="font-semibold font-mono text-accent opacity-100">GraviolaNFT</p>
+                        <p className="font-semibold font-mono text-accentDark dark:text-accent opacity-100">graviolaNFT</p>
                     </div>
 
                     <div className="max-lg:hidden lg:visible">

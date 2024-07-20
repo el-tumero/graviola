@@ -50,15 +50,9 @@ const icons = {
         </svg>
     ),
 
-    arrowRight: (
-        <svg className="w-auto h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 12H17M17 12L13 8M17 12L13 16" stroke="currentColor" />
-        </svg>
-    ),
-
-    arrowUp: (
-        <svg className="w-auto h-auto" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M10 18V2m0 0l7 7m-7-7L3 9" />
+    arrow: (
+        <svg className="w-full h-full aspect-square" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 12H17M17 12L13 8M17 12L13 16" strokeWidth={1.5} stroke="currentColor" />
         </svg>
     ),
 

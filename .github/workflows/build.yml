@@ -25,15 +25,23 @@ jobs:
       - name: Install yarn
         run: npm i -g yarn
 
-      - name: Generate types for website
+      - name: Start ganache
+        run: |
+          cd frontend
+          yarn
+          yarn ganache -d -D -q
+
+      - name: Deploy local contract & setup data
         run: |
           cd contracts
           yarn
+          yarn hardhat compile
           yarn build
+          yarn deploy:local
+          yarn cand
           yarn types
 
       - name: Build website
         run: |
           cd frontend
-          yarn
           yarn build

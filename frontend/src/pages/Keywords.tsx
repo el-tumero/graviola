@@ -20,32 +20,32 @@ const KeywordGroupBlock = (props: { gData: RarityGroupData, blockState: RarityGr
             borderWidth: 1,
             borderColor: props.gData.color
         }} className={cl(
-            "flex flex-col",
+            "flex flex-col gap-1.5",
             "p-4 rounded-xl",
             "h-fit w-fit min-w-32",
         )}>
-            <div className={cl("flex flex-col gap-1")}>
+            <div className={cl("flex flex-col gap-3")}>
 
                 {/* Title & Fold Button*/}
                 <div className={cl("flex justify-between items-center gap-6")}>
                     <p className="font-medium">{props.gData.name} ({props.gData.keywords.length})</p>
                     <div className={cl(
-                        "w-4 h-4 cursor-pointer",
-                        props.blockState.unfolded ? "rotate-180" : "rotate-90"
-                    )} onClick={() => props.blockStateSetter()}>{icons.arrowUp}</div>
+                        "w-6 h-6 cursor-pointer",
+                        props.blockState.unfolded && "rotate-90"
+                    )} onClick={() => props.blockStateSetter()}>{icons.arrow}</div>
                 </div>
 
                 {/* Weight, Min NFT Weight sum */}
                 <div className={cl(
                     "flex justify-between items-center w-full"
                 )}>
-                    <div className="flex">
-                        <div className="w-5 h-5">{icons.weight}</div>
+                    <div className="flex justify-center items-center">
+                        <div className="w-6 h-6">{icons.weight}</div>
                         <span>{props.gData.weight}</span>
                     </div>
-                    <div className="flex">
-                        <div className="flex gap-0.5 font-mono">min:{" "}
-                            <div className="w-5 h-5">{icons.weight}</div>
+                    <div className="flex justify-center items-center">
+                        <div className="flex justify-center items-center gap-1 font-mono">min:{" "}
+                            <div className="w-6 h-6">{icons.weight}</div>
                         </div>
                         <span>{props.gData.minTokenWeight}</span>
                     </div>
@@ -93,7 +93,7 @@ const Keywords = () => {
                 <div className={cl("flex w-full h-fit justify-end items-center p-3 mt-3", "rounded-xl")}>
                     <div className="flex w-full gap-1.5 justify-start items-center">
                         <div className="p-2 bg-light-border dark:bg-dark-border rounded-lg">
-                            <div className="w-5 h-5">{icons.weight}</div>
+                            <div className="w-6 h-6">{icons.weight}</div>
                         </div>
                         <p>
                             Weight — this value represents how heavy a keyword is.
