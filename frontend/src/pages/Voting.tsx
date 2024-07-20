@@ -1,5 +1,6 @@
 import Navbar from "../components/nav/Navbar"
 import { clsx as cl } from "clsx"
+import { compareById, compareAlphabetically, compareByScore } from "../utils/sort"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
@@ -11,12 +12,11 @@ import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 
-type CompareSortType = "Ascending" | "Descending"
 type ActivePage = "Voting" | "Archive"
 
-interface CandidateInfo {
+export interface CandidateInfo {
     id: number
-    badge?: null // Later
+    badge?: null // Cache server
     author: string
     keyword: string
     iteration: number
@@ -29,13 +29,11 @@ enum SortingType {
     BY_SCORE_DESC,
     BY_KEYWORD_ASC,
     BY_KEYWORD_DESC,
+    // BY_KWORD_ITER_ASC, // Future default?
+    // BY_KWORD_ITER_DESC,
+    // BY_BADGE           // Cache
+    // BY_TRENDING
 }
-
-// SORTING
-// TODO: Find a home for this
-const compareById = (a: CandidateInfo, b: CandidateInfo) => a.id - b.id
-const compareByScore = (t: CompareSortType) => (a: CandidateInfo, b: CandidateInfo) => (t === "Ascending") ? a.score - b.score : b.score - a.score
-const compareAlphabetically = (t: CompareSortType) => (a: CandidateInfo, b: CandidateInfo) => (t === "Ascending") ? a.keyword.localeCompare(b.keyword) : b.keyword.localeCompare(a.keyword)
 
 const Voting = () => {
 
