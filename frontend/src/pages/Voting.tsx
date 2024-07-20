@@ -4,7 +4,7 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-import candidateMockList from "../../../contracts/candidates.json"
+import candJson from "../../../contracts/candidates.json"
 import { useContext, useState } from "react"
 import { getKeyword } from "../utils/getKeyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
@@ -140,7 +140,7 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
         5: compareAlphabetically("Descending"), // BY_KEYWORD_ASC
     }
 
-    const mockCandidates = candidateMockList.map((data, i) => {
+    const mockCandidates = candJson.candidates.map((data, i) => {
         const candidateData: CandidateInfo = {
             id: i,
             author: data[2],
