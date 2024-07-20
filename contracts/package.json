@@ -7,6 +7,7 @@
     "build": "forge build",
     "deploy:local": "node utils/deploy.js local",
     "deploy:testnet": "node utils/deploy.js testnet",
+    "cand": "node utils/gen-candidates.js",
     "test": "forge test -vv",
     "types": "node utils/types.js",
     "pretty": "npx prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
