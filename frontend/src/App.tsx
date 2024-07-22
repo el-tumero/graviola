@@ -17,9 +17,7 @@ import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
 
-
 import useWeb3 from "./hooks/useWallet"
-
 
 const App = (props: { children: ReactNode }) => {
     const projectId = "a09890b34dc1551c2534337dbc22de8c"
@@ -57,10 +55,8 @@ const App = (props: { children: ReactNode }) => {
 
     const { walletProvider } = useWeb3ModalProvider()
 
-
-
     const { theme, toggleTheme } = useTheme(modal === undefined)
-    const { connectWallet, graviola } = useWeb3()
+    const { connectWallet, graviola, seasonsGovernor } = useWeb3()
     const [loading, setLoading] = useState<boolean>(true)
 
     // Contract data
@@ -115,11 +111,11 @@ const App = (props: { children: ReactNode }) => {
             console.log("[App] fetched collection ", collection) // DEBUG
             collection.length < 5
                 ? (() => {
-                    setCollection(new Array(5).fill(fallbackNFT))
-                    console.warn(
-                        "Collection is smaller than (5). Using fallback collection",
-                    )
-                })()
+                      setCollection(new Array(5).fill(fallbackNFT))
+                      console.warn(
+                          "Collection is smaller than (5). Using fallback collection",
+                      )
+                  })()
                 : setCollection((prev) => [...prev, ...collection])
 
             const raritiesData = rarityGroupsData.reduce<
@@ -146,6 +142,10 @@ const App = (props: { children: ReactNode }) => {
             setRarities(raritiesData)
             setLoading(false)
             console.log("[App] collection loaded!")
+
+            const candidateListSize =
+                await seasonsGovernor.getCandidateListSize()
+            console.log("[CandidateList size]", candidateListSize)
         }
 
         fetchCollection()
