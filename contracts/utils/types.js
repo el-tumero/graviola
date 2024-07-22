@@ -4,7 +4,8 @@ const BUILD_PATH = "./out"
 
 const allFiles = [
     `${BUILD_PATH}/GraviolaMain.sol/Graviola.json`,
-    `${BUILD_PATH}/GraviolaWell.sol/GraviolaWell.json`
+    `${BUILD_PATH}/GraviolaWell.sol/GraviolaWell.json`,
+    `${BUILD_PATH}/GraviolaSeasonsGovernor.sol/GraviolaSeasonsGovernor.json`,
 ]
 
 async function generateContractTypes() {
@@ -13,12 +14,12 @@ async function generateContractTypes() {
         filesToProcess: allFiles,
         allFiles,
         outDir: "typechain-types",
-        target: "ethers-v6"
+        target: "ethers-v6",
     })
 }
 
 if (require.main === module) {
-    (async () => {
+    ;(async () => {
         await generateContractTypes()
     })()
 }

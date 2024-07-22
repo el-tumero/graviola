@@ -5,8 +5,10 @@ module.exports = {
     solidity: "0.8.24",
     networks: {
         hardhat: {
-            auto: false,
-            interval: 5000,
+            mining: {
+                auto: false,
+                interval: 3000,
+            },
         },
     },
 }
