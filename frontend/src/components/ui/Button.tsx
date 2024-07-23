@@ -31,7 +31,9 @@ const Button = ({
             <button disabled={disabled}>
                 <p className="font-content">{text}</p>
             </button>
-            {arrowIcon && icons.arrow}
+            <div className="w-6 h-6 flex justify-center items-center">
+                {arrowIcon && icons.arrow}
+            </div>
         </div>
     )
 }
