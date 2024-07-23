@@ -30,7 +30,8 @@ const Drops = () => {
     const contractNFTs = graviolaContext.collection as NFT[]
     const rGroups = graviolaContext.rarities as RaritiesData
 
-    const [filterMode, setFilterMode] = useState<DropFilterMode>("Everyone's Drops")
+    const [filterMode, setFilterMode] =
+        useState<DropFilterMode>("Everyone's Drops")
     const [ownedTokensIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [isLoading, setIsLoading] = useState<boolean>(true)
     const [fetchingCollection, setFetchingCollection] = useState<boolean>(false)
@@ -43,7 +44,9 @@ const Drops = () => {
         setFetchingCollection(true)
         let userOwnedTokens
         if (address) {
-            userOwnedTokens = await graviolaContext.contract?.ownedTokens(ethers.getAddress(address))
+            userOwnedTokens = await graviolaContext.contract?.ownedTokens(
+                ethers.getAddress(address),
+            )
         }
         userOwnedTokens &&
             userOwnedTokens.forEach((token) => {
@@ -72,7 +75,8 @@ const Drops = () => {
                 const scrollTop = scrollContainerRef.current.scrollTop
                 const scrollHeight = scrollContainerRef.current.scrollHeight
                 const clientHeight = scrollContainerRef.current.clientHeight
-                const scrolledPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100
+                const scrolledPercentage =
+                    (scrollTop / (scrollHeight - clientHeight)) * 100
 
                 // console.log("scroll ", scrolledPercentage)
                 if (scrolledPercentage < scrollThresholdPerc) {
@@ -87,7 +91,8 @@ const Drops = () => {
         const scrollContainer = scrollContainerRef.current
         scrollContainer?.addEventListener("scroll", handleScroll)
 
-        return () => scrollContainer?.removeEventListener("scroll", handleScroll)
+        return () =>
+            scrollContainer?.removeEventListener("scroll", handleScroll)
     }, [])
 
     return (
@@ -99,7 +104,11 @@ const Drops = () => {
 
                 {!contentReady ? (
                     <SectionContainer additionalClasses="self-center w-fit justify-center">
-                        {isLoading ? <p>Fetching drops...</p> : <p>You need to connect your wallet to see Drops</p>}
+                        {isLoading ? (
+                            <p>Fetching drops...</p>
+                        ) : (
+                            <p>You need to connect your wallet to see Drops</p>
+                        )}
                     </SectionContainer>
                 ) : (
                     <>
@@ -124,11 +133,18 @@ const Drops = () => {
                                 </p>
                             </div>
                             <div className="flex gap-3">
-                                <Button text="Refresh" onClick={() => fetchCollectionTokens()} disabled={fetchingCollection} />
+                                <Button
+                                    text="Refresh"
+                                    onClick={() => fetchCollectionTokens()}
+                                    disabled={fetchingCollection}
+                                />
                                 <Button
                                     text={`See ${filterMode === "My Drops" ? "all drops" : "my drops only"}`}
                                     onClick={() => {
-                                        const invertedCollectionMode = filterMode === "My Drops" ? "Everyone's Drops" : "My Drops"
+                                        const invertedCollectionMode =
+                                            filterMode === "My Drops"
+                                                ? "Everyone's Drops"
+                                                : "My Drops"
                                         setFilterMode(invertedCollectionMode)
                                     }}
                                 />
@@ -136,7 +152,12 @@ const Drops = () => {
                         </div>
 
                         <div
-                            className={cl("grid gap-4 w-full", "max-sm:grid-cols-2", "max-md:grid-cols-3 md:grid-cols-4", "xl:grid-cols-6")}
+                            className={cl(
+                                "grid gap-4 w-full",
+                                "max-sm:grid-cols-2",
+                                "max-md:grid-cols-3 md:grid-cols-4",
+                                "xl:grid-cols-6",
+                            )}
                         >
                             <CollectionList
                                 contractNFTs={contractNFTs}
@@ -154,7 +175,7 @@ const Drops = () => {
                                             "rounded-lg bg-light-bgPrimary dark:bg-dark-bgPrimary",
                                             "border border-light-border dark:border-dark-border",
                                             "hover:bg-light-border/75 dark:hover:bg-dark-border/75",
-                                            "-rotate-90"
+                                            "-rotate-90",
                                         )}
                                         onClick={() => scrollToTop()}
                                     >
@@ -180,10 +201,22 @@ const CollectionList = (props: {
         <>
             {props.contractNFTs.map((nft: NFT, idx) => {
                 const percRarity = formatBpToPercentage(nft.attributes[0].value)
-                const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
-                const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
-                const [, rarityData] = getRarityFromPerc(percRarity, props.rGroups)
-                if (props.collectionMode === "My Drops" && !props.ownedTokenIds.includes(idx)) {
+                const keywordsArray: string[] = nft.description
+                    .split(":")
+                    .pop()!
+                    .trim()
+                    .split(",")
+                const keywords: string[] = keywordsArray.map((keyword) =>
+                    keyword.trim(),
+                )
+                const [, rarityData] = getRarityFromPerc(
+                    percRarity,
+                    props.rGroups,
+                )
+                if (
+                    props.collectionMode === "My Drops" &&
+                    !props.ownedTokenIds.includes(idx)
+                ) {
                     return null
                 } else {
                     return (
@@ -204,12 +237,25 @@ const CollectionList = (props: {
                                     borderColor: rarityData.color,
                                 }}
                             >
-                                <BlockNFT nftData={nft} glowColor={"auto"} additionalClasses={`w-fit h-fit max-w-[14em]`} />
+                                <BlockNFT
+                                    nftData={nft}
+                                    glowColor={"auto"}
+                                    additionalClasses={`w-fit h-fit max-w-[14em]`}
+                                />
                             </div>
 
                             {/* Stats, info */}
-                            <div className={cl("flex flex-col gap-1 h-full justify-between items-between")}>
-                                <div className={cl("flex flex-col w-full h-fit gap-1", "justify-start items-start")}>
+                            <div
+                                className={cl(
+                                    "flex flex-col gap-1 h-full justify-between items-between",
+                                )}
+                            >
+                                <div
+                                    className={cl(
+                                        "flex flex-col w-full h-fit gap-1",
+                                        "justify-start items-start",
+                                    )}
+                                >
                                     <p>id: {nft.id}</p>
                                     <p>
                                         Rarity:{" "}
@@ -223,10 +269,18 @@ const CollectionList = (props: {
                                         </span>
                                     </p>
                                 </div>
-                                <div className={cl("flex flex-wrap w-full h-fit", "gap-1 justify-start items-start")}>
+                                <div
+                                    className={cl(
+                                        "flex flex-wrap w-full h-fit",
+                                        "gap-1 justify-start items-start",
+                                    )}
+                                >
                                     {keywords.map((keyword, idx) => (
                                         <span
-                                            className={cl("py-1 px-2 rounded-md", "bg-light-bgLight/75 dark:bg-dark-bgLight/75")}
+                                            className={cl(
+                                                "py-1 px-2 rounded-md",
+                                                "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
+                                            )}
                                             key={idx}
                                         >
                                             {keyword}

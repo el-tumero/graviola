@@ -21,7 +21,10 @@ const Error = () => {
                     <p>Something went wrong.</p>
                 </div>
                 <div className="w-full h-px bg-light-border dark:bg-dark-border"></div>
-                <Button onClick={() => navigate(routerPaths.home)} text="Go home" />
+                <Button
+                    onClick={() => navigate(routerPaths.home)}
+                    text="Go home"
+                />
             </div>
         </FullscreenContainer>
     )

@@ -85,10 +85,12 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             let userOwnedTokens
             if (address) {
-                userOwnedTokens = await contract.ownedTokens(ethers.getAddress(address))
+                userOwnedTokens = await contract.ownedTokens(
+                    ethers.getAddress(address),
+                )
             }
             userOwnedTokens &&
                 userOwnedTokens.forEach((token: bigint) => {
@@ -107,7 +109,11 @@ const TradeUp = () => {
 
                 {!contentReady ? (
                     <SectionContainer additionalClasses="self-center w-fit justify-center">
-                        {status === "loading" ? <p>Loading...</p> : <p>You need to connect your wallet first!</p>}
+                        {status === "loading" ? (
+                            <p>Loading...</p>
+                        ) : (
+                            <p>You need to connect your wallet first!</p>
+                        )}
                     </SectionContainer>
                 ) : (
                     <div className="flex flex-col gap-3 justify-between items-center h-full flex-grow">
@@ -120,28 +126,67 @@ const TradeUp = () => {
                             )}
                         >
                             {/* Owned NFTs (Left panel) */}
-                            <div className={cl("flex basis-2/3", "flex-col", "p-6 max-sm:p-3")}>
-                                <div className={cl("flex-grow w-full h-0 overflow-auto", "rounded-xl")}>
+                            <div
+                                className={cl(
+                                    "flex basis-2/3",
+                                    "flex-col",
+                                    "p-6 max-sm:p-3",
+                                )}
+                            >
+                                <div
+                                    className={cl(
+                                        "flex-grow w-full h-0 overflow-auto",
+                                        "rounded-xl",
+                                    )}
+                                >
                                     <div
                                         className={cl(
                                             "grid gap-3 auto-rows-min",
                                             "max-sm:grid-cols-3",
                                             "max-md:grid-cols-4 md:grid-cols-5",
-                                        )} > {collection.map((nft: NFT, i) => {
-                                            const percRarity = formatBpToPercentage(nft.attributes[0].value)
-                                            const keywordsArray: string[] = nft.description.split(":").pop()!.trim().split(",")
-                                            const keywords: string[] = keywordsArray.map((keyword) => keyword.trim())
-                                            const [rarityLevel] = getRarityFromPerc(percRarity, rGroups)
+                                        )}
+                                    >
+                                        {" "}
+                                        {collection.map((nft: NFT, i) => {
+                                            const percRarity =
+                                                formatBpToPercentage(
+                                                    nft.attributes[0].value,
+                                                )
+                                            const keywordsArray: string[] =
+                                                nft.description
+                                                    .split(":")
+                                                    .pop()!
+                                                    .trim()
+                                                    .split(",")
+                                            const keywords: string[] =
+                                                keywordsArray.map((keyword) =>
+                                                    keyword.trim(),
+                                                )
+                                            const [rarityLevel] =
+                                                getRarityFromPerc(
+                                                    percRarity,
+                                                    rGroups,
+                                                )
 
-                                            if (selectedGroup !== null && selectedGroup !== rarityLevel) {
+                                            if (
+                                                selectedGroup !== null &&
+                                                selectedGroup !== rarityLevel
+                                            ) {
                                                 return null
-                                            } else if (!ownedTokenIds.includes(i)) {
+                                            } else if (
+                                                !ownedTokenIds.includes(i)
+                                            ) {
                                                 return null
                                             } else {
                                                 return (
                                                     <div
                                                         key={i}
-                                                        onClick={() => handleNFTClick(i, rarityLevel)}
+                                                        onClick={() =>
+                                                            handleNFTClick(
+                                                                i,
+                                                                rarityLevel,
+                                                            )
+                                                        }
                                                         className={cn(
                                                             // Fancy NFT hover selection animations & borders
                                                             "flex flex-col justify-center items-center rounded-xl",
@@ -149,20 +194,34 @@ const TradeUp = () => {
                                                             "border border-light-border dark:border-dark-border rounded-xl",
                                                             "hover:border-light-text/40 dark:hover:border-dark-text/40",
                                                             "hover:scale-95 transition-transform duration-300",
-                                                            selectedIds.includes(i) ? "opacity-50 scale-95" : "opacity-100",
+                                                            selectedIds.includes(
+                                                                i,
+                                                            )
+                                                                ? "opacity-50 scale-95"
+                                                                : "opacity-100",
                                                         )}
                                                     >
-                                                        <div className={cl("m-4")}>
+                                                        <div
+                                                            className={cl(
+                                                                "m-4",
+                                                            )}
+                                                        >
                                                             <BlockNFT
                                                                 nftData={nft}
-                                                                glowColor={"auto"}
+                                                                glowColor={
+                                                                    "auto"
+                                                                }
                                                                 disableMetadataOnHover
                                                                 additionalClasses={`w-fit h-fit max-w-[12em]`}
                                                             />
                                                         </div>
                                                         <div className="flex flex-col gap-2 justify-center items-center">
                                                             {/* Keywords */}
-                                                            <KeywordBlocks keywords={keywords} />
+                                                            <KeywordBlocks
+                                                                keywords={
+                                                                    keywords
+                                                                }
+                                                            />
                                                         </div>
                                                     </div>
                                                 )
@@ -173,17 +232,36 @@ const TradeUp = () => {
                             </div>
 
                             {/* TradeUp Result (Right panel) */}
-                            <div className={cl("flex max-md:flex-col basis-1/3", "justify-center items-center", "p-6 max-sm:p-3")}>
+                            <div
+                                className={cl(
+                                    "flex max-md:flex-col basis-1/3",
+                                    "justify-center items-center",
+                                    "p-6 max-sm:p-3",
+                                )}
+                            >
                                 {selectedIds.length === 0 ? (
                                     <p>Select the NFTs you want to trade</p>
                                 ) : (
-                                    <TradeUpGenerateContainer active={selectedIds.length === 3} rGroups={rGroups}>
+                                    <TradeUpGenerateContainer
+                                        active={selectedIds.length === 3}
+                                        rGroups={rGroups}
+                                    >
                                         {selectedIds.map((id, i) => {
                                             const randBase = Math.random()
-                                            const randRotate = Math.floor(randBase * 30) + 1 // 15-60deg rotate
-                                            const randSign = randBase < 0.5 ? -1 : 1
-                                            const percRarity = formatBpToPercentage(collection[id].attributes[0].value)
-                                            const [, rGroupData] = getRarityFromPerc(percRarity, rGroups)
+                                            const randRotate =
+                                                Math.floor(randBase * 30) + 1 // 15-60deg rotate
+                                            const randSign =
+                                                randBase < 0.5 ? -1 : 1
+                                            const percRarity =
+                                                formatBpToPercentage(
+                                                    collection[id].attributes[0]
+                                                        .value,
+                                                )
+                                            const [, rGroupData] =
+                                                getRarityFromPerc(
+                                                    percRarity,
+                                                    rGroups,
+                                                )
                                             return (
                                                 <div
                                                     key={i}
@@ -195,11 +273,18 @@ const TradeUp = () => {
                                                         "hover:cursor-pointer",
                                                     )}
                                                     style={{
-                                                        ...getRarityBorder(rGroupData, true).style,
+                                                        ...getRarityBorder(
+                                                            rGroupData,
+                                                            true,
+                                                        ).style,
                                                         zIndex: `${selectedIds.length}`,
                                                         rotate: `${randSign * randRotate}deg`,
                                                     }}
-                                                    onClick={() => handleSelectedNFTClick(id)}
+                                                    onClick={() =>
+                                                        handleSelectedNFTClick(
+                                                            id,
+                                                        )
+                                                    }
                                                 >
                                                     <BlockNFT
                                                         nftData={collection[id]}
@@ -219,7 +304,12 @@ const TradeUp = () => {
                         <SectionContainer additionalClasses="justify-between items-center">
                             <div className="flex flex-wrap justify-center items-center">
                                 <span>Status: </span>
-                                <span className={cl("p-3 max-sm:mt-3 rounded-xl", "bg-light-border/75 dark:bg-dark-border/75")}>
+                                <span
+                                    className={cl(
+                                        "p-3 max-sm:mt-3 rounded-xl",
+                                        "bg-light-border/75 dark:bg-dark-border/75",
+                                    )}
+                                >
                                     {txMsg}
                                 </span>
                             </div>
@@ -229,7 +319,9 @@ const TradeUp = () => {
                                 disabled={false}
                                 onClick={() => requestGen(selectedIds)}
                                 additionalClasses={
-                                    selectedIds.length === 3 ? "border border-light-text/25 dark:border-dark-text/25" : "border-none"
+                                    selectedIds.length === 3
+                                        ? "border border-light-text/25 dark:border-dark-text/25"
+                                        : "border-none"
                                 }
                             />
                         </SectionContainer>
@@ -241,7 +333,11 @@ const TradeUp = () => {
 }
 
 // Wrapper (ready = 3/3 Tokens selected)
-const TradeUpGenerateContainer = (props: { children: React.ReactNode; active: boolean; rGroups: RaritiesData }) => {
+const TradeUpGenerateContainer = (props: {
+    children: React.ReactNode
+    active: boolean
+    rGroups: RaritiesData
+}) => {
     const rarityAnimBorder = useRandomRarityBorder(true, 750, props.rGroups)
     return (
         <div
@@ -263,7 +359,13 @@ const KeywordBlocks = (props: { keywords: string[] }) => {
         <div className="flex flex-wrap gap-1 justify-center items-center text-sm mx-1 mb-3">
             {props.keywords.map((keyword: string, idx: number) => {
                 return (
-                    <div key={idx} className={cl("rounded-lg py-1 px-1.5 border", "border-light-border dark:border-dark-border")}>
+                    <div
+                        key={idx}
+                        className={cl(
+                            "rounded-lg py-1 px-1.5 border",
+                            "border-light-border dark:border-dark-border",
+                        )}
+                    >
                         <p>{keyword}</p>
                     </div>
                 )

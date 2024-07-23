@@ -9,7 +9,13 @@ interface ButtonProps {
     arrowIcon?: boolean
 }
 
-const Button = ({ text, onClick, disabled = false, arrowIcon = false, additionalClasses }: ButtonProps) => {
+const Button = ({
+    text,
+    onClick,
+    disabled = false,
+    arrowIcon = false,
+    additionalClasses,
+}: ButtonProps) => {
     return (
         <div
             onClick={() => onClick()}

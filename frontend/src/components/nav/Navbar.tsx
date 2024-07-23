@@ -41,27 +41,53 @@ const Navbar = () => {
         </NavElement>,
 
         <NavElement onClick={() => openURL(links.repo)}>
-            <div className={cl("flex w-min hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>{icons.github}</div>
+            <div
+                className={cl(
+                    "flex w-min hover:cursor-pointer",
+                    "max-lg:w-full justify-center items-center",
+                )}
+            >
+                {icons.github}
+            </div>
         </NavElement>,
 
         <NavElement onClick={() => openURL(links.discord)}>
-            <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+            <div
+                className={cl(
+                    "flex w-auto h-6 hover:cursor-pointer",
+                    "max-lg:w-full justify-center items-center",
+                )}
+            >
                 {icons.discordLogo}
             </div>
         </NavElement>,
 
         <NavElement onClick={() => toggleTheme()}>
-            <div className={cl("flex justify-center items-center", "w-full h-6 cursor-pointer", "text-light-text dark:text-dark-text")}>
+            <div
+                className={cl(
+                    "flex justify-center items-center",
+                    "w-full h-6 cursor-pointer",
+                    "text-light-text dark:text-dark-text",
+                )}
+            >
                 {theme === "dark" ? icons.darkTheme : icons.lightTheme}
             </div>
         </NavElement>,
 
-        isDevMode ?
+        isDevMode ? (
             <NavElement onClick={() => connectDevWallet()}>
-                <div className={cl("flex w-auto h-6 hover:cursor-pointer", "max-lg:w-full justify-center items-center")}>
+                <div
+                    className={cl(
+                        "flex w-auto h-6 hover:cursor-pointer",
+                        "max-lg:w-full justify-center items-center",
+                    )}
+                >
                     DEV
                 </div>
-            </NavElement> : <></>
+            </NavElement>
+        ) : (
+            <></>
+        ),
     ]
 
     return (
@@ -72,7 +98,8 @@ const Navbar = () => {
                     "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
                     "w-screen backdrop-blur-lg",
                     "bg-transparent",
-                    mobileListVisible && "border-b border-light-border dark:border-dark-border",
+                    mobileListVisible &&
+                        "border-b border-light-border dark:border-dark-border",
                 )}
             >
                 <div
@@ -80,7 +107,8 @@ const Navbar = () => {
                         "flex justify-between items-center",
                         "py-2 px-[2.5%]",
                         "select-none font-content",
-                        !mobileListVisible && "border-b border-light-border dark:border-dark-border",
+                        !mobileListVisible &&
+                            "border-b border-light-border dark:border-dark-border",
                     )}
                 >
                     <div
@@ -92,14 +120,27 @@ const Navbar = () => {
                         )}
                         onClick={() => navigate(routerPaths.home)}
                     >
-                        <div className={cl("flex justify-center items-center", "h-auto w-fit rounded-xl")}>
-                            <img className="w-5 h-auto aspect-auto mb-1 p-0.5" src={Logo} />
+                        <div
+                            className={cl(
+                                "flex justify-center items-center",
+                                "h-auto w-fit rounded-xl",
+                            )}
+                        >
+                            <img
+                                className="w-5 h-auto aspect-auto mb-1 p-0.5"
+                                src={Logo}
+                            />
                         </div>
-                        <p className="font-semibold font-mono text-accentDark dark:text-accent opacity-100">graviolaNFT</p>
+                        <p className="font-semibold font-mono text-accentDark dark:text-accent opacity-100">
+                            graviolaNFT
+                        </p>
                     </div>
 
                     <div className="max-lg:hidden lg:visible">
-                        <NavListDesktop navItems={navItems} mobileStyles={false} />
+                        <NavListDesktop
+                            navItems={navItems}
+                            mobileStyles={false}
+                        />
                     </div>
 
                     {/* Mobile navbar icon */}
@@ -118,8 +159,17 @@ const Navbar = () => {
                 </div>
 
                 {mobileListVisible && (
-                    <div className={cl("flex flex-col w-full h-fit", "bg-transparent", "transition-all duration-300")}>
-                        <NavListDesktop navItems={navItems} mobileStyles={true} />
+                    <div
+                        className={cl(
+                            "flex flex-col w-full h-fit",
+                            "bg-transparent",
+                            "transition-all duration-300",
+                        )}
+                    >
+                        <NavListDesktop
+                            navItems={navItems}
+                            mobileStyles={true}
+                        />
                     </div>
                 )}
             </div>

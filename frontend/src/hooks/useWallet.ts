@@ -1,12 +1,12 @@
-import { Eip1193Provider, Wallet } from "ethers";
-import { JsonRpcProvider } from "ethers";
-import { setSigner, connectContractsToSigner, graviolaContract } from "../web3";
+import { Eip1193Provider, Wallet } from "ethers"
+import { JsonRpcProvider } from "ethers"
+import { setSigner, connectContractsToSigner, graviolaContract } from "../web3"
 
 import localhostConfig from "../../../contracts/localhost-config.json"
-import { useAppSelector, useAppDispatch } from '../app/hooks'
-import { setConnected, setAddress } from "../features/wallet/walletSlice";
-import { Web3Address } from "../features/wallet/walletSlice";
-import { BrowserProvider } from "ethers";
+import { useAppSelector, useAppDispatch } from "../app/hooks"
+import { setConnected, setAddress } from "../features/wallet/walletSlice"
+import { Web3Address } from "../features/wallet/walletSlice"
+import { BrowserProvider } from "ethers"
 
 export default function useWallet() {
     const isConnected = useAppSelector((state) => state.wallet.isConnected)
@@ -32,7 +32,6 @@ export default function useWallet() {
         connectContractsToSigner()
         dispatch(setConnected(true))
     }
-
 
     return { connectWallet, connectDevWallet, isConnected, address, graviola }
 }

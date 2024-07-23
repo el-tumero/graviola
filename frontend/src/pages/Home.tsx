@@ -33,11 +33,15 @@ const Home = () => {
 
             <ContentContainer additionalClasses="flex-col">
                 <div className="flex flex-col p-4 gap-3">
-
-                    <Popup additionalClasses="w-full max-w-full relative top-0 right-0 z-2" onClickClose={() => { }} disableCloseButton type="neutral" message={`
+                    <Popup
+                        additionalClasses="w-full max-w-full relative top-0 right-0 z-2"
+                        onClickClose={() => {}}
+                        disableCloseButton
+                        type="neutral"
+                        message={`
                         Graviola is growing rapidly; we're introducing big changes lately.
-                        If you encounter bugs or unexpected errors, please open an Issue in Github.`
-                    } />
+                        If you encounter bugs or unexpected errors, please open an Issue in Github.`}
+                    />
 
                     <SectionContainer>
                         <div
@@ -48,23 +52,36 @@ const Home = () => {
                             )}
                         >
                             <h1 className="text-accent font-title font-semibold text-2xl">
-                                Unique, dynamically generated character portrait NFTs
+                                Unique, dynamically generated character portrait
+                                NFTs
                             </h1>
                             <h2 className="text-light-text dark:text-dark-text text-lg">
-                                Own a piece of our limited-time, algorithmically generated character NFTs! Each one is a fun, unique
-                                creation blending art and tech. It's like collecting digital trading cards with a twist. Dive in, grab a
-                                quirky NFT, and join our chill community of enthusiasts
+                                Own a piece of our limited-time, algorithmically
+                                generated character NFTs! Each one is a fun,
+                                unique creation blending art and tech. It's like
+                                collecting digital trading cards with a twist.
+                                Dive in, grab a quirky NFT, and join our chill
+                                community of enthusiasts
                             </h2>
                         </div>
 
-                        <div className={cl("flex max-sm:justify-center justify-end items-center w-1/2 max-sm:w-full sm:w-1/3")}>
+                        <div
+                            className={cl(
+                                "flex max-sm:justify-center justify-end items-center w-1/2 max-sm:w-full sm:w-1/3",
+                            )}
+                        >
                             <AutoBlockNFT />
                         </div>
                     </SectionContainer>
 
                     {/* Header buttons - get yours now, browse collection */}
                     <div>
-                        <div className={cl(["flex justify-end items-center gap-4 w-full", "max-sm:flex-col mt-4 mb-8"])}>
+                        <div
+                            className={cl([
+                                "flex justify-end items-center gap-4 w-full",
+                                "max-sm:flex-col mt-4 mb-8",
+                            ])}
+                        >
                             <Button
                                 text="Get yours now!"
                                 onClick={() => navigate(routerPaths.generate)}
@@ -87,16 +104,27 @@ const Home = () => {
                     </div>
 
                     <SectionContainer>
-                        <div className={cl("flex flex-col gap-3 justify-start items-start", "max-sm:w-full w-1/3 h-full text-lg")}>
+                        <div
+                            className={cl(
+                                "flex flex-col gap-3 justify-start items-start",
+                                "max-sm:w-full w-1/3 h-full text-lg",
+                            )}
+                        >
                             <SectionTitle
                                 title="Inspect to see more details"
                                 secondaryContent={
                                     <p>
-                                        The metadata object contains valuable information about your image. Hover any NFT on this website to
-                                        see its metadata. Learn more about meta properties{" "}
+                                        The metadata object contains valuable
+                                        information about your image. Hover any
+                                        NFT on this website to see its metadata.
+                                        Learn more about meta properties{" "}
                                         <span
-                                            onClick={() => navigate(routerPaths.generate)}
-                                            className={cl("underline underline-offset-2 hover:cursor-pointer hover:decoration-accent")}
+                                            onClick={() =>
+                                                navigate(routerPaths.generate)
+                                            }
+                                            className={cl(
+                                                "underline underline-offset-2 hover:cursor-pointer hover:decoration-accent",
+                                            )}
                                         >
                                             {/* TODO: Make static page with All metadata attributes listed and explained */}
                                             here
@@ -126,7 +154,10 @@ const Home = () => {
                     </SectionContainer>
 
                     <SectionContainer additionalClasses="flex-col">
-                        <SectionTitle title="Ready to test your luck?" secondaryContent="Discover your odds for each rarity tier!" />
+                        <SectionTitle
+                            title="Ready to test your luck?"
+                            secondaryContent="Discover your odds for each rarity tier!"
+                        />
                         <div
                             className={cl(
                                 "xl:flex xl:justify-center xl:items-center",
@@ -136,36 +167,50 @@ const Home = () => {
                                 "bg-light-border/30 dark:bg-dark-border/30",
                             )}
                         >
-
                             {/* Display one preview NFT of each Rarity Level */}
-                            {Object.entries(rGroups).map(([rLevel, rarityGroup]: [string, RarityGroupData], i) => {
-                                const rarityLevel = rLevel as RarityLevel
-                                return (
-                                    <div
-                                        className="flex flex-col gap-2 justify-center items-center hover:scale-105 transition-transform duration-300"
-                                        key={i}
-                                    >
-                                        <div>
-                                            <BlockNFT
-                                                nftData={nftRarityScaleArr[i]}
-                                                glowColor={rarityLevel}
-                                                additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
-                                            />
+                            {Object.entries(rGroups).map(
+                                (
+                                    [rLevel, rarityGroup]: [
+                                        string,
+                                        RarityGroupData,
+                                    ],
+                                    i,
+                                ) => {
+                                    const rarityLevel = rLevel as RarityLevel
+                                    return (
+                                        <div
+                                            className="flex flex-col gap-2 justify-center items-center hover:scale-105 transition-transform duration-300"
+                                            key={i}
+                                        >
+                                            <div>
+                                                <BlockNFT
+                                                    nftData={
+                                                        nftRarityScaleArr[i]
+                                                    }
+                                                    glowColor={rarityLevel}
+                                                    additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
+                                                />
+                                            </div>
+                                            <div className="flex flex-col justify-center items-center w-fit h-fit">
+                                                <p
+                                                    className="mt-2 font-normal font-content"
+                                                    style={{
+                                                        color: rarityGroup.color,
+                                                    }}
+                                                >
+                                                    {rarityGroup.name}
+                                                </p>
+                                                <span>
+                                                    {rarityGroup.endRange -
+                                                        rarityGroup.startRange +
+                                                        1}
+                                                    %
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col justify-center items-center w-fit h-fit">
-                                            <p
-                                                className="mt-2 font-normal font-content"
-                                                style={{
-                                                    color: rarityGroup.color,
-                                                }}
-                                            >
-                                                {rarityGroup.name}
-                                            </p>
-                                            <span>{rarityGroup.endRange - rarityGroup.startRange + 1}%</span>
-                                        </div>
-                                    </div>
-                                )
-                            })}
+                                    )
+                                },
+                            )}
                         </div>
                     </SectionContainer>
 
@@ -182,7 +227,13 @@ const Home = () => {
                         />
                         <div className="w-min justify-end items-center">
                             <div
-                                onClick={() => window.open(links.ora, "_blank", "noopener,noreferrer")}
+                                onClick={() =>
+                                    window.open(
+                                        links.ora,
+                                        "_blank",
+                                        "noopener,noreferrer",
+                                    )
+                                }
                                 className={cl(
                                     "flex w-fit h-fit gap-1 justify-center items-center cursor-pointer",
                                     "py-6 px-3 rounded-xl hover:bg-light-border/30 dark:hover:bg-dark-border/30",
@@ -205,7 +256,13 @@ const Home = () => {
                             `}
                         />
                         <div
-                            onClick={() => window.open(links.discord, "_blank", "noopener,noreferrer")}
+                            onClick={() =>
+                                window.open(
+                                    links.discord,
+                                    "_blank",
+                                    "noopener,noreferrer",
+                                )
+                            }
                             className={cl(
                                 "flex w-fit h-fit p-3 rounded-xl cursor-pointer",
                                 "hover:bg-light-border/30 dark:hover:bg-dark-border/30",

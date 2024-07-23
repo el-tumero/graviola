@@ -6,7 +6,11 @@ export interface NavElementProps {
     additionalClasses?: string
 }
 
-const NavElement = ({ children, onClick, additionalClasses }: NavElementProps) => {
+const NavElement = ({
+    children,
+    onClick,
+    additionalClasses,
+}: NavElementProps) => {
     return (
         <div
             className={cl(

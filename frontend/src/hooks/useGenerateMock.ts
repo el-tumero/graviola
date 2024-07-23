@@ -1,12 +1,12 @@
-import { useContext, useState, useEffect } from "react";
-import { GraviolaContext } from "../contexts/GraviolaContext";
-import { NFTExt } from "../pages/Generate";
-import { RaritiesData } from "../types/RarityGroup";
-import { TransactionStatus } from "../types/TransactionStatus";
-import { getRarityFromPerc } from "../utils/getRarityData";
-import { TxStatusMessagesMap } from "../utils/statusMessages";
-import { fallbackNFT } from "../data/fallbacks";
-import { formatBpToPercentage } from "../utils/format";
+import { useContext, useState, useEffect } from "react"
+import { GraviolaContext } from "../contexts/GraviolaContext"
+import { NFTExt } from "../pages/Generate"
+import { RaritiesData } from "../types/RarityGroup"
+import { TransactionStatus } from "../types/TransactionStatus"
+import { getRarityFromPerc } from "../utils/getRarityData"
+import { TxStatusMessagesMap } from "../utils/statusMessages"
+import { fallbackNFT } from "../data/fallbacks"
+import { formatBpToPercentage } from "../utils/format"
 
 /**
  * Mock hook for offline UX testing and error handling by the web
@@ -15,7 +15,7 @@ import { formatBpToPercentage } from "../utils/format";
  * Step 2 = onMint callback mock
  * Step 3 = "Almost ready"
  * Step 4 = Result display, state
- * 
+ *
  * Calling with Step 1 on 'false' and Step 2 on 'true' will
  * always terminate the mock job on Step 1 and return the Error
  */
@@ -26,14 +26,14 @@ interface MockBehaviorSettings {
     doNotResetOnError?: boolean
 }
 
-export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavior: MockBehaviorSettings) {
-
+export default function useGenerateMock(
+    txMessages: TxStatusMessagesMap,
+    behavior: MockBehaviorSettings,
+) {
     const MOCK_STEP_TIMEOUT_MS = 7000 // Time between steps
     const RESET_ON_ERR_TIMEOUT_MS = 4000
 
-    const {
-        rarities: rGroups,
-    } = useContext(GraviolaContext) as {
+    const { rarities: rGroups } = useContext(GraviolaContext) as {
         rarities: RaritiesData
     }
 
@@ -49,7 +49,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
 
     // Tx function
     const txFunc = () => {
-
         console.log("[useGenerate MOCK] tx init.")
         let run = true
 
@@ -67,14 +66,14 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
             console.log("[useGenerate MOCK] onMint tick")
             setTxStatus("MINTED")
             run = requireStep(2, "ERROR")
-        }, MOCK_STEP_TIMEOUT_MS * 2);
+        }, MOCK_STEP_TIMEOUT_MS * 2)
 
         setTimeout(() => {
             if (!run) return
             console.log("[useGenerate MOCK] onFinishing")
             setTxStatus("FINISHING")
             run = requireStep(3, "ERROR")
-        }, MOCK_STEP_TIMEOUT_MS * 3);
+        }, MOCK_STEP_TIMEOUT_MS * 3)
 
         setTimeout(() => {
             if (!run) return
@@ -114,8 +113,11 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
     }
 
     const requestGen = async () => {
-        if (behavior.performSteps.length === 0 || behavior.performSteps.length < 4) {
-            console.error('[useGenerate MOCK] invalid behavior arg')
+        if (
+            behavior.performSteps.length === 0 ||
+            behavior.performSteps.length < 4
+        ) {
+            console.error("[useGenerate MOCK] invalid behavior arg")
             return
         }
         console.log("[useGenerate MOCK] requestGen")
@@ -133,6 +135,6 @@ export default function useGenerateMock(txMessages: TxStatusMessagesMap, behavio
         txErr,
         rolledNFT,
         requestGen,
-        closeTxErr
+        closeTxErr,
     }
 }
