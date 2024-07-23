@@ -6,11 +6,12 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import candJson from "../../../contracts/candidates.json"
-import { useContext, useState } from "react"
+import { ChangeEvent, ReactNode, Fragment, useContext, useState, useEffect } from "react"
 import { getKeyword } from "../utils/getKeyword"
 import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
+import Button from "../components/ui/Button"
 
 type ActivePage = "Voting" | "Archive"
 
@@ -35,10 +36,94 @@ enum SortingType {
     // BY_TRENDING
 }
 
+const PopupContainer = (props: { children: ReactNode }) => {
+    return (
+        <div className={cl(
+            "flex w-2/3 h-fit top-1/2 left-1/2 -translate-x-1/2 translate-y-[90%]",
+            "absolute",
+            "p-3 rounded-lg border border-light-border dark:border-dark-border",
+            "bg-light-bgPrimary/75 dark:bg-dark-bgPrimary/75 backdrop-blur-3xl",
+            "shadow-md z-[99]"
+        )}>{props.children}
+        </div>
+    )
+}
+
+const AddKeywordForm = (props: { onClickClose: () => void }) => {
+
+    const KEYWORD_MIN_LENGTH = 3
+    const [keyword, setKeyword] = useState<string>("")
+    const [valid, setValid] = useState<boolean>(false)
+    const displayErrMsg = (keyword.length > KEYWORD_MIN_LENGTH && !valid)
+
+    // TODO: Need better regex for keywords later
+    const isValid = (str: string) => /^[a-z]{3,32}$/.test(str)
+
+    useEffect(() => {
+        if (keyword.length < KEYWORD_MIN_LENGTH) {
+            setValid(false)
+            return
+        }
+        setValid(isValid(keyword))
+    }, [keyword, valid])
+
+    const handleSubmitKeyword = async () => {
+        // Call contract
+    }
+
+    return (
+        <Fragment>
+            <div onClick={props.onClickClose} className={cl(
+                "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
+            )}>
+                {icons.close}
+            </div>
+            <div className={cl(
+                "flex flex-col gap-3 px-3 grow",
+            )}>
+                <div className={cl("flex flex-col grow gap-1.5")}>
+                    <p className="font-mono font-semibold mb-1.5">Add your keyword</p>
+                    <input
+                        placeholder="Your keyword"
+                        type="text"
+                        value={keyword}
+                        className={cl(
+                            "self-center w-full h-fit rounded-lg p-3",
+                            "bg-light-bgDark/20 dark:bg-dark-bgLight/20",
+                            "border border-light-border dark:border-dark-border",
+                        )}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => setKeyword(e.target.value)}
+                    />
+                </div>
+
+                {/* Err msg */}
+                <div className={cl(
+                    "flex flex-col gap-1 relative w-full h-fit rounded-lg border p-3",
+                    "border-amber-600 dark:border-amber-600",
+                    "bg-amber-500/50 dark:bg-amber-500/50",
+                    "backdrop-blur-md font-mono",
+                    displayErrMsg ? "opacity-100" : "invisible"
+                )}>
+                    <p className="font-semibold">Your keyword candidate must be:</p>
+                    <p>— Between 3 and 32 characters long</p>
+                    <p>— Contain only lowercase a-z characters</p>
+                </div>
+
+                <div>
+                    <Button text="Add" disabled={!valid} onClick={() => handleSubmitKeyword()} />
+                </div>
+            </div>
+        </Fragment>
+    )
+}
+
 const Voting = () => {
 
     const [activePage, setActivePage] = useState<ActivePage>("Voting")
+    // Info tooltip - "What is this?"
     const [infoVisible, setInfoVisible] = useState<boolean>(false)
+    // Add your keyword form
+    const [addKeywordVisible, setAddKeywordVisible] = useState<boolean>(false)
 
     return (
         <FullscreenContainer>
@@ -47,31 +132,36 @@ const Voting = () => {
 
                 <PageTitle title="Voting Panel" additionalClasses="mb-3" />
 
+                {/* Add keyword form */}
+                <div className="relative">
+                    {addKeywordVisible && <PopupContainer>
+                        <AddKeywordForm onClickClose={() => setAddKeywordVisible(false)} />
+                    </PopupContainer>}
+                </div>
+
                 {/* What is this: Floating Popup */}
                 <div className="relative">
                     {infoVisible &&
-
-                        <div className={cl(
-                            "flex w-[55%] h-fit top-1/2 left-1/2 -translate-x-1/2 translate-y-[40%]",
-                            "absolute",
-                            "p-3 rounded-lg border border-light-border dark:border-dark-border",
-                            "bg-light-bgPrimary/75 dark:bg-dark-bgPrimary/75 backdrop-blur-3xl",
-                            "shadow-md"
-                        )}>
-                            <div onClick={() => setInfoVisible(false)} className={cl(
-                                "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
-                            )}>
-                                {icons.close}
-                            </div>
-                            <div className={cl("flex flex-col gap-3 p-3")}>
-                                <p>{"Each graviolaNFT season lasts exactly "}<span className="font-semibold underline underline-offset-2">3 months</span>{"."}
-                                </p>
-                                <p>During each season, holders can add new keyword candidates for the upcoming season.</p>
-                                <p>The community can then judge and pick which of these keywords they'd like to see in use.</p>
-                                <p>This panel allows to vote, track and browse all current keyword candidates.</p>
-                                <p>Go ahead and add your own keyword to the list {":)"}</p>
-                            </div>
-                        </div>
+                        <PopupContainer>
+                            <Fragment>
+                                <div onClick={() => setInfoVisible(false)} className={cl(
+                                    "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
+                                )}>
+                                    {icons.close}
+                                </div>
+                                <div className={cl("flex flex-col w-full px-3 leading-6")}>
+                                    <div className="mb-1.5">
+                                        <p>{"Each graviolaNFT season lasts exactly "}<span className="font-semibold underline underline-offset-2">3 months</span>{"."}</p>
+                                    </div>
+                                    <div className="text-light-textSecondary dark:text-dark-textSecondary">
+                                        <p>During each season, holders can add new keyword candidates for the upcoming season.</p>
+                                        <p>The community can then judge and pick which of these keywords they'd like to see in use.</p>
+                                        <p>This panel allows to vote, track and browse all current keyword candidates.</p>
+                                        <p>Go ahead and add your own keyword to the list {":)"}</p>
+                                    </div>
+                                </div>
+                            </Fragment>
+                        </PopupContainer>
                     }
                 </div>
 
@@ -110,7 +200,11 @@ const Voting = () => {
                 </SectionContainer>
 
                 {activePage === "Voting"
-                    ? <KeywordVotingPage onClickInfo={() => setInfoVisible(true)} /> : <ArchivePage />
+                    ? <KeywordVotingPage
+                        onClickInfo={() => setInfoVisible(true)}
+                        onClickAddKeyword={() => setAddKeywordVisible(true)}
+                    />
+                    : <ArchivePage />
                 }
 
             </ContentContainer>
@@ -121,7 +215,10 @@ const Voting = () => {
 
 const ArchivePage = () => <p className="self-center">Soon</p>
 
-const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
+const KeywordVotingPage = (props: {
+    onClickInfo: () => void,
+    onClickAddKeyword: () => void,
+}) => {
 
     const { rarities } = useContext(GraviolaContext) as {
         rarities: RaritiesData
@@ -151,7 +248,7 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
 
     return (
         <div className={cl(
-            "flex w-1/2 h-fit flex-col justify-start items-start self-center",
+            "flex w-2/3 h-fit flex-col justify-start items-start self-center",
             "max-md:w-full"
         )}>
 
@@ -165,15 +262,8 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
 
                 {/* What is this = floating tooltip explaining the purpose of Voting */}
                 <div className="flex gap-3">
-                    <div onClick={props.onClickInfo} className={cl(
-                        "flex justify-center items-center rounded-lg",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/25 dark:bg-dark-bgLight/25 cursor-pointer",
-                        "hover:bg-light-bgDark/75 hover:dark:bg-dark-bgLight/75",
-                        "transition-colors duration-300 ease-in-out"
-                    )}>
-                        <span className="font-mono p-2">What is this?</span>
-                    </div>
+                    <Button text="What is this?" onClick={props.onClickInfo} />
+                    <Button text="Add keyword" onClick={props.onClickAddKeyword} />
                 </div>
 
                 {/* Sorting */}
@@ -199,7 +289,7 @@ const KeywordVotingPage = (props: { onClickInfo: () => void }) => {
             </div>
 
             <div className={cl(
-                "flex w-full h-fit mb-24",
+                "flex w-3/4 self-center h-fit mb-24",
                 "border border-light-border dark:border-dark-border rounded-lg p-1",
             )}>
 

@@ -25,7 +25,7 @@ const Button = ({ text, onClick, disabled = false, arrowIcon = false, additional
             <button disabled={disabled}>
                 <p className="font-content">{text}</p>
             </button>
-            {arrowIcon && icons.arrowRight}
+            {arrowIcon && icons.arrow}
         </div>
     )
 }
