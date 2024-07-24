@@ -6,9 +6,9 @@ import {Graviola} from "../src/Graviola/GraviolaMain.sol";
 import {AIOracleMock} from "../src/OAO/AIOracleMock.sol";
 import {GraviolaToken} from "../src/Graviola/GraviolaToken.sol";
 import {GraviolaSeasonsArchive} from "../src/Graviola/seasons/GraviolaSeasonsArchive.sol";
-import {GraviolaSeasonsGovernor} from "../src/Graviola/seasons/GraviolaSeasonsGovernor.sol";
+import {TGraviolaSeasonsGovernor} from "../src/Graviola/seasons/TGraviolaSeasonsGovernor.sol";
 
-contract GraviolaDeploy is Script {
+contract GraviolaLocalDeploy is Script {
     function run() public {
         vm.startBroadcast();
         AIOracleMock oao = new AIOracleMock();
@@ -17,10 +17,14 @@ contract GraviolaDeploy is Script {
         GraviolaToken gt = new GraviolaToken(msg.sender);
 
         GraviolaSeasonsArchive gsa = new GraviolaSeasonsArchive(msg.sender);
-        GraviolaSeasonsGovernor gsg = new GraviolaSeasonsGovernor(
+        TGraviolaSeasonsGovernor gsg = new TGraviolaSeasonsGovernor(
             address(gsa),
             address(gt)
         );
+
+        for (uint i = 1; i < 100; i++) {
+            gsg.addAndUpvote(i);
+        }
 
         console.log("GRAVIOLA_ADDRESS:%s", address(graviola));
         console.log("OAO_ADDRESS:%s", address(oao));
