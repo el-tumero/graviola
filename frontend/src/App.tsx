@@ -36,7 +36,7 @@ const App = (props: { children: ReactNode }) => {
         rpcUrl: import.meta.env.VITE_DEV_RPC,
     }
     const metadata = {
-        name: "Graviola NFT",
+        name: "graviola NFT",
         description: "NFT generator powered by opML",
         url: "https://el-tumero.github.io/graviola/",
         icons: [],
@@ -138,7 +138,7 @@ const App = (props: { children: ReactNode }) => {
                 {} as Record<RarityLevel, RarityGroupData>,
             )
 
-            console.log("[App] raritiesData: ", raritiesData) // DEBUG
+            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
             setRarities(raritiesData)
             setLoading(false)
             console.log("[App] collection loaded!")

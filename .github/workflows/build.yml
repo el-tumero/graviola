@@ -31,12 +31,14 @@ jobs:
           yarn
           yarn ganache -d -D -q
 
-      - name: Generate types for website
+      - name: Deploy local contract & setup data
         run: |
           cd contracts
           yarn
+          yarn hardhat compile
           yarn build
           yarn deploy:local
+          yarn cand
           yarn types
 
       - name: Build website

@@ -9,7 +9,8 @@ export const mockMetaBannerData: MetadataMockProperty[] = [
     {
         name: "Weight Sum",
         val: "7",
-        comment: "Sum of rolled keywords' weights (this determines the final rarity"
+        comment:
+            "Sum of rolled keywords' weights (this determines the final rarity",
     },
     {
         name: "Rarity",

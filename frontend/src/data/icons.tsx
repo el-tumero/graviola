@@ -1,20 +1,51 @@
 const icons = {
     list: (
         <svg className="h-fit w-fit" fill="none" viewBox="0 0 24 24">
-            <path className="fill-current" id="Vector" d="M5 17H19M5 12H19M5 7H19" stroke="currentColor" />
+            <path
+                className="fill-current"
+                id="Vector"
+                d="M5 17H19M5 12H19M5 7H19"
+                stroke="currentColor"
+            />
         </svg>
     ),
 
     close: (
-        <svg className="w-fit h-fit p-1" viewBox="-0.5 0 25 25" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className="fill-current" d="M3 21.32L21 3.32001" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
-            <path className="fill-current" d="M3 3.32001L21 21.32" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" />
+        <svg
+            className="w-fit h-fit p-1"
+            viewBox="-0.5 0 25 25"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                className="fill-current"
+                d="M3 21.32L21 3.32001"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
+            <path
+                className="fill-current"
+                d="M3 3.32001L21 21.32"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+            />
         </svg>
     ),
 
     github: (
-        <svg className="w-6 h-6" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg">
-            <g id="Dribbble-Light-Preview" transform="translate(-140.000000, -7559.000000)" fill="#000000">
+        <svg
+            className="w-6 h-6"
+            viewBox="0 0 20 20"
+            version="1.1"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <g
+                id="Dribbble-Light-Preview"
+                transform="translate(-140.000000, -7559.000000)"
+                fill="#000000"
+            >
                 <g id="icons" transform="translate(56.000000, 160.000000)">
                     <path
                         className="fill-current"
@@ -50,21 +81,35 @@ const icons = {
         </svg>
     ),
 
-    arrowRight: (
-        <svg className="w-auto h-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 12H17M17 12L13 8M17 12L13 16" stroke="currentColor" />
-        </svg>
-    ),
-
-    arrowUp: (
-        <svg className="w-auto h-auto" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
-            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M10 18V2m0 0l7 7m-7-7L3 9" />
+    arrow: (
+        <svg
+            className="w-full h-full aspect-square"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                d="M7 12H17M17 12L13 8M17 12L13 16"
+                strokeWidth={1.5}
+                stroke="currentColor"
+            />
         </svg>
     ),
 
     weight: (
-        <svg className="w-auto h-auto" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" d="M12 8L13 6M7.0998 7.0011C7.03435 7.32387 7 7.65792 7 8C7 10.7614 9.23858 13 12 13C14.7614 13 17 10.7614 17 8C17 7.65792 16.9656 7.32387 16.9002 7.0011M7.0998 7.0011C7.56264 4.71831 9.58065 3 12 3C14.4193 3 16.4374 4.71831 16.9002 7.0011M7.0998 7.0011C5.87278 7.00733 5.1837 7.04895 4.63803 7.32698C4.07354 7.6146 3.6146 8.07354 3.32698 8.63803C3 9.27976 3 10.1198 3 11.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V11.8C21 10.1198 21 9.27976 20.673 8.63803C20.3854 8.07354 19.9265 7.6146 19.362 7.32698C18.8163 7.04895 18.1272 7.00733 16.9002 7.0011" />
+        <svg
+            className="w-auto h-auto"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <path
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8L13 6M7.0998 7.0011C7.03435 7.32387 7 7.65792 7 8C7 10.7614 9.23858 13 12 13C14.7614 13 17 10.7614 17 8C17 7.65792 16.9656 7.32387 16.9002 7.0011M7.0998 7.0011C7.56264 4.71831 9.58065 3 12 3C14.4193 3 16.4374 4.71831 16.9002 7.0011M7.0998 7.0011C5.87278 7.00733 5.1837 7.04895 4.63803 7.32698C4.07354 7.6146 3.6146 8.07354 3.32698 8.63803C3 9.27976 3 10.1198 3 11.8V16.2C3 17.8802 3 18.7202 3.32698 19.362C3.6146 19.9265 4.07354 20.3854 4.63803 20.673C5.27976 21 6.11984 21 7.8 21H16.2C17.8802 21 18.7202 21 19.362 20.673C19.9265 20.3854 20.3854 19.9265 20.673 19.362C21 18.7202 21 17.8802 21 16.2V11.8C21 10.1198 21 9.27976 20.673 8.63803C20.3854 8.07354 19.9265 7.6146 19.362 7.32698C18.8163 7.04895 18.1272 7.00733 16.9002 7.0011"
+            />
         </svg>
     ),
 
@@ -80,8 +125,16 @@ const icons = {
         >
             <rect width="206" height="66" fill="url(#pattern0)" />
             <defs>
-                <pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">
-                    <use xlinkHref="#image0_316_107" transform="scale(0.00485437 0.0151515)" />
+                <pattern
+                    id="pattern0"
+                    patternContentUnits="objectBoundingBox"
+                    width="1"
+                    height="1"
+                >
+                    <use
+                        xlinkHref="#image0_316_107"
+                        transform="scale(0.00485437 0.0151515)"
+                    />
                 </pattern>
                 <image
                     id="image0_316_107"
@@ -94,7 +147,12 @@ const icons = {
     ),
 
     discordLogo: (
-        <svg className="w-6 h-6 fill-light-text dark:fill-dark-text" fill="none" viewBox="0 0 512 512" aria-label="Discord">
+        <svg
+            className="w-6 h-6 fill-light-text dark:fill-dark-text"
+            fill="none"
+            viewBox="0 0 512 512"
+            aria-label="Discord"
+        >
             <rect fill="none" width="512" height="512" rx="15%" />
             <path
                 stroke="currentColor"
@@ -104,7 +162,11 @@ const icons = {
     ),
 
     discordBannerLogo: (
-        <svg className="w-fit h-20" viewBox="0 -206 512 512" preserveAspectRatio="xMidYMid">
+        <svg
+            className="w-fit h-20"
+            viewBox="0 -206 512 512"
+            preserveAspectRatio="xMidYMid"
+        >
             <g>
                 <path
                     className="fill-current"

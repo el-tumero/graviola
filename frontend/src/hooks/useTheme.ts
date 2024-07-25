@@ -2,9 +2,14 @@ import { useWeb3ModalTheme } from "@web3modal/ethers/react"
 import { useEffect, useState } from "react"
 import { Theme } from "../types/Theme"
 
-export default function useTheme(web3ModalLoaded: boolean): { theme: Theme; toggleTheme: () => void } {
+export default function useTheme(web3ModalLoaded: boolean): {
+    theme: Theme
+    toggleTheme: () => void
+} {
     const { setThemeMode } = useWeb3ModalTheme()
-    const [theme, setTheme] = useState<Theme>((localStorage.getItem("theme") as Theme) || "dark")
+    const [theme, setTheme] = useState<Theme>(
+        (localStorage.getItem("theme") as Theme) || "dark",
+    )
 
     useEffect(() => {
         detectTheme()
@@ -13,13 +18,18 @@ export default function useTheme(web3ModalLoaded: boolean): { theme: Theme; togg
     useEffect(() => {
         if (!theme) return
         const bodyClassList = document.documentElement.classList
-        theme === "dark" ? bodyClassList.add("dark") : bodyClassList.remove("dark")
+        theme === "dark"
+            ? bodyClassList.add("dark")
+            : bodyClassList.remove("dark")
         theme === "dark" ? setThemeMode("dark") : setThemeMode("light")
     }, [theme])
 
     const detectTheme = () => {
         if (theme) return
-        const detectedTheme = window.matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light"
+        const detectedTheme = window.matchMedia("(prefers-color-scheme:dark)")
+            .matches
+            ? "dark"
+            : "light"
         web3ModalLoaded && setThemeMode(detectedTheme)
         setTheme(detectedTheme)
     }

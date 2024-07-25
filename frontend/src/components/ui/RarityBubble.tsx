@@ -6,7 +6,10 @@ interface RarityBubbleProps {
     additionalClasses?: string
 }
 
-const RarityBubble = ({ rarityGroup, additionalClasses }: RarityBubbleProps) => {
+const RarityBubble = ({
+    rarityGroup,
+    additionalClasses,
+}: RarityBubbleProps) => {
     return (
         <div
             style={{

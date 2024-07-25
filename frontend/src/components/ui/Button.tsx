@@ -9,7 +9,13 @@ interface ButtonProps {
     arrowIcon?: boolean
 }
 
-const Button = ({ text, onClick, disabled = false, arrowIcon = false, additionalClasses }: ButtonProps) => {
+const Button = ({
+    text,
+    onClick,
+    disabled = false,
+    arrowIcon = false,
+    additionalClasses,
+}: ButtonProps) => {
     return (
         <div
             onClick={() => onClick()}
@@ -25,7 +31,9 @@ const Button = ({ text, onClick, disabled = false, arrowIcon = false, additional
             <button disabled={disabled}>
                 <p className="font-content">{text}</p>
             </button>
-            {arrowIcon && icons.arrowRight}
+            <div className="w-6 h-6 flex justify-center items-center">
+                {arrowIcon && icons.arrow}
+            </div>
         </div>
     )
 }
