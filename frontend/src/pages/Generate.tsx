@@ -96,9 +96,9 @@ const Generate = () => {
                             "mb-3",
                         )}
                     >
-                        <div>
+                        <div data-testid="generate-status">
                             {rolledNFT ? (
-                                <p>
+                                <p data-testid="generate-success">
                                     Congratulations! You rolled a&nbsp;
                                     <span
                                         style={{
@@ -120,11 +120,13 @@ const Generate = () => {
                             )}
                         </div>
 
-                        <Button
-                            text={"Generate!"}
-                            disabled={!isConnected || txStatus !== "NONE"}
-                            onClick={() => requestGen()}
-                        />
+                        <span data-testid="generate-btn">
+                            <Button
+                                text={"Generate!"}
+                                disabled={!isConnected || txStatus !== "NONE"}
+                                onClick={() => requestGen()}
+                            />
+                        </span>
                     </div>
                 </div>
 

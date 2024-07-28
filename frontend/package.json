@@ -6,12 +6,13 @@
     "type": "module",
     "scripts": {
         "dev": "cross-env NODE_ENV=dev vite",
-        "dev:test": "concurrently 'cross-env NODE_ENV=dev vite --port 3000 -l silent' 'ganache -D -d -q'",
+        "dev:test": "concurrently 'cross-env NODE_ENV=dev vite -l silent' 'cd ../contracts && yarn local-node'",
         "build": "vite build",
         "predeploy": "vite build && cp ./dist/index.html ./dist/404.html",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\" --tab-width 4 --no-semi --jsx-single-quote false",
         "deploy": "gh-pages -d dist",
-        "preview": "vite preview"
+        "preview": "vite preview",
+        "test": "VITE_DEV_PROVIDER=true playwright test"
     },
     "dependencies": {
         "@reduxjs/toolkit": "^2.2.6",
@@ -30,6 +31,8 @@
     "devDependencies": {
         "@eslint/compat": "^1.1.1",
         "@eslint/js": "^9.7.0",
+        "@playwright/test": "^1.45.2",
+        "@types/node": "^20.14.11",
         "@types/react": "^18.2.56",
         "@types/react-dom": "^18.2.19",
         "@vitejs/plugin-react": "^4.2.1",
@@ -40,7 +43,6 @@
         "eslint-plugin-react": "^7.34.3",
         "eslint-plugin-react-hooks": "^4.6.0",
         "eslint-plugin-react-refresh": "^0.4.5",
-        "ganache": "^7.9.2",
         "gh-pages": "^6.1.1",
         "globals": "^15.8.0",
         "postcss": "^8.4.35",

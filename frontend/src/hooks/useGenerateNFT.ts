@@ -5,12 +5,12 @@ import { NFTExt } from "../pages/Generate"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { useState, useEffect, useContext } from "react"
-import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { NFT } from "../types/NFT"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { PopupBase } from "../components/Popup"
 import { RaritiesData } from "../types/RarityGroup"
 import { ContractTransactionResponse } from "ethers"
+import useWallet from "./useWallet"
 
 type TradeUpArgs = number[]
 
@@ -24,7 +24,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         rarities: RaritiesData
         collection: NFT[]
     }
-    const { address } = useWeb3ModalAccount()
+    const { address } = useWallet()
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
@@ -90,8 +90,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             return
         }
         setCallbacksInit(true)
-        contract.on(contract.filters.Mint, onMint)
-        contract.on(contract.filters.TokenReady, onTokenReady)
+
+        contract.once(contract.filters.Mint, onMint)
+        contract.once(contract.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks init OK")
     }
 

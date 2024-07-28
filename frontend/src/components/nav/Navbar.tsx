@@ -10,18 +10,17 @@ import icons from "../../data/icons"
 import { AppContext } from "../../contexts/AppContext"
 import { links } from "../../links"
 import { isDevMode } from "../../app/mode"
-import { useAppDispatch } from "../../app/hooks"
 import useWallet from "../../hooks/useWallet"
 
 const Navbar = () => {
     const navigate = useNavigate()
     const { theme, toggleTheme } = useContext(AppContext)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
-    const { connectDevWallet } = useWallet()
+    const { connectDevWallet, isConnected } = useWallet()
 
     const navItems: React.ReactNode[] = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
-            <p>Generate</p>
+            <p data-testid="generate-nav-btn">Generate</p>
         </NavElement>,
 
         <NavElement onClick={() => navigate(routerPaths.drops)}>
@@ -77,9 +76,11 @@ const Navbar = () => {
         isDevMode ? (
             <NavElement onClick={() => connectDevWallet()}>
                 <div
+                    data-testid="dev-btn"
                     className={cl(
                         "flex w-auto h-6 hover:cursor-pointer",
                         "max-lg:w-full justify-center items-center",
+                        isConnected ? "text-green-600" : "",
                     )}
                 >
                     DEV

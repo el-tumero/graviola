@@ -56,7 +56,7 @@ const App = (props: { children: ReactNode }) => {
     const { walletProvider } = useWeb3ModalProvider()
 
     const { theme, toggleTheme } = useTheme(modal === undefined)
-    const { connectWallet, graviola } = useWeb3()
+    const { connectWallet, graviola, seasonsGovernor } = useWeb3()
     const [loading, setLoading] = useState<boolean>(true)
 
     // Contract data
@@ -142,6 +142,10 @@ const App = (props: { children: ReactNode }) => {
             setRarities(raritiesData)
             setLoading(false)
             console.log("[App] collection loaded!")
+
+            const candidateListSize =
+                await seasonsGovernor.getCandidateListSize()
+            console.log("[CandidateList size]", candidateListSize)
         }
 
         fetchCollection()
