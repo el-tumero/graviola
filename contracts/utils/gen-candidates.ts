@@ -1,11 +1,8 @@
 import hardhat from "hardhat"
 import { writeFileSync } from "fs"
-import createLogger from "./logger"
 
 const OUT_PATH = "candidates.json"
 const CANDIDATE_AMOUNT = 100
-
-const log = createLogger(OUT_PATH)
 
 async function main() {
     writeFileSync(OUT_PATH, "")
@@ -43,7 +40,9 @@ async function main() {
         )
 
         let resJson = { candidates }
-        log(JSON.stringify(resJson, null, 4))
+
+        writeFileSync(OUT_PATH, JSON.stringify(resJson, null, 4))
+        console.log(`Candidates saved to '${OUT_PATH}'`)
 
         console.log("Done")
     } catch (err) {

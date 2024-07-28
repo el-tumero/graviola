@@ -1,6 +1,5 @@
 import deployLocal from "./deploy-local"
 import { writeFileSync } from "fs"
-import { runTypeChain } from "typechain"
 import hardhat from "hardhat"
 import sendRpcCall from "./rpcCall"
 
