@@ -7,5 +7,8 @@
         "strict": true,
         "skipLibCheck": true,
         "resolveJsonModule": true
+    },
+    "ts-node": {
+        "files": true
     }
 }

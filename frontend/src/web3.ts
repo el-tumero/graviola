@@ -2,10 +2,12 @@ import { isDevMode } from "./app/mode"
 import addressesLocal from "../../contracts/addresses-local.json"
 import addresses from "../../contracts/addresses.json"
 import { JsonRpcProvider, Signer } from "ethers"
-import { Graviola__factory } from "../../contracts/typechain-types/factories/GraviolaMain.sol"
-import { Graviola } from "../../contracts/typechain-types/GraviolaMain.sol"
-import { GraviolaSeasonsGovernor } from "../../contracts/typechain-types/GraviolaSeasonsGovernor"
-import { GraviolaSeasonsGovernor__factory } from "../../contracts/typechain-types/factories/GraviolaSeasonsGovernor__factory"
+import {
+    Graviola,
+    Graviola__factory,
+    GraviolaSeasonsGovernor,
+    GraviolaSeasonsGovernor__factory,
+} from "../../contracts/typechain-types/index"
 
 const defaultRpc = isDevMode
     ? import.meta.env.VITE_DEV_RPC

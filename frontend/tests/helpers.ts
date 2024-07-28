@@ -7,5 +7,7 @@ export async function deploy() {
 }
 
 export async function oaoMockResponse() {
-    await execp("cd ../contracts && node utils/oao-mock.js")
+    await execp(
+        "cd ../contracts && HARDHAT_NETWORK=localhost yarn ts-node utils/oao-mock.ts",
+    )
 }

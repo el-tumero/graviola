@@ -1,4 +1,4 @@
-async function sendRpcCall(method, params) {
+export default async function sendRpcCall(method: string, params: any[]) {
     const body = {
         jsonrpc: "2.0",
         method,
@@ -14,5 +14,3 @@ async function sendRpcCall(method, params) {
         body: JSON.stringify(body),
     })
 }
-
-module.exports = sendRpcCall
