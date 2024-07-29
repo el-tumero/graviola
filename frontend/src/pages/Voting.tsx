@@ -23,6 +23,7 @@ import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
+import { Candidate } from "../types/Candidate"
 
 type ActivePage = "Voting" | "Archive"
 
@@ -231,13 +232,13 @@ const Voting = () => {
                             "p-2 rounded-l-lg",
                             activePage === "Voting"
                                 ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
+                                    "border border-light-text/25 dark:border-dark-text/25",
+                                    "bg-light-border/30 dark:bg-dark-border/30",
+                                ]
                                 : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
+                                    "cursor-pointer",
+                                    "border-light-border dark:border-dark-border",
+                                ],
                         )}
                     >
                         <p className="select-none">Voting</p>
@@ -250,13 +251,13 @@ const Voting = () => {
                             "p-2 rounded-r-lg",
                             activePage === "Archive"
                                 ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
+                                    "border border-light-text/25 dark:border-dark-text/25",
+                                    "bg-light-border/30 dark:bg-dark-border/30",
+                                ]
                                 : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
+                                    "cursor-pointer",
+                                    "border-light-border dark:border-dark-border",
+                                ],
                         )}
                     >
                         <p className="select-none">Archive</p>
@@ -297,16 +298,16 @@ const KeywordVotingPage = (props: {
         2: compareByScore("Ascending"), // BY_SCORE_ASC
         3: compareByScore("Descending"), // BY_SCORE_DESC
         4: compareAlphabetically("Ascending"), // BY_KEYWORD_ASC
-        5: compareAlphabetically("Descending"), // BY_KEYWORD_ASC
+        5: compareAlphabetically("Descending"), // BY_K2EYWORD_ASC
     }
 
-    const mockCandidates = candJson.candidates.map((data, i) => {
+    const mockCandidates = candJson.candidates.map((data: Candidate, i: number) => {
         const candidateData: CandidateInfo = {
             id: i,
-            author: data[2],
-            keyword: getKeyword(+data[0] - 1, rarities)[0], // -1 to avoid out of bounds absIdx
+            author: data.author || "UNKNOWN",
+            keyword: getKeyword((+data.id || -1) - 1, rarities)[0], // -1 to avoid out of bounds absIdx
             iteration: 0,
-            score: +data[1],
+            score: (+data.score || -1),
         }
         return candidateData
     })

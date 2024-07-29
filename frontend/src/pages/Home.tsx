@@ -35,12 +35,12 @@ const Home = () => {
                 <div className="flex flex-col p-4 gap-3">
                     <Popup
                         additionalClasses="w-full max-w-full relative top-0 right-0 z-2"
-                        onClickClose={() => {}}
+                        onClickClose={() => { }}
                         disableCloseButton
                         type="neutral"
                         message={`
                         Graviola is growing rapidly; we're introducing big changes lately.
-                        If you encounter bugs or unexpected errors, please open an Issue in Github.`}
+                        If you encounter bugs or unexpected errors, please open an Issue on Github.`}
                     />
 
                     <SectionContainer>

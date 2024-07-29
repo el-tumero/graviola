@@ -4,6 +4,7 @@ import {
     setSigner,
     connectContractsToSigner,
     graviolaContract,
+    tokenContract,
     seasonsGovernorContract,
 } from "../web3"
 
@@ -18,7 +19,8 @@ export default function useWallet() {
     const address = useAppSelector((state) => state.wallet.address)
 
     const graviola = graviolaContract
-    const seasonsGovernor = seasonsGovernorContract
+    const grvSeasonsGovernor = seasonsGovernorContract
+    const grvToken = tokenContract
 
     const dispatch = useAppDispatch()
 
@@ -46,6 +48,7 @@ export default function useWallet() {
         isConnected,
         address,
         graviola,
-        seasonsGovernor,
+        grvToken,
+        grvSeasonsGovernor
     }
 }
