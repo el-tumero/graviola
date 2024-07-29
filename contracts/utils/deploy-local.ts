@@ -14,7 +14,7 @@ export default async function deployLocal() {
 
     const output: Record<string, string> = {}
 
-    names.forEach((name, index) => {
+    names.forEach((name: string, index: number) => {
         output[`${name}_ADDRESS`] = addresses[index]
     })
 

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.25;
+pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/src/Script.sol";
 import {Graviola} from "../src/Graviola/GraviolaMain.sol";

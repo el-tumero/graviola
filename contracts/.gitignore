@@ -3,6 +3,7 @@ node_modules
 *.log
 .DS_Store
 out
+cache
 cache_forge
 cache_hardhat
 artifacts
