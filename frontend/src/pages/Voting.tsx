@@ -10,20 +10,13 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import candJson from "../../../contracts/candidates.json"
-import {
-    ChangeEvent,
-    ReactNode,
-    Fragment,
-    useContext,
-    useState,
-    useEffect,
-} from "react"
+import { ChangeEvent, ReactNode, Fragment, useState, useEffect } from "react"
 import { getKeyword } from "../utils/getKeyword"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
 import { Candidate } from "../types/Candidate"
+import { useAppSelector } from "../redux/hooks"
 
 type ActivePage = "Voting" | "Archive"
 
@@ -205,8 +198,8 @@ const Voting = () => {
                                         </p>
                                         <p>
                                             The community can then judge and
-                                            pick which of these keywords they'd
-                                            like to see in use.
+                                            pick which of these keywords
+                                            they&apos;d like to see in use.
                                         </p>
                                         <p>
                                             This panel allows to vote, track and
@@ -232,13 +225,13 @@ const Voting = () => {
                             "p-2 rounded-l-lg",
                             activePage === "Voting"
                                 ? [
-                                    "border border-light-text/25 dark:border-dark-text/25",
-                                    "bg-light-border/30 dark:bg-dark-border/30",
-                                ]
+                                      "border border-light-text/25 dark:border-dark-text/25",
+                                      "bg-light-border/30 dark:bg-dark-border/30",
+                                  ]
                                 : [
-                                    "cursor-pointer",
-                                    "border-light-border dark:border-dark-border",
-                                ],
+                                      "cursor-pointer",
+                                      "border-light-border dark:border-dark-border",
+                                  ],
                         )}
                     >
                         <p className="select-none">Voting</p>
@@ -251,13 +244,13 @@ const Voting = () => {
                             "p-2 rounded-r-lg",
                             activePage === "Archive"
                                 ? [
-                                    "border border-light-text/25 dark:border-dark-text/25",
-                                    "bg-light-border/30 dark:bg-dark-border/30",
-                                ]
+                                      "border border-light-text/25 dark:border-dark-text/25",
+                                      "bg-light-border/30 dark:bg-dark-border/30",
+                                  ]
                                 : [
-                                    "cursor-pointer",
-                                    "border-light-border dark:border-dark-border",
-                                ],
+                                      "cursor-pointer",
+                                      "border-light-border dark:border-dark-border",
+                                  ],
                         )}
                     >
                         <p className="select-none">Archive</p>
@@ -283,10 +276,9 @@ const KeywordVotingPage = (props: {
     onClickInfo: () => void
     onClickAddKeyword: () => void
 }) => {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     // Default sort is always by id (same order as we got from the contract)
     const [sorting, setSorting] = useState<SortingType>(SortingType["BY_ID"])
     // Map sorting types (enum) to compare fns
@@ -301,16 +293,18 @@ const KeywordVotingPage = (props: {
         5: compareAlphabetically("Descending"), // BY_K2EYWORD_ASC
     }
 
-    const mockCandidates = candJson.candidates.map((data: Candidate, i: number) => {
-        const candidateData: CandidateInfo = {
-            id: i,
-            author: data.author || "UNKNOWN",
-            keyword: getKeyword((+data.id || -1) - 1, rarities)[0], // -1 to avoid out of bounds absIdx
-            iteration: 0,
-            score: (+data.score || -1),
-        }
-        return candidateData
-    })
+    const mockCandidates = candJson.candidates.map(
+        (data: Candidate, i: number) => {
+            const candidateData: CandidateInfo = {
+                id: i,
+                author: data.author || "UNKNOWN",
+                keyword: getKeyword((+data.id || -1) - 1, rarities)[0], // -1 to avoid out of bounds absIdx
+                iteration: 0,
+                score: +data.score || -1,
+            }
+            return candidateData
+        },
+    )
 
     return (
         <div

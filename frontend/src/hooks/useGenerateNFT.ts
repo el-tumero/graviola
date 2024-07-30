@@ -1,16 +1,15 @@
 import { parseEther, toBigInt } from "ethers"
-import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFTExt } from "../pages/Generate"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { getRarityFromPerc } from "../utils/getRarityData"
 import { PopupBase } from "../components/Popup"
+import useWallet from "./useWallet"
+import { useAppSelector } from "../redux/hooks"
 import { RaritiesData } from "../types/RarityGroup"
 import { ContractTransactionResponse } from "ethers"
-import useWallet from "./useWallet"
 
 type TradeUpArgs = number[]
 
@@ -19,12 +18,9 @@ type TradeUpArgs = number[]
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
-    const { contract, rarities, collection } = useContext(GraviolaContext) as {
-        contract: Graviola
-        rarities: RaritiesData
-        collection: NFT[]
-    }
-    const { address } = useWallet()
+    const rarities = useAppSelector(state => state.graviolaData.rarities) as RaritiesData
+    const collection = useAppSelector(state => state.graviolaData.collection)
+    const { graviola, address } = useWallet()
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
@@ -39,7 +35,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
-        const estFee: bigint = await contract.estimateFee()
+        const estFee: bigint = await graviola.estimateFee()
         console.log("estfee ", estFee)
         let tx: ContractTransactionResponse | null = null
         console.log(
@@ -49,11 +45,11 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         try {
             if (tradeupArgs) {
                 const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
-                tx = await contract.tradeUp([args[0], args[1], args[2]], {
+                tx = await graviola.tradeUp([args[0], args[1], args[2]], {
                     value: estFee + parseEther("0.006"),
                 })
             } else {
-                tx = await contract.mint({
+                tx = await graviola.mint({
                     value: parseEther("0.006"),
                     // gasLimit: 900_000
                 })
@@ -91,15 +87,15 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         }
         setCallbacksInit(true)
 
-        contract.once(contract.filters.Mint, onMint)
-        contract.once(contract.filters.TokenReady, onTokenReady)
+        graviola.once(graviola.filters.Mint, onMint)
+        graviola.once(graviola.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks init OK")
     }
 
     const disableCallbacks = () => {
         if (!callbacksInit) return
-        contract.off(contract.filters.Mint, onMint)
-        contract.off(contract.filters.TokenReady, onTokenReady)
+        graviola.off(graviola.filters.Mint, onMint)
+        graviola.off(graviola.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks disable OK")
         setCallbacksInit(false)
     }
@@ -114,7 +110,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         if (addr != address) return // Don't eavesdrop other people's drops
         console.log(`[useGenerate] onTokenReady: tokenId ${Number(tokenId)}`)
 
-        const uri = await contract.tokenURI(tokenId)
+        const uri = await graviola.tokenURI(tokenId)
         const response = await fetch(uri)
         const nextIdx = collection.length
         const nftData = await response.json()

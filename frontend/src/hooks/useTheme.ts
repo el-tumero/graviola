@@ -1,15 +1,16 @@
 import { useWeb3ModalTheme } from "@web3modal/ethers/react"
-import { useEffect, useState } from "react"
-import { Theme } from "../types/Theme"
+import { useEffect } from "react"
+import { Theme, setTheme } from "../redux/reducers/theme"
+import { useAppSelector, useAppDispatch } from "../redux/hooks"
 
 export default function useTheme(web3ModalLoaded: boolean): {
     theme: Theme
     toggleTheme: () => void
 } {
+
+    const dispatch = useAppDispatch()
     const { setThemeMode } = useWeb3ModalTheme()
-    const [theme, setTheme] = useState<Theme>(
-        (localStorage.getItem("theme") as Theme) || "dark",
-    )
+    const { theme } = useAppSelector((state) => state.theme)
 
     useEffect(() => {
         detectTheme()
@@ -31,12 +32,12 @@ export default function useTheme(web3ModalLoaded: boolean): {
             ? "dark"
             : "light"
         web3ModalLoaded && setThemeMode(detectedTheme)
-        setTheme(detectedTheme)
+        dispatch(setTheme(detectedTheme))
     }
 
     const toggleTheme = () => {
         const invertedTheme = theme === "dark" ? "light" : "dark"
-        setTheme(invertedTheme)
+        dispatch(setTheme(invertedTheme))
         web3ModalLoaded && setThemeMode(invertedTheme)
         localStorage.setItem("theme", invertedTheme)
     }

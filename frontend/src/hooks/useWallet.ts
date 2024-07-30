@@ -9,9 +9,9 @@ import {
 } from "../web3"
 
 import localhostConfig from "../../../contracts/localhost-config.json"
-import { useAppSelector, useAppDispatch } from "../app/hooks"
-import { setConnected, setAddress } from "../features/wallet/walletSlice"
-import { Web3Address } from "../features/wallet/walletSlice"
+import { useAppSelector, useAppDispatch } from "../redux/hooks"
+import { setConnected, setAddress } from "../redux/reducers/wallet"
+import { Web3Address } from "../redux/reducers/wallet"
 import { BrowserProvider } from "ethers"
 
 export default function useWallet() {

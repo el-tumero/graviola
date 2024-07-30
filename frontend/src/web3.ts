@@ -1,4 +1,4 @@
-import { isDevMode } from "./app/mode"
+import { isDevMode } from "./utils/mode"
 import addressesLocal from "../../contracts/addresses-local.json"
 import addresses from "../../contracts/addresses.json"
 import { JsonRpcProvider, Signer } from "ethers"

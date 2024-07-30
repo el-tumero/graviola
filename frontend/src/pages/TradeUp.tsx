@@ -3,8 +3,7 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
-import { useContext, useEffect, useState } from "react"
-import { GraviolaContext } from "../contexts/GraviolaContext"
+import { useEffect, useState } from "react"
 import { NFT } from "../types/NFT"
 import { RaritiesData } from "../types/RarityGroup"
 import { ethers } from "ethers"
@@ -14,7 +13,6 @@ import { formatBpToPercentage } from "../utils/format"
 import BlockNFT from "../components/BlockNFT"
 import { RarityLevel } from "../types/Rarity"
 import { tradeUpTxStatusMessages } from "../utils/statusMessages"
-import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { cn } from "../utils/cn"
@@ -22,24 +20,23 @@ import { getRarityBorder } from "../utils/getRarityBorder"
 import useRandomRarityBorder from "../hooks/useBorderAnimation"
 import { Status } from "../types/Status"
 import useGenerateNFT from "../hooks/useGenerateNFT"
+import useWallet from "../hooks/useWallet"
+import { useAppSelector } from "../redux/hooks"
 
 const TradeUp = () => {
+    const { graviola } = useWallet()
     const { isConnected, address } = useWeb3ModalAccount()
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
+    const collection = useAppSelector(
+        (state) => state.graviolaData.collection,
+    ) as NFT[]
 
     const {
-        contract,
-        rarities: rGroups,
-        collection,
-    } = useContext(GraviolaContext) as {
-        contract: Graviola
-        rarities: RaritiesData
-        collection: NFT[]
-    }
-
-    const {
-        txStatus,
+        // txStatus,
         txMsg,
-        rolledNFT,
+        // rolledNFT,
         requestGen,
         initCallbacks,
         disableCallbacks,
@@ -88,7 +85,7 @@ const TradeUp = () => {
         ;(async () => {
             let userOwnedTokens
             if (address) {
-                userOwnedTokens = await contract.ownedTokens(
+                userOwnedTokens = await graviola.ownedTokens(
                     ethers.getAddress(address),
                 )
             }
@@ -165,7 +162,7 @@ const TradeUp = () => {
                                             const [rarityLevel] =
                                                 getRarityFromPerc(
                                                     percRarity,
-                                                    rGroups,
+                                                    rarities,
                                                 )
 
                                             if (
@@ -244,7 +241,7 @@ const TradeUp = () => {
                                 ) : (
                                     <TradeUpGenerateContainer
                                         active={selectedIds.length === 3}
-                                        rGroups={rGroups}
+                                        rGroups={rarities}
                                     >
                                         {selectedIds.map((id, i) => {
                                             const randBase = Math.random()
@@ -260,7 +257,7 @@ const TradeUp = () => {
                                             const [, rGroupData] =
                                                 getRarityFromPerc(
                                                     percRarity,
-                                                    rGroups,
+                                                    rarities,
                                                 )
                                             return (
                                                 <div

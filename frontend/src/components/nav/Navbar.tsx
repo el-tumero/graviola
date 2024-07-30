@@ -1,4 +1,4 @@
-import { useState, useContext } from "react"
+import { useState } from "react"
 import Logo from "../../assets/logo.webp"
 import NavElement from "./NavElement"
 import { useNavigate } from "react-router-dom"
@@ -7,18 +7,19 @@ import { clsx as cl } from "clsx"
 import { openURL } from "../../utils/openURL"
 import NavListDesktop from "./NavList"
 import icons from "../../data/icons"
-import { AppContext } from "../../contexts/AppContext"
 import { links } from "../../links"
-import { isDevMode } from "../../app/mode"
+import { isDevMode } from "../../utils/mode"
+import useTheme from "../../hooks/useTheme"
 import useWallet from "../../hooks/useWallet"
 
 const Navbar = () => {
     const navigate = useNavigate()
-    const { theme, toggleTheme } = useContext(AppContext)
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
+    const { theme, toggleTheme } = useTheme(true)
     const { connectDevWallet, isConnected } = useWallet()
 
-    const navItems: React.ReactNode[] = [
+    /* eslint-disable */
+    const navItems = [
         <NavElement onClick={() => navigate(routerPaths.generate)}>
             <p data-testid="generate-nav-btn">Generate</p>
         </NavElement>,
@@ -90,6 +91,7 @@ const Navbar = () => {
             <></>
         ),
     ]
+    /* eslint-enable */
 
     return (
         <div className="sticky top-0 z-30">
