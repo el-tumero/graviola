@@ -4,13 +4,13 @@ import { clsx as cl } from "clsx"
 import { NFT, NFTAttributes } from "../types/NFT"
 import { getRarityFromLevel, getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
-import { useContext, useState } from "react"
-import { GraviolaContext } from "../contexts/GraviolaContext"
+import { useState } from "react"
 import Tooltip from "./Tooltip"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 import { Status } from "../types/Status"
+import { useAppSelector } from "../redux/hooks"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
 
@@ -27,9 +27,9 @@ const BlockNFT = ({
     disableMetadataOnHover,
     additionalClasses,
 }: BlockNFTProps) => {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     const [, rData] = getRarityFromPerc(
         formatBpToPercentage(nftData.attributes[0].value),
         rarities,

@@ -3,12 +3,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 export type Web3Address = `0x${string}`
 
 interface Web3State {
-    address: Web3Address | undefined
+    address: Web3Address | null
     isConnected: boolean
 }
 
 const initialState: Web3State = {
-    address: undefined,
+    address: null,
     isConnected: false,
 }
 

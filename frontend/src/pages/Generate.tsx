@@ -1,4 +1,4 @@
-import { useEffect, useContext } from "react"
+import { useEffect } from "react"
 import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
@@ -6,18 +6,16 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
-import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-
 import useWeb3 from "../hooks/useWallet"
+import { useAppSelector } from "../redux/hooks"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -27,12 +25,9 @@ export interface NFTExt extends NFT {
 
 const Generate = () => {
     const navigate = useNavigate()
-    const { rarities: rGroups } = useContext(GraviolaContext) as {
-        contract: Graviola
-        rarities: RaritiesData
-        collection: NFT[]
-    }
-
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     const { isConnected } = useWeb3()
 
     // // MOCK
@@ -85,7 +80,7 @@ const Generate = () => {
                         <GenerateContainer
                             rolledNFT={rolledNFT}
                             runBorderAnim={!rolledNFT}
-                            rGroups={rGroups}
+                            rGroups={rarities}
                         />
                     </div>
 

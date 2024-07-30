@@ -1,4 +1,4 @@
-import { useEffect, useState, ReactNode } from "react"
+import { useEffect, useState, ReactNode, Fragment } from "react"
 import tailwindConfig from "../tailwind.config"
 import {
     createWeb3Modal,
@@ -6,78 +6,52 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
 
-import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-
 import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { RarityLevel, RarityGroupData } from "./types/Rarity"
-import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./data/fallbacks"
-import { AppContext } from "./contexts/AppContext"
-
-import useWeb3 from "./hooks/useWallet"
+import useWallet from "./hooks/useWallet"
+import { isDevMode } from "./utils/mode"
+import { setCollection, setRarities } from "./redux/reducers/graviola"
+import { useAppDispatch } from "./redux/hooks"
 
 const App = (props: { children: ReactNode }) => {
-    const projectId = "a09890b34dc1551c2534337dbc22de8c"
-    const sepolia = {
-        chainId: 421614,
-        name: "Arbitrum Sepolia",
-        currency: "ETH",
-        explorerUrl: "https://sepolia.etherscan.io/",
-        rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
-    }
-    const mock = {
-        chainId: 3151908,
-        name: "Graviola Devnet",
-        currency: "ETH",
-        explorerUrl: "",
-        rpcUrl: import.meta.env.VITE_DEV_RPC,
-    }
-    const metadata = {
-        name: "graviola NFT",
-        description: "NFT generator powered by opML",
-        url: "https://el-tumero.github.io/graviola/",
-        icons: [],
-    }
-
     const modal = createWeb3Modal({
         themeVariables: {
             "--w3m-accent": tailwindConfig.theme.extend.colors.accentDark,
         },
         ethersConfig: defaultConfig({
-            metadata,
+            metadata: {
+                name: "graviola NFT",
+                description: "NFT generator powered by opML",
+                url: "https://el-tumero.github.io/graviola/",
+                icons: [],
+            },
         }),
-        chains: [sepolia],
-        projectId,
+        chains: [
+            {
+                chainId: 421614,
+                name: "Arbitrum Sepolia",
+                currency: "ETH",
+                explorerUrl: "https://sepolia.etherscan.io/",
+                rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
+            },
+        ],
+        projectId: "a09890b34dc1551c2534337dbc22de8c",
     })
 
+    const dispatch = useAppDispatch()
+    useTheme(modal === undefined)
     const { walletProvider } = useWeb3ModalProvider()
-
-    const { theme, toggleTheme } = useTheme(modal === undefined)
-    const { connectWallet, graviola, seasonsGovernor } = useWeb3()
+    const { connectWallet, graviola } = useWallet()
     const [loading, setLoading] = useState<boolean>(true)
-
-    // Contract data
-    const [dataFetched, setDataFetched] = useState<boolean>(false)
-    const [collection, setCollection] = useState<NFT[]>([])
-    const [rarities, setRarities] = useState<RaritiesData | null>(null)
-
-    const graviolaContextValue = {
-        contract: graviola,
-        collection,
-        rarities,
-    }
-
-    const appContextValue = {
-        theme,
-        toggleTheme,
-    }
+    // const [graviolaDataFetched, setGraviolaDataFetched] = useState<boolean>(false)
 
     // Fetch contract data
     useEffect(() => {
-        if (!graviola || dataFetched) return
+        if (!graviola || !loading) return
 
         const fetchCollection = async () => {
             const rarityGroupsData = await graviola.getRarityGroups()
@@ -111,12 +85,12 @@ const App = (props: { children: ReactNode }) => {
             console.log("[App] fetched collection ", collection) // DEBUG
             collection.length < 5
                 ? (() => {
-                      setCollection(new Array(5).fill(fallbackNFT))
                       console.warn(
                           "Collection is smaller than (5). Using fallback collection",
                       )
+                      dispatch(setCollection(new Array(5).fill(fallbackNFT)))
                   })()
-                : setCollection((prev) => [...prev, ...collection])
+                : dispatch(setCollection(collection))
 
             const raritiesData = rarityGroupsData.reduce<
                 Record<RarityLevel, RarityGroupData>
@@ -139,17 +113,14 @@ const App = (props: { children: ReactNode }) => {
             )
 
             // console.log("[App] raritiesData: ", raritiesData) // DEBUG
-            setRarities(raritiesData)
-            setLoading(false)
+            dispatch(setRarities(raritiesData))
             console.log("[App] collection loaded!")
 
-            const candidateListSize =
-                await seasonsGovernor.getCandidateListSize()
-            console.log("[CandidateList size]", candidateListSize)
+            setLoading(false)
         }
 
+        console.log("[App] Is running in dev mode?: ", isDevMode)
         fetchCollection()
-        setDataFetched(true)
     }, [graviola])
 
     useEffect(() => {
@@ -158,15 +129,7 @@ const App = (props: { children: ReactNode }) => {
         }
     }, [walletProvider])
 
-    return loading ? (
-        <Loading />
-    ) : (
-        <GraviolaContext.Provider value={graviolaContextValue}>
-            <AppContext.Provider value={appContextValue}>
-                {props.children}
-            </AppContext.Provider>
-        </GraviolaContext.Provider>
-    )
+    return loading ? <Loading /> : <Fragment>{props.children}</Fragment>
 }
 
 export default App

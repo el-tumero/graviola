@@ -4,13 +4,14 @@ import {
     setSigner,
     connectContractsToSigner,
     graviolaContract,
+    tokenContract,
     seasonsGovernorContract,
 } from "../web3"
 
 import localhostConfig from "../../../contracts/localhost-config.json"
-import { useAppSelector, useAppDispatch } from "../app/hooks"
-import { setConnected, setAddress } from "../features/wallet/walletSlice"
-import { Web3Address } from "../features/wallet/walletSlice"
+import { useAppSelector, useAppDispatch } from "../redux/hooks"
+import { setConnected, setAddress } from "../redux/reducers/wallet"
+import { Web3Address } from "../redux/reducers/wallet"
 import { BrowserProvider } from "ethers"
 
 export default function useWallet() {
@@ -18,7 +19,8 @@ export default function useWallet() {
     const address = useAppSelector((state) => state.wallet.address)
 
     const graviola = graviolaContract
-    const seasonsGovernor = seasonsGovernorContract
+    const grvSeasonsGovernor = seasonsGovernorContract
+    const grvToken = tokenContract
 
     const dispatch = useAppDispatch()
 
@@ -46,6 +48,7 @@ export default function useWallet() {
         isConnected,
         address,
         graviola,
-        seasonsGovernor,
+        grvToken,
+        grvSeasonsGovernor
     }
 }

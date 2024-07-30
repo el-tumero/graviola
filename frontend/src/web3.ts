@@ -1,4 +1,4 @@
-import { isDevMode } from "./app/mode"
+import { isDevMode } from "./utils/mode"
 import addressesLocal from "../../contracts/addresses-local.json"
 import addresses from "../../contracts/addresses.json"
 import { JsonRpcProvider, Signer } from "ethers"
@@ -7,6 +7,8 @@ import {
     Graviola__factory,
     GraviolaSeasonsGovernor,
     GraviolaSeasonsGovernor__factory,
+    GraviolaToken,
+    GraviolaToken__factory,
 } from "../../contracts/typechain-types/index"
 
 const defaultRpc = isDevMode
@@ -19,6 +21,10 @@ const seasonsGovernorAddress = isDevMode
     ? addressesLocal.SEASONS_GOVERNOR_ADDRESS
     : addresses.SEASONS_GOVERNOR_ADDRESS
 
+const tokenAddress = isDevMode
+    ? addressesLocal.TOKEN_ADDRESS
+    : addresses.TOKEN_ADDRESS
+
 let provider = new JsonRpcProvider(defaultRpc)
 let graviolaContract: Graviola = Graviola__factory.connect(
     graviolaAddress,
@@ -26,6 +32,8 @@ let graviolaContract: Graviola = Graviola__factory.connect(
 )
 let seasonsGovernorContract: GraviolaSeasonsGovernor =
     GraviolaSeasonsGovernor__factory.connect(seasonsGovernorAddress, provider)
+
+let tokenContract: GraviolaToken = GraviolaToken__factory.connect(tokenAddress, provider)
 
 let signer: Signer | undefined
 
@@ -37,4 +45,4 @@ export function connectContractsToSigner() {
     graviolaContract = graviolaContract.connect(signer)
 }
 
-export { graviolaContract, seasonsGovernorContract }
+export { graviolaContract, seasonsGovernorContract, tokenContract }

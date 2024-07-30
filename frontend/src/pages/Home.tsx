@@ -2,13 +2,11 @@ import { useNavigate } from "react-router-dom"
 import { links } from "../links"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { mockMetaBannerData } from "../data/mock"
-import { useContext } from "react"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import AutoBlockNFT from "../components/AutoBlockNFT"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { routerPaths } from "../router"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import BlockNFT from "../components/BlockNFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
 import { RaritiesData } from "../types/RarityGroup"
@@ -18,14 +16,15 @@ import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import MetadataMock from "../components/ui/MetadataMock"
 import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
 import { nftRarityScaleArr } from "../data/fallbacks"
+import { useAppSelector } from "../redux/hooks"
 import Button from "../components/ui/Button"
 import Popup from "../components/Popup"
 
 const Home = () => {
     const navigate = useNavigate()
-
-    const graviolaContext = useContext(GraviolaContext)
-    const rGroups = graviolaContext.rarities as RaritiesData
+    const rGroups = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
 
     return (
         <FullscreenContainer>
@@ -40,7 +39,7 @@ const Home = () => {
                         type="neutral"
                         message={`
                         Graviola is growing rapidly; we're introducing big changes lately.
-                        If you encounter bugs or unexpected errors, please open an Issue in Github.`}
+                        If you encounter bugs or unexpected errors, please open an Issue on Github.`}
                     />
 
                     <SectionContainer>
@@ -58,10 +57,10 @@ const Home = () => {
                             <h2 className="text-light-text dark:text-dark-text text-lg">
                                 Own a piece of our limited-time, algorithmically
                                 generated character NFTs! Each one is a fun,
-                                unique creation blending art and tech. It's like
-                                collecting digital trading cards with a twist.
-                                Dive in, grab a quirky NFT, and join our chill
-                                community of enthusiasts
+                                unique creation blending art and tech. It&apos;s
+                                like collecting digital trading cards with a
+                                twist. Dive in, grab a quirky NFT, and join our
+                                chill community of enthusiasts
                             </h2>
                         </div>
 

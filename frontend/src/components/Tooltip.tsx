@@ -1,11 +1,10 @@
-import { useContext } from "react"
 import { Tooltip as BaseTooltip } from "react-tooltip"
-import { AppContext } from "../contexts/AppContext"
 import { ITooltip } from "react-tooltip"
+import { useAppSelector } from "../redux/hooks"
 import tailwindColors from "../../tailwind.config"
 
 const Tooltip = (props: ITooltip) => {
-    const { theme } = useContext(AppContext)
+    const { theme } = useAppSelector((state) => state.theme)
 
     const coreStyles = {
         fontSize: "0.75rem",

@@ -1,18 +1,18 @@
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { Status } from "../types/Status"
 import { clsx as cl } from "clsx"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import BlockNFT from "./BlockNFT"
 import { nftRarityScaleArr } from "../data/fallbacks"
+import { useAppSelector } from "../redux/hooks"
 
 const NFT_AMOUNT = 5 // 5 is sweet spot
 const AUTO_CHANGE_TIME_INTERVAL_MS = 5000 // 5s
 
 const AutoBlockNFT = () => {
-    const { collection } = useContext(GraviolaContext) as {
-        collection: NFT[]
-    }
+    const collection = useAppSelector(
+        (state) => state.graviolaData.collection,
+    ) as NFT[]
 
     const shouldUseFallbackNFTList = collection.length < NFT_AMOUNT
     const [status, setStatus] = useState<Status>("loading")
