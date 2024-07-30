@@ -12,12 +12,10 @@ struct Metadata {
     bool filled;
 }
 
-contract GraviolaMetadata {
+abstract contract GraviolaMetadata {
     using JsonWriter for JsonWriter.Json;
 
     mapping(uint256 => Metadata) private metadataStorage;
-    string internal constant PROMPT_BASE =
-        "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
     // NOTE: addRarity() should be called after this func
     function addPrompt(uint256 tokenId, string memory prompt) internal {
@@ -102,7 +100,7 @@ contract GraviolaMetadata {
                     generateJSON(
                         metadataStorage[tokenId].image,
                         string.concat(
-                            PROMPT_BASE,
+                            "todo: add promtp base",
                             metadataStorage[tokenId].prompt
                         ),
                         metadataStorage[tokenId].rarity,

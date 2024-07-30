@@ -1,10 +1,11 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 
-abstract contract GraviolaNonFungible is ERC721 {
-    // mapping for tokens owned by address (user)
+contract GraviolaCollection is ERC721 {
+    constructor() ERC721("GraviolaCollection", "GRVC") {}
+
     mapping(address => uint256[]) private _ownedTokens;
 
     function _update(
@@ -20,7 +21,7 @@ abstract contract GraviolaNonFungible is ERC721 {
 
     function ownedTokens(
         address addr
-    ) public view returns (uint256[] memory output) {
+    ) external view returns (uint256[] memory output) {
         uint256[] memory buffer = new uint256[](_ownedTokens[addr].length);
         uint256 j = 0;
         for (uint i = 0; i < _ownedTokens[addr].length; i++) {
