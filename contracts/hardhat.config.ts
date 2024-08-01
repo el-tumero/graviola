@@ -1,7 +1,6 @@
 import "dotenv/config"
 import { HardhatUserConfig } from "hardhat/config"
 import "@nomicfoundation/hardhat-toolbox"
-import "@nomicfoundation/hardhat-foundry"
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 const API_KEY_INFURA = process.env.API_KEY_INFURA
@@ -24,7 +23,7 @@ const config: HardhatUserConfig = {
         sources: "./src",
         tests: "./test",
         cache: "./cache_hardhat",
-        artifacts: "./out",
+        artifacts: "./artifacts",
     },
 }
 

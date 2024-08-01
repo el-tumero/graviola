@@ -1,17 +1,25 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IGraviolaSeasonsArchive} from "./seasons/IGraviolaSeasonsArchive.sol";
+import {GraviolaSeed} from "./GraviolaSeed.sol";
+
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IGraviolaCollection} from "./IGraviolaCollection.sol";
 import {IAIOracle} from "../OAO/IAIOracle.sol";
 
-contract GraviolaGenerator {
+import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
+import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
+import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
+
+contract GraviolaGenerator is
+    GraviolaSeed,
+    VRFV2PlusWrapperConsumerBase,
+    ConfirmedOwner
+{
     string internal constant PROMPT_BASE =
         "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
     IERC20 private token;
-    IGraviolaSeasonsArchive private archive;
     IGraviolaCollection private collection;
     IAIOracle private aiOracle;
 
@@ -41,21 +49,28 @@ contract GraviolaGenerator {
 
     mapping(uint256 => Request) requests;
 
+    uint32 private constant callbackGasLimit = 100000;
+    uint16 private constant requestConfirmations = 3;
+    uint32 private constant numWords = 1;
+
     constructor(
         address tokenAddress,
         address archiveAddress,
         address collectionAddress,
-        address aiOracleAddress
-    ) {
+        address aiOracleAddress,
+        address wrapperAddress
+    )
+        GraviolaSeed(archiveAddress)
+        ConfirmedOwner(msg.sender)
+        VRFV2PlusWrapperConsumerBase(wrapperAddress)
+    {
         token = IERC20(tokenAddress);
-        archive = IGraviolaSeasonsArchive(archiveAddress);
         collection = IGraviolaCollection(collectionAddress);
         aiOracle = IAIOracle(aiOracleAddress);
     }
 
     function prepare() external payable {
-        // (uint256 requestId) = requestRandomnessPayInNative()
-        uint256 requestId = 1;
+        (uint256 requestId, ) = requestRandomWords();
         requests[requestId] = Request({
             status: RequestStatus.VRF_WAIT,
             seed: 0,
@@ -64,10 +79,27 @@ contract GraviolaGenerator {
         emit RequestVRFSent(requestId);
     }
 
+    function requestRandomWords()
+        internal
+        onlyOwner
+        returns (uint256, uint256)
+    {
+        bytes memory extraArgs = VRFV2PlusClient._argsToBytes(
+            VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
+        );
+        (uint256 requestId, uint256 reqPrice) = requestRandomnessPayInNative(
+            callbackGasLimit,
+            requestConfirmations,
+            numWords,
+            extraArgs
+        );
+        return (requestId, reqPrice);
+    }
+
     function fulfillRandomWords(
         uint256 _requestId,
         uint256[] memory _randomWords
-    ) internal {
+    ) internal override {
         Request storage request = requests[_requestId];
         if (request.status != RequestStatus.VRF_WAIT) {
             revert RequestVRFNotFound();
