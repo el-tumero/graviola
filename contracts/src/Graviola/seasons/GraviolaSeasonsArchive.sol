@@ -25,7 +25,11 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     mapping(uint256 => Season) private seasons;
 
     uint256 private currentSeasonId;
-    uint8[totalRarityGroups] wordsPerRarityGroup = [77, 15, 5, 2, 1];
+    uint8[totalRarityGroups] wordsPerRarityGroup = [1, 2, 5, 15, 77];
+    uint8[totalRarityGroups] rarityGroupWeights = [12, 8, 5, 3, 1];
+
+    // [77, 15, 5, 2, 1];
+    // [1, 2, 5, 15, 77];
 
     function nameSeason(
         uint256 seasonId,
@@ -54,7 +58,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
         require(season.well.length < wellSize);
         season.well.push(word);
         if (season.well.length <= expLen) expiredWords[word] = true;
-        else usedWords[word] = true;
+        usedWords[word] = true;
     }
 
     function isWordExpired(string calldata word) external view returns (bool) {
@@ -65,12 +69,42 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
         return usedWords[word];
     }
 
-    function getWordsPerRarityGroup()
-        external
-        view
-        returns (uint8[totalRarityGroups] memory)
-    {
-        return wordsPerRarityGroup;
+    function getRarityGroupById(uint256 id) external view returns (uint256) {
+        uint256 range;
+        for (uint i = 0; i < totalRarityGroups; i++) {
+            range += wordsPerRarityGroup[i];
+            if (id < range) return i;
+        }
+        return totalRarityGroups - 1;
+    }
+
+    function getWordsPerRarityGroup(
+        uint256 groupId
+    ) external view returns (uint8) {
+        return wordsPerRarityGroup[groupId];
+    }
+
+    function getRarityGroupWeight(
+        uint256 groupId
+    ) external view returns (uint8) {
+        return rarityGroupWeights[groupId];
+    }
+
+    function getWellSize() external view returns (uint256) {
+        return wellSize;
+    }
+
+    function getWord(
+        uint256 wordId,
+        uint256 seasonId
+    ) public view returns (string memory) {
+        return seasons[seasonId].well[wordId];
+    }
+
+    function getWordCurrentSeason(
+        uint256 wordId
+    ) external view returns (string memory) {
+        return getWord(wordId, currentSeasonId);
     }
 
     function setWellSize(uint16 size) external onlyOwner {

@@ -6,18 +6,12 @@ import "@openzeppelin/contracts/utils/structs/DoubleEndedQueue.sol";
 import "./GraviolaMetadata.sol";
 import "../OAO/AIOracleCallbackReceiver.sol";
 import "./GraviolaWell.sol";
-import "./GraviolaNonFungible.sol";
 
 // Uncomment this line to use console.log
 // import "hardhat/console.sol";
 
 /// @notice A base contract for Graviola non-fungible token
-contract Graviola is
-    GraviolaNonFungible,
-    GraviolaMetadata,
-    GraviolaWell,
-    AIOracleCallbackReceiver
-{
+contract Graviola is GraviolaMetadata, GraviolaWell, AIOracleCallbackReceiver {
     using DoubleEndedQueue for DoubleEndedQueue.Bytes32Deque;
 
     /// @notice Mint is emitted when the account calls mint()
@@ -77,18 +71,13 @@ contract Graviola is
     constructor(
         address aiOracle,
         address vrfHost
-    )
-        ERC721("Graviola", "GRV")
-        GraviolaNonFungible()
-        GraviolaWell()
-        AIOracleCallbackReceiver(IAIOracle(aiOracle))
-    {}
+    ) GraviolaWell() AIOracleCallbackReceiver(IAIOracle(aiOracle)) {}
 
     /// @notice minting a token without metadata
     /// @dev can be called by anybody
     function mint() external payable {
         require(msg.value > estimateFee() + 0.005 ether);
-        _safeMint(msg.sender, _nextTokenId);
+        // _safeMint(msg.sender, _nextTokenId);
         emit Mint(msg.sender, _nextTokenId);
         pasteRandomValue(_nextTokenId); // temp
 
@@ -110,7 +99,7 @@ contract Graviola is
             randomValue
         );
 
-        string memory fullPrompt = string.concat(PROMPT_BASE, prompt);
+        string memory fullPrompt = string.concat("123", prompt);
 
         // metadata
         addPrompt(tokenId, prompt);
@@ -126,12 +115,12 @@ contract Graviola is
         uint[TOKENS_PER_TRADE_UP] memory _tradeUpTokenIds
     ) external payable {
         require(msg.value > estimateFee() + 0.005 ether, "Fee is too low!");
-        require(
-            _ownerOf(_tradeUpTokenIds[0]) == msg.sender &&
-                _ownerOf(_tradeUpTokenIds[1]) == msg.sender &&
-                _ownerOf(_tradeUpTokenIds[2]) == msg.sender,
-            "Only the owner of the tokens can trade them up!"
-        );
+        // require(
+        //     _ownerOf(_tradeUpTokenIds[0]) == msg.sender &&
+        //         _ownerOf(_tradeUpTokenIds[1]) == msg.sender &&
+        //         _ownerOf(_tradeUpTokenIds[2]) == msg.sender,
+        //     "Only the owner of the tokens can trade them up!"
+        // );
 
         (bool sameRarityGroup, uint rarityGroupId) = raritiesInTheSameGroup(
             _tradeUpTokenIds
@@ -146,7 +135,7 @@ contract Graviola is
         );
 
         uint256 tokenId = _nextTokenId++;
-        _safeMint(msg.sender, tokenId);
+        // _safeMint(msg.sender, tokenId);
         emit Mint(msg.sender, tokenId);
 
         uint256 seed = uint256(blockhash(block.number - 1)); // temp option
@@ -155,11 +144,11 @@ contract Graviola is
             rarityGroupId
         );
 
-        _burn(_tradeUpTokenIds[0]);
-        _burn(_tradeUpTokenIds[1]);
-        _burn(_tradeUpTokenIds[2]);
+        // _burn(_tradeUpTokenIds[0]);
+        // _burn(_tradeUpTokenIds[1]);
+        // _burn(_tradeUpTokenIds[2]);
 
-        string memory fullPrompt = string.concat(PROMPT_BASE, prompt);
+        string memory fullPrompt = string.concat("123", prompt);
 
         // adds metadata
         addPrompt(tokenId, prompt);
@@ -191,7 +180,7 @@ contract Graviola is
         uint256 tokenId = abi.decode(callbackData, (uint256));
         addImage(tokenId, string(output));
         oaoRequestsStatus[requestId] = OAORequestStatus.DONE;
-        emit TokenReady(ownerOf(tokenId), tokenId);
+        emit TokenReady(address(1), tokenId);
     }
 
     function estimateFee() public view returns (uint256) {
@@ -200,12 +189,6 @@ contract Graviola is
                 AIORACLE_MODEL_ID,
                 AIORACLE_CALLBACK_GAS_LIMIT
             );
-    }
-
-    function tokenURI(
-        uint256 tokenId
-    ) public view virtual override returns (string memory) {
-        return _tokenURI(tokenId);
     }
 
     function totalSupply() public view returns (uint256) {
