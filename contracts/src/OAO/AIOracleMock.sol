@@ -46,7 +46,7 @@ contract AIOracleMock is IAIOracle {
                 revert(add(data, 32), mload(data))
             }
         }
-        emit AICallbackResult(msg.sender, requestId, output);
+        emit AICallbackResult(msg.sender, requestId, msg.sender, output);
     }
 
     function requestCallback(
