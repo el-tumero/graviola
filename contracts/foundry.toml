@@ -5,6 +5,7 @@
     out = "out"
     solc = "0.8.24"
     evm_version = "shanghai"
+    cache_path="cache_forge"
 
 [rpc_endpoints]
     sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
