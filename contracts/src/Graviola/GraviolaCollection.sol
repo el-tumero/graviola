@@ -2,11 +2,39 @@
 pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {GraviolaMetadata, Metadata} from "./GraviolaMetadata.sol";
 
-contract GraviolaCollection is ERC721 {
-    constructor() ERC721("GraviolaCollection", "GRVC") {}
-
+contract GraviolaCollection is ERC721, Ownable, GraviolaMetadata {
     mapping(address => uint256[]) private _ownedTokens;
+
+    uint256 private nextTokenId;
+
+    constructor(
+        address ownerAddress,
+        address archiveAddress
+    )
+        ERC721("GraviolaCollection", "GRVC")
+        Ownable(ownerAddress)
+        GraviolaMetadata(archiveAddress)
+    {}
+
+    function mint(address to) external onlyOwner returns (uint256) {
+        uint256 tokenId = nextTokenId++;
+        _safeMint(to, tokenId);
+        return tokenId;
+    }
+
+    function createMetadata(
+        uint256 tokenId,
+        Metadata memory metadata
+    ) external onlyOwner {
+        _createMetadata(tokenId, metadata);
+    }
+
+    function addImage(uint256 tokenId, string memory image) external onlyOwner {
+        _addImage(tokenId, image);
+    }
 
     function _update(
         address to,

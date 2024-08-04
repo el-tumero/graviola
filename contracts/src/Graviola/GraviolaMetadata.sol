@@ -3,13 +3,15 @@ pragma solidity ^0.8.24;
 
 import "solidity-json-writer/contracts/JsonWriter.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
+import "./seasons/IGraviolaSeasonsArchive.sol";
 
 struct Metadata {
+    string description;
     string image;
-    string prompt;
     uint256 rarity;
     uint256 weightSum;
-    bool filled;
+    uint256 seasonId;
+    bool isReady;
 }
 
 abstract contract GraviolaMetadata {
@@ -17,60 +19,56 @@ abstract contract GraviolaMetadata {
 
     mapping(uint256 => Metadata) private metadataStorage;
 
-    // NOTE: addRarity() should be called after this func
-    function addPrompt(uint256 tokenId, string memory prompt) internal {
-        require(!metadataStorage[tokenId].filled, "Metadata is filled!");
-        metadataStorage[tokenId].prompt = prompt;
+    IGraviolaSeasonsArchive immutable seasonsArchive;
+
+    constructor(address seasonsArchiveAddress) {
+        seasonsArchive = IGraviolaSeasonsArchive(seasonsArchiveAddress);
     }
 
-    // NOTE: requestCallback() should be called after this func
-    function addRarity(uint256 tokenId, uint256 rarity) internal {
-        require(!metadataStorage[tokenId].filled, "Metadata is filled!");
-        metadataStorage[tokenId].rarity = rarity;
-    }
-
-    function addWeightSum(uint256 tokenId, uint256 sum) internal {
-        require(!metadataStorage[tokenId].filled, "Metadata is filled!");
-        metadataStorage[tokenId].weightSum = sum;
+    /// @notice Creates metadata and adds it to the metadata storage
+    /// @param tokenId id of the token
+    /// @param metadata Metadata struct object
+    function _createMetadata(
+        uint256 tokenId,
+        Metadata memory metadata
+    ) internal {
+        metadataStorage[tokenId] = metadata;
     }
 
     /// @notice Adds image cid to metadata for the token with given tokenId
     /// @param tokenId id of the token
     /// @param image cid
-    function addImage(uint256 tokenId, string memory image) internal {
-        require(!metadataStorage[tokenId].filled, "Metadata is filled!");
+    function _addImage(uint256 tokenId, string memory image) internal {
         metadataStorage[tokenId].image = image;
-        metadataStorage[tokenId].filled = true;
-    }
-
-    function getMetadata(
-        uint256 tokenId
-    ) public view returns (Metadata memory) {
-        return metadataStorage[tokenId];
     }
 
     // -- conversions --
 
     function generateJSON(
-        string memory image,
-        string memory prompt,
-        uint256 rarity,
-        uint256 weightSum
+        Metadata memory metadata
     ) private pure returns (string memory) {
         JsonWriter.Json memory writer;
         writer = writer.writeStartObject();
-        writer = writer.writeStringProperty("image", image);
-        writer = writer.writeStringProperty("description", prompt);
+        writer = writer = writer.writeStringProperty(
+            "description",
+            metadata.description
+        );
+        writer = writer.writeStringProperty("image", metadata.image);
         writer = writer.writeStartArray("attributes");
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("trait_type", "Rarity");
-        writer = writer.writeUintProperty("value", rarity);
+        writer = writer.writeUintProperty("value", metadata.rarity);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
         writer = writer.writeStringProperty("trait_type", "Weight Sum");
-        writer = writer.writeUintProperty("value", weightSum);
+        writer = writer.writeUintProperty("value", metadata.weightSum);
+        writer = writer.writeEndObject();
+
+        writer = writer.writeStartObject();
+        writer = writer.writeStringProperty("trait_type", "Season ID");
+        writer = writer.writeUintProperty("value", metadata.seasonId);
         writer = writer.writeEndObject();
 
         writer = writer.writeEndArray();
@@ -93,20 +91,8 @@ abstract contract GraviolaMetadata {
 
     // NOTE: public only for local tests
     function _tokenURI(uint256 tokenId) internal view returns (string memory) {
-        require(metadataStorage[tokenId].filled, "Metadata is empty!");
+        require(metadataStorage[tokenId].isReady, "Metadata is empty!");
         return
-            convertToBase64URL(
-                bytes(
-                    generateJSON(
-                        metadataStorage[tokenId].image,
-                        string.concat(
-                            "todo: add promtp base",
-                            metadataStorage[tokenId].prompt
-                        ),
-                        metadataStorage[tokenId].rarity,
-                        metadataStorage[tokenId].weightSum
-                    )
-                )
-            );
+            convertToBase64URL(bytes(generateJSON(metadataStorage[tokenId])));
     }
 }

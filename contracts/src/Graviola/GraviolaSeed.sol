@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {IGraviolaSeasonsArchive} from "./seasons/IGraviolaSeasonsArchive.sol";
 
 contract GraviolaSeed {
-    IGraviolaSeasonsArchive private archive;
+    IGraviolaSeasonsArchive internal archive;
 
     uint8 KEYWORDS_PER_TOKEN = 3;
 

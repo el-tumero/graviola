@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 interface IGraviolaSeasonsArchive {
     struct Season {
         string name;
+        string promptBase;
         string[] well;
     }
 
@@ -11,7 +12,20 @@ interface IGraviolaSeasonsArchive {
 
     function nextSeason() external;
 
+    function addPromptBase(
+        uint256 seasonId,
+        string calldata promptBase
+    ) external;
+
     function getSeason(uint256 seasonId) external view returns (Season memory);
+
+    function getSeasonName(
+        uint256 seasonId
+    ) external view returns (string memory);
+
+    function getSeasonPromptBase(
+        uint256 seasonId
+    ) external view returns (string memory);
 
     function getCurrentSeasonId() external view returns (uint256);
 

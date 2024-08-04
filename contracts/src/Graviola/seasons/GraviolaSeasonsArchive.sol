@@ -10,7 +10,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     uint16 wellSize = 100; // how many words can be added to single season's well
     uint8 expLen = 8; // how many words expire after season
 
-    uint8 constant totalRarityGroups = 5;
+    uint8 constant TOTAL_RARITY_GROUPS = 5;
 
     enum Rarity {
         COMMON,
@@ -25,8 +25,8 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     mapping(uint256 => Season) private seasons;
 
     uint256 private currentSeasonId;
-    uint8[totalRarityGroups] wordsPerRarityGroup = [1, 2, 5, 15, 77];
-    uint8[totalRarityGroups] rarityGroupWeights = [12, 8, 5, 3, 1];
+    uint8[TOTAL_RARITY_GROUPS] wordsPerRarityGroup = [1, 2, 5, 15, 77];
+    uint8[TOTAL_RARITY_GROUPS] rarityGroupWeights = [12, 8, 5, 3, 1];
 
     // [77, 15, 5, 2, 1];
     // [1, 2, 5, 15, 77];
@@ -36,6 +36,13 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
         string calldata name
     ) external onlyOwner {
         seasons[seasonId].name = name;
+    }
+
+    function addPromptBase(
+        uint256 seasonId,
+        string calldata promptBase
+    ) external onlyOwner {
+        seasons[seasonId].promptBase = promptBase;
     }
 
     function nextSeason() external onlyOwner {
@@ -48,6 +55,18 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
 
     function getCurrentSeasonId() external view returns (uint256) {
         return currentSeasonId;
+    }
+
+    function getSeasonName(
+        uint256 seasonId
+    ) external view override returns (string memory) {
+        return seasons[seasonId].name;
+    }
+
+    function getSeasonPromptBase(
+        uint256 seasonId
+    ) external view override returns (string memory) {
+        return seasons[seasonId].promptBase;
     }
 
     function addWordToSeason(
@@ -71,11 +90,11 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
 
     function getRarityGroupById(uint256 id) external view returns (uint256) {
         uint256 range;
-        for (uint i = 0; i < totalRarityGroups; i++) {
+        for (uint i = 0; i < TOTAL_RARITY_GROUPS; i++) {
             range += wordsPerRarityGroup[i];
             if (id < range) return i;
         }
-        return totalRarityGroups - 1;
+        return TOTAL_RARITY_GROUPS - 1;
     }
 
     function getWordsPerRarityGroup(
