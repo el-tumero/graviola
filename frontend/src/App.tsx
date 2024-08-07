@@ -47,7 +47,6 @@ const App = (props: { children: ReactNode }) => {
     const { walletProvider } = useWeb3ModalProvider()
     const { connectWallet, graviola } = useWallet()
     const [loading, setLoading] = useState<boolean>(true)
-    // const [graviolaDataFetched, setGraviolaDataFetched] = useState<boolean>(false)
 
     // Fetch contract data
     useEffect(() => {
@@ -118,6 +117,7 @@ const App = (props: { children: ReactNode }) => {
 
             setLoading(false)
         }
+
 
         console.log("[App] Is running in dev mode?: ", isDevMode)
         fetchCollection()
