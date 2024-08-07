@@ -5,8 +5,7 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "cross-env NODE_ENV=dev vite",
-        "dev:test": "concurrently 'cross-env NODE_ENV=dev vite --open' 'cd ../contracts && yarn local-node'",
+        "dev": "cross-env NODE_ENV=dev vite --open",
         "build": "vite build",
         "predeploy": "vite build && cp ./dist/index.html ./dist/404.html",
         "pretty": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\" --tab-width 4 --no-semi --jsx-single-quote false",

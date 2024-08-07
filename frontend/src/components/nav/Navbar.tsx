@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Logo from "../../assets/logo.webp"
 import NavElement from "./NavElement"
 import { useNavigate } from "react-router-dom"
@@ -9,14 +9,45 @@ import NavListDesktop from "./NavList"
 import icons from "../../data/icons"
 import { links } from "../../links"
 import { isDevMode } from "../../utils/mode"
+import { userStatsSlice } from "../../redux/reducers/stats"
 import useTheme from "../../hooks/useTheme"
 import useWallet from "../../hooks/useWallet"
+import { useAppDispatch } from "../../redux/hooks"
 
 const Navbar = () => {
+
+    const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
+    const [userStatsFetched, setUserStatsFetched] = useState<boolean>(false)
     const { theme, toggleTheme } = useTheme(true)
-    const { connectDevWallet, isConnected } = useWallet()
+    const { address, connectDevWallet, isConnected, grvToken, graviola } = useWallet()
+
+    // fetch user stats
+    useEffect(() => {
+        if (!address || !isConnected || userStatsFetched) return
+        (async () => {
+            try {
+                const ownedNfts = await graviola.balanceOf(address)
+                // console.log(ownedNfts)
+                const tokenBalance = await grvToken.balanceOf(address)
+                // console.log(tokenBalance)
+                const grvAddress = await graviola.getAddress()
+                const filter = graviola.filters.Transfer(grvAddress, address)
+                const events = await graviola.queryFilter(filter)
+                const droppedNfts = events.length
+                // console.log(droppedNfts)
+                dispatch(userStatsSlice.actions.setUserStats({
+                    tokenBalance: Number(tokenBalance),
+                    nftsOwned: Number(ownedNfts),
+                    nftsDropped: droppedNfts
+                }))
+                setUserStatsFetched(true)
+            } catch (err) {
+                console.error(err)
+            }
+        })()
+    }, [address, isConnected])
 
     /* eslint-disable */
     const navItems = [
