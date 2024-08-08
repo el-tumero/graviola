@@ -113,6 +113,12 @@ contract GraviolaSeasonsGovernor is
         return voting[votingId].state;
     }
 
+    function getVotingStartTimestamp(
+        uint256 votingId
+    ) external view returns (uint256) {
+        return voting[votingId].startTimestamp;
+    }
+
     function getCandidateScore(uint256 word) external view returns (uint256) {
         return getValue(word);
     }
@@ -140,8 +146,4 @@ contract GraviolaSeasonsGovernor is
     function getCandidateListSize() external view returns (uint256) {
         return _getListSize();
     }
-
-
-
-
 }

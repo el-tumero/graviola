@@ -17,6 +17,7 @@ import icons from "../data/icons"
 import Button from "../components/ui/Button"
 import { Candidate } from "../types/Candidate"
 import { useAppSelector } from "../redux/hooks"
+import useWallet from "../hooks/useWallet"
 
 type ActivePage = "Voting" | "Archive"
 
@@ -293,6 +294,28 @@ const KeywordVotingPage = (props: {
         5: compareAlphabetically("Descending"), // BY_K2EYWORD_ASC
     }
 
+    const [candidates, setCandidates] = useState<CandidateInfo[]>([])
+
+    const { grvSeasonsGovernor } = useWallet()
+
+    useEffect(() => {
+        ;(async () => {
+            const listSize = await grvSeasonsGovernor.getCandidateListSize()
+
+            const rawCandidates =
+                await grvSeasonsGovernor.getTopCandidatesInfo(listSize)
+            setCandidates(
+                rawCandidates.map(([id, score, author]) => ({
+                    id: Number(id),
+                    author,
+                    keyword: score.toString(),
+                    score: Number(id),
+                    iteration: 1,
+                })),
+            )
+        })()
+    }, [])
+
     const mockCandidates = candJson.candidates.map(
         (data: Candidate, i: number) => {
             const candidateData: CandidateInfo = {
@@ -382,7 +405,7 @@ const KeywordVotingPage = (props: {
                     role="list"
                     className="w-full divide-y divide-light-border dark:divide-dark-border"
                 >
-                    {mockCandidates
+                    {candidates
                         .sort(sortCompareFns[sorting])
                         .map((candInfo, idx) => (
                             <KeywordCandidate {...candInfo} key={idx} />
@@ -393,85 +416,107 @@ const KeywordVotingPage = (props: {
     )
 }
 
-const KeywordCandidate = (props: CandidateInfo) => (
-    <div
-        className={cl(
-            "flex w-full h-fit p-3 justify-between items-center overflow-x-hidden",
-            "max-md:gap-2 max-md:justify-start max-md:items-start",
-            "even:bg-light-border/30 even:dark:bg-dark-border/30",
-            "odd:bg-light-bgDark/30 odd:dark:bg-dark-bgLight/30",
-            "first:rounded-t-md last:rounded-b-md",
-        )}
-    >
-        {/* Pre-left part: global item index */}
-        <div className="mr-2 self-center w-6">
-            <span className="font-mono text-light-text/75 dark:text-dark-text/75">
-                {props.id}.
-            </span>
-        </div>
-        {/* Left part: Id, Badge, Keyword, Iteration info */}
+const KeywordCandidate = (props: CandidateInfo) => {
+    const { grvSeasonsGovernor } = useWallet()
+
+    const handleUpvote = async () => {
+        const tx = await grvSeasonsGovernor.upvoteCandidate(props.id, {
+            gasLimit: 1_000_000,
+        })
+        console.log(tx)
+    }
+
+    const handleDownvote = async () => {
+        const tx = await grvSeasonsGovernor.downvoteCandidate(props.id, {
+            gasLimit: 1_000_000,
+        })
+        console.log(tx)
+    }
+
+    return (
         <div
             className={cl(
-                "flex flex-nowrap gap-3 justify-center items-center w-1/2 h-full",
-                "max-md:w-full",
+                "flex w-full h-fit p-3 justify-between items-center overflow-x-hidden",
+                "max-md:gap-2 max-md:justify-start max-md:items-start",
+                "even:bg-light-border/30 even:dark:bg-dark-border/30",
+                "odd:bg-light-bgDark/30 odd:dark:bg-dark-bgLight/30",
+                "first:rounded-t-md last:rounded-b-md",
             )}
         >
+            {/* Pre-left part: global item index */}
+            <div className="mr-2 self-center w-6">
+                <span className="font-mono text-light-text/75 dark:text-dark-text/75">
+                    {props.id}.
+                </span>
+            </div>
+            {/* Left part: Id, Badge, Keyword, Iteration info */}
             <div
                 className={cl(
-                    "w-8 h-8 flex justify-center items-center",
-                    !props.badge && [
-                        "border-2 border-light-border dark:border-dark-border",
-                        "border-dashed rounded-md",
-                    ],
+                    "flex flex-nowrap gap-3 justify-center items-center w-1/2 h-full",
+                    "max-md:w-full",
                 )}
             >
-                {props.badge && <img src={props.badge} />}
-            </div>
-            <div className="flex w-full flex-1 gap-0.5 justify-start items-center">
-                <p className="mr-1 font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
-                    ({props.iteration})
-                </p>
-                <p>{props.keyword}</p>
-            </div>
-        </div>
-        {/* Right part: Score, Upvote, Downvote */}
-        <div
-            className={cl(
-                "w-1/2 flex justify-end items-center h-full gap-3",
-                "max-md:w-full",
-            )}
-        >
-            <div className={cl("flex w-24 justify-end items-center")}>
-                <span className="font-semibold font-mono">{props.score}</span>
-            </div>
-            <div className="flex gap-1.5 flex-nowrap">
                 <div
                     className={cl(
-                        "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer -rotate-90",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                        "hover:bg-accentDark/50 hover:dark:bg-accent/50 duration-300 transition-colors",
-                        "hover:border-accentDark hover:dark:border-accent",
-                        "text-accentDark dark:text-accent",
+                        "w-8 h-8 flex justify-center items-center",
+                        !props.badge && [
+                            "border-2 border-light-border dark:border-dark-border",
+                            "border-dashed rounded-md",
+                        ],
                     )}
                 >
-                    {icons.arrow}
+                    {props.badge && <img src={props.badge} />}
                 </div>
-                <div
-                    className={cl(
-                        "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer rotate-90",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                        "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
-                        "hover:border-red-500 hover:dark:border-red-500",
-                        "text-red-500 dark:text-red-500",
-                    )}
-                >
-                    {icons.arrow}
+                <div className="flex w-full flex-1 gap-0.5 justify-start items-center">
+                    <p className="mr-1 font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
+                        ({props.iteration})
+                    </p>
+                    <p>{props.keyword}</p>
+                </div>
+            </div>
+            {/* Right part: Score, Upvote, Downvote */}
+            <div
+                className={cl(
+                    "w-1/2 flex justify-end items-center h-full gap-3",
+                    "max-md:w-full",
+                )}
+            >
+                <div className={cl("flex w-24 justify-end items-center")}>
+                    <span className="font-semibold font-mono">
+                        {props.score}
+                    </span>
+                </div>
+                <div className="flex gap-1.5 flex-nowrap">
+                    <div
+                        className={cl(
+                            "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer -rotate-90",
+                            "border border-light-border dark:border-dark-border",
+                            "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
+                            "hover:bg-accentDark/50 hover:dark:bg-accent/50 duration-300 transition-colors",
+                            "hover:border-accentDark hover:dark:border-accent",
+                            "text-accentDark dark:text-accent",
+                        )}
+                        onClick={handleUpvote}
+                    >
+                        {icons.arrow}
+                    </div>
+                    <div
+                        className={cl(
+                            "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer rotate-90",
+                            "border border-light-border dark:border-dark-border",
+                            "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
+                            "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
+                            "hover:border-red-500 hover:dark:border-red-500",
+                            "text-red-500 dark:text-red-500",
+                        )}
+                        onClick={handleDownvote}
+                    >
+                        {icons.arrow}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-)
+    )
+}
 
 export default Voting

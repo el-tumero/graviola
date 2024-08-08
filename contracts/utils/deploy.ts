@@ -34,6 +34,8 @@ async function main() {
             )
         }
 
+        await hardhat.run("compile")
+
         const { output, script } = config[variant]
 
         const addresses = await script()

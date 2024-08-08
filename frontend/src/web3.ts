@@ -33,7 +33,10 @@ let graviolaContract: Graviola = Graviola__factory.connect(
 let seasonsGovernorContract: GraviolaSeasonsGovernor =
     GraviolaSeasonsGovernor__factory.connect(seasonsGovernorAddress, provider)
 
-let tokenContract: GraviolaToken = GraviolaToken__factory.connect(tokenAddress, provider)
+let tokenContract: GraviolaToken = GraviolaToken__factory.connect(
+    tokenAddress,
+    provider,
+)
 
 let signer: Signer | undefined
 
@@ -43,6 +46,8 @@ export function setSigner(s: Signer) {
 
 export function connectContractsToSigner() {
     graviolaContract = graviolaContract.connect(signer)
+    tokenContract = tokenContract.connect(signer)
+    seasonsGovernorContract = seasonsGovernorContract.connect(signer)
 }
 
 export { graviolaContract, seasonsGovernorContract, tokenContract }

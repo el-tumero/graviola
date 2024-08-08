@@ -33,9 +33,13 @@ contract LocalMigration {
         gsa = new GraviolaSeasonsArchive(msg.sender);
         gsg = new TGraviolaSeasonsGovernor(address(gsa), address(gt));
 
-        for (uint i = 1; i < 100; i++) {
+        for (uint i = 1; i < 101; i++) {
             gsg.addAndUpvote(i);
         }
+    }
+
+    function snapshot() external {
+        gsg.snapshot();
     }
 
     function getNames()
