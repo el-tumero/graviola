@@ -12,6 +12,114 @@ import {GraviolaCollection} from "../Graviola/GraviolaCollection.sol";
 contract LocalMigration {
     uint256 constant NUMBER_OF_CONTRACTS = 7;
 
+    string private constant DEFAULT_PROMPT_BASE =
+        "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
+
+    uint256 constant NUMBER_OF_KEYWORDS = 100;
+
+    string[NUMBER_OF_KEYWORDS] keywords = [
+        "human",
+        "android",
+        "robot",
+        "cyborg",
+        "droid",
+        "clone",
+        "replicant",
+        "simulant",
+        "machina",
+        "automa",
+        "cybernetic",
+        "bionic",
+        "golem",
+        "mechanoid",
+        "synthetic",
+        "hologram",
+        "artificer",
+        "servitor",
+        "doppelganger",
+        "mimic",
+        "automaton",
+        "construct",
+        "program",
+        "replica",
+        "model",
+        "drone",
+        "entity",
+        "avatar",
+        "system",
+        "framework",
+        "unit",
+        "figure",
+        "template",
+        "pattern",
+        "layout",
+        "format",
+        "config",
+        "blueprint",
+        "prototype",
+        "design",
+        "machine",
+        "device",
+        "engine",
+        "instrument",
+        "gadget",
+        "appliance",
+        "tool",
+        "apparatus",
+        "mechanism",
+        "gear",
+        "module",
+        "component",
+        "part",
+        "element",
+        "piece",
+        "subsystem",
+        "structure",
+        "architecture",
+        "network",
+        "grid",
+        "mesh",
+        "web",
+        "infrastructure",
+        "circuit",
+        "pathway",
+        "channel",
+        "conduit",
+        "track",
+        "route",
+        "course",
+        "line",
+        "fire",
+        "water",
+        "matrix",
+        "nexus",
+        "interface",
+        "controller",
+        "elf",
+        "goblin",
+        "gnome",
+        "fairy",
+        "troll",
+        "sprite",
+        "nymph",
+        "imp",
+        "dryad",
+        "satyr",
+        "hobbit",
+        "leprechaun",
+        "nomad",
+        "assassin",
+        "agent",
+        "mercenary",
+        "spy",
+        "hunter",
+        "berserker",
+        "mage",
+        "shaman",
+        "wizard",
+        "graviola"
+    ];
+
     string[NUMBER_OF_CONTRACTS] private names = [
         "VRF",
         "OAO",
@@ -23,7 +131,6 @@ contract LocalMigration {
     ];
 
     VRFV2PlusWrapperMock private vrf;
-
     AIOracleMock private oao;
     GraviolaToken private gt;
     GraviolaCollection private collection;
@@ -37,6 +144,7 @@ contract LocalMigration {
         gt = new GraviolaToken(msg.sender);
         gsa = new GraviolaSeasonsArchive(msg.sender);
         gsg = new TGraviolaSeasonsGovernor(address(gsa), address(gt));
+        collection = new GraviolaCollection(msg.sender, address(1));
 
         generator = new GraviolaGenerator(
             address(gt),
@@ -48,6 +156,14 @@ contract LocalMigration {
 
         for (uint i = 1; i < 100; i++) {
             gsg.addAndUpvote(i);
+        }
+
+        gsa.nameSeason(0, "Summer 2024");
+        gsa.addPromptBase(0, DEFAULT_PROMPT_BASE);
+
+        // fill season with keywords
+        for (uint i = 0; i < NUMBER_OF_KEYWORDS; i++) {
+            gsa.addWordToSeason(0, keywords[i]);
         }
     }
 

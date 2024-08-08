@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {IVRFV2PlusWrapper} from "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFV2PlusWrapper.sol";
+import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
 
 contract VRFV2PlusWrapperMock is IVRFV2PlusWrapper {
     uint256 private _lastRequestId = 0;
@@ -10,12 +11,24 @@ contract VRFV2PlusWrapperMock is IVRFV2PlusWrapper {
     address private linkAddress = address(1);
     address private linkNativeFeedAddress = address(2);
 
-    event Request(
-        uint32 callbackGasLimit,
-        uint16 requestConfirmations,
-        uint32 numWords,
-        bytes extraArgs
-    );
+    // uint256[] randomValues = [
+    //     0x277C53DE11311A417F71762C9C21790B2DF973C12BA9303436E6801246BFDD4D,
+    //     0x1BF7689A00773BFF5D1E8CE5577CE9FD826695D5E58F73BE47308351CF73207D,
+    //     0x342E26AE4C066F833BD904A9E71A9860C1F5D20106C8521E0340835EFE923C9B
+    // ];
+
+    uint256[] randomWords = [
+        0x277C53DE11311A417F71762C9C21790B2DF973C12BA9303436E6801246BFDD4D
+    ];
+
+    struct Request {
+        uint32 callbackGasLimit;
+        uint16 requestConfirmations;
+        uint32 numWords;
+        address target;
+    }
+
+    mapping(uint256 => Request) private _requests;
 
     function lastRequestId() external view override returns (uint256) {
         return _lastRequestId;
@@ -61,15 +74,24 @@ contract VRFV2PlusWrapperMock is IVRFV2PlusWrapper {
         uint32 _callbackGasLimit,
         uint16 _requestConfirmations,
         uint32 _numWords,
-        bytes calldata extraArgs
+        bytes calldata /* extraArgs */
     ) external payable override returns (uint256 requestId) {
-        emit Request(
+        _requests[_lastRequestId] = Request(
             _callbackGasLimit,
             _requestConfirmations,
             _numWords,
-            extraArgs
+            msg.sender
         );
         return _lastRequestId++;
+    }
+
+    function fulfillRandomWords(uint256 _requestId) external {
+        Request memory request = _requests[_requestId];
+
+        VRFV2PlusWrapperConsumerBase(request.target).rawFulfillRandomWords(
+            _requestId,
+            randomWords
+        );
     }
 
     function link() external view override returns (address) {}

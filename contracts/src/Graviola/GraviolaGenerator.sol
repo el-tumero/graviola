@@ -87,6 +87,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         if (reqPrice > msg.value) {
             revert RequestVRFInsufficientBalance();
         }
+
         // add request to requests storage
         requests[requestId] = Request({
             status: RequestStatus.VRF_WAIT,
@@ -163,7 +164,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
 
         collection.createMetadata(tokenId, metadata);
 
-        aiOracle.requestCallback(
+        aiOracle.requestCallback{value: fee}(
             MODEL_ID,
             bytes(string.concat(promptBase, result)),
             address(this),

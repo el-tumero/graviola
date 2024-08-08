@@ -34,14 +34,14 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     function nameSeason(
         uint256 seasonId,
         string calldata name
-    ) external onlyOwner {
+    ) external /*onlyOwner*/ {
         seasons[seasonId].name = name;
     }
 
     function addPromptBase(
         uint256 seasonId,
         string calldata promptBase
-    ) external onlyOwner {
+    ) external /*onlyOwner*/ {
         seasons[seasonId].promptBase = promptBase;
     }
 
@@ -72,7 +72,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     function addWordToSeason(
         uint seasonId,
         string calldata word
-    ) external onlyOwner {
+    ) external /*onlyOwner*/ {
         Season storage season = seasons[seasonId];
         require(season.well.length < wellSize);
         season.well.push(word);
