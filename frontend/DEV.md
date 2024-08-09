@@ -16,8 +16,5 @@
 1. `yarn test` - This runs every available test
 2. `yarn test <path>` - This runs the test on the specified path
 
-### Running web on localhost
-
-1. (contracts) - `yarn local-node`
-2. (contracts) - `yarn deploy:local`
-3. (frontend) - `yarn dev`
+### Running the project locally
+- Use `local-dev.sh` for automated localhost setup

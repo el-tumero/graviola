@@ -29,18 +29,3 @@ jobs:
               run: |
                 chmod +x ./install.sh
                 ./install.sh
-
-            # - name: Deploy local contract & setup data
-            #   run: |
-            #       cd contracts
-            #       yarn
-            #       yarn hardhat compile
-            #       yarn hardhat node > /dev/null 2>&1 &
-            #       yarn deploy:local
-            #       yarn cand
-
-            # - name: Build website
-            #   run: |
-            #       cd frontend
-            #       yarn
-            #       yarn build
