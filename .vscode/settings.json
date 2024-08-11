@@ -1,0 +1,9 @@
+{
+    "solidity.compileUsingRemoteVersion": "v0.8.24+commit.e11b9ed9",
+    "solidity.linter": "solhint",
+    "solidity.formatter": "prettier",
+
+    "[solidity]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}
