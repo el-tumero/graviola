@@ -6,14 +6,14 @@ import {IGraviolaSeasonsArchive} from "./seasons/IGraviolaSeasonsArchive.sol";
 contract GraviolaSeed {
     IGraviolaSeasonsArchive internal archive;
 
-    uint8 KEYWORDS_PER_TOKEN = 3;
+    uint8 private KEYWORDS_PER_TOKEN = 3;
 
     constructor(address archiveAddress) {
         archive = IGraviolaSeasonsArchive(archiveAddress);
     }
 
     /// @notice Convert a fraction to basis points (BP)
-    function fractionToBasisPoints(
+    function _fractionToBasisPoints(
         uint256 _numerator,
         uint256 _denumerator
     ) internal pure returns (uint256) {
@@ -31,9 +31,9 @@ contract GraviolaSeed {
     ) public view returns (string memory, uint256, uint256) {
         uint16 i = 0;
         uint16 j = 0;
-        uint totalProbability = 1;
-        uint weightSum = 0;
-        int[] memory used = new int[](KEYWORDS_PER_TOKEN);
+        uint256 totalProbability = 1;
+        uint256 weightSum = 0;
+        int256[] memory used = new int256[](KEYWORDS_PER_TOKEN);
         string memory result = "";
 
         // Init 'used' arr
@@ -50,21 +50,21 @@ contract GraviolaSeed {
 
             // Duplicate id, re-roll
             if (
-                used[0] == int(wordId) ||
-                used[1] == int(wordId) ||
-                used[2] == int(wordId)
+                used[0] == int256(wordId) ||
+                used[1] == int256(wordId) ||
+                used[2] == int256(wordId)
             ) {
                 continue;
             }
 
-            used[i] = int(wordId);
+            used[i] = int256(wordId);
 
             // Get group of rolled word
             uint256 groupId = archive.getRarityGroupById(wordId);
             // Get word count for the group with given id
             uint256 groupWordCount = archive.getWordsPerRarityGroup(groupId);
 
-            totalProbability *= fractionToBasisPoints(groupWordCount, omega);
+            totalProbability *= _fractionToBasisPoints(groupWordCount, omega);
             weightSum += archive.getRarityGroupWeight(groupId);
 
             result = string(

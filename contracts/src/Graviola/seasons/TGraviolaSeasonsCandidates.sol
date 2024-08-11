@@ -23,16 +23,19 @@ contract TGraviolaSeasonsCandidates is GraviolaSeasonsCandidates {
         _upvoteCandidate(id, votingPower);
     }
 
-    function getTopCandidates(uint256 size) external view returns (uint256[] memory){
+    function getTopCandidates(
+        uint256 size
+    ) external view returns (uint256[] memory) {
         return _getTopCandidates(size);
-    } 
+    }
 
-    function getTopCandidatesInfo(uint256 size) external view returns (CandidateExternal[] memory) {
+    function getTopCandidatesInfo(
+        uint256 size
+    ) external view returns (CandidateExternal[] memory) {
         return _getTopCandidatesInfo(size);
     }
 
     function getListSize() external view returns (uint256) {
         return _getListSize();
     }
-
 }

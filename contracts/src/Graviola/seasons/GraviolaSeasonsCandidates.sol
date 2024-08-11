@@ -3,9 +3,9 @@ pragma solidity ^0.8.24;
 
 import {StructuredLinkedList, IStructureInterface} from "solidity-linked-list/contracts/StructuredLinkedList.sol";
 import {CandidateExternal} from "./IGraviolaSeasonsGovernor.sol";
+import {KeywordConverter} from "../../utils/KeywordConverter.sol";
 
-
-contract GraviolaSeasonsCandidates is IStructureInterface {
+contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
     using StructuredLinkedList for StructuredLinkedList.List;
 
     error CandidateAlreadyAdded();
@@ -15,7 +15,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
     error VoteNotAllowed(uint256 code);
     error NegativeScore();
 
-    uint256 immutable MAX_LIST_SIZE;
+    uint256 private immutable MAX_LIST_SIZE;
 
     struct Candidate {
         int256 score;
@@ -47,7 +47,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         // 3. candidate stays outside the list
         if (!candidates[id].exists) revert CandidateNonExistent();
 
-        int afterVote = candidates[id].score - int256(votingPower);
+        int256 afterVote = candidates[id].score - int256(votingPower);
 
         if (list.nodeExists(id)) {
             list.remove(id); // remove from old position
@@ -81,7 +81,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
         // 3. candidate stays outside the list
         if (!candidates[id].exists) revert CandidateNonExistent();
 
-        int afterVote = candidates[id].score + int256(votingPower);
+        int256 afterVote = candidates[id].score + int256(votingPower);
 
         if (list.nodeExists(id) || list.sizeOf() < MAX_LIST_SIZE) {
             list.remove(id); // remove from old position
@@ -122,14 +122,16 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
     ) internal view returns (CandidateExternal[] memory c) {
         c = new CandidateExternal[](size);
         uint256 next;
-        for (uint i = 0; i < size; i++) {
+        for (uint256 i = 0; i < size; i++) {
             (, next) = list.getAdjacent(next, false);
-            c[i] = CandidateExternal(
-                next,
-                candidates[next].score,
-                candidates[next].author
-            );
+            c[i] = CandidateExternal({
+                id: next,
+                keyword: _decodeKeyword(next),
+                score: candidates[next].score,
+                author: candidates[next].author
+            });
         }
+        return c;
     }
 
     function _getTopCandidates(
@@ -137,9 +139,10 @@ contract GraviolaSeasonsCandidates is IStructureInterface {
     ) internal view returns (uint256[] memory c) {
         c = new uint256[](size);
         uint256 next;
-        for (uint i = 0; i < size; i++) {
+        for (uint256 i = 0; i < size; i++) {
             (, next) = list.getAdjacent(next, false);
             c[i] = next;
         }
+        return c;
     }
 }

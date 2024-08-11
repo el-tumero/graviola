@@ -8,7 +8,6 @@ import {IGraviolaCollection} from "./IGraviolaCollection.sol";
 import {IAIOracle} from "../OAO/IAIOracle.sol";
 import {Metadata} from "./GraviolaMetadata.sol";
 
-import {ConfirmedOwner} from "@chainlink/contracts/src/v0.8/shared/access/ConfirmedOwner.sol";
 import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
@@ -63,7 +62,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         uint256 balance;
     }
 
-    mapping(uint256 => Request) requests;
+    mapping(uint256 => Request) private requests;
 
     constructor(
         address tokenAddress,
@@ -82,7 +81,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
 
     function prepare() external payable {
         // request to the VRF service
-        (uint256 requestId, uint256 reqPrice) = requestRandomWords();
+        (uint256 requestId, uint256 reqPrice) = _requestRandomWords();
         // check if the VRF request price is higher than msg.value (native currency sent e.g. ETH)
         if (reqPrice > msg.value) {
             revert RequestVRFInsufficientBalance();
@@ -98,7 +97,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         emit RequestVRFSent(requestId);
     }
 
-    function requestRandomWords() internal returns (uint256, uint256) {
+    function _requestRandomWords() internal returns (uint256, uint256) {
         // prepare extraArgs for nativePayment
         bytes memory extraArgs = VRFV2PlusClient._argsToBytes(
             VRFV2PlusClient.ExtraArgsV1({nativePayment: true})
@@ -113,6 +112,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         return (requestId, reqPrice);
     }
 
+    // solhint-disable-next-line chainlink-solidity/prefix-internal-functions-with-underscore
     function fulfillRandomWords(
         uint256 _requestId,
         uint256[] memory _randomWords

@@ -1,38 +1,48 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./IGraviolaSeasonsArchive.sol";
-import "./GraviolaSeasonsCandidates.sol";
+import {IGraviolaSeasonsArchive} from "./IGraviolaSeasonsArchive.sol";
+import {GraviolaSeasonsCandidates} from "./GraviolaSeasonsCandidates.sol";
+import {ERC20Votes} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+// solhint-disable-next-line no-global-import
 import "./IGraviolaSeasonsGovernor.sol";
-import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
 contract GraviolaSeasonsGovernor is
     IGraviolaSeasonsGovernor,
     GraviolaSeasonsCandidates
 {
-    IGraviolaSeasonsArchive immutable archive;
-    ERC20Votes immutable token;
+    uint256 private constant MAX_LIST_SIZE = 100;
+
+    IGraviolaSeasonsArchive private immutable ARCHIVE;
+    ERC20Votes private immutable TOKEN;
 
     struct Voting {
-        uint256 startTimestamp;
-        VotingState state;
+        uint256 startTimestamp; // Voting start timestamp
+        VotingState state; // State of the voting
     }
 
     uint256 private currentVotingId = 0;
     mapping(uint256 => Voting) private voting;
+    // Stores how much voting power is given to specified candidate by specified voter (address)
     mapping(address => mapping(uint256 => int256)) private voters;
 
     constructor(
         address archiveAddress,
         address tokenAddress
-    ) GraviolaSeasonsCandidates(100) {
-        archive = IGraviolaSeasonsArchive(archiveAddress);
-        token = ERC20Votes(tokenAddress);
+    ) GraviolaSeasonsCandidates(MAX_LIST_SIZE) {
+        ARCHIVE = IGraviolaSeasonsArchive(archiveAddress);
+        TOKEN = ERC20Votes(tokenAddress);
     }
 
-    function validateWord(string memory str) private pure returns (bool) {
-        bytes memory b = bytes(str);
+    /// @notice Validate if a given keyword can become a candidate
+    /// @dev Check if bytes of the keyword are in range [97, 122];
+    /// (Check if keyword is is made of lowercase letters)
+    /// @param keyword string representation of the keyword
+    /// @return isValid true if keyword is valid
+    function _validateKeyword(
+        string memory keyword
+    ) private pure returns (bool) {
+        bytes memory b = bytes(keyword);
         if (b.length == 0) return false;
         for (uint256 i = 0; i < b.length; i++) {
             uint8 char = uint8(b[i]);
@@ -42,79 +52,116 @@ contract GraviolaSeasonsGovernor is
         return true;
     }
 
-    function uint256ToBytes(uint256 n) internal pure returns (bytes memory) {
-        bytes memory b = new bytes(32);
-        assembly {
-            mstore(add(b, 32), n)
-        }
-        return b;
+    /// @notice Adds a new candidate with given id to the CandidatesCollection
+    /// @dev Emits CandidateAdded(id) event on success
+    /// Reverts with WrongKeywordFormat or KeywordIsExpired on error
+    /// @param id uint256 representation of the keyword
+    function addCandidate(uint256 id) external {
+        string memory keyword = _decodeKeyword(id);
+        if (!_validateKeyword(keyword)) revert WrongKeywordFormat();
+        if (ARCHIVE.isWordExpired(keyword)) revert KeywordExpired();
+        _addCandidate(id);
+        emit CandidateAdded(id);
     }
 
-    function addCandidate(uint256 word) external {
-        string memory wordStr = string(uint256ToBytes(word));
-        if (!validateWord(wordStr)) revert WrongWordFormat();
-        if (archive.isWordExpired(wordStr)) revert WordExpired();
-
-        _addCandidate(word);
-        emit CandidateAdded(word);
-    }
-
-    function upvoteCandidate(uint256 word) external {
-        if (voters[msg.sender][word] != 0) revert DoubleVoting();
-        uint256 votes = token.getPastVotes(
+    /// @notice Upvote candidate with given id - add value equal
+    /// to the voting power of the voter to the candidate's score.
+    /// Depending on the state of the CandidatesList candidate:
+    /// - is added to the CandidatesList at the appropriate position
+    /// - their position change after vote
+    /// - their position does not change after vote
+    /// @dev Emits CandidateUpvoted(id) event on success
+    /// Reverts with DoubleVoting or ZeroVoting on error
+    /// @param id uint256 representation of the keyword
+    function upvoteCandidate(uint256 id) external {
+        if (voters[msg.sender][id] != 0) revert DoubleVoting();
+        // Read token balance of the voter from the snapshot
+        uint256 votes = TOKEN.getPastVotes(
             msg.sender,
             voting[currentVotingId].startTimestamp
         );
         if (votes == 0) revert ZeroVoting();
-        _upvoteCandidate(word, votes);
-        voters[msg.sender][word] = int256(votes);
-        emit CandidateUpvoted(word);
+        _upvoteCandidate(id, votes);
+        voters[msg.sender][id] = int256(votes);
+        emit CandidateUpvoted(id);
     }
 
-    function downvoteCandidate(uint256 word) external {
-        if (voters[msg.sender][word] != 0) revert DoubleVoting();
-        uint256 votes = token.getPastVotes(
+    /// @notice Downvote candidate with given id - substract value equal
+    /// to the voting power of the voter from the candidate's score.
+    /// Depending on state of the CandidatesList candidate:
+    /// - is removed from the CandidatesList
+    /// - their position change after vote
+    /// - their position does not change after vote
+    /// @dev Emits CandidateDownvoted(id) event on success
+    /// Reverts with DoubleVoting or ZeroVoting on error
+    /// @param id uint256 representation of the keyword
+    function downvoteCandidate(uint256 id) external {
+        if (voters[msg.sender][id] != 0) revert DoubleVoting();
+        // Read token balance of the voter from the snapshot
+        uint256 votes = TOKEN.getPastVotes(
             msg.sender,
             voting[currentVotingId].startTimestamp
         );
         if (votes == 0) revert ZeroVoting();
-        _downvoteCandidate(word, votes);
-        voters[msg.sender][word] = int256(votes) * (-1);
-        emit CandidateDownvoted(word);
+        _downvoteCandidate(id, votes);
+        voters[msg.sender][id] = int256(votes) * (-1);
+        emit CandidateDownvoted(id);
     }
 
-    function undoVoteCandidate(uint256 word) external {
-        int256 votes = voters[msg.sender][word];
+    /// @notice Cancel a vote cast by voter for candidate with given id
+    /// @dev Emits CandidateCancelVote(id) event on success
+    /// Reverts with NoVoteBefore on error
+    /// @param id uint256 representation of the keyword
+    function cancelVoteCandidate(uint256 id) external {
+        // votes cast by msg.sender for candidate with given id
+        int256 votes = voters[msg.sender][id];
         if (votes == 0) revert NoVoteBefore();
-        if (votes > 0) _downvoteCandidate(word, uint256(votes));
-        if (votes < 0) _upvoteCandidate(word, uint256(votes * (-1)));
-        voters[msg.sender][word] = 0;
-        emit CandidateUndoVote(word);
+        // if the voter has upvoted before - the candidate is downvoted with value
+        // equal to the voting power previously added to the score
+        if (votes > 0) _downvoteCandidate(id, uint256(votes));
+        // if the voter has downvoted before - the candidate is downvoted with value
+        // equal to the voting power previously added to the score
+        if (votes < 0) _upvoteCandidate(id, uint256(votes * (-1)));
+        voters[msg.sender][id] = 0;
+        emit CandidateCancelVote(id);
     }
 
-    function promoteCandidate(uint256 word) external {
-        _promoteCandidate(word);
-        emit CandidatePromoted(word);
+    /// @notice Promote (add) candidate with given id to the CandidatesList
+    /// Function can be called if candidate with given id has score greater
+    /// then the 100th (worst) candidate on the CandidatesList
+    /// NOTE: the candidate must be added to the CandidatesCollection beforehand
+    /// by executing addCandidate function
+    /// @param id uint256 representation of the keyword
+    function promoteCandidate(uint256 id) external {
+        _promoteCandidate(id);
+        emit CandidatePromoted(id);
     }
 
+    /// @notice Perform snapshot for the current Voting by saving
+    /// current block.timestamp and changing voting state to OPENED
     function snapshot() external {
         Voting storage currentVoting = voting[currentVotingId];
         currentVoting.startTimestamp = block.timestamp;
         currentVoting.state = VotingState.OPENED;
     }
 
+    /// @notice Return id of the current Voting
     function getCurrentVotingId() external view returns (uint256) {
         return currentVotingId;
     }
 
+    /// @notice Return state of the Voting with given id
+    /// @param votingId id of the Voting
     function getVotingState(
         uint256 votingId
     ) external view returns (VotingState) {
         return voting[votingId].state;
     }
 
-    function getCandidateScore(uint256 word) external view returns (uint256) {
-        return getValue(word);
+    /// @notice Return score of candidate with given id
+    /// @param id uint256 representation of the keyword
+    function getCandidateScore(uint256 id) external view returns (uint256) {
+        return getValue(id);
     }
 
     function getTopCandidates(
@@ -137,11 +184,8 @@ contract GraviolaSeasonsGovernor is
         return _getWorstScoreList();
     }
 
+    /// @notice Return current list size
     function getCandidateListSize() external view returns (uint256) {
         return _getListSize();
     }
-
-
-
-
 }

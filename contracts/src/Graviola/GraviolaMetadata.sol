@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
-import "solidity-json-writer/contracts/JsonWriter.sol";
-import "@openzeppelin/contracts/utils/Base64.sol";
-import "./seasons/IGraviolaSeasonsArchive.sol";
+import {JsonWriter} from "solidity-json-writer/contracts/JsonWriter.sol";
+import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
+import {IGraviolaSeasonsArchive} from "./seasons/IGraviolaSeasonsArchive.sol";
 
 struct Metadata {
     string description;
@@ -17,12 +17,14 @@ struct Metadata {
 abstract contract GraviolaMetadata {
     using JsonWriter for JsonWriter.Json;
 
+    error MetadataEmpty();
+
     mapping(uint256 => Metadata) private metadataStorage;
 
-    IGraviolaSeasonsArchive immutable seasonsArchive;
+    IGraviolaSeasonsArchive private immutable SEASONS_ARCHIVE;
 
     constructor(address seasonsArchiveAddress) {
-        seasonsArchive = IGraviolaSeasonsArchive(seasonsArchiveAddress);
+        SEASONS_ARCHIVE = IGraviolaSeasonsArchive(seasonsArchiveAddress);
     }
 
     /// @notice Creates metadata and adds it to the metadata storage
@@ -44,7 +46,7 @@ abstract contract GraviolaMetadata {
 
     // -- conversions --
 
-    function generateJSON(
+    function _generateJSON(
         Metadata memory metadata
     ) private pure returns (string memory) {
         JsonWriter.Json memory writer;
@@ -77,7 +79,7 @@ abstract contract GraviolaMetadata {
         return writer.value;
     }
 
-    function convertToBase64URL(
+    function _convertToBase64URL(
         bytes memory data
     ) private pure returns (string memory) {
         return
@@ -91,8 +93,10 @@ abstract contract GraviolaMetadata {
 
     // NOTE: public only for local tests
     function _tokenURI(uint256 tokenId) internal view returns (string memory) {
-        require(metadataStorage[tokenId].isReady, "Metadata is empty!");
+        if (!metadataStorage[tokenId].isReady) {
+            revert MetadataEmpty();
+        }
         return
-            convertToBase64URL(bytes(generateJSON(metadataStorage[tokenId])));
+            _convertToBase64URL(bytes(_generateJSON(metadataStorage[tokenId])));
     }
 }

@@ -10,14 +10,14 @@ import {VRFV2PlusWrapperMock} from "../utils/VRFV2PlusWrapperMock.sol";
 import {GraviolaCollection} from "../Graviola/GraviolaCollection.sol";
 
 contract LocalMigration {
-    uint256 constant NUMBER_OF_CONTRACTS = 7;
+    uint256 private constant NUMBER_OF_CONTRACTS = 7;
 
     string private constant DEFAULT_PROMPT_BASE =
         "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
 
-    uint256 constant NUMBER_OF_KEYWORDS = 100;
+    uint256 private constant NUMBER_OF_KEYWORDS = 100;
 
-    string[NUMBER_OF_KEYWORDS] keywords = [
+    string[NUMBER_OF_KEYWORDS] private keywords = [
         "human",
         "android",
         "robot",
@@ -154,7 +154,7 @@ contract LocalMigration {
             address(vrf)
         );
 
-        for (uint i = 1; i < 100; i++) {
+        for (uint256 i = 1; i < 100; i++) {
             gsg.addAndUpvote(i);
         }
 
@@ -162,7 +162,7 @@ contract LocalMigration {
         gsa.addPromptBase(0, DEFAULT_PROMPT_BASE);
 
         // fill season with keywords
-        for (uint i = 0; i < NUMBER_OF_KEYWORDS; i++) {
+        for (uint256 i = 0; i < NUMBER_OF_KEYWORDS; i++) {
             gsa.addWordToSeason(0, keywords[i]);
         }
     }

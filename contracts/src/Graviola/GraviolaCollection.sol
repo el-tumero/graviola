@@ -52,19 +52,21 @@ contract GraviolaCollection is ERC721, Ownable, GraviolaMetadata {
 
     function ownedTokens(
         address addr
-    ) external view returns (uint256[] memory output) {
+    ) external view returns (uint256[] memory) {
         uint256[] memory buffer = new uint256[](_ownedTokens[addr].length);
         uint256 j = 0;
-        for (uint i = 0; i < _ownedTokens[addr].length; i++) {
+        for (uint256 i = 0; i < _ownedTokens[addr].length; i++) {
             uint256 tokenId = _ownedTokens[addr][i];
             if (_ownerOf(tokenId) == addr) {
                 buffer[j] = tokenId;
                 j++;
             }
         }
-        output = new uint256[](j);
-        for (uint i = 0; i < j; i++) {
+
+        uint256[] memory output = new uint256[](j);
+        for (uint256 i = 0; i < j; i++) {
             output[i] = buffer[i];
         }
+        return output;
     }
 }

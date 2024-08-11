@@ -8,6 +8,8 @@ interface IGraviolaSeasonsArchive {
         string[] well;
     }
 
+    error WellFull();
+
     function nameSeason(uint256 seasonId, string calldata name) external;
 
     function nextSeason() external;
@@ -29,7 +31,7 @@ interface IGraviolaSeasonsArchive {
 
     function getCurrentSeasonId() external view returns (uint256);
 
-    function addWordToSeason(uint seasonId, string calldata word) external;
+    function addWordToSeason(uint256 seasonId, string calldata word) external;
 
     function isWordUsed(string calldata word) external view returns (bool);
 

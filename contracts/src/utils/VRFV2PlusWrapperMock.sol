@@ -4,6 +4,9 @@ pragma solidity ^0.8.24;
 import {IVRFV2PlusWrapper} from "@chainlink/contracts/src/v0.8/vrf/dev/interfaces/IVRFV2PlusWrapper.sol";
 import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
 
+/// @title VRFV2PlusWrapperMock
+/// @notice Mock Chainlink V2.5 VRF wrapper
+/// @dev The contract was created for testing purposes only!
 contract VRFV2PlusWrapperMock is IVRFV2PlusWrapper {
     uint256 private _lastRequestId = 0;
     uint256 private testValue = 123;
@@ -17,7 +20,7 @@ contract VRFV2PlusWrapperMock is IVRFV2PlusWrapper {
     //     0x342E26AE4C066F833BD904A9E71A9860C1F5D20106C8521E0340835EFE923C9B
     // ];
 
-    uint256[] randomWords = [
+    uint256[] private randomWords = [
         0x277C53DE11311A417F71762C9C21790B2DF973C12BA9303436E6801246BFDD4D
     ];
 
@@ -94,7 +97,11 @@ contract VRFV2PlusWrapperMock is IVRFV2PlusWrapper {
         );
     }
 
-    function link() external view override returns (address) {}
+    function link() external view override returns (address) {
+        return linkAddress;
+    }
 
-    function linkNativeFeed() external view override returns (address) {}
+    function linkNativeFeed() external view override returns (address) {
+        return linkNativeFeedAddress;
+    }
 }

@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+// solhint-disable-next-line no-global-import
 import "./IGraviolaSeasonsArchive.sol";
 
 contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     constructor(address owner) Ownable(owner) {}
 
-    uint16 wellSize = 100; // how many words can be added to single season's well
-    uint8 expLen = 8; // how many words expire after season
+    uint16 private wellSize = 100; // how many words can be added to single season's well
+    uint8 private expLen = 8; // how many words expire after season
 
-    uint8 constant TOTAL_RARITY_GROUPS = 5;
+    uint8 private constant TOTAL_RARITY_GROUPS = 5;
 
     enum Rarity {
         COMMON,
@@ -25,8 +26,8 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     mapping(uint256 => Season) private seasons;
 
     uint256 private currentSeasonId;
-    uint8[TOTAL_RARITY_GROUPS] wordsPerRarityGroup = [1, 2, 5, 15, 77];
-    uint8[TOTAL_RARITY_GROUPS] rarityGroupWeights = [12, 8, 5, 3, 1];
+    uint8[TOTAL_RARITY_GROUPS] private wordsPerRarityGroup = [1, 2, 5, 15, 77];
+    uint8[TOTAL_RARITY_GROUPS] private rarityGroupWeights = [12, 8, 5, 3, 1];
 
     // [77, 15, 5, 2, 1];
     // [1, 2, 5, 15, 77];
@@ -34,14 +35,14 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     function nameSeason(
         uint256 seasonId,
         string calldata name
-    ) external /*onlyOwner*/ {
+    ) external onlyOwner {
         seasons[seasonId].name = name;
     }
 
     function addPromptBase(
         uint256 seasonId,
         string calldata promptBase
-    ) external /*onlyOwner*/ {
+    ) external onlyOwner {
         seasons[seasonId].promptBase = promptBase;
     }
 
@@ -70,11 +71,13 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     }
 
     function addWordToSeason(
-        uint seasonId,
+        uint256 seasonId,
         string calldata word
-    ) external /*onlyOwner*/ {
+    ) external onlyOwner {
         Season storage season = seasons[seasonId];
-        require(season.well.length < wellSize);
+        if (season.well.length > wellSize) {
+            revert WellFull();
+        }
         season.well.push(word);
         if (season.well.length <= expLen) expiredWords[word] = true;
         usedWords[word] = true;
@@ -90,7 +93,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
 
     function getRarityGroupById(uint256 id) external view returns (uint256) {
         uint256 range;
-        for (uint i = 0; i < TOTAL_RARITY_GROUPS; i++) {
+        for (uint256 i = 0; i < TOTAL_RARITY_GROUPS; i++) {
             range += wordsPerRarityGroup[i];
             if (id < range) return i;
         }
