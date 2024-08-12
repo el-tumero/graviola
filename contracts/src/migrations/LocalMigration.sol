@@ -4,8 +4,8 @@ pragma solidity ^0.8.24;
 import {GraviolaGenerator} from "../Graviola/GraviolaGenerator.sol";
 import {AIOracleMock} from "../OAO/AIOracleMock.sol";
 import {GraviolaToken} from "../Graviola/GraviolaToken.sol";
-import {GraviolaSeasonsArchive} from "../Graviola/seasons/GraviolaSeasonsArchive.sol";
-import {TGraviolaSeasonsGovernor} from "../Graviola/seasons/TGraviolaSeasonsGovernor.sol";
+import {GraviolaSeasonsArchive} from "../Graviola/seasons/archive/GraviolaSeasonsArchive.sol";
+import {TGraviolaSeasonsGovernor} from "../Graviola/seasons/governor/TGraviolaSeasonsGovernor.sol";
 import {VRFV2PlusWrapperMock} from "../utils/VRFV2PlusWrapperMock.sol";
 import {GraviolaCollection} from "../Graviola/GraviolaCollection.sol";
 
@@ -159,11 +159,11 @@ contract LocalMigration {
         }
 
         gsa.nameSeason(0, "Summer 2024");
-        gsa.addPromptBase(0, DEFAULT_PROMPT_BASE);
+        gsa.addPromptBaseToSeason(0, DEFAULT_PROMPT_BASE);
 
         // fill season with keywords
         for (uint256 i = 0; i < NUMBER_OF_KEYWORDS; i++) {
-            gsa.addWordToSeason(0, keywords[i]);
+            gsa.addKeywordToSeason(0, keywords[i]);
         }
     }
 

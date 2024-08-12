@@ -19,7 +19,7 @@ contract GraviolaCollection is ERC721, Ownable, GraviolaMetadata {
         GraviolaMetadata(archiveAddress)
     {}
 
-    function mint(address to /*onlyOwner*/) external returns (uint256) {
+    function mint(address to) external onlyOwner returns (uint256) {
         uint256 tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         return tokenId;
@@ -28,14 +28,11 @@ contract GraviolaCollection is ERC721, Ownable, GraviolaMetadata {
     function createMetadata(
         uint256 tokenId,
         Metadata memory metadata
-    ) external /*onlyOwner*/ {
+    ) external onlyOwner {
         _createMetadata(tokenId, metadata);
     }
 
-    function addImage(
-        uint256 tokenId,
-        string memory image
-    ) external /*onlyOwner*/ {
+    function addImage(uint256 tokenId, string memory image) external onlyOwner {
         _addImage(tokenId, image);
     }
 

@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 
 import {JsonWriter} from "solidity-json-writer/contracts/JsonWriter.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
-import {IGraviolaSeasonsArchive} from "./seasons/IGraviolaSeasonsArchive.sol";
+import {IGraviolaSeasonsArchive} from "./seasons/archive/IGraviolaSeasonsArchive.sol";
 
 struct Metadata {
     string description;

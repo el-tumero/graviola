@@ -5,6 +5,7 @@ node_modules
 out
 cache_forge
 cache_hardhat
+docs
 artifacts
 typechain-types
 

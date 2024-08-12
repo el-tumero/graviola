@@ -3,17 +3,34 @@ pragma solidity ^0.8.24;
 
 import {StructuredLinkedList, IStructureInterface} from "solidity-linked-list/contracts/StructuredLinkedList.sol";
 import {CandidateExternal} from "./IGraviolaSeasonsGovernor.sol";
-import {KeywordConverter} from "../../utils/KeywordConverter.sol";
+import {KeywordConverter} from "../../../utils/KeywordConverter.sol";
 
-contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
+abstract contract GraviolaSeasonsCandidates is
+    IStructureInterface,
+    KeywordConverter
+{
     using StructuredLinkedList for StructuredLinkedList.List;
 
-    error CandidateAlreadyAdded();
+    /// @notice CandidateAlreadyInCollection error is emitted in
+    /// _addCandidate function when candidate is
+    /// already added to the CandidatesCollection
+    error CandidateAlreadyInCollection();
+
+    /// @notice CandidateAlreadyInList error is emitted in
+    /// _promoteCandidate function when candidate is
+    /// already in the CandidatesList
     error CandidateAlreadyInList();
+
+    /// @notice CandidateNonExistent error is emitted in
+    /// _downvoteCandidate, _upvoteCandidate, _promoteCandidate
+    /// functions when candidate has not been added to the
+    /// CandidatesCollection
     error CandidateNonExistent();
+
+    /// @notice PromotionNotAllowed error is emitted in
+    /// _promoteCandidate function when the candidate's
+    /// score is less then or equal to 0
     error PromotionNotAllowed();
-    error VoteNotAllowed(uint256 code);
-    error NegativeScore();
 
     uint256 private immutable MAX_LIST_SIZE;
 
@@ -23,31 +40,31 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
         bool exists;
     }
 
+    // CandidatesCollection
+    mapping(uint256 => Candidate) internal collection;
+    // CandidatesList
     StructuredLinkedList.List internal list;
-    mapping(uint256 => Candidate) internal candidates;
 
     constructor(uint256 listSize) {
         MAX_LIST_SIZE = listSize;
     }
 
     function getValue(uint256 _id) public view override returns (uint256) {
-        int256 score = candidates[_id].score;
-        if (score < 0) revert NegativeScore();
-        return uint256(score);
+        return uint256(collection[_id].score);
     }
 
     function _addCandidate(uint256 id) internal {
-        if (candidates[id].exists) revert CandidateAlreadyAdded();
-        candidates[id] = Candidate(0, msg.sender, true);
+        if (collection[id].exists) revert CandidateAlreadyInCollection();
+        collection[id] = Candidate(0, msg.sender, true);
     }
 
     function _downvoteCandidate(uint256 id, uint256 votingPower) internal {
         // 1. candidate stays in the list after vote
         // 2. candidate is kicked out from the list
         // 3. candidate stays outside the list
-        if (!candidates[id].exists) revert CandidateNonExistent();
+        if (!collection[id].exists) revert CandidateNonExistent();
 
-        int256 afterVote = candidates[id].score - int256(votingPower);
+        int256 afterVote = collection[id].score - int256(votingPower);
 
         if (list.nodeExists(id)) {
             list.remove(id); // remove from old position
@@ -61,13 +78,13 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
                 list.pushFront(id);
             }
         }
-        candidates[id].score = afterVote;
+        collection[id].score = afterVote;
     }
 
     function _promoteCandidate(uint256 id) internal {
-        if (!candidates[id].exists) revert CandidateNonExistent();
+        if (!collection[id].exists) revert CandidateNonExistent();
         if (list.nodeExists(id)) revert CandidateAlreadyInList();
-        int256 score = candidates[id].score;
+        int256 score = collection[id].score;
         if (score < 0) revert PromotionNotAllowed();
         if (list.sizeOf() < MAX_LIST_SIZE) {
             uint256 spot = list.getSortedSpot(address(this), uint256(score));
@@ -79,9 +96,9 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
         // 1. candidate already in the list or list size < MAX_LIST_SIZE
         // 2. candidate promoted to the list
         // 3. candidate stays outside the list
-        if (!candidates[id].exists) revert CandidateNonExistent();
+        if (!collection[id].exists) revert CandidateNonExistent();
 
-        int256 afterVote = candidates[id].score + int256(votingPower);
+        int256 afterVote = collection[id].score + int256(votingPower);
 
         if (list.nodeExists(id) || list.sizeOf() < MAX_LIST_SIZE) {
             list.remove(id); // remove from old position
@@ -89,7 +106,7 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
                 address(this),
                 uint256(afterVote)
             ); // calculate spot
-            candidates[id].score = afterVote;
+            collection[id].score = afterVote;
             list.insertBefore(spot, id);
         } else if (afterVote > _getWorstScoreList()) {
             list.popFront();
@@ -97,10 +114,10 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
                 address(this),
                 uint256(afterVote)
             );
-            candidates[id].score = afterVote;
+            collection[id].score = afterVote;
             list.insertBefore(spot, id);
         } else {
-            candidates[id].score = afterVote;
+            collection[id].score = afterVote;
         }
     }
 
@@ -110,10 +127,14 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
 
     function _getWorstScoreList() internal view returns (int256) {
         (, uint256 id) = list.getAdjacent(0, true);
-        return candidates[id].score;
+        return collection[id].score;
     }
 
-    function _isCandidateExist(uint256 id) internal view returns (bool) {
+    function _isCandidateInCollection(uint256 id) internal view returns (bool) {
+        return collection[id].exists;
+    }
+
+    function _isCandidateInList(uint256 id) internal view returns (bool) {
         return list.nodeExists(id);
     }
 
@@ -127,8 +148,8 @@ contract GraviolaSeasonsCandidates is IStructureInterface, KeywordConverter {
             c[i] = CandidateExternal({
                 id: next,
                 keyword: _decodeKeyword(next),
-                score: candidates[next].score,
-                author: candidates[next].author
+                score: collection[next].score,
+                author: collection[next].author
             });
         }
         return c;

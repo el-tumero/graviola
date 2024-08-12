@@ -1,13 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IGraviolaSeasonsArchive} from "./seasons/IGraviolaSeasonsArchive.sol";
+import {IGraviolaSeasonsArchive} from "./seasons/archive/IGraviolaSeasonsArchive.sol";
 
 contract GraviolaSeed {
     IGraviolaSeasonsArchive internal archive;
 
+    // How many words are drawed for prompt creation
     uint8 private KEYWORDS_PER_TOKEN = 3;
+    uint256 private OMEGA = 100;
 
+    /// @notice Create GraviolaSeed module
+    /// @param archiveAddress GraviolaSeasonsArchive address
     constructor(address archiveAddress) {
         archive = IGraviolaSeasonsArchive(archiveAddress);
     }
@@ -45,8 +49,7 @@ contract GraviolaSeed {
             j++;
             uint256 randNum = uint256(keccak256(abi.encode(seed, i, j)));
             // Default omega is 100, so we're going to get an index in range 0-99 (inclusive)
-            uint256 omega = archive.getWellSize();
-            uint256 wordId = randNum % omega;
+            uint256 wordId = randNum % OMEGA;
 
             // Duplicate id, re-roll
             if (
@@ -64,14 +67,14 @@ contract GraviolaSeed {
             // Get word count for the group with given id
             uint256 groupWordCount = archive.getWordsPerRarityGroup(groupId);
 
-            totalProbability *= _fractionToBasisPoints(groupWordCount, omega);
+            totalProbability *= _fractionToBasisPoints(groupWordCount, OMEGA);
             weightSum += archive.getRarityGroupWeight(groupId);
 
             result = string(
                 abi.encodePacked(
                     result,
                     (i > 0 ? ", " : ""),
-                    archive.getWordCurrentSeason(wordId)
+                    archive.getKeywordCurrentSeason(wordId)
                 )
             );
             i++;
