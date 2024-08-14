@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Test, console} from "forge-std/src/Test.sol";
+import {Test} from "forge-std/src/Test.sol";
+import {Migration} from "../src/migrations/Migration.sol";
 import {LocalMigration} from "../src/migrations/LocalMigration.sol";
 import {GraviolaGenerator} from "../src/Graviola/GraviolaGenerator.sol";
 import {VRFV2PlusWrapperMock} from "../src/utils/VRFV2PlusWrapperMock.sol";
 
+/* solhint-disable */
 contract GraviolaGeneratorTest is Test {
     LocalMigration public lm;
 
@@ -16,14 +18,17 @@ contract GraviolaGeneratorTest is Test {
 
     function setUp() public virtual {
         vm.deal(alice, 1 ether);
-        console.log(alice);
 
         lm = new LocalMigration();
-        lm.run();
-        address[7] memory addresses = lm.getAddresses();
+        lm.deploy();
+        lm.setup();
 
-        vrf = VRFV2PlusWrapperMock(addresses[0]);
-        generator = GraviolaGenerator(addresses[6]);
+        vrf = VRFV2PlusWrapperMock(
+            lm.getAddress(Migration.DeployedContract.VRF)
+        );
+        generator = GraviolaGenerator(
+            lm.getAddress(Migration.DeployedContract.GENERATOR)
+        );
     }
 
     function test_Prepare() external {
@@ -35,8 +40,8 @@ contract GraviolaGeneratorTest is Test {
     function test_Generate() external {
         vm.startPrank(alice);
         generator.prepare{value: 200000}();
-        // vm.expectEmit();
-        // emit GraviolaGenerator.RequestVRFFulfilled(0);
+        vm.expectEmit();
+        emit GraviolaGenerator.RequestVRFFulfilled(0);
         vrf.fulfillRandomWords(0);
         generator.generate(0);
     }

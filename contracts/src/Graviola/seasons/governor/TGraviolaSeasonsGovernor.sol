@@ -13,8 +13,8 @@ contract TGraviolaSeasonsGovernor is
         address tokenAddress
     ) GraviolaSeasonsGovernor(archiveAddress, tokenAddress) {}
 
-    function addAndUpvote(uint256 id) external {
+    function addAndUpvote(uint256 id, uint256 score) external {
         _addCandidate(id);
-        _upvoteCandidate(id, id);
+        _upvoteCandidate(id, score);
     }
 }

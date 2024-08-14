@@ -1,13 +1,19 @@
-import deployLocal from "./deploy-local"
-import { writeFileSync } from "fs"
-import hardhat from "hardhat"
-import sendRpcCall from "./rpcCall"
+import deployLocal from './deploy-local'
+import { writeFileSync } from 'fs'
+import hardhat from 'hardhat'
+import sendRpcCall from './rpcCall'
+import deployTestnet from './deploy-testnet'
 
 const config = {
     // Local dev (hardhat)
     localhost: {
-        output: "addresses-local.json",
+        output: 'addresses-local.json',
         script: deployLocal,
+    },
+
+    testnet: {
+        output: 'addresses-testnet.json',
+        script: deployTestnet,
     },
 }
 
@@ -34,6 +40,8 @@ async function main() {
             )
         }
 
+        await hardhat.run('compile')
+
         const { output, script } = config[variant]
 
         const addresses = await script()
@@ -41,12 +49,12 @@ async function main() {
         writeFileSync(output, JSON.stringify(addresses, null, 4))
         console.log(`Addresses saved to '${output}'`)
 
-        await hardhat.run("typechain")
-        console.log("Types generated!")
+        await hardhat.run('typechain')
+        console.log('Types generated!')
 
-        if (variant === "localhost") {
-            console.log("Auto-mine turned on!")
-            await sendRpcCall("evm_setIntervalMining", [3000])
+        if (variant === 'localhost') {
+            console.log('Auto-mine turned on!')
+            await sendRpcCall('evm_setIntervalMining', [3000])
         }
     } catch (err) {
         console.log(err)
