@@ -2,10 +2,16 @@
 pragma solidity ^0.8.24;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {GraviolaMetadata, Metadata} from "./GraviolaMetadata.sol";
 
-contract GraviolaCollection is ERC721, Ownable, GraviolaMetadata {
+contract GraviolaCollection is
+    ERC721,
+    ERC721Enumerable,
+    Ownable,
+    GraviolaMetadata
+{
     mapping(address => uint256[]) private _ownedTokens;
 
     uint256 private nextTokenId;
@@ -40,30 +46,20 @@ contract GraviolaCollection is ERC721, Ownable, GraviolaMetadata {
         address to,
         uint256 tokenId,
         address auth
-    ) internal virtual override returns (address) {
-        address previousOwner = super._update(to, tokenId, auth);
-
-        if (to != address(0)) _ownedTokens[to].push(tokenId);
-        return previousOwner;
+    ) internal override(ERC721, ERC721Enumerable) returns (address) {
+        return super._update(to, tokenId, auth);
     }
 
-    function ownedTokens(
-        address addr
-    ) external view returns (uint256[] memory) {
-        uint256[] memory buffer = new uint256[](_ownedTokens[addr].length);
-        uint256 j = 0;
-        for (uint256 i = 0; i < _ownedTokens[addr].length; i++) {
-            uint256 tokenId = _ownedTokens[addr][i];
-            if (_ownerOf(tokenId) == addr) {
-                buffer[j] = tokenId;
-                j++;
-            }
-        }
+    function _increaseBalance(
+        address account,
+        uint128 value
+    ) internal override(ERC721, ERC721Enumerable) {
+        super._increaseBalance(account, value);
+    }
 
-        uint256[] memory output = new uint256[](j);
-        for (uint256 i = 0; i < j; i++) {
-            output[i] = buffer[i];
-        }
-        return output;
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
+        return super.supportsInterface(interfaceId);
     }
 }

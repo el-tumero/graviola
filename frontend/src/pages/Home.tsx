@@ -9,22 +9,17 @@ import SectionContainer from "../components/ui/layout/SectionContainer"
 import { routerPaths } from "../router"
 import BlockNFT from "../components/BlockNFT"
 import SectionTitle from "../components/ui/layout/SectionTitle"
-import { RaritiesData } from "../types/RarityGroup"
 import { clsx as cl } from "clsx"
 import icons from "../data/icons"
-import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import MetadataMock from "../components/ui/MetadataMock"
 import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
 import { nftRarityScaleArr } from "../data/fallbacks"
-import { useAppSelector } from "../redux/hooks"
 import Button from "../components/ui/Button"
+import { rarities, rarityColors, RarityLevel } from "../data/rarities"
 import Popup from "../components/Popup"
 
 const Home = () => {
     const navigate = useNavigate()
-    const rGroups = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
 
     return (
         <FullscreenContainer>
@@ -167,49 +162,33 @@ const Home = () => {
                             )}
                         >
                             {/* Display one preview NFT of each Rarity Level */}
-                            {Object.entries(rGroups).map(
-                                (
-                                    [rLevel, rarityGroup]: [
-                                        string,
-                                        RarityGroupData,
-                                    ],
-                                    i,
-                                ) => {
-                                    const rarityLevel = rLevel as RarityLevel
-                                    return (
-                                        <div
-                                            className="flex flex-col gap-2 justify-center items-center hover:scale-105 transition-transform duration-300"
-                                            key={i}
-                                        >
-                                            <div>
-                                                <BlockNFT
-                                                    nftData={
-                                                        nftRarityScaleArr[i]
-                                                    }
-                                                    glowColor={rarityLevel}
-                                                    additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
-                                                />
-                                            </div>
-                                            <div className="flex flex-col justify-center items-center w-fit h-fit">
-                                                <p
-                                                    className="mt-2 font-normal font-content"
-                                                    style={{
-                                                        color: rarityGroup.color,
-                                                    }}
-                                                >
-                                                    {rarityGroup.name}
-                                                </p>
-                                                <span>
-                                                    {rarityGroup.endRange -
-                                                        rarityGroup.startRange +
-                                                        1}
-                                                    %
-                                                </span>
-                                            </div>
+                            {rarities.map((rarity: RarityLevel, i) => {
+                                return (
+                                    <div
+                                        className="flex flex-col gap-2 justify-center items-center hover:scale-105 transition-transform duration-300"
+                                        key={i}
+                                    >
+                                        <div>
+                                            <BlockNFT
+                                                nftData={nftRarityScaleArr[i]}
+                                                glowColor={rarity}
+                                                additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
+                                            />
                                         </div>
-                                    )
-                                },
-                            )}
+                                        <div className="flex flex-col justify-center items-center w-fit h-fit">
+                                            <p
+                                                className="mt-2 font-normal font-content"
+                                                style={{
+                                                    color: rarityColors[rarity],
+                                                }}
+                                            >
+                                                {rarity}
+                                            </p>
+                                            <span>%%%</span>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
                     </SectionContainer>
 

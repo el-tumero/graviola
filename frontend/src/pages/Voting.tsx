@@ -11,8 +11,6 @@ import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import candJson from "../../../contracts/candidates.json"
 import { ChangeEvent, ReactNode, Fragment, useState, useEffect } from "react"
-import { getKeyword } from "../utils/getKeyword"
-import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
 import { Candidate } from "../types/Candidate"
@@ -276,9 +274,6 @@ const KeywordVotingPage = (props: {
     onClickInfo: () => void
     onClickAddKeyword: () => void
 }) => {
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
     // Default sort is always by id (same order as we got from the contract)
     const [sorting, setSorting] = useState<SortingType>(SortingType["BY_ID"])
     // Map sorting types (enum) to compare fns
@@ -292,19 +287,6 @@ const KeywordVotingPage = (props: {
         4: compareAlphabetically("Ascending"), // BY_KEYWORD_ASC
         5: compareAlphabetically("Descending"), // BY_K2EYWORD_ASC
     }
-
-    const mockCandidates = candJson.candidates.map(
-        (data: Candidate, i: number) => {
-            const candidateData: CandidateInfo = {
-                id: i,
-                author: data.author || "UNKNOWN",
-                keyword: getKeyword((+data.id || -1) - 1, rarities)[0], // -1 to avoid out of bounds absIdx
-                iteration: 0,
-                score: +data.score || -1,
-            }
-            return candidateData
-        },
-    )
 
     return (
         <div

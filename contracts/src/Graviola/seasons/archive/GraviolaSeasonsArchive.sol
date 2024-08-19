@@ -184,4 +184,14 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     ) external view returns (uint8) {
         return rarityGroupWeights[groupId];
     }
+
+    /// @notice Return the number of keywords for each keyword group for all groups
+    function getGroupSizes() external view returns (uint8[5] memory) {
+        return wordsPerRarityGroup;
+    }
+
+    /// @notice Return all weights
+    function getGroupWeights() external view returns (uint8[5] memory) {
+        return rarityGroupWeights;
+    }
 }

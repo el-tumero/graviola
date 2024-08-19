@@ -25,9 +25,6 @@ const Drops = () => {
     const collection = useAppSelector(
         (state) => state.graviolaData.collection,
     ) as NFT[]
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
 
     const [filterMode, setFilterMode] =
         useState<DropFilterMode>("Everyone's Drops")
@@ -43,7 +40,7 @@ const Drops = () => {
         setFetchingCollection(true)
         let userOwnedTokens
         if (address) {
-            userOwnedTokens = await collectionContract.ownedTokens(
+            userOwnedTokens = await collectionContract.balanceOf(
                 ethers.getAddress(address),
             )
         }
@@ -208,7 +205,7 @@ const CollectionList = (props: {
                 const keywords: string[] = keywordsArray.map((keyword) =>
                     keyword.trim(),
                 )
-                const [, rarityData] = getRarityFromPerc(
+                const [, rarityData] = getRariptyFromPerc(
                     percRarity,
                     props.rGroups,
                 )

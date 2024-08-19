@@ -1,4 +1,4 @@
-export const rarityGroups = [
+export const rarities = [
     "common",
     "uncommon",
     "rare",
@@ -6,9 +6,9 @@ export const rarityGroups = [
     "legendary",
 ] as const
 
-export type RarityLevel = (typeof rarityGroups)[number]
+export type RarityLevel = (typeof rarities)[number]
 
-export const rarityGroupColors: Record<RarityLevel, string> = {
+export const rarityColors: Record<RarityLevel, string> = {
     common: "rgba(140, 140, 155, 0.8)",
     uncommon: "rgba(54, 202, 108, 0.8)",
     rare: "rgba(37, 99, 235, 0.8)",

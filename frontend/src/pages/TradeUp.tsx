@@ -5,13 +5,11 @@ import Navbar from "../components/nav/Navbar"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { useEffect, useState } from "react"
 import { NFT } from "../types/NFT"
-import { RaritiesData } from "../types/RarityGroup"
 import { ethers } from "ethers"
 import { clsx as cl } from "clsx"
-import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import BlockNFT from "../components/BlockNFT"
-import { RarityLevel } from "../types/Rarity"
+import { RarityLevel, rarities } from "../data/rarities"
 import { tradeUpTxStatusMessages } from "../utils/statusMessages"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
@@ -24,11 +22,8 @@ import useWallet from "../hooks/useWallet"
 import { useAppSelector } from "../redux/hooks"
 
 const TradeUp = () => {
-    const { graviola } = useWallet()
+    const { collectionContract } = useWallet()
     const { isConnected, address } = useWeb3ModalAccount()
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
     const collection = useAppSelector(
         (state) => state.graviolaData.collection,
     ) as NFT[]
@@ -47,8 +42,6 @@ const TradeUp = () => {
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
     const contentReady = status === "ready" && isConnected
-
-    const { collectionContract } = useWallet()
 
     // Handle generate callbacks
     useEffect(() => {
@@ -87,12 +80,14 @@ const TradeUp = () => {
         ;(async () => {
             let userOwnedTokens
             if (address) {
-                userOwnedTokens = await collectionContract.ownedTokens(
+                // FIXME
+                userOwnedTokens = await collectionContract.tokenOfOwnerByIndex(
                     ethers.getAddress(address),
+                    0,
                 )
             }
             userOwnedTokens &&
-                userOwnedTokens.forEach((token: bigint) => {
+                [userOwnedTokens].forEach((token: bigint) => {
                     setOwnedTokensIds((prev) => [...prev, Number(token)])
                 })
             // console.log(ownedTokensIds)
@@ -100,6 +95,7 @@ const TradeUp = () => {
         })()
     }, [isConnected, address])
 
+    return <></>
     return (
         <FullscreenContainer>
             <Navbar />
@@ -147,10 +143,6 @@ const TradeUp = () => {
                                     >
                                         {" "}
                                         {collection.map((nft: NFT, i) => {
-                                            const percRarity =
-                                                formatBpToPercentage(
-                                                    nft.attributes[0].value,
-                                                )
                                             const keywordsArray: string[] =
                                                 nft.description
                                                     .split(":")
@@ -161,12 +153,6 @@ const TradeUp = () => {
                                                 keywordsArray.map((keyword) =>
                                                     keyword.trim(),
                                                 )
-                                            const [rarityLevel] =
-                                                getRarityFromPerc(
-                                                    percRarity,
-                                                    rarities,
-                                                )
-
                                             if (
                                                 selectedGroup !== null &&
                                                 selectedGroup !== rarityLevel

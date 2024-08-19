@@ -1,8 +1,7 @@
 import { NFT } from "../types/NFT"
-import { RarityLevel } from "../types/Rarity"
 
 // main fallbackNFT
-export const fallbackNFTRarityLevel = RarityLevel.Legendary
+export const fallbackNFTRarityLevel = "legendary"
 export const fallbackNFT: NFT = {
     id: 99999,
     image: "QmSmZ7GBc3TssiZnZRazxCBSeenL2iSYmfQtNELGLCfg9d",

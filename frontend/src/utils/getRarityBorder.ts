@@ -1,8 +1,4 @@
-import {
-    RarityLevel,
-    rarityGroups,
-    rarityGroupColors,
-} from "../data/rarityData"
+import { RarityLevel, rarities, rarityColors } from "../data/rarities"
 
 export function getRarityBorder(
     rarityGroup: RarityLevel,
@@ -11,7 +7,7 @@ export function getRarityBorder(
     style: React.CSSProperties
     className: string
 } {
-    const rarityGroupColor = rarityGroupColors[rarityGroup]
+    const rarityGroupColor = rarityColors[rarityGroup]
     const baseStyle = {
         boxShadow: `0px 0px 20px 6px ${rarityGroupColor}`,
         WebkitBoxShadow: `0px 0px 20px 6px ${rarityGroupColor}`,
@@ -29,6 +25,6 @@ export function getRarityBorder(
 }
 
 export function getRandomRarity(): RarityLevel {
-    const randomIndex = Math.floor(Math.random() * rarityGroups.length)
-    return rarityGroups[randomIndex]
+    const randomIndex = Math.floor(Math.random() * rarities.length)
+    return rarities[randomIndex]
 }

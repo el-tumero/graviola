@@ -2,17 +2,15 @@ import { useEffect, useState } from "react"
 import useRandomRarityBorder from "../../../hooks/useBorderAnimation"
 import { getRarityBorder } from "../../../utils/getRarityBorder"
 import { NFT } from "../../../types/NFT"
-import { getRarityFromPerc } from "../../../utils/getRarityData"
 import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
-import { RaritiesData } from "../../../types/RarityGroup"
+import { RarityLevel } from "../../../data/rarities"
 import { formatBpToPercentage } from "../../../utils/format"
 import { cn } from "../../../utils/cn"
-import { useAppSelector } from "../../../redux/hooks"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
     runBorderAnim: boolean
-    rGroups: RaritiesData
+    rGroups: RarityLevel[]
 }
 
 const GenerateContainer = ({
@@ -20,9 +18,6 @@ const GenerateContainer = ({
     runBorderAnim,
     rGroups,
 }: GenerateContainerProps) => {
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
     const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750, rGroups)
     const [resOpacity, setResOpacity] = useState<number>(0)
 
@@ -31,8 +26,8 @@ const GenerateContainer = ({
 
     if (rolledNFT) {
         const percentage = formatBpToPercentage(rolledNFT.attributes[0].value)
-        const rarity = getRarityFromPerc(percentage, rarities)[1]
-        rarityBorderObject = getRarityBorder(rarity, true)
+        // const weights = rolledNFT.attributes TODO
+        rarityBorderObject = getRarityBorder("common", true) // FIXME
     }
 
     const {

@@ -6,15 +6,18 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
 
-import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-import { rarityScale, rarityGroupColors } from "./data/rarityData"
-import { fallbackNFT } from "./data/fallbacks"
 import useWallet from "./hooks/useWallet"
-import { isDevMode } from "./utils/mode"
-import { setCollection, setRarities } from "./redux/reducers/graviola"
+
+import {
+    setCollection,
+    setGroupSizes,
+    setWeights,
+} from "./redux/reducers/graviola"
 import { useAppDispatch } from "./redux/hooks"
+import { fetchCollection, fetchGroupSizes } from "./web3"
+import { fallbackNFT } from "./data/fallbacks"
 
 const App = (props: { children: ReactNode }) => {
     const modal = createWeb3Modal({
@@ -44,101 +47,38 @@ const App = (props: { children: ReactNode }) => {
     const dispatch = useAppDispatch()
     useTheme(modal === undefined)
     const { walletProvider } = useWeb3ModalProvider()
-
-    const { theme, toggleTheme } = useTheme(modal === undefined)
-    const { connectWallet, collectionContract } = useWeb3()
+    const { connectWallet, collectionContract, seasonsArchiveContract } =
+        useWallet()
     const [loading, setLoading] = useState<boolean>(true)
 
-    // Contract data
-    // const [dataFetched, setDataFetched] = useState<boolean>(false)
-    // const [collection, setCollection] = useState<NFT[]>([])
-    // const [rarities, setRarities] = useState<RaritiesData | null>(null)
-
-    const appContextValue = {
-        theme,
-        toggleTheme,
-    }
-
-    useEffect(() => {
-        setLoading(false)
-    }, [])
-
     // Fetch contract data
-    // useEffect(() => {
-    //     if (!graviola || dataFetched) return
+    useEffect(() => {
+        if (!loading) return
 
-    //     const fetchCollection = async () => {
-    //         const rarityGroupsData = await graviola.getRarityGroups()
-    //         const nftTotalSupply = await graviola.totalSupply()
-    //         console.log("[App] totalSupply: ", Number(nftTotalSupply))
-    //         const promises = Array.from(
-    //             {
-    //                 length: Number(nftTotalSupply),
-    //             },
-    //             async (_, idx) => {
-    //                 try {
-    //                     const uri = await graviola.tokenURI(BigInt(idx))
-    //                     const response = await fetch(uri)
-    //                     const nftData = await response.json()
-    //                     return {
-    //                         id: idx,
-    //                         ...nftData,
-    //                     }
-    //                 } catch (error) {
-    //                     console.warn(
-    //                         "[App]",
-    //                         (error as Error).message.substring(0, 72) + "...",
-    //                     )
-    //                     return fallbackNFT
-    //                 }
-    //             },
-    //         )
+        const fetchContractData = async () => {
+            const collectionData = await fetchCollection()
+            const groupSizes = await fetchGroupSizes()
 
-    //         // Nfts
-    //         const collection: NFT[] = await Promise.all(promises)
-    //         console.log("[App] fetched collection ", collection) // DEBUG
-    //         collection.length < 5
-    //             ? (() => {
-    //                   setCollection(new Array(5).fill(fallbackNFT))
-    //                   console.warn(
-    //                       "Collection is smaller than (5). Using fallback collection",
-    //                   )
-    //               })()
-    //             : setCollection((prev) => [...prev, ...collection])
+            const weights = await seasonsArchiveContract.getGroupWeights()
+            const nftTotalSupply = await collectionContract.totalSupply()
+            console.log("[App] totalSupply: ", Number(nftTotalSupply))
+            console.log("[App] fetched collection ", collectionData)
 
-    //         // const raritiesData = rarityGroupsData.reduce<
-    //         //     Record<RarityLevel, RarityGroupData>
-    //         // >(
-    //         //     (acc, groupData, idx) => {
-    //         //         const obj = groupData as unknown as RarityGroupData
-    //         //         const gData: RarityGroupData = {
-    //         //             name: obj.name,
-    //         //             color: rarityGroupColors[rarityScale[idx]],
-    //         //             keywords: obj.keywords.map((kword) => kword),
-    //         //             startRange: Number(obj.startRange),
-    //         //             endRange: Number(obj.endRange),
-    //         //             weight: Number(obj.weight),
-    //         //             minTokenWeight: Number(obj.minTokenWeight),
-    //         //         }
-    //         //         acc[rarityScale[idx]] = gData
-    //         //         return acc
-    //         //     },
-    //         //     {} as Record<RarityLevel, RarityGroupData>,
-    //         // )
+            if (collectionData.length < 5) {
+                dispatch(setCollection(new Array(5).fill(fallbackNFT)))
+            } else {
+                dispatch(setCollection(collectionData))
+            }
 
-    //         // console.log("[App] raritiesData: ", raritiesData) // DEBUG
-    //         // setRarities(raritiesData)
-    //         setLoading(false)
-    //         console.log("[App] collection loaded!")
+            dispatch(setGroupSizes(groupSizes))
+            dispatch(setWeights(weights.map((w) => Number(w))))
 
-    //         const candidateListSize =
-    //             await seasonsGovernor.getCandidateListSize()
-    //         console.log("[CandidateList size]", candidateListSize)
-    //     }
+            setLoading(false)
+            console.log("[App] collection loaded!")
+        }
 
-    //     fetchCollection()
-    //     setDataFetched(true)
-    // }, [graviola])
+        fetchContractData()
+    }, [loading])
 
     useEffect(() => {
         if (walletProvider) {
