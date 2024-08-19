@@ -1,4 +1,4 @@
-import { useEffect, useState, ReactNode } from "react"
+import { useEffect, useState, ReactNode, Fragment } from "react"
 import tailwindConfig from "../tailwind.config"
 import {
     createWeb3Modal,
@@ -6,46 +6,43 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
 
-// import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-
-// import { rarityScale, rarityGroupColors } from "./data/rarityData"
-// import { RarityLevel, RarityGroupData } from "./types/Rarity"
-// import { RaritiesData } from "./types/RarityGroup"
+import { rarityScale, rarityGroupColors } from "./data/rarityData"
 import { fallbackNFT } from "./data/fallbacks"
-import { AppContext } from "./contexts/AppContext"
-
-import useWeb3 from "./hooks/useWallet"
+import useWallet from "./hooks/useWallet"
+import { isDevMode } from "./utils/mode"
+import { setCollection, setRarities } from "./redux/reducers/graviola"
+import { useAppDispatch } from "./redux/hooks"
 
 const App = (props: { children: ReactNode }) => {
-    const projectId = "a09890b34dc1551c2534337dbc22de8c"
-    const sepolia = {
-        chainId: 421614,
-        name: "Arbitrum Sepolia",
-        currency: "ETH",
-        explorerUrl: "https://sepolia.etherscan.io/",
-        rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
-    }
-    const metadata = {
-        name: "graviola NFT",
-        description: "NFT generator powered by opML",
-        url: "https://el-tumero.github.io/graviola/",
-        icons: [],
-    }
-
     const modal = createWeb3Modal({
         themeVariables: {
             "--w3m-accent": tailwindConfig.theme.extend.colors.accentDark,
         },
         ethersConfig: defaultConfig({
-            metadata,
+            metadata: {
+                name: "graviola NFT",
+                description: "NFT generator powered by opML",
+                url: "https://el-tumero.github.io/graviola/",
+                icons: [],
+            },
         }),
-        chains: [sepolia],
-        projectId,
+        chains: [
+            {
+                chainId: 421614,
+                name: "Arbitrum Sepolia",
+                currency: "ETH",
+                explorerUrl: "https://sepolia.etherscan.io/",
+                rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
+            },
+        ],
+        projectId: "a09890b34dc1551c2534337dbc22de8c",
     })
 
+    const dispatch = useAppDispatch()
+    useTheme(modal === undefined)
     const { walletProvider } = useWeb3ModalProvider()
 
     const { theme, toggleTheme } = useTheme(modal === undefined)
@@ -149,13 +146,7 @@ const App = (props: { children: ReactNode }) => {
         }
     }, [walletProvider])
 
-    return loading ? (
-        <Loading />
-    ) : (
-        <AppContext.Provider value={appContextValue}>
-            {props.children}
-        </AppContext.Provider>
-    )
+    return loading ? <Loading /> : <Fragment>{props.children}</Fragment>
 }
 
 export default App

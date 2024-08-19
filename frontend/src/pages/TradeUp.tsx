@@ -3,7 +3,7 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useWeb3ModalAccount } from "@web3modal/ethers/react"
-import { useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { NFT } from "../types/NFT"
 import { RaritiesData } from "../types/RarityGroup"
 import { ethers } from "ethers"
@@ -21,14 +21,22 @@ import useRandomRarityBorder from "../hooks/useBorderAnimation"
 import { Status } from "../types/Status"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 import useWallet from "../hooks/useWallet"
+import { useAppSelector } from "../redux/hooks"
 
 const TradeUp = () => {
+    const { graviola } = useWallet()
     const { isConnected, address } = useWeb3ModalAccount()
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
+    const collection = useAppSelector(
+        (state) => state.graviolaData.collection,
+    ) as NFT[]
 
     const {
-        txStatus,
+        // txStatus,
         txMsg,
-        rolledNFT,
+        // rolledNFT,
         requestGen,
         initCallbacks,
         disableCallbacks,
@@ -156,7 +164,7 @@ const TradeUp = () => {
                                             const [rarityLevel] =
                                                 getRarityFromPerc(
                                                     percRarity,
-                                                    rGroups,
+                                                    rarities,
                                                 )
 
                                             if (
@@ -235,7 +243,7 @@ const TradeUp = () => {
                                 ) : (
                                     <TradeUpGenerateContainer
                                         active={selectedIds.length === 3}
-                                        rGroups={rGroups}
+                                        rGroups={rarities}
                                     >
                                         {selectedIds.map((id, i) => {
                                             const randBase = Math.random()
@@ -251,7 +259,7 @@ const TradeUp = () => {
                                             const [, rGroupData] =
                                                 getRarityFromPerc(
                                                     percRarity,
-                                                    rGroups,
+                                                    rarities,
                                                 )
                                             return (
                                                 <div

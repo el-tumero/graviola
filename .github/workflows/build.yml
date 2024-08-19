@@ -25,17 +25,22 @@ jobs:
             - name: Install yarn
               run: npm i -g yarn
 
-            - name: Deploy local contract & setup data
+            - name: Setup project
               run: |
-                  cd contracts
-                  yarn
-                  yarn hardhat compile
-                  yarn hardhat node > /dev/null 2>&1 &
-                  yarn deploy:local
-                  yarn cand
+                chmod +x ./install.sh
+                ./install.sh
 
-            - name: Build website
-              run: |
-                  cd frontend
-                  yarn
-                  yarn build
+            # - name: Deploy local contract & setup data
+            #   run: |
+            #       cd contracts
+            #       yarn
+            #       yarn hardhat compile
+            #       yarn hardhat node > /dev/null 2>&1 &
+            #       yarn deploy:local
+            #       yarn cand
+
+            # - name: Build website
+            #   run: |
+            #       cd frontend
+            #       yarn
+            #       yarn build

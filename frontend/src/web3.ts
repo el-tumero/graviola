@@ -1,4 +1,4 @@
-import { isDevMode } from "./app/mode"
+import { isDevMode } from "./utils/mode"
 import addressesLocal from "../../contracts/addresses-local.json"
 import addressesTestnet from "../../contracts/addresses-testnet.json"
 import { JsonRpcProvider, Signer } from "ethers"
@@ -20,6 +20,10 @@ const addresses = isDevMode ? addressesLocal : addressesTestnet
 const defaultRpc = isDevMode
     ? import.meta.env.VITE_DEV_RPC
     : "https://sepolia-rollup.arbitrum.io/rpc"
+
+const tokenAddress = isDevMode
+    ? addressesLocal.TOKEN_ADDRESS
+    : addresses.TOKEN_ADDRESS
 
 let provider = new JsonRpcProvider(defaultRpc)
 let generator: GraviolaGenerator = GraviolaGenerator__factory.connect(
@@ -44,6 +48,11 @@ let seasonsGovernor: GraviolaSeasonsGovernor =
 
 let seasonsArchive: GraviolaSeasonsArchive =
     GraviolaSeasonsArchive__factory.connect(addresses.SEASONS_ARCHIVE, provider)
+
+let tokenContract: GraviolaToken = GraviolaToken__factory.connect(
+    tokenAddress,
+    provider,
+)
 
 let signer: Signer | undefined
 

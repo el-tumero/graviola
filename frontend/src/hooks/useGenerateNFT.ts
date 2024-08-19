@@ -5,8 +5,10 @@ import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
-import { ContractTransactionResponse } from "ethers"
 import useWallet from "./useWallet"
+import { useAppSelector } from "../redux/hooks"
+import { RaritiesData } from "../types/RarityGroup"
+import { ContractTransactionResponse } from "ethers"
 
 type TradeUpArgs = number[]
 
@@ -16,6 +18,10 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
     const { address, generatorContract, collectionContract } = useWallet()
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
+    const collection = useAppSelector((state) => state.graviolaData.collection)
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")

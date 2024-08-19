@@ -24,7 +24,8 @@ export const getKeyword = (
             return [group.keywords[relIdx], group]
         }
     }
-    throw Error(
+    console.warn(
         "Index does not match any keyword in collection. Input possibly out of bounds.",
     )
+    return ["ERROR", rarities["legendary"]]
 }

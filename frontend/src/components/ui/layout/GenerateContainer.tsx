@@ -1,13 +1,13 @@
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState } from "react"
 import useRandomRarityBorder from "../../../hooks/useBorderAnimation"
 import { getRarityBorder } from "../../../utils/getRarityBorder"
 import { NFT } from "../../../types/NFT"
 import { getRarityFromPerc } from "../../../utils/getRarityData"
 import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
-import { GraviolaContext } from "../../../contexts/GraviolaContext"
 import { RaritiesData } from "../../../types/RarityGroup"
 import { formatBpToPercentage } from "../../../utils/format"
 import { cn } from "../../../utils/cn"
+import { useAppSelector } from "../../../redux/hooks"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
@@ -20,10 +20,9 @@ const GenerateContainer = ({
     runBorderAnim,
     rGroups,
 }: GenerateContainerProps) => {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750, rGroups)
     const [resOpacity, setResOpacity] = useState<number>(0)
 

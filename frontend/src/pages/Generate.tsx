@@ -1,4 +1,4 @@
-import { useEffect, useContext } from "react"
+import { useEffect } from "react"
 import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
@@ -14,8 +14,8 @@ import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-
 import useWeb3 from "../hooks/useWallet"
+import { useAppSelector } from "../redux/hooks"
 
 // Extended NFT interface to avoid computing the same properties multiple times
 export interface NFTExt extends NFT {
@@ -25,7 +25,9 @@ export interface NFTExt extends NFT {
 
 const Generate = () => {
     const navigate = useNavigate()
-
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     const { isConnected } = useWeb3()
 
     // // MOCK
@@ -78,7 +80,7 @@ const Generate = () => {
                         <GenerateContainer
                             rolledNFT={rolledNFT}
                             runBorderAnim={!rolledNFT}
-                            rGroups={rGroups}
+                            rGroups={rarities}
                         />
                     </div>
 

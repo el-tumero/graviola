@@ -1,5 +1,4 @@
-import { useContext, useState, useEffect } from "react"
-import { GraviolaContext } from "../contexts/GraviolaContext"
+import { useState, useEffect } from "react"
 import { NFTExt } from "../pages/Generate"
 import { RaritiesData } from "../types/RarityGroup"
 import { TransactionStatus } from "../types/TransactionStatus"
@@ -7,6 +6,7 @@ import { getRarityFromPerc } from "../utils/getRarityData"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { fallbackNFT } from "../data/fallbacks"
 import { formatBpToPercentage } from "../utils/format"
+import { useAppSelector } from "../redux/hooks"
 
 /**
  * Mock hook for offline UX testing and error handling by the web
@@ -33,10 +33,7 @@ export default function useGenerateMock(
     const MOCK_STEP_TIMEOUT_MS = 7000 // Time between steps
     const RESET_ON_ERR_TIMEOUT_MS = 4000
 
-    const { rarities: rGroups } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-
+    const rarities = useAppSelector(state => state.graviolaData.rarities) as RaritiesData
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
     const [txErr, setTxErr] = useState<string>("")
@@ -80,7 +77,7 @@ export default function useGenerateMock(
             console.log("[useGenerate MOCK] nft Res")
             setTxStatus("DONE")
             const perc = formatBpToPercentage(fallbackNFT.attributes[0].value)
-            const [rLevel, rData] = getRarityFromPerc(perc, rGroups)
+            const [rLevel, rData] = getRarityFromPerc(perc, rarities)
             const mockNFTRes: NFTExt = {
                 ...fallbackNFT,
                 rarityLevel: rLevel,

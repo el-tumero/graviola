@@ -10,18 +10,13 @@ import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import candJson from "../../../contracts/candidates.json"
-import {
-    ChangeEvent,
-    ReactNode,
-    Fragment,
-    useContext,
-    useState,
-    useEffect,
-} from "react"
+import { ChangeEvent, ReactNode, Fragment, useState, useEffect } from "react"
 import { getKeyword } from "../utils/getKeyword"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
+import { Candidate } from "../types/Candidate"
+import { useAppSelector } from "../redux/hooks"
 
 type ActivePage = "Voting" | "Archive"
 
@@ -203,8 +198,8 @@ const Voting = () => {
                                         </p>
                                         <p>
                                             The community can then judge and
-                                            pick which of these keywords they'd
-                                            like to see in use.
+                                            pick which of these keywords
+                                            they&apos;d like to see in use.
                                         </p>
                                         <p>
                                             This panel allows to vote, track and
@@ -281,6 +276,9 @@ const KeywordVotingPage = (props: {
     onClickInfo: () => void
     onClickAddKeyword: () => void
 }) => {
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     // Default sort is always by id (same order as we got from the contract)
     const [sorting, setSorting] = useState<SortingType>(SortingType["BY_ID"])
     // Map sorting types (enum) to compare fns
@@ -292,8 +290,21 @@ const KeywordVotingPage = (props: {
         2: compareByScore("Ascending"), // BY_SCORE_ASC
         3: compareByScore("Descending"), // BY_SCORE_DESC
         4: compareAlphabetically("Ascending"), // BY_KEYWORD_ASC
-        5: compareAlphabetically("Descending"), // BY_KEYWORD_ASC
+        5: compareAlphabetically("Descending"), // BY_K2EYWORD_ASC
     }
+
+    const mockCandidates = candJson.candidates.map(
+        (data: Candidate, i: number) => {
+            const candidateData: CandidateInfo = {
+                id: i,
+                author: data.author || "UNKNOWN",
+                keyword: getKeyword((+data.id || -1) - 1, rarities)[0], // -1 to avoid out of bounds absIdx
+                iteration: 0,
+                score: +data.score || -1,
+            }
+            return candidateData
+        },
+    )
 
     return (
         <div

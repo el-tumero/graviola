@@ -3,11 +3,11 @@ import { clsx as cl } from "clsx"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import PageTitle from "../components/ui/layout/PageTitle"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import icons from "../data/icons"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import { RarityGroupData } from "../types/Rarity"
+import { useAppSelector } from "../redux/hooks"
 
 // Interface in case this grows
 interface RarityGroupBlock {
@@ -93,10 +93,9 @@ const KeywordGroupBlock = (props: {
 }
 
 const Keywords = () => {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-
+    const rarities = useAppSelector(
+        (state) => state.graviolaData.rarities,
+    ) as RaritiesData
     const [groupBlocks, setGroupBlocks] = useState<
         Record<string, RarityGroupBlock>
     >(() => {
@@ -125,9 +124,9 @@ const Keywords = () => {
                         </div>
                         <p>
                             Weight — this value represents how heavy a keyword
-                            is. Each groups' keywords have their weights. For an
-                            NFT to be of certain Rarity, it needs to have at
-                            least the "min" weight sum value.
+                            is. Each groups&apos; keywords have their weights.
+                            For an NFT to be of certain Rarity, it needs to have
+                            at least the &quot;min&quot; weight sum value.
                         </p>
                     </div>
                 </div>
