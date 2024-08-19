@@ -6,10 +6,8 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
-import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
 import { RarityGroupData, RarityLevel } from "../types/Rarity"
 import { RaritiesData } from "../types/RarityGroup"
 import { routerPaths } from "../router"
@@ -27,11 +25,6 @@ export interface NFTExt extends NFT {
 
 const Generate = () => {
     const navigate = useNavigate()
-    const { rarities: rGroups } = useContext(GraviolaContext) as {
-        contract: Graviola
-        rarities: RaritiesData
-        collection: NFT[]
-    }
 
     const { isConnected } = useWeb3()
 

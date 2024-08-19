@@ -6,14 +6,14 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
 
-import { GraviolaContext } from "./contexts/GraviolaContext"
+// import { GraviolaContext } from "./contexts/GraviolaContext"
 import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 
-import { rarityScale, rarityGroupColors } from "./data/rarityData"
-import { RarityLevel, RarityGroupData } from "./types/Rarity"
-import { RaritiesData } from "./types/RarityGroup"
+// import { rarityScale, rarityGroupColors } from "./data/rarityData"
+// import { RarityLevel, RarityGroupData } from "./types/Rarity"
+// import { RaritiesData } from "./types/RarityGroup"
 import { fallbackNFT } from "./data/fallbacks"
 import { AppContext } from "./contexts/AppContext"
 
@@ -27,13 +27,6 @@ const App = (props: { children: ReactNode }) => {
         currency: "ETH",
         explorerUrl: "https://sepolia.etherscan.io/",
         rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
-    }
-    const mock = {
-        chainId: 3151908,
-        name: "Graviola Devnet",
-        currency: "ETH",
-        explorerUrl: "",
-        rpcUrl: import.meta.env.VITE_DEV_RPC,
     }
     const metadata = {
         name: "graviola NFT",
@@ -56,101 +49,99 @@ const App = (props: { children: ReactNode }) => {
     const { walletProvider } = useWeb3ModalProvider()
 
     const { theme, toggleTheme } = useTheme(modal === undefined)
-    const { connectWallet, graviola, seasonsGovernor } = useWeb3()
+    const { connectWallet, collectionContract } = useWeb3()
     const [loading, setLoading] = useState<boolean>(true)
 
     // Contract data
-    const [dataFetched, setDataFetched] = useState<boolean>(false)
-    const [collection, setCollection] = useState<NFT[]>([])
-    const [rarities, setRarities] = useState<RaritiesData | null>(null)
-
-    const graviolaContextValue = {
-        contract: graviola,
-        collection,
-        rarities,
-    }
+    // const [dataFetched, setDataFetched] = useState<boolean>(false)
+    // const [collection, setCollection] = useState<NFT[]>([])
+    // const [rarities, setRarities] = useState<RaritiesData | null>(null)
 
     const appContextValue = {
         theme,
         toggleTheme,
     }
 
-    // Fetch contract data
     useEffect(() => {
-        if (!graviola || dataFetched) return
+        setLoading(false)
+    }, [])
 
-        const fetchCollection = async () => {
-            const rarityGroupsData = await graviola.getRarityGroups()
-            const nftTotalSupply = await graviola.totalSupply()
-            console.log("[App] totalSupply: ", Number(nftTotalSupply))
-            const promises = Array.from(
-                {
-                    length: Number(nftTotalSupply),
-                },
-                async (_, idx) => {
-                    try {
-                        const uri = await graviola.tokenURI(BigInt(idx))
-                        const response = await fetch(uri)
-                        const nftData = await response.json()
-                        return {
-                            id: idx,
-                            ...nftData,
-                        }
-                    } catch (error) {
-                        console.warn(
-                            "[App]",
-                            (error as Error).message.substring(0, 72) + "...",
-                        )
-                        return fallbackNFT
-                    }
-                },
-            )
+    // Fetch contract data
+    // useEffect(() => {
+    //     if (!graviola || dataFetched) return
 
-            // Nfts
-            const collection: NFT[] = await Promise.all(promises)
-            console.log("[App] fetched collection ", collection) // DEBUG
-            collection.length < 5
-                ? (() => {
-                      setCollection(new Array(5).fill(fallbackNFT))
-                      console.warn(
-                          "Collection is smaller than (5). Using fallback collection",
-                      )
-                  })()
-                : setCollection((prev) => [...prev, ...collection])
+    //     const fetchCollection = async () => {
+    //         const rarityGroupsData = await graviola.getRarityGroups()
+    //         const nftTotalSupply = await graviola.totalSupply()
+    //         console.log("[App] totalSupply: ", Number(nftTotalSupply))
+    //         const promises = Array.from(
+    //             {
+    //                 length: Number(nftTotalSupply),
+    //             },
+    //             async (_, idx) => {
+    //                 try {
+    //                     const uri = await graviola.tokenURI(BigInt(idx))
+    //                     const response = await fetch(uri)
+    //                     const nftData = await response.json()
+    //                     return {
+    //                         id: idx,
+    //                         ...nftData,
+    //                     }
+    //                 } catch (error) {
+    //                     console.warn(
+    //                         "[App]",
+    //                         (error as Error).message.substring(0, 72) + "...",
+    //                     )
+    //                     return fallbackNFT
+    //                 }
+    //             },
+    //         )
 
-            const raritiesData = rarityGroupsData.reduce<
-                Record<RarityLevel, RarityGroupData>
-            >(
-                (acc, groupData, idx) => {
-                    const obj = groupData as unknown as RarityGroupData
-                    const gData: RarityGroupData = {
-                        name: obj.name,
-                        color: rarityGroupColors[rarityScale[idx]],
-                        keywords: obj.keywords.map((kword) => kword),
-                        startRange: Number(obj.startRange),
-                        endRange: Number(obj.endRange),
-                        weight: Number(obj.weight),
-                        minTokenWeight: Number(obj.minTokenWeight),
-                    }
-                    acc[rarityScale[idx]] = gData
-                    return acc
-                },
-                {} as Record<RarityLevel, RarityGroupData>,
-            )
+    //         // Nfts
+    //         const collection: NFT[] = await Promise.all(promises)
+    //         console.log("[App] fetched collection ", collection) // DEBUG
+    //         collection.length < 5
+    //             ? (() => {
+    //                   setCollection(new Array(5).fill(fallbackNFT))
+    //                   console.warn(
+    //                       "Collection is smaller than (5). Using fallback collection",
+    //                   )
+    //               })()
+    //             : setCollection((prev) => [...prev, ...collection])
 
-            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
-            setRarities(raritiesData)
-            setLoading(false)
-            console.log("[App] collection loaded!")
+    //         // const raritiesData = rarityGroupsData.reduce<
+    //         //     Record<RarityLevel, RarityGroupData>
+    //         // >(
+    //         //     (acc, groupData, idx) => {
+    //         //         const obj = groupData as unknown as RarityGroupData
+    //         //         const gData: RarityGroupData = {
+    //         //             name: obj.name,
+    //         //             color: rarityGroupColors[rarityScale[idx]],
+    //         //             keywords: obj.keywords.map((kword) => kword),
+    //         //             startRange: Number(obj.startRange),
+    //         //             endRange: Number(obj.endRange),
+    //         //             weight: Number(obj.weight),
+    //         //             minTokenWeight: Number(obj.minTokenWeight),
+    //         //         }
+    //         //         acc[rarityScale[idx]] = gData
+    //         //         return acc
+    //         //     },
+    //         //     {} as Record<RarityLevel, RarityGroupData>,
+    //         // )
 
-            const candidateListSize =
-                await seasonsGovernor.getCandidateListSize()
-            console.log("[CandidateList size]", candidateListSize)
-        }
+    //         // console.log("[App] raritiesData: ", raritiesData) // DEBUG
+    //         // setRarities(raritiesData)
+    //         setLoading(false)
+    //         console.log("[App] collection loaded!")
 
-        fetchCollection()
-        setDataFetched(true)
-    }, [graviola])
+    //         const candidateListSize =
+    //             await seasonsGovernor.getCandidateListSize()
+    //         console.log("[CandidateList size]", candidateListSize)
+    //     }
+
+    //     fetchCollection()
+    //     setDataFetched(true)
+    // }, [graviola])
 
     useEffect(() => {
         if (walletProvider) {
@@ -161,11 +152,9 @@ const App = (props: { children: ReactNode }) => {
     return loading ? (
         <Loading />
     ) : (
-        <GraviolaContext.Provider value={graviolaContextValue}>
-            <AppContext.Provider value={appContextValue}>
-                {props.children}
-            </AppContext.Provider>
-        </GraviolaContext.Provider>
+        <AppContext.Provider value={appContextValue}>
+            {props.children}
+        </AppContext.Provider>
     )
 }
 

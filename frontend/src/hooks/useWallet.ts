@@ -3,8 +3,10 @@ import { JsonRpcProvider } from "ethers"
 import {
     setSigner,
     connectContractsToSigner,
-    graviolaContract,
-    seasonsGovernorContract,
+    generator,
+    collection,
+    token,
+    seasonsGovernor,
 } from "../web3"
 
 import localhostConfig from "../../../contracts/localhost-config.json"
@@ -17,10 +19,12 @@ export default function useWallet() {
     const isConnected = useAppSelector((state) => state.wallet.isConnected)
     const address = useAppSelector((state) => state.wallet.address)
 
-    const graviola = graviolaContract
-    const seasonsGovernor = seasonsGovernorContract
-
     const dispatch = useAppDispatch()
+
+    const generatorContract = generator
+    const collectionContract = collection
+    const tokenContract = token
+    const seasonsGovernorContract = seasonsGovernor
 
     function connectDevWallet() {
         const provider = new JsonRpcProvider(localhostConfig.rpcUrl)
@@ -45,7 +49,9 @@ export default function useWallet() {
         connectDevWallet,
         isConnected,
         address,
-        graviola,
-        seasonsGovernor,
+        generatorContract,
+        collectionContract,
+        tokenContract,
+        seasonsGovernorContract,
     }
 }

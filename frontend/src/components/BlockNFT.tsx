@@ -3,14 +3,14 @@ import { cn } from "../utils/cn"
 import { clsx as cl } from "clsx"
 import { NFT, NFTAttributes } from "../types/NFT"
 import { getRarityFromLevel, getRarityFromPerc } from "../utils/getRarityData"
-import { formatBpToPercentage } from "../utils/format"
-import { useContext, useState } from "react"
-import { GraviolaContext } from "../contexts/GraviolaContext"
+// import { formatBpToPercentage } from "../utils/format"
+import { useState } from "react"
 import Tooltip from "./Tooltip"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { RarityLevel } from "../types/Rarity"
-import { RaritiesData } from "../types/RarityGroup"
+// import { RaritiesData } from "../types/RarityGroup"
 import { Status } from "../types/Status"
+// import { useAppDispatch } from "../app/hooks"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
 
@@ -27,28 +27,25 @@ const BlockNFT = ({
     disableMetadataOnHover,
     additionalClasses,
 }: BlockNFTProps) => {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-    const [, rData] = getRarityFromPerc(
-        formatBpToPercentage(nftData.attributes[0].value),
-        rarities,
-    )
+    // const [, rData] = getRarityFromPerc(
+    //     formatBpToPercentage(nftData.attributes[0].value),
+    //     rarities,
+    // )
     const [status, setStatus] = useState<Status>("loading")
 
-    const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto"
-    const glowLevelData = shouldGetRarityLevel
-        ? getRarityFromLevel(glowColor, rarities)
-        : null
+    // const shouldGetRarityLevel = glowColor !== "none" && glowColor !== "auto"
+    // const glowLevelData = shouldGetRarityLevel
+    //     ? getRarityFromLevel(glowColor, rarities)
+    //     : null
 
-    let style: React.CSSProperties = {}
-    if (glowColor !== "none") {
-        if (glowColor === "auto") style = getRarityBorder(rData).style
-        else if (glowLevelData) {
-            // handle custom/hardcoded glow colors
-            style = getRarityBorder(glowLevelData).style
-        }
-    }
+    // let style: React.CSSProperties = {}
+    // if (glowColor !== "none") {
+    //     if (glowColor === "auto") style = getRarityBorder(rData).style
+    //     else if (glowLevelData) {
+    //         // handle custom/hardcoded glow colors
+    //         style = getRarityBorder(glowLevelData).style
+    //     }
+    // }
 
     // TODO: Ideally each BlockNFT should be shift-clickable on hover
     // and open the formatted url to IPFS in a new tab
@@ -56,7 +53,7 @@ const BlockNFT = ({
 
     return (
         <div
-            style={style}
+            // style={}
             className={cn(
                 "flex w-36 h-36 shadow-sm",
                 "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",

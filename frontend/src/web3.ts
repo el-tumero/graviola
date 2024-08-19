@@ -1,31 +1,49 @@
 import { isDevMode } from "./app/mode"
 import addressesLocal from "../../contracts/addresses-local.json"
-import addresses from "../../contracts/addresses.json"
+import addressesTestnet from "../../contracts/addresses-testnet.json"
 import { JsonRpcProvider, Signer } from "ethers"
 import {
-    Graviola,
-    Graviola__factory,
+    GraviolaGenerator,
+    GraviolaGenerator__factory,
+    GraviolaCollection,
+    GraviolaCollection__factory,
+    GraviolaToken,
+    GraviolaToken__factory,
     GraviolaSeasonsGovernor,
     GraviolaSeasonsGovernor__factory,
+    GraviolaSeasonsArchive,
+    GraviolaSeasonsArchive__factory,
 } from "../../contracts/typechain-types/index"
+
+const addresses = isDevMode ? addressesLocal : addressesTestnet
 
 const defaultRpc = isDevMode
     ? import.meta.env.VITE_DEV_RPC
     : "https://sepolia-rollup.arbitrum.io/rpc"
-const graviolaAddress = isDevMode
-    ? addressesLocal.GRAVIOLA_ADDRESS
-    : addresses.GRAVIOLA_ADDRESS
-const seasonsGovernorAddress = isDevMode
-    ? addressesLocal.SEASONS_GOVERNOR_ADDRESS
-    : addresses.SEASONS_GOVERNOR_ADDRESS
 
 let provider = new JsonRpcProvider(defaultRpc)
-let graviolaContract: Graviola = Graviola__factory.connect(
-    graviolaAddress,
+let generator: GraviolaGenerator = GraviolaGenerator__factory.connect(
+    addresses.GENERATOR,
     provider,
 )
-let seasonsGovernorContract: GraviolaSeasonsGovernor =
-    GraviolaSeasonsGovernor__factory.connect(seasonsGovernorAddress, provider)
+let collection: GraviolaCollection = GraviolaCollection__factory.connect(
+    addresses.COLLECTION,
+    provider,
+)
+
+let token: GraviolaToken = GraviolaToken__factory.connect(
+    addresses.TOKEN,
+    provider,
+)
+
+let seasonsGovernor: GraviolaSeasonsGovernor =
+    GraviolaSeasonsGovernor__factory.connect(
+        addresses.SEASONS_GOVERNOR,
+        provider,
+    )
+
+let seasonsArchive: GraviolaSeasonsArchive =
+    GraviolaSeasonsArchive__factory.connect(addresses.SEASONS_ARCHIVE, provider)
 
 let signer: Signer | undefined
 
@@ -34,7 +52,8 @@ export function setSigner(s: Signer) {
 }
 
 export function connectContractsToSigner() {
-    graviolaContract = graviolaContract.connect(signer)
+    generator = generator.connect(signer)
+    token = token.connect(signer)
 }
 
-export { graviolaContract, seasonsGovernorContract }
+export { generator, collection, token, seasonsGovernor, seasonsArchive }

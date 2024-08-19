@@ -19,7 +19,6 @@ import {
     useEffect,
 } from "react"
 import { getKeyword } from "../utils/getKeyword"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { RaritiesData } from "../types/RarityGroup"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
@@ -282,10 +281,6 @@ const KeywordVotingPage = (props: {
     onClickInfo: () => void
     onClickAddKeyword: () => void
 }) => {
-    const { rarities } = useContext(GraviolaContext) as {
-        rarities: RaritiesData
-    }
-
     // Default sort is always by id (same order as we got from the contract)
     const [sorting, setSorting] = useState<SortingType>(SortingType["BY_ID"])
     // Map sorting types (enum) to compare fns
@@ -299,17 +294,6 @@ const KeywordVotingPage = (props: {
         4: compareAlphabetically("Ascending"), // BY_KEYWORD_ASC
         5: compareAlphabetically("Descending"), // BY_KEYWORD_ASC
     }
-
-    const mockCandidates = candJson.candidates.map((data, i) => {
-        const candidateData: CandidateInfo = {
-            id: i,
-            author: data[2],
-            keyword: getKeyword(+data[0] - 1, rarities)[0], // -1 to avoid out of bounds absIdx
-            iteration: 0,
-            score: +data[1],
-        }
-        return candidateData
-    })
 
     return (
         <div
@@ -386,13 +370,7 @@ const KeywordVotingPage = (props: {
                 <ul
                     role="list"
                     className="w-full divide-y divide-light-border dark:divide-dark-border"
-                >
-                    {mockCandidates
-                        .sort(sortCompareFns[sorting])
-                        .map((candInfo, idx) => (
-                            <KeywordCandidate {...candInfo} key={idx} />
-                        ))}
-                </ul>
+                ></ul>
             </div>
         </div>
     )

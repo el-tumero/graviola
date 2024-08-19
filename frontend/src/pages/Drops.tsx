@@ -3,14 +3,11 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
 import { useContext, useEffect, useRef, useState } from "react"
 import { clsx as cl } from "clsx"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFT } from "../types/NFT"
 import Button from "../components/ui/Button"
 import BlockNFT from "../components/BlockNFT"
-import { getRarityFromPerc } from "../utils/getRarityData"
 import { formatBpToPercentage } from "../utils/format"
 import { ethers } from "ethers"
-import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
 import PageTitle from "../components/ui/layout/PageTitle"
 import icons from "../data/icons"
@@ -23,12 +20,14 @@ const Drops = () => {
     // TODO: Add options to filter by Rarity, or by included Keywords.
 
     // const { isConnected, address } = useWeb3ModalAccount()
-    const { isConnected, address } = useWeb3()
+    const { isConnected, address, collectionContract } = useWeb3()
 
-    const graviolaContext = useContext(GraviolaContext)
+    // const graviolaContext = useContext(GraviolaContext)
 
-    const contractNFTs = graviolaContext.collection as NFT[]
-    const rGroups = graviolaContext.rarities as RaritiesData
+    // const contractNFTs = graviolaContext.collection as NFT[]
+    // const rGroups = graviolaContext.rarities as RaritiesData
+
+    // const contractsNFTs = useState<NFT[]>([])
 
     const [filterMode, setFilterMode] =
         useState<DropFilterMode>("Everyone's Drops")
@@ -44,7 +43,7 @@ const Drops = () => {
         setFetchingCollection(true)
         let userOwnedTokens
         if (address) {
-            userOwnedTokens = await graviolaContext.contract?.ownedTokens(
+            userOwnedTokens = await collectionContract.ownedTokens(
                 ethers.getAddress(address),
             )
         }

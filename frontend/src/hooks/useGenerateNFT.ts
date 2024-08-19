@@ -1,14 +1,10 @@
 import { parseEther, toBigInt } from "ethers"
-import { Graviola } from "../../../contracts/typechain-types/GraviolaMain.sol"
-import { GraviolaContext } from "../contexts/GraviolaContext"
 import { NFTExt } from "../pages/Generate"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
-import { getRarityFromPerc } from "../utils/getRarityData"
 import { PopupBase } from "../components/Popup"
-import { RaritiesData } from "../types/RarityGroup"
 import { ContractTransactionResponse } from "ethers"
 import useWallet from "./useWallet"
 
@@ -19,12 +15,7 @@ type TradeUpArgs = number[]
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
-    const { contract, rarities, collection } = useContext(GraviolaContext) as {
-        contract: Graviola
-        rarities: RaritiesData
-        collection: NFT[]
-    }
-    const { address } = useWallet()
+    const { address, generatorContract, collectionContract } = useWallet()
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
@@ -39,28 +30,31 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
-        const estFee: bigint = await contract.estimateFee()
-        console.log("estfee ", estFee)
+        // const estFee: bigint = await generatorContract.estimateFee()
+        // console.log("estfee ", estFee)
         let tx: ContractTransactionResponse | null = null
         console.log(
             "[useGenerate] tx init. mode: ",
             tradeupArgs ? "trade up" : "generate",
         )
         try {
-            if (tradeupArgs) {
-                const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
-                tx = await contract.tradeUp([args[0], args[1], args[2]], {
-                    value: estFee + parseEther("0.006"),
-                })
-            } else {
-                tx = await contract.mint({
-                    value: parseEther("0.006"),
-                    // gasLimit: 900_000
-                })
-            }
+            // if (tradeupArgs) {
+            //     const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
+            //     tx = await contract.tradeUp([args[0], args[1], args[2]], {
+            //         value: estFee + parseEther("0.006"),
+            //     })
+            // } else {
+            //     tx = await contract.mint({
+            //         value: parseEther("0.006"),
+            //         // gasLimit: 900_000
+            //     })
+            // }
+
+            const tx = await generatorContract.prepare()
+
             const receipt = await tx.wait()
             if (receipt) {
-                console.log("[useGenerate] tx receipt OK")
+                console.log("[useGenerate] prepare tx receipt OK")
                 setTxStatus("BEFORE_MINT")
             }
         } catch (error) {
@@ -91,52 +85,63 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         }
         setCallbacksInit(true)
 
-        contract.once(contract.filters.Mint, onMint)
-        contract.once(contract.filters.TokenReady, onTokenReady)
+        generatorContract.once(
+            generatorContract.filters.RequestVRFFulfilled,
+            onVRFResponse,
+        )
+        generatorContract.once(
+            generatorContract.filters.RequestOAOFulfilled,
+            onOAOResponse,
+        )
+
+        // generatorContract.once(generatorContract.filters.RequestOAOFulfilled, onMint)
+        // contract.once(contract.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks init OK")
     }
 
     const disableCallbacks = () => {
         if (!callbacksInit) return
-        contract.off(contract.filters.Mint, onMint)
-        contract.off(contract.filters.TokenReady, onTokenReady)
+        // contract.off(contract.filters.Mint, onMint)
+        // contract.off(contract.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks disable OK")
         setCallbacksInit(false)
     }
 
-    const onMint = (addr: string, tokenId: bigint) => {
-        if (addr != address) return
-        console.log(`[useGenerate] onMint: tokenId ${tokenId}`)
-        setTxStatus("MINTED")
-    }
+    // const onMint = (addr: string, tokenId: bigint) => {
+    //     if (addr != address) return
+    //     console.log(`[useGenerate] onMint: tokenId ${tokenId}`)
+    //     setTxStatus("MINTED")
+    // }
 
-    const onTokenReady = async (addr: string, tokenId: bigint) => {
-        if (addr != address) return // Don't eavesdrop other people's drops
+    const onVRFResponse = async (tokenId: bigint) => {}
+
+    const onOAOResponse = async (tokenId: bigint) => {
+        // if (addr != address) return // Don't eavesdrop other people's drops
         console.log(`[useGenerate] onTokenReady: tokenId ${Number(tokenId)}`)
 
-        const uri = await contract.tokenURI(tokenId)
+        const uri = await collectionContract.tokenURI(tokenId)
         const response = await fetch(uri)
-        const nextIdx = collection.length
+        // const nextIdx = collection.length
         const nftData = await response.json()
-        const [rLevel, rData] = getRarityFromPerc(
-            nftData.attributes[0].value,
-            rarities,
-        )
+        // const [rLevel, rData] = getRarityFromPerc(
+        //     nftData.attributes[0].value,
+        //     rarities,
+        // )
 
         const nftBase: NFT = {
-            id: nextIdx,
+            id: tokenId,
             ...nftData,
         }
 
-        const nftRes: NFTExt = {
-            rarityLevel: rLevel,
-            rarityData: rData,
-            ...nftBase,
-        }
-        console.log("[useGenerate] nftRes: ", JSON.stringify(nftRes, null, 4)) // DEBUG
+        // const nftRes: NFTExt = {
+        //     rarityLevel: rLevel,
+        //     rarityData: rData,
+        //     ...nftBase,
+        // }
+        // console.log("[useGenerate] nftRes: ", JSON.stringify(nftRes, null, 4)) // DEBUG
 
         setTxStatus("DONE")
-        setRolledNFT(nftRes)
+        // setRolledNFT(nftRes)
     }
 
     const closePopup = () => {
