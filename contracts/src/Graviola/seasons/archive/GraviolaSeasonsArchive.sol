@@ -146,6 +146,12 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
         return seasons[seasonId].well[wordId];
     }
 
+    function getKeywords(
+        uint256 seasonId
+    ) public view returns (string[] memory) {
+        return seasons[seasonId].well;
+    }
+
     /// @notice Return keyword with the given wordId from
     /// the current season
     /// @param wordId id of the keyword inside the season's well
@@ -153,6 +159,14 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
         uint256 wordId
     ) external view returns (string memory) {
         return getKeyword(wordId, currentSeasonId);
+    }
+
+    function getKeywordsCurrentSeason()
+        external
+        view
+        returns (string[] memory)
+    {
+        return getKeywords(currentSeasonId);
     }
 
     /// @notice Return rarity group id for the given wordId

@@ -15,33 +15,43 @@ import useWallet from "../../hooks/useWallet"
 import { useAppDispatch } from "../../redux/hooks"
 
 const Navbar = () => {
-
     const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
     const [userStatsFetched, setUserStatsFetched] = useState<boolean>(false)
     const { theme, toggleTheme } = useTheme(true)
-    const { address, connectDevWallet, isConnected, grvToken, graviola } = useWallet()
+    const {
+        address,
+        connectDevWallet,
+        isConnected,
+        tokenContract,
+        collectionContract,
+    } = useWallet()
 
     // fetch user stats
     useEffect(() => {
         if (!address || !isConnected || userStatsFetched) return
-        (async () => {
+        ;(async () => {
             try {
-                const ownedNfts = await graviola.balanceOf(address)
+                const ownedNfts = await collectionContract.balanceOf(address)
                 // console.log(ownedNfts)
-                const tokenBalance = await grvToken.balanceOf(address)
+                const tokenBalance = await tokenContract.balanceOf(address)
                 // console.log(tokenBalance)
-                const grvAddress = await graviola.getAddress()
-                const filter = graviola.filters.Transfer(grvAddress, address)
-                const events = await graviola.queryFilter(filter)
+                const collectionAddress = await collectionContract.getAddress()
+                const filter = collectionContract.filters.Transfer(
+                    collectionAddress,
+                    address,
+                )
+                const events = await collectionContract.queryFilter(filter)
                 const droppedNfts = events.length
                 // console.log(droppedNfts)
-                dispatch(userStatsSlice.actions.setUserStats({
-                    tokenBalance: Number(tokenBalance),
-                    nftsOwned: Number(ownedNfts),
-                    nftsDropped: droppedNfts
-                }))
+                dispatch(
+                    userStatsSlice.actions.setUserStats({
+                        tokenBalance: Number(tokenBalance),
+                        nftsOwned: Number(ownedNfts),
+                        nftsDropped: droppedNfts,
+                    }),
+                )
                 setUserStatsFetched(true)
             } catch (err) {
                 console.error(err)

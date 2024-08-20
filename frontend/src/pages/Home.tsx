@@ -17,9 +17,13 @@ import { nftRarityScaleArr } from "../data/fallbacks"
 import Button from "../components/ui/Button"
 import { rarities, rarityColors, RarityLevel } from "../data/rarities"
 import Popup from "../components/Popup"
+import camelToSpacePascal from "../utils/camelToSpacePascal"
+import useArchive from "../hooks/useArchive"
 
 const Home = () => {
     const navigate = useNavigate()
+
+    const { groupSizes } = useArchive()
 
     return (
         <FullscreenContainer>
@@ -182,9 +186,16 @@ const Home = () => {
                                                     color: rarityColors[rarity],
                                                 }}
                                             >
-                                                {rarity}
+                                                {camelToSpacePascal(rarity)}
                                             </p>
-                                            <span>%%%</span>
+                                            <span>
+                                                {
+                                                    groupSizes[
+                                                        rarities.length - 1 - i
+                                                    ]
+                                                }
+                                                %
+                                            </span>
                                         </div>
                                     </div>
                                 )

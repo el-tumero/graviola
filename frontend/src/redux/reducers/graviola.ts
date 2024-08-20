@@ -5,12 +5,14 @@ interface GraviolaData {
     collection: NFT[]
     groupSizes: number[]
     weights: number[]
+    keywords: string[]
 }
 
 const initialState: GraviolaData = {
     collection: [],
     groupSizes: [],
     weights: [],
+    keywords: [],
 }
 
 export const graviolaDataSlice = createSlice({
@@ -26,9 +28,12 @@ export const graviolaDataSlice = createSlice({
         setWeights: (state, action: PayloadAction<number[]>) => {
             state.weights = action.payload
         },
+        setKeywords: (state, action: PayloadAction<string[]>) => {
+            state.keywords = action.payload
+        },
     },
 })
 
-export const { setCollection, setGroupSizes, setWeights } =
+export const { setCollection, setGroupSizes, setWeights, setKeywords } =
     graviolaDataSlice.actions
 export default graviolaDataSlice.reducer

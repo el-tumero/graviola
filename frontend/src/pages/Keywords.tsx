@@ -5,9 +5,6 @@ import Navbar from "../components/nav/Navbar"
 import PageTitle from "../components/ui/layout/PageTitle"
 import { useState } from "react"
 import icons from "../data/icons"
-import { RaritiesData } from "../types/RarityGroup"
-import { RarityGroupData } from "../types/Rarity"
-import { useAppSelector } from "../redux/hooks"
 
 // Interface in case this grows
 interface RarityGroupBlock {
@@ -15,7 +12,6 @@ interface RarityGroupBlock {
 }
 
 const KeywordGroupBlock = (props: {
-    gData: RarityGroupData
     blockState: RarityGroupBlock
     blockStateSetter: () => void
 }) => {
@@ -93,9 +89,6 @@ const KeywordGroupBlock = (props: {
 }
 
 const Keywords = () => {
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
     const [groupBlocks, setGroupBlocks] = useState<
         Record<string, RarityGroupBlock>
     >(() => {

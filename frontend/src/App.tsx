@@ -9,14 +9,11 @@ import {
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
 import useWallet from "./hooks/useWallet"
+import useArchive from "./hooks/useArchive"
 
-import {
-    setCollection,
-    setGroupSizes,
-    setWeights,
-} from "./redux/reducers/graviola"
+import { setCollection } from "./redux/reducers/graviola"
 import { useAppDispatch } from "./redux/hooks"
-import { fetchCollection, fetchGroupSizes } from "./web3"
+import { fetchCollection } from "./web3"
 import { fallbackNFT } from "./data/fallbacks"
 
 const App = (props: { children: ReactNode }) => {
@@ -47,9 +44,10 @@ const App = (props: { children: ReactNode }) => {
     const dispatch = useAppDispatch()
     useTheme(modal === undefined)
     const { walletProvider } = useWeb3ModalProvider()
-    const { connectWallet, collectionContract, seasonsArchiveContract } =
-        useWallet()
+    const { connectWallet, collectionContract } = useWallet()
     const [loading, setLoading] = useState<boolean>(true)
+
+    const { fetchArchive } = useArchive()
 
     // Fetch contract data
     useEffect(() => {
@@ -57,10 +55,8 @@ const App = (props: { children: ReactNode }) => {
 
         const fetchContractData = async () => {
             const collectionData = await fetchCollection()
-            const groupSizes = await fetchGroupSizes()
-
-            const weights = await seasonsArchiveContract.getGroupWeights()
             const nftTotalSupply = await collectionContract.totalSupply()
+            await fetchArchive()
             console.log("[App] totalSupply: ", Number(nftTotalSupply))
             console.log("[App] fetched collection ", collectionData)
 
@@ -69,9 +65,6 @@ const App = (props: { children: ReactNode }) => {
             } else {
                 dispatch(setCollection(collectionData))
             }
-
-            dispatch(setGroupSizes(groupSizes))
-            dispatch(setWeights(weights.map((w) => Number(w))))
 
             setLoading(false)
             console.log("[App] collection loaded!")

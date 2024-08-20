@@ -4,45 +4,19 @@ import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
-import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import Popup from "../components/Popup"
 import { generateTxStatusMessages } from "../utils/statusMessages"
-import { RarityGroupData, RarityLevel } from "../types/Rarity"
-import { RaritiesData } from "../types/RarityGroup"
 import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-import useWeb3 from "../hooks/useWallet"
-import { useAppSelector } from "../redux/hooks"
-
-// Extended NFT interface to avoid computing the same properties multiple times
-export interface NFTExt extends NFT {
-    rarityLevel: RarityLevel
-    rarityData: RarityGroupData
-}
+import useWallet from "../hooks/useWallet"
 
 const Generate = () => {
     const navigate = useNavigate()
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
-    const { isConnected } = useWeb3()
 
-    // // MOCK
-    // const mockBehavior = {
-    //     performSteps: [false, true, true, true],
-    //     doNotResetOnError: false
-    // }
-    // const {
-    //     txStatus,
-    //     txMsg,
-    //     txErr,
-    //     rolledNFT,
-    //     requestGen,
-    //     closeTxErr
-    // } = useGenerateMock(generateTxStatusMessages, mockBehavior)
+    const { isConnected } = useWallet()
 
     // Gen data
     const {
@@ -80,7 +54,6 @@ const Generate = () => {
                         <GenerateContainer
                             rolledNFT={rolledNFT}
                             runBorderAnim={!rolledNFT}
-                            rGroups={rarities}
                         />
                     </div>
 
@@ -92,7 +65,7 @@ const Generate = () => {
                         )}
                     >
                         <div data-testid="generate-status">
-                            {rolledNFT ? (
+                            {/* {rolledNFT ? (
                                 <p data-testid="generate-success">
                                     Congratulations! You rolled a&nbsp;
                                     <span
@@ -112,7 +85,7 @@ const Generate = () => {
                                 <p>{txMsg}</p>
                             ) : (
                                 <p>Connect your wallet first</p>
-                            )}
+                            )} */}
                         </div>
 
                         <span data-testid="generate-btn">

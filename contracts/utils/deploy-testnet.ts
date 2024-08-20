@@ -98,11 +98,11 @@ export default async function deployTestnet() {
     const output = {
         VRF_ADDRESS: VRF_WRAPPER_ADDRESS,
         OAO_ADDRESS: OAO_PROXY_ADDRESS,
-        TOKEN: tokenAddress,
-        COLLECTION: collectionAddress,
-        SEASONS_ARCHIVE: gsaAddress,
-        SEASONS_GOVERNOR: gsgAddress,
-        GENERATOR: generatorAddress,
+        TOKEN_ADDRESS: tokenAddress,
+        COLLECTION_ADDRESS: collectionAddress,
+        SEASONS_ARCHIVE_ADDRESS: gsaAddress,
+        SEASONS_GOVERNOR_ADDRESS: gsgAddress,
+        GENERATOR_ADDRESS: generatorAddress,
     }
 
     return output

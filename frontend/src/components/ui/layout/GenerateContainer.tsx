@@ -3,22 +3,20 @@ import useRandomRarityBorder from "../../../hooks/useBorderAnimation"
 import { getRarityBorder } from "../../../utils/getRarityBorder"
 import { NFT } from "../../../types/NFT"
 import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
-import { RarityLevel } from "../../../data/rarities"
 import { formatBpToPercentage } from "../../../utils/format"
 import { cn } from "../../../utils/cn"
+import { rarities } from "../../../data/rarities"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
     runBorderAnim: boolean
-    rGroups: RarityLevel[]
 }
 
 const GenerateContainer = ({
     rolledNFT,
     runBorderAnim,
-    rGroups,
 }: GenerateContainerProps) => {
-    const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750, rGroups)
+    const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750)
     const [resOpacity, setResOpacity] = useState<number>(0)
 
     // Dynamic styles based on rolledNFT

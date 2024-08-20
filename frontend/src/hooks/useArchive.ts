@@ -1,7 +1,28 @@
-import { seasonsArchive } from "../web3"
+import { useAppSelector } from "../redux/hooks"
+import { fetchGroupSizes, seasonsArchiveContract } from "../web3"
+import { useAppDispatch } from "../redux/hooks"
+import {
+    setGroupSizes,
+    setWeights,
+    setKeywords,
+} from "../redux/reducers/graviola"
 
 export default function useArchive() {
-    async function getRarities() {
-        // seasonsArchive.getRarityGroupWeight()
+    const weights = useAppSelector((state) => state.graviolaData.weights)
+    const groupSizes = useAppSelector((state) => state.graviolaData.groupSizes)
+    const keywords = useAppSelector((state) => state.graviolaData.keywords)
+
+    const dispatch = useAppDispatch()
+
+    async function fetchArchive() {
+        const groupSizes = await fetchGroupSizes()
+        const weights = await seasonsArchiveContract.getGroupWeights()
+        const keywords = await seasonsArchiveContract.getKeywordsCurrentSeason()
+
+        dispatch(setGroupSizes(groupSizes))
+        dispatch(setWeights(weights.map((w) => Number(w))))
+        dispatch(setKeywords(keywords))
     }
+
+    return { weights, groupSizes, keywords, fetchArchive }
 }

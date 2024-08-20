@@ -25,25 +25,28 @@ const defaultRpc = isDevMode
 
 let provider = new JsonRpcProvider(defaultRpc)
 let generatorContract: GraviolaGenerator = GraviolaGenerator__factory.connect(
-    addresses.GENERATOR,
+    addresses.GENERATOR_ADDRESS,
     provider,
 )
 let collectionContract: GraviolaCollection =
-    GraviolaCollection__factory.connect(addresses.COLLECTION, provider)
+    GraviolaCollection__factory.connect(addresses.COLLECTION_ADDRESS, provider)
 
 let tokenContract: GraviolaToken = GraviolaToken__factory.connect(
-    addresses.TOKEN,
+    addresses.TOKEN_ADDRESS,
     provider,
 )
 
 let seasonsGovernorContract: GraviolaSeasonsGovernor =
     GraviolaSeasonsGovernor__factory.connect(
-        addresses.SEASONS_GOVERNOR,
+        addresses.SEASONS_GOVERNOR_ADDRESS,
         provider,
     )
 
 let seasonsArchiveContract: GraviolaSeasonsArchive =
-    GraviolaSeasonsArchive__factory.connect(addresses.SEASONS_ARCHIVE, provider)
+    GraviolaSeasonsArchive__factory.connect(
+        addresses.SEASONS_ARCHIVE_ADDRESS,
+        provider,
+    )
 
 let signer: Signer | undefined
 

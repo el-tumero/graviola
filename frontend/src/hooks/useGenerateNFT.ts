@@ -1,5 +1,3 @@
-import { parseEther, toBigInt } from "ethers"
-import { NFTExt } from "../pages/Generate"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { useState, useEffect } from "react"
@@ -7,8 +5,8 @@ import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
 import useWallet from "./useWallet"
 import { useAppSelector } from "../redux/hooks"
-import { RaritiesData } from "../types/RarityGroup"
 import { ContractTransactionResponse } from "ethers"
+import { isDevMode } from "../utils/mode"
 
 type TradeUpArgs = number[]
 
@@ -18,16 +16,14 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
     const { address, generatorContract, collectionContract } = useWallet()
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
+
     const collection = useAppSelector((state) => state.graviolaData.collection)
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
     const [txPopup, setTxPopup] = useState<PopupBase>()
-    const [rolledNFT, setRolledNFT] = useState<NFTExt | undefined>()
+    const [rolledNFT, setRolledNFT] = useState<NFT | undefined>()
 
     // Automatically update Tx status messages based on status
     useEffect(() => {
@@ -36,33 +32,12 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
-        // const estFee: bigint = await generatorContract.estimateFee()
-        // console.log("estfee ", estFee)
         let tx: ContractTransactionResponse | null = null
         console.log(
             "[useGenerate] tx init. mode: ",
             tradeupArgs ? "trade up" : "generate",
         )
         try {
-            // if (tradeupArgs) {
-            //     const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
-            //     tx = await contract.tradeUp([args[0], args[1], args[2]], {
-            //         value: estFee + parseEther("0.006"),
-            //     })
-            // } else {
-            //     tx = await contract.mint({
-            //         value: parseEther("0.006"),
-            //         // gasLimit: 900_000
-            //     })
-            // }
-
-            const tx = await generatorContract.prepare()
-
-            const receipt = await tx.wait()
-            if (receipt) {
-                console.log("[useGenerate] prepare tx receipt OK")
-                setTxStatus("BEFORE_MINT")
-            }
         } catch (error) {
             const errMsg =
                 (error as Error).message.length > 64
@@ -82,6 +57,36 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const requestGen = async (tradeupData?: TradeUpArgs) => {
         setTxStatus("AWAIT_CONFIRM")
         await txFunc(tradeupData)
+    }
+
+    const prepare = async () => {
+        const estimatedServiceFee = 101 // TODO: calculate
+        const serviceFee = isDevMode ? 200000 : estimatedServiceFee
+
+        const tx = await generatorContract.prepare({
+            value: serviceFee,
+            gasLimit: 200_000,
+        })
+        setTxStatus("PRE_AWAIT_CONFIRM")
+
+        const receipt = await tx.wait()
+        if (receipt) {
+            console.log("[useGenerate] prepare tx - receipt OK")
+            setTxStatus("PRE_WAIT")
+        }
+    }
+
+    const generate = async (requestId: number) => {
+        const tx = await generatorContract.generate(requestId, {
+            gasLimit: 200_000,
+        })
+        setTxStatus("GEN_AWAIT_CONFIRM")
+
+        const receipt = await tx.wait()
+        if (receipt) {
+            console.log("[useGenerate] generate tx - receipt OK")
+            setTxStatus("GEN_WAIT")
+        }
     }
 
     const initCallbacks = () => {
@@ -119,7 +124,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     //     setTxStatus("MINTED")
     // }
 
-    const onVRFResponse = async (tokenId: bigint) => {}
+    const onVRFResponse = async (tokenId: bigint) => {
+        console.log("OMG!")
+    }
 
     const onOAOResponse = async (tokenId: bigint) => {
         // if (addr != address) return // Don't eavesdrop other people's drops
