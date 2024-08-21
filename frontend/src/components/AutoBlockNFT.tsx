@@ -3,7 +3,7 @@ import { Status } from "../types/Status"
 import { clsx as cl } from "clsx"
 import { NFT } from "../types/NFT"
 import BlockNFT from "./BlockNFT"
-import { nftRarityScaleArr } from "../data/fallbacks"
+import { fallbackNFTsRarityList } from "../data/fallbacks"
 import { useAppSelector } from "../redux/hooks"
 
 const NFT_AMOUNT = 5 // 5 is sweet spot
@@ -29,8 +29,6 @@ const AutoBlockNFT = () => {
             setRandomNFTs(randNfts)
             setActiveNFT(0)
             setStatus("ready")
-            // console.log('randnfts ', randNfts)
-            // console.log('init ok')
         }
     }, [collection])
 
@@ -47,8 +45,8 @@ const AutoBlockNFT = () => {
     }, [status, activeNFT, blockAutoChange, randomNFTs.length])
 
     // If the contract has less than NFT_AMOUNT nfts, show the fallbacks instead.
-    const targetNFTList = shouldUseFallbackNFTList
-        ? nftRarityScaleArr
+    const targetNFTList: NFT[] = shouldUseFallbackNFTList
+        ? fallbackNFTsRarityList
         : randomNFTs
 
     return status !== "ready" ? (
@@ -62,7 +60,7 @@ const AutoBlockNFT = () => {
                     "flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1",
                 )}
             >
-                {targetNFTList.map((_, idx) => {
+                {targetNFTList.map((_:NFT,idx) => {
                     return (
                         <div
                             key={idx}

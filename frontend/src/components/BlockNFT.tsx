@@ -7,6 +7,7 @@ import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { Status } from "../types/Status"
 import { RarityLevel } from "../data/rarities"
 import { getRarityBorder } from "../utils/getRarityBorder"
+import { formatBpToPercentage } from "../utils/format"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
 
@@ -83,11 +84,14 @@ const BlockNFT = ({
 const BlockNFTMetadata = (props: { metadata: NFTAttributes[] }) => {
     return (
         <div>
-            {props.metadata.map((attr, idx) => (
-                <p key={idx}>
-                    {attr.trait_type}: &quot;{attr.value}&quot;
-                </p>
-            ))}
+            {props.metadata.map((attr, idx) => {
+                let val: number | string = attr.value
+                // Human-readable probability percentage (instead of BP)
+                if (attr.trait_type === "Probability"){ val = formatBpToPercentage(val) + "%"}
+                return (<p key={idx}>
+                    {attr.trait_type}: &quot;{val}&quot;
+                </p>)
+            })}
         </div>
     )
 }

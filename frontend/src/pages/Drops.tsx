@@ -15,11 +15,12 @@ import SectionContainer from "../components/ui/layout/SectionContainer"
 import useWeb3 from "../hooks/useWallet"
 import useWallet from "../hooks/useWallet"
 import { useAppSelector } from "../redux/hooks"
+import { rarityColors } from "../data/rarities"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"
 
 const Drops = () => {
-    // TODO: Add options to filter by Rarity, or by included Keywords.
+    // TODO: MAINNET: Add options to filter by Rarity, or by included Keywords.
     const { isConnected, address } = useWeb3()
     const { collectionContract } = useWallet()
     const collection = useAppSelector(
@@ -36,7 +37,7 @@ const Drops = () => {
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const contentReady = !isLoading && isConnected
 
-    const fetchCollectionTokens = async () => {
+    const fetchUserOwnedTokens = async () => {
         setFetchingCollection(true)
         let userOwnedTokens: number = 0
         if (address) {
@@ -51,7 +52,7 @@ const Drops = () => {
     }
 
     useEffect(() => {
-        fetchCollectionTokens()
+        fetchUserOwnedTokens()
     }, [])
 
     const scrollToTop = () => {
@@ -71,7 +72,6 @@ const Drops = () => {
                 const scrolledPercentage =
                     (scrollTop / (scrollHeight - clientHeight)) * 100
 
-                // console.log("scroll ", scrolledPercentage)
                 if (scrolledPercentage < scrollThresholdPerc) {
                     setBackToTopVisible(false)
                     return
@@ -128,7 +128,7 @@ const Drops = () => {
                             <div className="flex gap-3">
                                 <Button
                                     text="Refresh"
-                                    onClick={() => fetchCollectionTokens()}
+                                    onClick={() => fetchUserOwnedTokens()}
                                     disabled={fetchingCollection}
                                 />
                                 <Button
@@ -191,8 +191,6 @@ const CollectionList = (props: {
     return (
         <>
             {props.contractNFTs.map((nft: NFT, idx) => {
-                const percRarity = formatBpToPercentage(nft.attributes[0].value)
-                console.log(nft.attributes)
                 const keywordsArray: string[] = nft.description
                     .split(":")
                     .pop()!
@@ -201,10 +199,6 @@ const CollectionList = (props: {
                 const keywords: string[] = keywordsArray.map((keyword) =>
                     keyword.trim(),
                 )
-                // const [, rarityData] = getRariptyFromPerc(
-                //     percRarity,
-                //     props.rGroups,
-                // )
                 if (
                     props.collectionMode === "My Drops" &&
                     !props.ownedTokenIds.includes(idx)
@@ -249,14 +243,14 @@ const CollectionList = (props: {
                                 >
                                     <p>id: {nft.id}</p>
                                     <p>
-                                        Rarity:{" "}
+                                        Rarity:&nbsp;
                                         <span
                                             className={"font-normal"}
                                             style={{
-                                                // color: rarityData.color,
+                                                color: rarityColors[nft.rarityGroup],
                                             }}
                                         >
-                                            {/* {rarityData.name} */}
+                                            {nft.rarityGroup}
                                         </span>
                                     </p>
                                 </div>

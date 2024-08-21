@@ -1,7 +1,7 @@
 import { NFT } from "../types/NFT"
 
 // main fallbackNFT
-export const fallbackNFTRarityLevel = "legendary"
+export const fallbackNFTProbabilityLevel = "legendary"
 export const fallbackNFT: NFT = {
     id: 99999,
     image: "QmSmZ7GBc3TssiZnZRazxCBSeenL2iSYmfQtNELGLCfg9d",
@@ -9,13 +9,17 @@ export const fallbackNFT: NFT = {
     rarityGroup: "legendary",
     attributes: [
         {
-            trait_type: "Rarity",
-            value: 1,
+            trait_type: "Score",
+            value: 36
+        },
+        {
+            trait_type: "Probability",
+            value: 1000,
         },
     ],
 }
 
-export const nftRarityScaleArr: NFT[] = [
+export const fallbackNFTsRarityList: NFT[] = [
     {
         id: 9995,
         image: "QmNjGp4AKSoooj4YAdknye1RuWE3whGETa4h9VKZ13fVu5",
@@ -23,7 +27,11 @@ export const nftRarityScaleArr: NFT[] = [
         rarityGroup: "common",
         attributes: [
             {
-                trait_type: "Rarity",
+                trait_type: "Score",
+                value: 3
+            },
+            {
+                trait_type: "Probability",
                 value: 600000,
             },
         ],
@@ -35,7 +43,11 @@ export const nftRarityScaleArr: NFT[] = [
         rarityGroup: "uncommon",
         attributes: [
             {
-                trait_type: "Rarity",
+                trait_type: "Score",
+                value: 7
+            },
+            {
+                trait_type: "Probability",
                 value: 120000,
             },
         ],
@@ -47,7 +59,11 @@ export const nftRarityScaleArr: NFT[] = [
         rarityGroup: "rare",
         attributes: [
             {
-                trait_type: "Rarity",
+                trait_type: "Score",
+                value: 18
+            },
+            {
+                trait_type: "Probability",
                 value: 30967,
             },
         ],
@@ -59,7 +75,11 @@ export const nftRarityScaleArr: NFT[] = [
         description: "Fallback VERY RARE NFT image.",
         attributes: [
             {
-                trait_type: "Rarity",
+                trait_type: "Score",
+                value: 25
+            },
+            {
+                trait_type: "Probability",
                 value: 15460,
             },
         ],
@@ -71,7 +91,11 @@ export const nftRarityScaleArr: NFT[] = [
         description: "Fallback LEGENDARY NFT image.",
         attributes: [
             {
-                trait_type: "Rarity",
+                trait_type: "Score",
+                value: 36
+            },
+            {
+                trait_type: "Probability",
                 value: 2500,
             },
         ],

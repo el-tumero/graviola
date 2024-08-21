@@ -13,7 +13,7 @@ import { clsx as cl } from "clsx"
 import icons from "../data/icons"
 import MetadataMock from "../components/ui/MetadataMock"
 import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
-import { nftRarityScaleArr } from "../data/fallbacks"
+import { fallbackNFTsRarityList } from "../data/fallbacks"
 import Button from "../components/ui/Button"
 import { rarities, rarityColors, RarityLevel } from "../data/rarities"
 import Popup from "../components/Popup"
@@ -174,7 +174,7 @@ const Home = () => {
                                     >
                                         <div>
                                             <BlockNFT
-                                                nftData={nftRarityScaleArr[i]}
+                                                nftData={fallbackNFTsRarityList[i]}
                                                 glowColor={rarity}
                                                 additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
                                             />
@@ -189,12 +189,7 @@ const Home = () => {
                                                 {camelToPascal(rarity)}
                                             </p>
                                             <span>
-                                                {
-                                                    groupSizes[
-                                                        rarities.length - 1 - i
-                                                    ]
-                                                }
-                                                %
+                                                {groupSizes[i]}%
                                             </span>
                                         </div>
                                     </div>
