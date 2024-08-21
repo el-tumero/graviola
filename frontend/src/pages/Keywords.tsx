@@ -5,21 +5,27 @@ import Navbar from "../components/nav/Navbar"
 import PageTitle from "../components/ui/layout/PageTitle"
 import { useState } from "react"
 import icons from "../data/icons"
+import { rarities, rarityColors, RarityLevel } from "../data/rarities"
+import useArchive from "../hooks/useArchive"
 
-// Interface in case this grows
-interface RarityGroupBlock {
+interface RarityGroupData {
+    rarity: RarityLevel
+    minWeight: number
+    maxWeight: number
+    keywordWeight: number
+    keywords: string[]
     unfolded: boolean
 }
 
 const KeywordGroupBlock = (props: {
-    blockState: RarityGroupBlock
+    data: RarityGroupData
     blockStateSetter: () => void
 }) => {
     return (
         <div
             style={{
                 borderWidth: 1,
-                borderColor: props.gData.color,
+                borderColor: rarityColors[props.data.rarity],
             }}
             className={cl(
                 "flex flex-col gap-1.5",
@@ -31,12 +37,12 @@ const KeywordGroupBlock = (props: {
                 {/* Title & Fold Button*/}
                 <div className={cl("flex justify-between items-center gap-6")}>
                     <p className="font-medium">
-                        {props.gData.name} ({props.gData.keywords.length})
+                        {props.data.rarity} ({props.data.keywords.length})
                     </p>
                     <div
                         className={cl(
                             "w-6 h-6 cursor-pointer",
-                            props.blockState.unfolded && "rotate-90",
+                            props.data.unfolded && "rotate-90",
                         )}
                         onClick={() => props.blockStateSetter()}
                     >
@@ -45,16 +51,16 @@ const KeywordGroupBlock = (props: {
                 </div>
 
                 {/* Weight, Min NFT Weight sum */}
-                <div className={cl("flex justify-between items-center w-full")}>
+                <div className={cl("flex justify-between items-center w-full select-none")}>
                     <div className="flex justify-center items-center">
                         <div className="w-6 h-6">{icons.weight}</div>
-                        <span>{props.gData.weight}</span>
+                        <span>{props.data.keywordWeight}</span>
                     </div>
                     <div className="flex justify-center items-center">
                         <div className="flex justify-center items-center gap-1 font-mono">
                             min: <div className="w-6 h-6">{icons.weight}</div>
                         </div>
-                        <span>{props.gData.minTokenWeight}</span>
+                        <span>{props.data.minWeight}</span>
                     </div>
                 </div>
             </div>
@@ -62,7 +68,7 @@ const KeywordGroupBlock = (props: {
             {/* Keyword list (unfolded) */}
             <div
                 className={cl(
-                    props.blockState.unfolded
+                    props.data.unfolded
                         ? "visible mt-3"
                         : "invisible h-0 overflow-hidden",
                 )}
@@ -75,7 +81,7 @@ const KeywordGroupBlock = (props: {
                         "bg-light-bgLight/50 dark:bg-dark-bgLight/50",
                     )}
                 >
-                    {props.gData.keywords.map(
+                    {props.data.keywords.map(
                         (keyword: string, idx: number) => (
                             <li key={idx} className={cl("px-3 py-1.5")}>
                                 {keyword}
@@ -89,12 +95,23 @@ const KeywordGroupBlock = (props: {
 }
 
 const Keywords = () => {
-    const [groupBlocks, setGroupBlocks] = useState<
-        Record<string, RarityGroupBlock>
-    >(() => {
-        const res: Record<string, RarityGroupBlock> = {}
-        Object.values(rarities).forEach((rData: RarityGroupData) => {
-            res[rData.name] = { unfolded: false }
+
+    const { weights, groupSizes, keywords } = useArchive()
+    const [groupBlocks, setGroupBlocks] = useState<Record<string, RarityGroupData>>(() => {
+        const res: Record<string, RarityGroupData> = {}
+        let startIndex = 0
+    
+        rarities.forEach((rarity: RarityLevel, idx: number) => {
+            const endIndex = startIndex + groupSizes[idx]
+            res[rarity] = {
+                rarity,
+                minWeight: 0,
+                maxWeight: 0,
+                keywords: keywords.slice(startIndex, endIndex),
+                keywordWeight: weights[idx],
+                unfolded: false,
+            }
+            startIndex = endIndex
         })
         return res
     })
@@ -133,23 +150,19 @@ const Keywords = () => {
                         "max-sm:flex max-sm:flex-col",
                     )}
                 >
-                    {Object.values(rarities).map(
+                    {Object.values(groupBlocks).map(
                         (rarityGroupData: RarityGroupData, idx: number) => (
                             <div key={idx}>
                                 <KeywordGroupBlock
-                                    gData={rarityGroupData}
-                                    blockState={
-                                        groupBlocks[rarityGroupData.name]
-                                    }
+                                    data={rarityGroupData}
                                     blockStateSetter={() => {
-                                        const prev =
-                                            groupBlocks[rarityGroupData.name]
-                                        setGroupBlocks({
-                                            ...groupBlocks,
-                                            [rarityGroupData.name]: {
-                                                unfolded: !prev.unfolded,
-                                            },
-                                        })
+                                        setGroupBlocks(prevGroupBlocks => ({
+                                            ...prevGroupBlocks,
+                                            [rarityGroupData.rarity]: {
+                                                ...prevGroupBlocks[rarityGroupData.rarity],
+                                                unfolded: !prevGroupBlocks[rarityGroupData.rarity].unfolded
+                                            }
+                                        }))
                                     }}
                                 />
                             </div>

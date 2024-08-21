@@ -19,8 +19,8 @@ export default function useArchive() {
         const weights = await seasonsArchiveContract.getGroupWeights()
         const keywords = await seasonsArchiveContract.getKeywordsCurrentSeason()
 
-        dispatch(setGroupSizes(groupSizes))
-        dispatch(setWeights(weights.map((w) => Number(w))))
+        dispatch(setGroupSizes(groupSizes.reverse()))
+        dispatch(setWeights(weights.map((w) => Number(w)).reverse()))
         dispatch(setKeywords(keywords))
     }
 
