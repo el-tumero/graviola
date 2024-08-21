@@ -67,7 +67,6 @@ const TradeUp = () => {
     // Clicking an active trade component in the right panel should unselect it
     const handleSelectedNFTClick = (idx: number) => {
         const indexOf = selectedIds.indexOf(idx)
-        console.log(indexOf)
         if (indexOf !== -1) {
             if (selectedIds.length === 1) setSelectedGroup(null)
             setSelectedIds((prev) => prev.filter((_id) => idx !== _id))
@@ -77,25 +76,24 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ;(async () => {
-            let userOwnedTokens
+        ; (async () => {
+            let userOwnedTokens = 0
             if (address) {
-                // FIXME
-                userOwnedTokens = await collectionContract.tokenOfOwnerByIndex(
-                    ethers.getAddress(address),
-                    0,
-                )
+
+                // TODO: fix this
+                // userOwnedTokens = await collectionContract.tokenOfOwnerByIndex(
+                //     ethers.getAddress(address),
+                //     0,
+                // )
+                // console.log(userOwnedTokens)
             }
-            userOwnedTokens &&
-                [userOwnedTokens].forEach((token: bigint) => {
-                    setOwnedTokensIds((prev) => [...prev, Number(token)])
-                })
-            // console.log(ownedTokensIds)
+            if (userOwnedTokens > 0) {
+                setOwnedTokensIds((prev) => [...prev, ...Array(userOwnedTokens)])
+            }
             setStatus("ready")
         })()
     }, [isConnected, address])
 
-    return <></>
     return (
         <FullscreenContainer>
             <Navbar />
@@ -128,92 +126,13 @@ const TradeUp = () => {
                                     "p-6 max-sm:p-3",
                                 )}
                             >
-                                <div
-                                    className={cl(
-                                        "flex-grow w-full h-0 overflow-auto",
-                                        "rounded-xl",
-                                    )}
-                                >
-                                    <div
-                                        className={cl(
-                                            "grid gap-3 auto-rows-min",
-                                            "max-sm:grid-cols-3",
-                                            "max-md:grid-cols-4 md:grid-cols-5",
-                                        )}
-                                    >
-                                        {" "}
-                                        {collection.map((nft: NFT, i) => {
-                                            const keywordsArray: string[] =
-                                                nft.description
-                                                    .split(":")
-                                                    .pop()!
-                                                    .trim()
-                                                    .split(",")
-                                            const keywords: string[] =
-                                                keywordsArray.map((keyword) =>
-                                                    keyword.trim(),
-                                                )
-                                            if (
-                                                selectedGroup !== null &&
-                                                selectedGroup !== rarityLevel
-                                            ) {
-                                                return null
-                                            } else if (
-                                                !ownedTokenIds.includes(i)
-                                            ) {
-                                                return null
-                                            } else {
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        onClick={() =>
-                                                            handleNFTClick(
-                                                                i,
-                                                                rarityLevel,
-                                                            )
-                                                        }
-                                                        className={cn(
-                                                            // Fancy NFT hover selection animations & borders
-                                                            "flex flex-col justify-center items-center rounded-xl",
-                                                            "gap-2 cursor-pointer hover:cursor-pointer",
-                                                            "border border-light-border dark:border-dark-border rounded-xl",
-                                                            "hover:border-light-text/40 dark:hover:border-dark-text/40",
-                                                            "hover:scale-95 transition-transform duration-300",
-                                                            selectedIds.includes(
-                                                                i,
-                                                            )
-                                                                ? "opacity-50 scale-95"
-                                                                : "opacity-100",
-                                                        )}
-                                                    >
-                                                        <div
-                                                            className={cl(
-                                                                "m-4",
-                                                            )}
-                                                        >
-                                                            <BlockNFT
-                                                                nftData={nft}
-                                                                glowColor={
-                                                                    "auto"
-                                                                }
-                                                                disableMetadataOnHover
-                                                                additionalClasses={`w-fit h-fit max-w-[12em]`}
-                                                            />
-                                                        </div>
-                                                        <div className="flex flex-col gap-2 justify-center items-center">
-                                                            {/* Keywords */}
-                                                            <KeywordBlocks
-                                                                keywords={
-                                                                    keywords
-                                                                }
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )
-                                            }
-                                        })}
-                                    </div>
-                                </div>
+                                <OwnedNFTsPanel
+                                    collection={collection}
+                                    selectedGroup={selectedGroup}
+                                    ownedTokenIds={ownedTokenIds}
+                                    onNFTClick={handleNFTClick}
+                                    selectedIds={selectedIds}
+                                />
                             </div>
 
                             {/* TradeUp Result (Right panel) */}
@@ -227,26 +146,13 @@ const TradeUp = () => {
                                 {selectedIds.length === 0 ? (
                                     <p>Select the NFTs you want to trade</p>
                                 ) : (
-                                    <TradeUpGenerateContainer
-                                        active={selectedIds.length === 3}
-                                        rGroups={rarities}
-                                    >
+                                    <TradeUpGenerateContainer active={selectedIds.length === 3}>
                                         {selectedIds.map((id, i) => {
                                             const randBase = Math.random()
                                             const randRotate =
                                                 Math.floor(randBase * 30) + 1 // 15-60deg rotate
                                             const randSign =
                                                 randBase < 0.5 ? -1 : 1
-                                            const percRarity =
-                                                formatBpToPercentage(
-                                                    collection[id].attributes[0]
-                                                        .value,
-                                                )
-                                            const [, rGroupData] =
-                                                getRarityFromPerc(
-                                                    percRarity,
-                                                    rarities,
-                                                )
                                             return (
                                                 <div
                                                     key={i}
@@ -257,14 +163,14 @@ const TradeUp = () => {
                                                         "border border-light-border dark:border-dark-border",
                                                         "hover:cursor-pointer",
                                                     )}
-                                                    style={{
-                                                        ...getRarityBorder(
-                                                            rGroupData,
-                                                            true,
-                                                        ).style,
-                                                        zIndex: `${selectedIds.length}`,
-                                                        rotate: `${randSign * randRotate}deg`,
-                                                    }}
+                                                    // style={{
+                                                    //     ...getRarityBorder(
+                                                    //         rGroupData,
+                                                    //         true,
+                                                    //     ).style,
+                                                    //     zIndex: `${selectedIds.length}`,
+                                                    //     rotate: `${randSign * randRotate}deg`,
+                                                    // }}
                                                     onClick={() =>
                                                         handleSelectedNFTClick(
                                                             id,
@@ -317,13 +223,110 @@ const TradeUp = () => {
     )
 }
 
+// Owned NFTs (left panel)
+const OwnedNFTsPanel = (props: {
+    collection: NFT[],
+    selectedGroup: RarityLevel | null,
+    ownedTokenIds: number[],
+    onNFTClick: (idx: number, rarityLevel: RarityLevel) => void,
+    selectedIds: number[]
+}) => {
+    return (
+        <div
+        className={cl(
+            "flex-grow w-full h-0 overflow-auto",
+            "rounded-xl",
+        )}
+    >
+        <div
+            className={cl(
+                "grid gap-3 auto-rows-min",
+                "max-sm:grid-cols-3",
+                "max-md:grid-cols-4 md:grid-cols-5",
+            )}
+        >
+            {" "}
+            {props.collection.map((nft: NFT, i) => {
+                const keywordsArray: string[] =
+                    nft.description
+                        .split(":")
+                        .pop()!
+                        .trim()
+                        .split(",")
+                const keywords: string[] =
+                    keywordsArray.map((keyword) =>
+                        keyword.trim(),
+                    )
+                if (
+                    props.selectedGroup !== null &&
+                    props.selectedGroup !== nft.rarityGroup
+                ) {
+                    return null
+                } else if (
+                    !props.ownedTokenIds.includes(i)
+                ) {
+                    return null
+                } else {
+                    return (
+                        <div
+                            key={i}
+                            onClick={() =>
+                                props.onNFTClick(
+                                    i,
+                                    nft.rarityGroup,
+                                )
+                            }
+                            className={cn(
+                                // Fancy NFT hover selection animations & borders
+                                "flex flex-col justify-center items-center rounded-xl",
+                                "gap-2 cursor-pointer hover:cursor-pointer",
+                                "border border-light-border dark:border-dark-border rounded-xl",
+                                "hover:border-light-text/40 dark:hover:border-dark-text/40",
+                                "hover:scale-95 transition-transform duration-300",
+                                props.selectedIds.includes(
+                                    i,
+                                )
+                                    ? "opacity-50 scale-95"
+                                    : "opacity-100",
+                            )}
+                        >
+                            <div
+                                className={cl(
+                                    "m-4",
+                                )}
+                            >
+                                <BlockNFT
+                                    nftData={nft}
+                                    glowColor={
+                                        "auto"
+                                    }
+                                    disableMetadataOnHover
+                                    additionalClasses={`w-fit h-fit max-w-[12em]`}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-2 justify-center items-center">
+                                {/* Keywords */}
+                                <KeywordBlocks
+                                    keywords={
+                                        keywords
+                                    }
+                                />
+                            </div>
+                        </div>
+                    )
+                }
+            })}
+        </div>
+    </div>
+    )
+}
+
 // Wrapper (ready = 3/3 Tokens selected)
 const TradeUpGenerateContainer = (props: {
     children: React.ReactNode
     active: boolean
-    rGroups: RaritiesData
 }) => {
-    const rarityAnimBorder = useRandomRarityBorder(true, 750, props.rGroups)
+    const rarityAnimBorder = useRandomRarityBorder(true, 750)
     return (
         <div
             className={cl(

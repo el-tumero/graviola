@@ -1,4 +1,5 @@
 import Navbar from "../components/nav/Navbar"
+import AddKeywordForm from "../components/AddKeywordForm"
 import { clsx as cl } from "clsx"
 import {
     compareById,
@@ -9,36 +10,16 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-import candJson from "../../../contracts/candidates.json"
-import { ChangeEvent, ReactNode, Fragment, useState, useEffect } from "react"
+import { ReactNode, Fragment, useState, useEffect } from "react"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
-import { Candidate } from "../types/Candidate"
-import { useAppSelector } from "../redux/hooks"
+import { CandidateInfo } from "../types/CandidateInfo"
+import { SortingType } from "../types/VotingSort"
+import useWallet from "../hooks/useWallet"
 
 type ActivePage = "Voting" | "Archive"
 
-export interface CandidateInfo {
-    id: number
-    badge?: null // Cache server
-    author: string
-    keyword: string
-    iteration: number
-    score: number
-}
-
-enum SortingType {
-    BY_ID = 1,
-    BY_SCORE_ASC,
-    BY_SCORE_DESC,
-    BY_KEYWORD_ASC,
-    BY_KEYWORD_DESC,
-    // BY_KWORD_ITER_ASC, // Future default?
-    // BY_KWORD_ITER_DESC,
-    // BY_BADGE           // Cache
-    // BY_TRENDING
-}
-
+// TODO: MAINNET: much better popup and dedicated component
 const PopupContainer = (props: { children: ReactNode }) => {
     return (
         <div
@@ -55,92 +36,38 @@ const PopupContainer = (props: { children: ReactNode }) => {
     )
 }
 
-const AddKeywordForm = (props: { onClickClose: () => void }) => {
-    const KEYWORD_MIN_LENGTH = 3
-    const [keyword, setKeyword] = useState<string>("")
-    const [valid, setValid] = useState<boolean>(false)
-    const displayErrMsg = keyword.length > KEYWORD_MIN_LENGTH && !valid
-
-    // TODO: Need better regex for keywords later
-    const isValid = (str: string) => /^[a-z]{3,32}$/.test(str)
-
-    useEffect(() => {
-        if (keyword.length < KEYWORD_MIN_LENGTH) {
-            setValid(false)
-            return
-        }
-        setValid(isValid(keyword))
-    }, [keyword, valid])
-
-    const handleSubmitKeyword = async () => {
-        // Call contract
-    }
-
-    return (
-        <Fragment>
-            <div
-                onClick={props.onClickClose}
-                className={cl(
-                    "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
-                )}
-            >
-                {icons.close}
-            </div>
-            <div className={cl("flex flex-col gap-3 px-3 grow")}>
-                <div className={cl("flex flex-col grow gap-1.5")}>
-                    <p className="font-mono font-semibold mb-1.5">
-                        Add your keyword
-                    </p>
-                    <input
-                        placeholder="Your keyword"
-                        type="text"
-                        value={keyword}
-                        className={cl(
-                            "self-center w-full h-fit rounded-lg p-3",
-                            "bg-light-bgDark/20 dark:bg-dark-bgLight/20",
-                            "border border-light-border dark:border-dark-border",
-                        )}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setKeyword(e.target.value)
-                        }
-                    />
-                </div>
-
-                {/* Err msg */}
-                <div
-                    className={cl(
-                        "flex flex-col gap-1 relative w-full h-fit rounded-lg border p-3",
-                        "border-amber-600 dark:border-amber-600",
-                        "bg-amber-500/50 dark:bg-amber-500/50",
-                        "backdrop-blur-md font-mono",
-                        displayErrMsg ? "opacity-100" : "invisible",
-                    )}
-                >
-                    <p className="font-semibold">
-                        Your keyword candidate must be:
-                    </p>
-                    <p>— Between 3 and 32 characters long</p>
-                    <p>— Contain only lowercase a-z characters</p>
-                </div>
-
-                <div>
-                    <Button
-                        text="Add"
-                        disabled={!valid}
-                        onClick={() => handleSubmitKeyword()}
-                    />
-                </div>
-            </div>
-        </Fragment>
-    )
-}
-
 const Voting = () => {
+
     const [activePage, setActivePage] = useState<ActivePage>("Voting")
     // Info tooltip - "What is this?"
     const [infoVisible, setInfoVisible] = useState<boolean>(false)
     // Add your keyword form
     const [addKeywordVisible, setAddKeywordVisible] = useState<boolean>(false)
+
+    const [candidatesReady, setCandidatesReady] = useState<boolean>(false)
+    const [candidates, setCandidates] = useState<CandidateInfo[]>([])
+    const { seasonsGovernorContract } = useWallet()
+
+    useEffect(() => {
+        if (candidatesReady) return
+
+        (async() => {
+            const candList = await seasonsGovernorContract.getTopCandidatesInfo(100n)
+            console.log(candList)
+                setCandidates(candList.map((cand, idx) => {
+                    const c: CandidateInfo = {
+                        id: idx,
+                        keyword: cand[1],
+                        score: Number(cand[2].toString().substring(0, cand[2].toString().length - 19)),
+                        author: cand[3],
+                        iteration: 1
+                    }
+                    return c
+                }))
+            setCandidatesReady(true)
+        })()
+        
+    }, [candidates, candidatesReady])
 
     return (
         <FullscreenContainer>
@@ -257,6 +184,7 @@ const Voting = () => {
 
                 {activePage === "Voting" ? (
                     <KeywordVotingPage
+                        candidates={candidates}
                         onClickInfo={() => setInfoVisible(true)}
                         onClickAddKeyword={() => setAddKeywordVisible(true)}
                     />
@@ -271,6 +199,7 @@ const Voting = () => {
 const ArchivePage = () => <p className="self-center">Soon</p>
 
 const KeywordVotingPage = (props: {
+    candidates: CandidateInfo[]
     onClickInfo: () => void
     onClickAddKeyword: () => void
 }) => {
@@ -360,16 +289,24 @@ const KeywordVotingPage = (props: {
                     "border border-light-border dark:border-dark-border rounded-lg p-1",
                 )}
             >
-                <ul
-                    role="list"
-                    className="w-full divide-y divide-light-border dark:divide-dark-border"
-                ></ul>
+                {props.candidates.length > 0 &&
+                    <ul
+                        role="list"
+                        className="w-full divide-y divide-light-border dark:divide-dark-border"
+                    >
+                        {props.candidates
+                        .sort(sortCompareFns[sorting])
+                        .map((candData, idx) => (
+                            <KeywordCandidate data={candData} key={idx} />
+                        ))}
+                    </ul>
+                }
             </div>
         </div>
     )
 }
 
-const KeywordCandidate = (props: CandidateInfo) => (
+const KeywordCandidate = (props: { data: CandidateInfo }) => (
     <div
         className={cl(
             "flex w-full h-fit p-3 justify-between items-center overflow-x-hidden",
@@ -382,7 +319,7 @@ const KeywordCandidate = (props: CandidateInfo) => (
         {/* Pre-left part: global item index */}
         <div className="mr-2 self-center w-6">
             <span className="font-mono text-light-text/75 dark:text-dark-text/75">
-                {props.id}.
+                {props.data.id}.
             </span>
         </div>
         {/* Left part: Id, Badge, Keyword, Iteration info */}
@@ -395,19 +332,19 @@ const KeywordCandidate = (props: CandidateInfo) => (
             <div
                 className={cl(
                     "w-8 h-8 flex justify-center items-center",
-                    !props.badge && [
+                    !props.data.badge && [
                         "border-2 border-light-border dark:border-dark-border",
                         "border-dashed rounded-md",
                     ],
                 )}
             >
-                {props.badge && <img src={props.badge} />}
+                {props.data.badge && <img src={props.data.badge} />}
             </div>
             <div className="flex w-full flex-1 gap-0.5 justify-start items-center">
                 <p className="mr-1 font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
-                    ({props.iteration})
+                    ({props.data.iteration})
                 </p>
-                <p>{props.keyword}</p>
+                <p>{props.data.keyword}</p>
             </div>
         </div>
         {/* Right part: Score, Upvote, Downvote */}
@@ -418,7 +355,7 @@ const KeywordCandidate = (props: CandidateInfo) => (
             )}
         >
             <div className={cl("flex w-24 justify-end items-center")}>
-                <span className="font-semibold font-mono">{props.score}</span>
+                <span className="font-semibold font-mono">{props.data.score}</span>
             </div>
             <div className="flex gap-1.5 flex-nowrap">
                 <div

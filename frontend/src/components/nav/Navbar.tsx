@@ -78,7 +78,7 @@ const Navbar = () => {
         </NavElement>,
 
         <NavElement onClick={() => navigate(routerPaths.voting)}>
-            <p className="font-bold">Vote!</p>
+            <p>Voting</p>
         </NavElement>,
 
         <NavElement onClick={() => openURL(links.repo)}>
