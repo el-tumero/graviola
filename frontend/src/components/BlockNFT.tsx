@@ -6,6 +6,7 @@ import Tooltip from "./Tooltip"
 import { convertToIfpsURL } from "../utils/convertToIpfsURL"
 import { Status } from "../types/Status"
 import { RarityLevel } from "../data/rarities"
+import { getRarityBorder } from "../utils/getRarityBorder"
 
 type NFTGlowColor = "auto" | "none" | RarityLevel
 
@@ -24,12 +25,22 @@ const BlockNFT = ({
 }: BlockNFTProps) => {
     const [status, setStatus] = useState<Status>("loading")
 
-    // TODO: Ideally each BlockNFT should be shift-clickable on hover
+    // TODO: (MAINNET) each BlockNFT should be shift-clickable on hover
     // and open the formatted url to IPFS in a new tab
     const metadata: NFTAttributes[] = nftData.attributes
 
+    let style: React.CSSProperties = {}
+    if (glowColor !== "none") {
+        if (glowColor === "auto") style = getRarityBorder(nftData.rarityGroup).style
+        else {
+            // handle custom glow color
+            style = getRarityBorder(glowColor).style
+        }
+    }
+
     return (
         <div
+            style={style}
             className={cn(
                 "flex w-36 h-36 shadow-sm",
                 "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",

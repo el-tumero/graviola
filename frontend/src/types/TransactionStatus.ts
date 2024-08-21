@@ -1,11 +1,13 @@
 export type TransactionStatus =
     | "NONE"
-    | "PRE_AWAIT_CONFIRM"
-    | "PRE_REJECTED"
-    | "PRE_WAIT"
-    | "PRE_READY"
+    // Prepare transactions
+    | "PREP_AWAIT_CONFIRM"
+    | "PREP_REJECTED"      
+    | "PREP_WAIT" // waiting for VRF to be fulfilled
+    | "PREP_READY"
+    // Generate transactions
     | "GEN_AWAIT_CONFIRM"
     | "GEN_REJECTED"
-    | "GEN_WAIT"
+    | "GEN_WAIT" // waiting for OAO to be fulfilled
     | "DONE"
     | "ERROR"

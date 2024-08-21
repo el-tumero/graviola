@@ -9,7 +9,7 @@ export interface NFT {
     id: number
     description: string
     image: string
-    rarityGroup?: RarityLevel
+    rarityGroup: RarityLevel
     seasonId?: number
     attributes: Array<NFTAttributes> // Meta attributes object (ERC721 opensea metadata standard)
 }

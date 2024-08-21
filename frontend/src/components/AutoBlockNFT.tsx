@@ -81,21 +81,6 @@ const AutoBlockNFT = () => {
                         />
                     )
                 })}
-                {/* {randomNFTs.map((_, idx) => (
-                    <div
-                        key={idx}
-                        className={cl(
-                            "w-3 h-3 rounded-full cursor-pointer",
-                            "transition-colors duration-300",
-                            "hover:bg-light-text dark:hover:bg-dark-text",
-                            idx === activeNFT ? "bg-light-text dark:bg-dark-text" : "bg-light-text/25 dark:bg-dark-text/25",
-                        )}
-                        onClick={() => {
-                            setActiveNFT(idx)
-                            setBlockAutoChange(true)
-                        }}
-                    />
-                ))} */}
             </div>
             <div className="w-64 h-64 relative">
                 {randomNFTs.map((nft, idx) => (

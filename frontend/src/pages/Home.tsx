@@ -17,7 +17,7 @@ import { nftRarityScaleArr } from "../data/fallbacks"
 import Button from "../components/ui/Button"
 import { rarities, rarityColors, RarityLevel } from "../data/rarities"
 import Popup from "../components/Popup"
-import camelToSpacePascal from "../utils/camelToSpacePascal"
+import camelToPascal from "../utils/camelToPascal"
 import useArchive from "../hooks/useArchive"
 
 const Home = () => {
@@ -124,7 +124,7 @@ const Home = () => {
                                                 "underline underline-offset-2 hover:cursor-pointer hover:decoration-accent",
                                             )}
                                         >
-                                            {/* TODO: Make static page with All metadata attributes listed and explained */}
+                                            {/* TODO: (MAINNET) Make static page with All metadata attributes listed and explained */}
                                             here
                                         </span>
                                     </p>
@@ -186,7 +186,7 @@ const Home = () => {
                                                     color: rarityColors[rarity],
                                                 }}
                                             >
-                                                {camelToSpacePascal(rarity)}
+                                                {camelToPascal(rarity)}
                                             </p>
                                             <span>
                                                 {

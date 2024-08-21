@@ -5,8 +5,9 @@
     "license": "MIT",
     "scripts": {
         "build": "forge build",
-        "deploy:local": "HARDHAT_NETWORK=localhost ts-node --transpile-only utils/deploy.ts",
-        "deploy:testnet": "HARDHAT_NETWORK=testnet ts-node --transpile-only utils/deploy.ts",
+        "deploy": "ts-node --transpile-only utils/deploy.ts",
+        "deploy:local": "HARDHAT_NETWORK=localhost yarn deploy",
+        "deploy:testnet": "HARDHAT_NETWORK=testnet yarn deploy",
         "local-node": "hardhat node",
         "test": "forge test -vv",
         "cand": "yarn hardhat run utils/gen-candidates.ts",

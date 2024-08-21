@@ -2,10 +2,9 @@
 
 # Script for setting up the project
 # This script assumes a unix environment
-# Requires valid .env keys in contracts
 # Last modified: 20/08/2024
 
-HARDHAT_DEFAULT_PORT = 8545
+HARDHAT_DEFAULT_PORT=8545
 
 cmd_exists() {
     command -v "$1" &> /dev/null
