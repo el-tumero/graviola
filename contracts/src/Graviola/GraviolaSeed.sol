@@ -27,16 +27,16 @@ contract GraviolaSeed {
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @param seed Random input seed
     /// @return keywords String of combined and separated result keywords
-    /// @return weightSum       // Weight sum of rolled groups (keywords). This determines the final Rarity level
-    /// @return totalProbability // Probability (in BP) of rolling the EXACT combination of rolled keywords (excluding order)
+    /// @return score // Weight sum of rolled groups' keywords. This determines the final token Rarity
+    /// @return probability // Probability (in BP) of rolling the EXACT combination of rolled keywords (excluding order)
     /// @dev Classic implementation (non-TradeUp)
     function rollWords(
         uint256 seed
     ) public view returns (string memory, uint256, uint256) {
         uint16 i = 0;
         uint16 j = 0;
-        uint256 totalProbability = 1;
-        uint256 weightSum = 0;
+        uint256 probability = 1;
+        uint256 score = 0;
         int256[] memory used = new int256[](KEYWORDS_PER_TOKEN);
         string memory result = "";
 
@@ -67,8 +67,8 @@ contract GraviolaSeed {
             // Get word count for the group with given id
             uint256 groupWordCount = archive.getWordsPerRarityGroup(groupId);
 
-            totalProbability *= _fractionToBasisPoints(groupWordCount, OMEGA);
-            weightSum += archive.getRarityGroupWeight(groupId);
+            probability *= _fractionToBasisPoints(groupWordCount, OMEGA);
+            score += archive.getRarityGroupWeight(groupId);
 
             result = string(
                 abi.encodePacked(
@@ -80,6 +80,6 @@ contract GraviolaSeed {
             i++;
         }
 
-        return (result, weightSum, totalProbability);
+        return (result, score, probability);
     }
 }

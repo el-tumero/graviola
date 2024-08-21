@@ -38,17 +38,14 @@ const Drops = () => {
 
     const fetchCollectionTokens = async () => {
         setFetchingCollection(true)
-        let userOwnedTokens
+        let userOwnedTokens: number = 0
         if (address) {
-            userOwnedTokens = await collectionContract.balanceOf(
+            userOwnedTokens = Number(await collectionContract.balanceOf(
                 ethers.getAddress(address),
-            )
+            ))
         }
-        userOwnedTokens &&
-            userOwnedTokens.forEach((token) => {
-                setOwnedTokensIds((prev) => [...prev, Number(token)])
-            })
-        // console.log(ownedTokensIds)
+        if (userOwnedTokens > 0)
+            setOwnedTokensIds([...Array(userOwnedTokens).keys()])
         setIsLoading(false)
         setFetchingCollection(false)
     }
@@ -159,7 +156,6 @@ const Drops = () => {
                                 contractNFTs={collection}
                                 collectionMode={filterMode}
                                 ownedTokenIds={ownedTokensIds}
-                                rGroups={rarities}
                             />
 
                             {/* Scroll to Top Button */}
@@ -191,12 +187,12 @@ const CollectionList = (props: {
     contractNFTs: Array<NFT>
     collectionMode: DropFilterMode
     ownedTokenIds: Array<number>
-    rGroups: RaritiesData
 }) => {
     return (
         <>
             {props.contractNFTs.map((nft: NFT, idx) => {
                 const percRarity = formatBpToPercentage(nft.attributes[0].value)
+                console.log(nft.attributes)
                 const keywordsArray: string[] = nft.description
                     .split(":")
                     .pop()!
@@ -205,10 +201,10 @@ const CollectionList = (props: {
                 const keywords: string[] = keywordsArray.map((keyword) =>
                     keyword.trim(),
                 )
-                const [, rarityData] = getRariptyFromPerc(
-                    percRarity,
-                    props.rGroups,
-                )
+                // const [, rarityData] = getRariptyFromPerc(
+                //     percRarity,
+                //     props.rGroups,
+                // )
                 if (
                     props.collectionMode === "My Drops" &&
                     !props.ownedTokenIds.includes(idx)
@@ -230,7 +226,6 @@ const CollectionList = (props: {
                                 style={{
                                     borderRadius: 16,
                                     borderWidth: 1,
-                                    borderColor: rarityData.color,
                                 }}
                             >
                                 <BlockNFT
@@ -258,10 +253,10 @@ const CollectionList = (props: {
                                         <span
                                             className={"font-normal"}
                                             style={{
-                                                color: rarityData.color,
+                                                // color: rarityData.color,
                                             }}
                                         >
-                                            {rarityData.name}
+                                            {/* {rarityData.name} */}
                                         </span>
                                     </p>
                                 </div>

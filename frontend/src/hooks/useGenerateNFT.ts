@@ -10,6 +10,8 @@ import { isDevMode } from "../utils/mode"
 
 type TradeUpArgs = number[]
 
+// TODO: Tumer: Fix this hook (and the mock one)
+
 // TODO: Add a timer feature after the tx.receit() arrives. If we go beyond 4-5 mintues,
 // Display a warning popup or provide a link to tx explorer
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
@@ -49,13 +51,13 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 message: `An error occurred. Message: ${errMsg}`,
             })
             setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
-            setTxStatus("REJECTED")
+            setTxStatus("GEN_REJECTED")
         }
     }
 
     // This should be called by main button: "Generate" or "Trade up"
     const requestGen = async (tradeupData?: TradeUpArgs) => {
-        setTxStatus("AWAIT_CONFIRM")
+        setTxStatus("GEN_AWAIT_CONFIRM")
         await txFunc(tradeupData)
     }
 
@@ -67,12 +69,12 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             value: serviceFee,
             gasLimit: 200_000,
         })
-        setTxStatus("PRE_AWAIT_CONFIRM")
+        setTxStatus("PREP_AWAIT_CONFIRM")
 
         const receipt = await tx.wait()
         if (receipt) {
             console.log("[useGenerate] prepare tx - receipt OK")
-            setTxStatus("PRE_WAIT")
+            setTxStatus("PREP_WAIT")
         }
     }
 

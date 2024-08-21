@@ -11,6 +11,7 @@ artifacts
 typechain-types
 
 addresses-local.json
+addresses-testnet.json
 candidates.json
 
 # broadcasts

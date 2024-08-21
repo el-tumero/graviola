@@ -1,4 +1,5 @@
 import { useEffect, useState, ReactNode, Fragment } from "react"
+import { isDevMode } from "./utils/mode"
 import tailwindConfig from "../tailwind.config"
 import {
     createWeb3Modal,
@@ -17,6 +18,7 @@ import { fetchCollection } from "./web3"
 import { fallbackNFT } from "./data/fallbacks"
 
 const App = (props: { children: ReactNode }) => {
+
     const modal = createWeb3Modal({
         themeVariables: {
             "--w3m-accent": tailwindConfig.theme.extend.colors.accentDark,
@@ -53,12 +55,14 @@ const App = (props: { children: ReactNode }) => {
     useEffect(() => {
         if (!loading) return
 
+        console.log("[App] is dev mode: ", isDevMode)
+
         const fetchContractData = async () => {
             const collectionData = await fetchCollection()
             const nftTotalSupply = await collectionContract.totalSupply()
             await fetchArchive()
             console.log("[App] totalSupply: ", Number(nftTotalSupply))
-            console.log("[App] fetched collection ", collectionData)
+            // console.log("[App] fetched collection ", collectionData)
 
             if (collectionData.length < 5) {
                 dispatch(setCollection(new Array(5).fill(fallbackNFT)))
@@ -67,7 +71,7 @@ const App = (props: { children: ReactNode }) => {
             }
 
             setLoading(false)
-            console.log("[App] collection loaded!")
+            // console.log("[App] collection loaded!")
         }
 
         fetchContractData()

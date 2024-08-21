@@ -145,8 +145,8 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         // perform process of selecting random words
         (
             string memory result,
-            uint256 weightSum,
-            uint256 totalProbability
+            uint256 score,
+            uint256 probability
         ) = rollWords(request.seed);
 
         uint256 tokenId = collection.mint(request.initiator);
@@ -156,8 +156,8 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         Metadata memory metadata = Metadata({
             description: result,
             image: "",
-            rarity: totalProbability,
-            weightSum: weightSum,
+            probability: probability,
+            score: score,
             seasonId: seasonId,
             isReady: false
         });

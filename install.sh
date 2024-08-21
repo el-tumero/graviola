@@ -2,7 +2,7 @@
 
 # Script for setting up the project
 # This script assumes a unix environment
-# Last modified: 20/08/2024
+# Last modified: 21/08/2024
 
 HARDHAT_DEFAULT_PORT=8545
 
@@ -21,9 +21,14 @@ require_ok() {
     fi
 }
 
+clear
+
 cd contracts
 yarn --dev
 require_ok "yarn install in contracts"
+
+bash ./utils/clear-cache.sh
+
 npx hardhat compile
 require_ok "hardhat compile"
 yarn local-node > /dev/null &
@@ -44,5 +49,7 @@ require_ok "hardhat localhost deploy"
 
 cd ../frontend
 yarn --dev
-echo "Setup complete. Run web locally with: 'cd frontend && yarn dev:test'"
-kill  $HH_NODE_PID
+echo "Setup complete. To run the project locally:"
+echo "'cd frontend && yarn dev'"
+echo "Make sure to kill the Hardhat Node that's running in the background when you're done"
+echo "Hardhat Node PID: $HH_NODE_PID"

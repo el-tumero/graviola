@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { NFTExt } from "../pages/Generate"
 import { RaritiesData } from "../types/RarityGroup"
 import { TransactionStatus } from "../types/TransactionStatus"
 import { getRarityFromPerc } from "../utils/getRarityData"
@@ -33,7 +32,6 @@ export default function useGenerateMock(
     const MOCK_STEP_TIMEOUT_MS = 7000 // Time between steps
     const RESET_ON_ERR_TIMEOUT_MS = 4000
 
-    const rarities = useAppSelector(state => state.graviolaData.rarities) as RaritiesData
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
     const [txErr, setTxErr] = useState<string>("")
@@ -49,26 +47,26 @@ export default function useGenerateMock(
         console.log("[useGenerate MOCK] tx init.")
         let run = true
 
-        run = requireStep(0, "REJECTED")
+        run = requireStep(0, "PREP_REJECTED")
 
         setTimeout(() => {
             if (!run) return
             console.log("[useGenerate MOCK] tx receipt OK")
-            setTxStatus("BEFORE_MINT")
             run = requireStep(1, "ERROR")
+            setTxStatus("")
         }, MOCK_STEP_TIMEOUT_MS)
 
         setTimeout(() => {
             if (!run) return
             console.log("[useGenerate MOCK] onMint tick")
-            setTxStatus("MINTED")
+            setTxStatus("")
             run = requireStep(2, "ERROR")
         }, MOCK_STEP_TIMEOUT_MS * 2)
 
         setTimeout(() => {
             if (!run) return
             console.log("[useGenerate MOCK] onFinishing")
-            setTxStatus("FINISHING")
+            setTxStatus("")
             run = requireStep(3, "ERROR")
         }, MOCK_STEP_TIMEOUT_MS * 3)
 
@@ -118,7 +116,7 @@ export default function useGenerateMock(
             return
         }
         console.log("[useGenerate MOCK] requestGen")
-        setTxStatus("AWAIT_CONFIRM")
+        setTxStatus("PREP_AWAIT_CONFIRM")
         txFunc()
     }
 

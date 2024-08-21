@@ -12,7 +12,7 @@ const config: HardhatUserConfig = {
             blockGasLimit: 300_000_000,
             allowUnlimitedContractSize: true,
             forking: {
-                enabled: true,
+                enabled: false,
                 url: `https://arbitrum-sepolia.infura.io/v3/${API_KEY_INFURA}`,
                 blockNumber: 71109865,
             },

@@ -8,8 +8,8 @@ import {IGraviolaSeasonsArchive} from "./seasons/archive/IGraviolaSeasonsArchive
 struct Metadata {
     string description;
     string image;
-    uint256 rarity;
-    uint256 weightSum;
+    uint256 probability;
+    uint256 score;
     uint256 seasonId;
     bool isReady;
 }
@@ -59,13 +59,13 @@ abstract contract GraviolaMetadata {
         writer = writer.writeStartArray("attributes");
 
         writer = writer.writeStartObject();
-        writer = writer.writeStringProperty("trait_type", "Rarity");
-        writer = writer.writeUintProperty("value", metadata.rarity);
+        writer = writer.writeStringProperty("trait_type", "Probability");
+        writer = writer.writeUintProperty("value", metadata.probability);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
-        writer = writer.writeStringProperty("trait_type", "Weight Sum");
-        writer = writer.writeUintProperty("value", metadata.weightSum);
+        writer = writer.writeStringProperty("trait_type", "Score");
+        writer = writer.writeUintProperty("value", metadata.score);
         writer = writer.writeEndObject();
 
         writer = writer.writeStartObject();
