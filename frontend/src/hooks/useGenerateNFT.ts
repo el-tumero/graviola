@@ -4,9 +4,11 @@ import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
 import useWallet from "./useWallet"
-import { useAppSelector } from "../redux/hooks"
+// import { useAppSelector } from "../redux/hooks"
 import { ContractTransactionResponse } from "ethers"
 import { isDevMode } from "../utils/mode"
+import { AddressLike } from "ethers"
+import { EventLog } from "ethers"
 
 type TradeUpArgs = number[]
 
@@ -19,7 +21,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     const { address, generatorContract, collectionContract } = useWallet()
 
-    const collection = useAppSelector((state) => state.graviolaData.collection)
+    // const collection = useAppSelector((state) => state.graviolaData.collection)
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
@@ -27,10 +29,70 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const [txPopup, setTxPopup] = useState<PopupBase>()
     const [rolledNFT, setRolledNFT] = useState<NFT | undefined>()
 
+    const [requestId, setRequestId] = useState<bigint | undefined>()
+
     // Automatically update Tx status messages based on status
     useEffect(() => {
+        console.log(txStatus)
         setTxMsg(txMessages[txStatus])
     }, [txStatus])
+
+    // Fetch historical events to determine status of the generation process
+    // Will be helpful if a user accidentally leaves a page
+    useEffect(() => {
+        if (!address) return
+        ;(async () => {
+            // filters
+            const vrfSentEventFilter = generatorContract.filters.RequestVRFSent(
+                address as string,
+            )
+            const vrfFulfilledEventFilter =
+                generatorContract.filters.RequestVRFFulfilled(address as string)
+            const oaoSentEventFilter = generatorContract.filters.RequestOAOSent(
+                address as string,
+            )
+
+            const oaoFulfilledEventFilter =
+                generatorContract.filters.RequestOAOFulfilled(address as string)
+
+            // events list
+            const vrfSentEvents =
+                await generatorContract.queryFilter(vrfSentEventFilter)
+
+            const vrfFulfilledEvents = await generatorContract.queryFilter(
+                vrfFulfilledEventFilter,
+            )
+
+            const oaoSentEvents =
+                await generatorContract.queryFilter(oaoSentEventFilter)
+
+            const oaoFulfilledEvents = await generatorContract.queryFilter(
+                oaoFulfilledEventFilter,
+            )
+
+            if (vrfSentEvents.length > vrfFulfilledEvents.length) {
+                setRequestId(
+                    vrfSentEvents[vrfSentEvents.length - 1].args.requestId,
+                )
+                setTxStatus("PREP_WAIT")
+            }
+
+            if (vrfFulfilledEvents.length > oaoSentEvents.length) {
+                setRequestId(
+                    vrfFulfilledEvents[vrfFulfilledEvents.length - 1].args
+                        .requestId,
+                )
+                setTxStatus("PREP_READY")
+            }
+
+            if (oaoSentEvents.length > oaoFulfilledEvents.length) {
+                setRequestId(
+                    oaoSentEvents[oaoSentEvents.length - 1].args.requestId,
+                )
+                setTxStatus("GEN_WAIT")
+            }
+        })()
+    }, [address])
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
@@ -39,6 +101,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             "[useGenerate] tx init. mode: ",
             tradeupArgs ? "trade up" : "generate",
         )
+
+        await prepare()
+
         try {
         } catch (error) {
             const errMsg =
@@ -98,65 +163,54 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         }
         setCallbacksInit(true)
 
-        generatorContract.once(
+        generatorContract.on(
             generatorContract.filters.RequestVRFFulfilled,
             onVRFResponse,
         )
-        generatorContract.once(
-            generatorContract.filters.RequestOAOFulfilled,
-            onOAOResponse,
+
+        collectionContract.on(
+            collectionContract.filters.ImageAdded,
+            onImageAdded,
         )
 
-        // generatorContract.once(generatorContract.filters.RequestOAOFulfilled, onMint)
-        // contract.once(contract.filters.TokenReady, onTokenReady)
         console.log("[useGenerate] callbacks init OK")
     }
 
     const disableCallbacks = () => {
         if (!callbacksInit) return
-        // contract.off(contract.filters.Mint, onMint)
-        // contract.off(contract.filters.TokenReady, onTokenReady)
+
+        generatorContract.off(
+            generatorContract.filters.RequestVRFFulfilled,
+            onVRFResponse,
+        )
+        collectionContract.off(
+            collectionContract.filters.ImageAdded,
+            onImageAdded,
+        )
         console.log("[useGenerate] callbacks disable OK")
         setCallbacksInit(false)
     }
 
-    // const onMint = (addr: string, tokenId: bigint) => {
-    //     if (addr != address) return
-    //     console.log(`[useGenerate] onMint: tokenId ${tokenId}`)
-    //     setTxStatus("MINTED")
-    // }
-
-    const onVRFResponse = async (tokenId: bigint) => {
-        console.log("OMG!")
+    const onVRFResponse = async (initiator: AddressLike, requestId: bigint) => {
+        if (initiator !== address) return
+        setRequestId(requestId)
+        console.log(`[useGenerate] onVRFResponse: requestId ${requestId}`)
     }
 
-    const onOAOResponse = async (tokenId: bigint) => {
-        // if (addr != address) return // Don't eavesdrop other people's drops
-        console.log(`[useGenerate] onTokenReady: tokenId ${Number(tokenId)}`)
+    const onImageAdded = async (tokenId: bigint, tokenOwner: AddressLike) => {
+        if (tokenOwner !== address) return
+
+        console.log(`[useGenerate] onImageAdded: tokenId ${Number(tokenId)}`)
 
         const uri = await collectionContract.tokenURI(tokenId)
-        const response = await fetch(uri)
-        // const nextIdx = collection.length
-        const nftData = await response.json()
-        // const [rLevel, rData] = getRarityFromPerc(
-        //     nftData.attributes[0].value,
-        //     rarities,
-        // )
+        const metadata = await (await fetch(uri)).json()
 
         const nftBase: NFT = {
             id: tokenId,
-            ...nftData,
+            ...metadata,
         }
 
-        // const nftRes: NFTExt = {
-        //     rarityLevel: rLevel,
-        //     rarityData: rData,
-        //     ...nftBase,
-        // }
-        // console.log("[useGenerate] nftRes: ", JSON.stringify(nftRes, null, 4)) // DEBUG
-
         setTxStatus("DONE")
-        // setRolledNFT(nftRes)
     }
 
     const closePopup = () => {

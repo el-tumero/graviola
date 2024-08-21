@@ -16,6 +16,8 @@ contract GraviolaCollection is
 
     uint256 private nextTokenId;
 
+    event ImageAdded(uint256 tokenId, address tokenOwner);
+
     constructor(
         address ownerAddress,
         address archiveAddress
@@ -40,6 +42,7 @@ contract GraviolaCollection is
 
     function addImage(uint256 tokenId, string memory image) external onlyOwner {
         _addImage(tokenId, image);
+        emit ImageAdded(tokenId, ownerOf(tokenId));
     }
 
     function _update(

@@ -9,6 +9,7 @@
         "deploy:local": "HARDHAT_NETWORK=localhost yarn deploy",
         "deploy:testnet": "HARDHAT_NETWORK=testnet yarn deploy",
         "local-node": "hardhat node",
+        "mock-bot": "HARDHAT_NETWORK=localhost ts-node --transpile-only utils/mock-bot.ts",
         "test": "forge test -vv",
         "cand": "yarn hardhat run utils/gen-candidates.ts",
         "types": "yarn hardhat typechain",

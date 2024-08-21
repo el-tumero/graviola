@@ -5,17 +5,17 @@ import {GraviolaSeed} from "./GraviolaSeed.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {IGraviolaCollection} from "./IGraviolaCollection.sol";
-import {IAIOracle} from "../OAO/IAIOracle.sol";
 import {Metadata} from "./GraviolaMetadata.sol";
+import {AIOracleCallbackReceiver} from "../OAO/AIOracleCallbackReceiver.sol";
 
 import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
 import {VRFV2PlusClient} from "@chainlink/contracts/src/v0.8/vrf/dev/libraries/VRFV2PlusClient.sol";
 
-contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
-    /// @dev Base of the prompt used for the OAO
-    // string private constant PROMPT_BASE =
-    // "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
-
+contract GraviolaGenerator is
+    GraviolaSeed,
+    VRFV2PlusWrapperConsumerBase,
+    AIOracleCallbackReceiver
+{
     /// @dev Stable Diffusion model id in the OAO
     uint256 private constant MODEL_ID = 50;
 
@@ -33,12 +33,11 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
 
     IERC20 private token;
     IGraviolaCollection private collection;
-    IAIOracle private aiOracle;
 
-    event RequestVRFSent(uint256 requestId);
-    event RequestVRFFulfilled(uint256 requestId);
-    event RequestOAOSent(uint256 requestId);
-    event RequestOAOFulfilled(uint256 requestId);
+    event RequestVRFSent(address indexed initiator, uint256 requestId);
+    event RequestVRFFulfilled(address indexed initiator, uint256 requestId);
+    event RequestOAOSent(address indexed initiator, uint256 requestId);
+    event RequestOAOFulfilled(address indexed initiator, uint256 requestId);
 
     error RequestVRFInsufficientBalance();
     error RequestOAOInsufficientBalance();
@@ -46,6 +45,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
     error RequestSeedNotFound();
 
     error SenderNotInitiator();
+    error RequestOAONotFound();
 
     enum RequestStatus {
         NON_EXISTENT, // Request hasn't been made
@@ -59,10 +59,12 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         RequestStatus status;
         uint256 seed;
         address initiator;
+        uint256 oaoRequestId;
         uint256 balance;
     }
 
     mapping(uint256 => Request) private requests;
+    mapping(uint256 => uint256) private oaoRequestIds;
 
     constructor(
         address tokenAddress,
@@ -73,10 +75,10 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
     )
         GraviolaSeed(archiveAddress)
         VRFV2PlusWrapperConsumerBase(wrapperAddress)
+        AIOracleCallbackReceiver(aiOracleAddress)
     {
         token = IERC20(tokenAddress);
         collection = IGraviolaCollection(collectionAddress);
-        aiOracle = IAIOracle(aiOracleAddress);
     }
 
     function prepare() external payable {
@@ -92,9 +94,10 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
             status: RequestStatus.VRF_WAIT,
             seed: 0,
             initiator: msg.sender,
+            oaoRequestId: 0,
             balance: msg.value - reqPrice
         });
-        emit RequestVRFSent(requestId);
+        emit RequestVRFSent(msg.sender, requestId);
     }
 
     function _requestRandomWords() internal returns (uint256, uint256) {
@@ -126,7 +129,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         request.seed = _randomWords[0];
         // change request status
         request.status = RequestStatus.VRF_RESPONSE;
-        emit RequestVRFFulfilled(_requestId);
+        emit RequestVRFFulfilled(request.initiator, _requestId);
     }
 
     function generate(uint256 requestId) external {
@@ -143,11 +146,9 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
         }
 
         // perform process of selecting random words
-        (
-            string memory result,
-            uint256 score,
-            uint256 probability
-        ) = rollWords(request.seed);
+        (string memory result, uint256 score, uint256 probability) = rollWords(
+            request.seed
+        );
 
         uint256 tokenId = collection.mint(request.initiator);
         uint256 seasonId = archive.getCurrentSeasonId();
@@ -164,7 +165,7 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
 
         collection.createMetadata(tokenId, metadata);
 
-        aiOracle.requestCallback{value: fee}(
+        uint256 oaoRequestId = aiOracle.requestCallback{value: fee}(
             MODEL_ID,
             bytes(string.concat(promptBase, result)),
             address(this),
@@ -172,6 +173,25 @@ contract GraviolaGenerator is GraviolaSeed, VRFV2PlusWrapperConsumerBase {
             abi.encode(tokenId)
         );
 
-        emit RequestOAOSent(requestId);
+        oaoRequestIds[oaoRequestId] = requestId;
+
+        emit RequestOAOSent(request.initiator, requestId);
+    }
+
+    function aiOracleCallback(
+        uint256 requestId,
+        bytes calldata output,
+        bytes calldata callbackData
+    ) external override onlyAIOracleCallback {
+        uint256 i_requestId = oaoRequestIds[requestId];
+        Request storage request = requests[i_requestId];
+
+        if (request.status != RequestStatus.OAO_WAIT) {
+            revert RequestOAONotFound();
+        }
+        uint256 tokenId = abi.decode(callbackData, (uint256));
+
+        collection.addImage(tokenId, string(output));
+        emit RequestOAOFulfilled(request.initiator, i_requestId);
     }
 }
