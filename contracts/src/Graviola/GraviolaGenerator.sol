@@ -29,7 +29,7 @@ contract GraviolaGenerator is
     uint32 private constant VRF_NUM_WORDS = 1;
 
     /// @dev Callback gas limit for the OAO request
-    uint64 private constant OAO_CALLBACK_GAS_LIMIT = 100000;
+    uint64 private constant OAO_CALLBACK_GAS_LIMIT = 150000;
 
     IERC20 private token;
     IGraviolaCollection private collection;
@@ -174,6 +174,7 @@ contract GraviolaGenerator is
         );
 
         oaoRequestIds[oaoRequestId] = requestId;
+        request.status = RequestStatus.OAO_WAIT;
 
         emit RequestOAOSent(request.initiator, requestId);
     }
@@ -192,6 +193,7 @@ contract GraviolaGenerator is
         uint256 tokenId = abi.decode(callbackData, (uint256));
 
         collection.addImage(tokenId, string(output));
+        request.status = RequestStatus.OAO_RESPONSE;
         emit RequestOAOFulfilled(request.initiator, i_requestId);
     }
 }

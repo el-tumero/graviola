@@ -27,6 +27,12 @@ abstract contract GraviolaMetadata {
         SEASONS_ARCHIVE = IGraviolaSeasonsArchive(seasonsArchiveAddress);
     }
 
+    function getMetadata(
+        uint256 tokenId
+    ) external view returns (Metadata memory) {
+        return metadataStorage[tokenId];
+    }
+
     /// @notice Creates metadata and adds it to the metadata storage
     /// @param tokenId id of the token
     /// @param metadata Metadata struct object
@@ -42,6 +48,7 @@ abstract contract GraviolaMetadata {
     /// @param image cid
     function _addImage(uint256 tokenId, string memory image) internal {
         metadataStorage[tokenId].image = image;
+        metadataStorage[tokenId].isReady = true;
     }
 
     // -- conversions --

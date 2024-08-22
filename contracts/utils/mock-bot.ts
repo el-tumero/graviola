@@ -1,6 +1,6 @@
 import hardhat from 'hardhat'
 import addresses from '../addresses-local.json'
-import { ethers } from 'ethers'
+import { ethers, toUtf8Bytes } from 'ethers'
 
 const IMG_CID = 'QmTjUY4rQLrgv8tjedXoXDmXRtahL1bcFVK64jnTkiVGEn'
 
@@ -36,7 +36,7 @@ async function main() {
     generator.on(
         generator.filters.RequestOAOSent,
         async (initiator: ethers.AddressLike, requestId: bigint) => {
-            const tx = await oao.invokeNextCallback(IMG_CID)
+            const tx = await oao.invokeNextCallback(toUtf8Bytes(IMG_CID))
             const recp = await tx.wait()
             if (recp?.status === 1) {
                 console.log(`Request id: ${requestId} - OAO fulfilled`)

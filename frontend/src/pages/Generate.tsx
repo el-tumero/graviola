@@ -1,4 +1,3 @@
-import { useEffect } from "react"
 import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
@@ -6,35 +5,29 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import { clsx as cl } from "clsx"
 import Popup from "../components/Popup"
-import { generateTxStatusMessages } from "../utils/statusMessages"
+import {
+    generateTxStatusMessages,
+    TransactionStatusEnum,
+} from "../utils/statusMessages"
 import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 import useWallet from "../hooks/useWallet"
+import { getRarityFromScore } from "../utils/getRarityFromScore"
+import useArchive from "../hooks/useArchive"
+import { getRarityColorFromScore } from "../utils/getRarityColorFromScore"
 
 const Generate = () => {
     const navigate = useNavigate()
 
     const { isConnected } = useWallet()
 
-    // Gen data
-    const {
-        txStatus,
-        txMsg,
-        txPopup,
-        rolledNFT,
-        requestGen,
-        initCallbacks,
-        disableCallbacks,
-        closePopup,
-    } = useGenerateNFT(generateTxStatusMessages)
+    const { weights } = useArchive()
 
-    // Handle generate callbacks
-    useEffect(() => {
-        initCallbacks()
-        return () => disableCallbacks()
-    }, [])
+    // Gen data
+    const { txStatus, txMsg, txPopup, rolledNFT, requestGen, closePopup } =
+        useGenerateNFT(generateTxStatusMessages)
 
     return (
         <FullscreenContainer>
@@ -65,19 +58,29 @@ const Generate = () => {
                         )}
                     >
                         <div data-testid="generate-status">
-                            {/* {rolledNFT ? (
+                            {rolledNFT ? (
                                 <p data-testid="generate-success">
                                     Congratulations! You rolled a&nbsp;
                                     <span
                                         style={{
-                                            color: rolledNFT.rarityData.color,
+                                            color: getRarityColorFromScore(
+                                                weights,
+                                                rolledNFT.attributes[1].value,
+                                            ),
                                             borderBottomWidth: 1,
                                             borderBottomColor:
-                                                rolledNFT.rarityData.color,
+                                                getRarityColorFromScore(
+                                                    weights,
+                                                    rolledNFT.attributes[1]
+                                                        .value,
+                                                ),
                                         }}
                                         className="font-bold"
                                     >
-                                        {rolledNFT.rarityLevel}
+                                        {getRarityFromScore(
+                                            weights,
+                                            rolledNFT.attributes[1].value,
+                                        )}
                                     </span>
                                     &nbsp;NFT!!!
                                 </p>
@@ -85,13 +88,23 @@ const Generate = () => {
                                 <p>{txMsg}</p>
                             ) : (
                                 <p>Connect your wallet first</p>
-                            )} */}
+                            )}
                         </div>
 
                         <span data-testid="generate-btn">
                             <Button
-                                text={"Generate!"}
-                                disabled={!isConnected || txStatus !== "NONE"}
+                                text={
+                                    TransactionStatusEnum[txStatus] < 4
+                                        ? "Prepare!"
+                                        : "Generate!"
+                                }
+                                disabled={
+                                    !isConnected ||
+                                    !(
+                                        txStatus == "NONE" ||
+                                        txStatus == "PREP_READY"
+                                    )
+                                }
                                 onClick={() => requestGen()}
                             />
                         </span>

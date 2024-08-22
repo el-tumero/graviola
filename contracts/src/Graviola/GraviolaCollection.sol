@@ -45,6 +45,13 @@ contract GraviolaCollection is
         emit ImageAdded(tokenId, ownerOf(tokenId));
     }
 
+    function tokenURI(
+        uint256 tokenId
+    ) public view override returns (string memory) {
+        // _requireOwned(tokenId);
+        return _tokenURI(tokenId);
+    }
+
     function _update(
         address to,
         uint256 tokenId,

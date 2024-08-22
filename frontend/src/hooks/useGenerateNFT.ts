@@ -1,14 +1,11 @@
-import { TransactionStatus } from "../types/TransactionStatus"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
 import useWallet from "./useWallet"
-// import { useAppSelector } from "../redux/hooks"
-import { ContractTransactionResponse } from "ethers"
 import { isDevMode } from "../utils/mode"
 import { AddressLike } from "ethers"
-import { EventLog } from "ethers"
+import useTransactionStatus from "./useTransactionStatus"
 
 type TradeUpArgs = number[]
 
@@ -17,14 +14,15 @@ type TradeUpArgs = number[]
 // TODO: Add a timer feature after the tx.receit() arrives. If we go beyond 4-5 mintues,
 // Display a warning popup or provide a link to tx explorer
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
-    const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
+    // const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
     const { address, generatorContract, collectionContract } = useWallet()
 
     // const collection = useAppSelector((state) => state.graviolaData.collection)
     const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
-    const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
+    const [txStatus, setTxStatus] = useTransactionStatus()
+
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
     const [txPopup, setTxPopup] = useState<PopupBase>()
     const [rolledNFT, setRolledNFT] = useState<NFT | undefined>()
@@ -36,6 +34,12 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         console.log(txStatus)
         setTxMsg(txMessages[txStatus])
     }, [txStatus])
+
+    useEffect(() => {
+        if (!address) return
+        initCallbacks()
+        return () => disableCallbacks()
+    }, [address])
 
     // Fetch historical events to determine status of the generation process
     // Will be helpful if a user accidentally leaves a page
@@ -96,39 +100,52 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
-        let tx: ContractTransactionResponse | null = null
         console.log(
             "[useGenerate] tx init. mode: ",
             tradeupArgs ? "trade up" : "generate",
         )
-
-        await prepare()
-
         try {
+            if (txStatus == "NONE") {
+                await prepare()
+            }
+
+            if (txStatus == "PREP_READY") {
+                if (requestId === undefined) {
+                    throw Error("No requestId provided for generate call!")
+                }
+                await generate(requestId)
+            }
         } catch (error) {
-            const errMsg =
-                (error as Error).message.length > 64
-                    ? (error as Error).message.substring(0, 64) + " (...)"
-                    : (error as Error).message
-            console.error("[useGenerate] err during tx init: ", error as Error)
-            setTxPopup({
-                type: "err",
-                message: `An error occurred. Message: ${errMsg}`,
-            })
-            setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
-            setTxStatus("GEN_REJECTED")
+            console.error(error)
+            // if (isError(error, "UNKNOWN_ERROR")) {
+            //     const errorDecoder = ErrorDecoder.create([
+            //         generatorContract.interface,
+            //     ])
+            //     const decoded = await errorDecoder.decode(error)
+            //     console.log(decoded)
+            // }
+            // console.log(error)
+            // if(error.data )
+            // const errMsg =
+            //     (error as Error).message.length > 64
+            //         ? (error as Error).message.substring(0, 64) + " (...)"
+            //         : (error as Error).message
+            // console.error("[useGenerate] err during tx init: ", error as Error)
+            // setTxPopup({
+            //     type: "err",
+            //     message: `An error occurred. Message: ${errMsg}`,
+            // })
         }
     }
 
     // This should be called by main button: "Generate" or "Trade up"
     const requestGen = async (tradeupData?: TradeUpArgs) => {
-        setTxStatus("GEN_AWAIT_CONFIRM")
         await txFunc(tradeupData)
     }
 
     const prepare = async () => {
         const estimatedServiceFee = 101 // TODO: calculate
-        const serviceFee = isDevMode ? 200000 : estimatedServiceFee
+        const serviceFee = isDevMode ? 100000 : estimatedServiceFee
 
         const tx = await generatorContract.prepare({
             value: serviceFee,
@@ -143,9 +160,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         }
     }
 
-    const generate = async (requestId: number) => {
+    const generate = async (requestId: bigint) => {
         const tx = await generatorContract.generate(requestId, {
-            gasLimit: 200_000,
+            gasLimit: 700_000,
         })
         setTxStatus("GEN_AWAIT_CONFIRM")
 
@@ -173,7 +190,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             onImageAdded,
         )
 
-        console.log("[useGenerate] callbacks init OK")
+        console.log(`[useGenerate] callbacks init OK, address ${address}`)
     }
 
     const disableCallbacks = () => {
@@ -194,6 +211,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const onVRFResponse = async (initiator: AddressLike, requestId: bigint) => {
         if (initiator !== address) return
         setRequestId(requestId)
+        setTxStatus("PREP_READY")
         console.log(`[useGenerate] onVRFResponse: requestId ${requestId}`)
     }
 
@@ -210,6 +228,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
             ...metadata,
         }
 
+        setRolledNFT(nftBase)
         setTxStatus("DONE")
     }
 
@@ -222,10 +241,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         txMsg,
         txPopup,
         rolledNFT,
+        requestId,
 
         requestGen,
-        initCallbacks,
-        disableCallbacks,
         closePopup,
     }
 }

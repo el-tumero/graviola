@@ -30,3 +30,16 @@ export const generateTxStatusMessages: TxStatusMessagesMap = {
     DONE: "",
     ERROR: "An error occurred. Please check the popup for more info.",
 }
+
+export const TransactionStatusEnum = {
+    NONE: 0,
+    PREP_AWAIT_CONFIRM: 1,
+    PREP_REJECTED: 2,
+    PREP_WAIT: 3,
+    PREP_READY: 4,
+    GEN_AWAIT_CONFIRM: 5,
+    GEN_REJECTED: 6,
+    GEN_WAIT: 7,
+    DONE: 8,
+    ERROR: 9,
+} as const

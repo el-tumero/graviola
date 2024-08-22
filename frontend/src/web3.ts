@@ -14,7 +14,6 @@ import {
     GraviolaSeasonsArchive,
     GraviolaSeasonsArchive__factory,
 } from "../../contracts/typechain-types/index"
-import { atob } from "buffer"
 import { NFT } from "./types/NFT"
 
 const addresses = isDevMode ? addressesLocal : addressesTestnet
@@ -64,8 +63,8 @@ export async function fetchCollection(): Promise<NFT[]> {
     const collectionData = []
     for (let i = 0; i < totalSupply; i++) {
         const encoded = await collectionContract.tokenURI(i)
-        const decoded = atob(encoded)
-        collectionData.push(JSON.parse(decoded))
+        const decoded = await (await fetch(encoded)).json()
+        collectionData.push(decoded)
     }
     return collectionData
 }
