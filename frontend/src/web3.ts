@@ -56,6 +56,7 @@ export function setSigner(s: Signer) {
 export function connectContractsToSigner() {
     generatorContract = generatorContract.connect(signer)
     tokenContract = tokenContract.connect(signer)
+    seasonsGovernorContract = seasonsGovernorContract.connect(signer)
 }
 
 export async function fetchCollection(): Promise<NFT[]> {

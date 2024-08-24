@@ -16,6 +16,8 @@ import Button from "../components/ui/Button"
 import { CandidateInfo } from "../types/CandidateInfo"
 import { SortingType } from "../types/VotingSort"
 import useWallet from "../hooks/useWallet"
+import KeywordCandidate from "../components/KeywordCandidate"
+import { encodeKeyword } from "../utils/keywordEncoding"
 
 type ActivePage = "Voting" | "Archive"
 
@@ -48,25 +50,68 @@ const Voting = () => {
     const [candidates, setCandidates] = useState<CandidateInfo[]>([])
     const { seasonsGovernorContract } = useWallet()
 
+    // Submitting new candidate through the form
+    const handleSubmitKeyword = async (keyword: string) => {
+        const encodedCandidateId = encodeKeyword(keyword)
+        console.log('encoded ', encodedCandidateId)
+        const res = await seasonsGovernorContract.addCandidate(encodedCandidateId)
+        const recp = await res.wait()
+        console.log(res)
+        console.log(recp)
+        console.log(recp?.logs)
+    }
+
+    const handleCandidateUpvoted = async (word: bigint) => { 
+
+    }
+    const handleCandidateDownvoted = async (word: bigint) => {
+
+    }
+    const handleCandidateCancelVote = async (word: bigint) => {
+
+    }
+    const handleCandidatePromoted = async (word: bigint) => { 
+
+    }
+
+    const handleCandidateAdded = async (word: bigint) => {
+        console.log('awdawd ' ,word)
+    }
+
+    useEffect(() => {
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateAdded, handleCandidateAdded)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateUpvoted, handleCandidateUpvoted)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateDownvoted, handleCandidateDownvoted)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateCancelVote, handleCandidateCancelVote)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidatePromoted, handleCandidatePromoted)
+
+        return () => {
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateAdded, handleCandidateAdded)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateUpvoted, handleCandidateUpvoted)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateDownvoted, handleCandidateDownvoted)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateCancelVote, handleCandidateCancelVote)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidatePromoted, handleCandidatePromoted)
+        }
+    }, [])
+
     useEffect(() => {
         if (candidatesReady) return
 
-        (async() => {
+        (async () => {
             const candList = await seasonsGovernorContract.getTopCandidatesInfo(100n)
-            console.log(candList)
-                setCandidates(candList.map((cand, idx) => {
-                    const c: CandidateInfo = {
-                        id: idx,
-                        keyword: cand[1],
-                        score: Number(cand[2].toString().substring(0, cand[2].toString().length - 19)),
-                        author: cand[3],
-                        iteration: 1
-                    }
-                    return c
-                }))
+            setCandidates(candList.map((cand, idx) => {
+                const c: CandidateInfo = {
+                    id: idx,
+                    keyword: cand[1],
+                    score: Number(cand[2].toString().substring(0, cand[2].toString().length - 19)),
+                    author: cand[3],
+                    iteration: 1
+                }
+                return c
+            }))
             setCandidatesReady(true)
         })()
-        
+
     }, [candidates, candidatesReady])
 
     return (
@@ -81,6 +126,7 @@ const Voting = () => {
                         <PopupContainer>
                             <AddKeywordForm
                                 onClickClose={() => setAddKeywordVisible(false)}
+                                onSubmit={handleSubmitKeyword}
                             />
                         </PopupContainer>
                     )}
@@ -150,13 +196,13 @@ const Voting = () => {
                             "p-2 rounded-l-lg",
                             activePage === "Voting"
                                 ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
+                                    "border border-light-text/25 dark:border-dark-text/25",
+                                    "bg-light-border/30 dark:bg-dark-border/30",
+                                ]
                                 : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
+                                    "cursor-pointer",
+                                    "border-light-border dark:border-dark-border",
+                                ],
                         )}
                     >
                         <p className="select-none">Voting</p>
@@ -169,13 +215,13 @@ const Voting = () => {
                             "p-2 rounded-r-lg",
                             activePage === "Archive"
                                 ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
+                                    "border border-light-text/25 dark:border-dark-text/25",
+                                    "bg-light-border/30 dark:bg-dark-border/30",
+                                ]
                                 : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
+                                    "cursor-pointer",
+                                    "border-light-border dark:border-dark-border",
+                                ],
                         )}
                     >
                         <p className="select-none">Archive</p>
@@ -295,10 +341,10 @@ const KeywordVotingPage = (props: {
                         className="w-full divide-y divide-light-border dark:divide-dark-border"
                     >
                         {props.candidates
-                        .sort(sortCompareFns[sorting])
-                        .map((candData, idx) => (
-                            <KeywordCandidate data={candData} key={idx} />
-                        ))}
+                            .sort(sortCompareFns[sorting])
+                            .map((candData, idx) => (
+                                <KeywordCandidate data={candData} key={idx} />
+                            ))}
                     </ul>
                 }
             </div>
@@ -306,85 +352,5 @@ const KeywordVotingPage = (props: {
     )
 }
 
-const KeywordCandidate = (props: { data: CandidateInfo }) => (
-    <div
-        className={cl(
-            "flex w-full h-fit p-3 justify-between items-center overflow-x-hidden",
-            "max-md:gap-2 max-md:justify-start max-md:items-start",
-            "even:bg-light-border/30 even:dark:bg-dark-border/30",
-            "odd:bg-light-bgDark/30 odd:dark:bg-dark-bgLight/30",
-            "first:rounded-t-md last:rounded-b-md",
-        )}
-    >
-        {/* Pre-left part: global item index */}
-        <div className="mr-2 self-center w-6">
-            <span className="font-mono text-light-text/75 dark:text-dark-text/75">
-                {props.data.id}.
-            </span>
-        </div>
-        {/* Left part: Id, Badge, Keyword, Iteration info */}
-        <div
-            className={cl(
-                "flex flex-nowrap gap-3 justify-center items-center w-1/2 h-full",
-                "max-md:w-full",
-            )}
-        >
-            <div
-                className={cl(
-                    "w-8 h-8 flex justify-center items-center",
-                    !props.data.badge && [
-                        "border-2 border-light-border dark:border-dark-border",
-                        "border-dashed rounded-md",
-                    ],
-                )}
-            >
-                {props.data.badge && <img src={props.data.badge} />}
-            </div>
-            <div className="flex w-full flex-1 gap-0.5 justify-start items-center">
-                <p className="mr-1 font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
-                    ({props.data.iteration})
-                </p>
-                <p>{props.data.keyword}</p>
-            </div>
-        </div>
-        {/* Right part: Score, Upvote, Downvote */}
-        <div
-            className={cl(
-                "w-1/2 flex justify-end items-center h-full gap-3",
-                "max-md:w-full",
-            )}
-        >
-            <div className={cl("flex w-24 justify-end items-center")}>
-                <span className="font-semibold font-mono">{props.data.score}</span>
-            </div>
-            <div className="flex gap-1.5 flex-nowrap">
-                <div
-                    className={cl(
-                        "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer -rotate-90",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                        "hover:bg-accentDark/50 hover:dark:bg-accent/50 duration-300 transition-colors",
-                        "hover:border-accentDark hover:dark:border-accent",
-                        "text-accentDark dark:text-accent",
-                    )}
-                >
-                    {icons.arrow}
-                </div>
-                <div
-                    className={cl(
-                        "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer rotate-90",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                        "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
-                        "hover:border-red-500 hover:dark:border-red-500",
-                        "text-red-500 dark:text-red-500",
-                    )}
-                >
-                    {icons.arrow}
-                </div>
-            </div>
-        </div>
-    </div>
-)
 
 export default Voting

@@ -34,9 +34,7 @@ const Navbar = () => {
         ;(async () => {
             try {
                 const ownedNfts = await collectionContract.balanceOf(address)
-                // console.log(ownedNfts)
                 const tokenBalance = await tokenContract.balanceOf(address)
-                // console.log(tokenBalance)
                 const collectionAddress = await collectionContract.getAddress()
                 const filter = collectionContract.filters.Transfer(
                     collectionAddress,
@@ -44,7 +42,6 @@ const Navbar = () => {
                 )
                 const events = await collectionContract.queryFilter(filter)
                 const droppedNfts = events.length
-                // console.log(droppedNfts)
                 dispatch(
                     userStatsSlice.actions.setUserStats({
                         tokenBalance: Number(tokenBalance),

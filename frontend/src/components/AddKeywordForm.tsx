@@ -3,7 +3,10 @@ import icons from "../data/icons"
 import Button from "./ui/Button"
 import { clsx as cl } from "clsx"
 
-const AddKeywordForm = (props: { onClickClose: () => void }) => {
+const AddKeywordForm = (props: {
+    onClickClose: () => void
+    onSubmit: (keyword: string) => Promise<void>
+}) => {
     const KEYWORD_MIN_LENGTH = 3
     const [keyword, setKeyword] = useState<string>("")
     const [valid, setValid] = useState<boolean>(false)
@@ -12,6 +15,11 @@ const AddKeywordForm = (props: { onClickClose: () => void }) => {
     // TODO: Need better regex for keywords later
     const isValid = (str: string) => /^[a-z]{3,32}$/.test(str)
 
+    const handleSubmit = () => {
+        if (!isValid(keyword)) return
+        props.onSubmit(keyword)
+    }
+
     useEffect(() => {
         if (keyword.length < KEYWORD_MIN_LENGTH) {
             setValid(false)
@@ -19,10 +27,6 @@ const AddKeywordForm = (props: { onClickClose: () => void }) => {
         }
         setValid(isValid(keyword))
     }, [keyword, valid])
-
-    const handleSubmitKeyword = async () => {
-        // Call contract
-    }
 
     return (
         <Fragment>
@@ -75,7 +79,7 @@ const AddKeywordForm = (props: { onClickClose: () => void }) => {
                     <Button
                         text="Add"
                         disabled={!valid}
-                        onClick={() => handleSubmitKeyword()}
+                        onClick={() => handleSubmit()}
                     />
                 </div>
             </div>
