@@ -18,7 +18,6 @@ import { fetchCollection } from "./web3"
 import { fallbackNFT } from "./data/fallbacks"
 
 const App = (props: { children: ReactNode }) => {
-
     const modal = createWeb3Modal({
         themeVariables: {
             "--w3m-accent": tailwindConfig.theme.extend.colors.accentDark,
@@ -36,8 +35,8 @@ const App = (props: { children: ReactNode }) => {
                 chainId: 421614,
                 name: "Arbitrum Sepolia",
                 currency: "ETH",
-                explorerUrl: "https://sepolia.etherscan.io/",
-                rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
+                explorerUrl: "https://sepolia.arbiscan.io",
+                rpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
             },
         ],
         projectId: "a09890b34dc1551c2534337dbc22de8c",

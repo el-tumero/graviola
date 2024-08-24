@@ -30,18 +30,19 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     // | RarityGroup | id | number of | keyword |
     // |             |    | keywords  | weight  |
     // |========================================|
-    // | Legendary   | 0  | 1         | 12      |
-    // | VeryRare    | 1  | 2         | 8       |
+    // | Common      | 0  | 77        | 1       |
+    // | Uncommon    | 1  | 15        | 3       |
     // | Rare        | 2  | 5         | 5       |
-    // | Uncommon    | 3  | 15        | 3       |
-    // | Common      | 4  | 77        | 1       |
+    // | VeryRare    | 3  | 2         | 8       |
+    // | Legendary   | 4  | 1         | 12      |
 
     // Two arrays bellow are filled with values corresponding to this table.
 
     // Represents how many words are assigned to specific group
-    uint8[TOTAL_RARITY_GROUPS] private wordsPerRarityGroup = [1, 2, 5, 15, 77];
+    uint8[TOTAL_RARITY_GROUPS] private wordsPerRarityGroup = [77, 15, 5, 2, 1];
+
     // Represents weights of keywords assigned to specific group
-    uint8[TOTAL_RARITY_GROUPS] private rarityGroupWeights = [12, 8, 5, 3, 1];
+    uint8[TOTAL_RARITY_GROUPS] private rarityGroupWeights = [1, 3, 5, 8, 12];
 
     /// @notice Name the season with the given id
     /// @param seasonId id of the season
@@ -125,6 +126,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
         return usedWords[keyword];
     }
 
+    // TODO: fix expired words logic
     /// @notice Return true if the given keyword was expired
     /// keyword is treated as expired if it was added to archive on
     /// 0-7 index postions (if keyword was legendary, very rare or rare)

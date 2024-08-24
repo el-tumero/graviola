@@ -155,7 +155,7 @@ contract GraviolaGenerator is
         string memory promptBase = archive.getSeasonPromptBase(seasonId);
 
         Metadata memory metadata = Metadata({
-            description: result,
+            description: string.concat(promptBase, result),
             image: "",
             probability: probability,
             score: score,
@@ -195,5 +195,28 @@ contract GraviolaGenerator is
         collection.addImage(tokenId, string(output));
         request.status = RequestStatus.OAO_RESPONSE;
         emit RequestOAOFulfilled(request.initiator, i_requestId);
+    }
+
+    function estimateServiceFee() external view returns (uint256) {
+        return
+            aiOracle.estimateFee(MODEL_ID, OAO_CALLBACK_GAS_LIMIT) +
+            i_vrfV2PlusWrapper.calculateRequestPriceNative(
+                VRF_CALLBACK_GAS_LIMIT,
+                1
+            );
+    }
+
+    function getRequestStatus(
+        uint256 requestId
+    ) external view returns (RequestStatus) {
+        return requests[requestId].status;
+    }
+
+    function withdraw(uint256 requestId) external {
+        Request storage request = requests[requestId];
+        if (msg.sender != request.initiator) {
+            revert SenderNotInitiator();
+        }
+        payable(msg.sender).transfer(requests[requestId].balance);
     }
 }

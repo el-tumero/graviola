@@ -8,6 +8,7 @@ import {
     tokenContract,
     seasonsGovernorContract,
     seasonsArchiveContract,
+    getBlockNumber,
 } from "../web3"
 
 import localhostConfig from "../../../contracts/localhost-config.json"
@@ -45,6 +46,7 @@ export default function useWallet() {
     return {
         connectWallet,
         connectDevWallet,
+        getBlockNumber,
         isConnected,
         address,
         collection,

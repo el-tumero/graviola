@@ -15,13 +15,19 @@ export default function useArchive() {
     const dispatch = useAppDispatch()
 
     async function fetchArchive() {
-        const groupSizes = await fetchGroupSizes()
-        const weights = await seasonsArchiveContract.getGroupWeights()
-        const keywords = await seasonsArchiveContract.getKeywordsCurrentSeason()
+        try {
+            const groupSizes = await fetchGroupSizes()
+            const weights = [12, 8, 5, 3, 1]
 
-        dispatch(setGroupSizes(groupSizes.reverse()))
-        dispatch(setWeights(weights.map((w) => Number(w)).reverse()))
-        dispatch(setKeywords(keywords))
+            const keywords =
+                await seasonsArchiveContract.getKeywordsCurrentSeason()
+
+            dispatch(setGroupSizes(groupSizes))
+            dispatch(setWeights(weights.map((w) => Number(w))))
+            dispatch(setKeywords(keywords))
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return { weights, groupSizes, keywords, fetchArchive }

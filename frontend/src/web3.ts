@@ -1,7 +1,7 @@
 import { isDevMode } from "./utils/mode"
 import addressesLocal from "../../contracts/addresses-local.json"
 import addressesTestnet from "../../contracts/addresses-testnet.json"
-import { JsonRpcProvider, Signer } from "ethers"
+import { WebSocketProvider, Signer } from "ethers"
 import {
     GraviolaGenerator,
     GraviolaGenerator__factory,
@@ -20,9 +20,9 @@ const addresses = isDevMode ? addressesLocal : addressesTestnet
 
 const defaultRpc = isDevMode
     ? import.meta.env.VITE_DEV_RPC
-    : "https://sepolia-rollup.arbitrum.io/rpc"
+    : import.meta.env.VITE_TESTNET_RPC
 
-let provider = new JsonRpcProvider(defaultRpc)
+let provider = new WebSocketProvider(defaultRpc)
 let generatorContract: GraviolaGenerator = GraviolaGenerator__factory.connect(
     addresses.GENERATOR_ADDRESS,
     provider,
@@ -67,12 +67,18 @@ export async function fetchCollection(): Promise<NFT[]> {
         const decoded = await (await fetch(encoded)).json()
         collectionData.push(decoded)
     }
+    console.log(collectionData)
     return collectionData
 }
 
 export async function fetchGroupSizes(): Promise<number[]> {
-    const groupSizes = await seasonsArchiveContract.getGroupSizes()
-    return groupSizes.map((size: bigint) => Number(size))
+    // const groupSizes = await seasonsArchiveContract.getGroupSizes()
+    // return groupSizes.map((size: bigint) => Number(size))
+    return [77, 15, 5, 2, 1]
+}
+
+export async function getBlockNumber() {
+    return await provider.getBlockNumber()
 }
 
 export {

@@ -3,23 +3,15 @@ import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
 import useWallet from "./useWallet"
-import { isDevMode } from "../utils/mode"
-import { AddressLike } from "ethers"
+import { AddressLike, isError } from "ethers"
 import useTransactionStatus from "./useTransactionStatus"
 
 type TradeUpArgs = number[]
 
-// TODO: Tumer: Fix this hook (and the mock one)
-
-// TODO: Add a timer feature after the tx.receit() arrives. If we go beyond 4-5 mintues,
-// Display a warning popup or provide a link to tx explorer
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     // const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
     const { address, generatorContract, collectionContract } = useWallet()
-
-    // const collection = useAppSelector((state) => state.graviolaData.collection)
-    const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
 
     const [txStatus, setTxStatus] = useTransactionStatus()
 
@@ -31,7 +23,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     // Automatically update Tx status messages based on status
     useEffect(() => {
-        console.log(txStatus)
+        // console.log(txStatus)
         setTxMsg(txMessages[txStatus])
     }, [txStatus])
 
@@ -41,62 +33,20 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         return () => disableCallbacks()
     }, [address])
 
-    // Fetch historical events to determine status of the generation process
-    // Will be helpful if a user accidentally leaves a page
     useEffect(() => {
-        if (!address) return
         ;(async () => {
-            // filters
-            const vrfSentEventFilter = generatorContract.filters.RequestVRFSent(
-                address as string,
-            )
-            const vrfFulfilledEventFilter =
-                generatorContract.filters.RequestVRFFulfilled(address as string)
-            const oaoSentEventFilter = generatorContract.filters.RequestOAOSent(
-                address as string,
-            )
-
-            const oaoFulfilledEventFilter =
-                generatorContract.filters.RequestOAOFulfilled(address as string)
-
-            // events list
-            const vrfSentEvents =
-                await generatorContract.queryFilter(vrfSentEventFilter)
-
-            const vrfFulfilledEvents = await generatorContract.queryFilter(
-                vrfFulfilledEventFilter,
-            )
-
-            const oaoSentEvents =
-                await generatorContract.queryFilter(oaoSentEventFilter)
-
-            const oaoFulfilledEvents = await generatorContract.queryFilter(
-                oaoFulfilledEventFilter,
-            )
-
-            if (vrfSentEvents.length > vrfFulfilledEvents.length) {
-                setRequestId(
-                    vrfSentEvents[vrfSentEvents.length - 1].args.requestId,
-                )
-                setTxStatus("PREP_WAIT")
-            }
-
-            if (vrfFulfilledEvents.length > oaoSentEvents.length) {
-                setRequestId(
-                    vrfFulfilledEvents[vrfFulfilledEvents.length - 1].args
-                        .requestId,
-                )
-                setTxStatus("PREP_READY")
-            }
-
-            if (oaoSentEvents.length > oaoFulfilledEvents.length) {
-                setRequestId(
-                    oaoSentEvents[oaoSentEvents.length - 1].args.requestId,
-                )
-                setTxStatus("GEN_WAIT")
+            if (requestId) {
+                console.log(await generatorContract.getRequestStatus(requestId))
+                if (requestId > 1n) {
+                    setTxStatus("PREP_READY")
+                }
             }
         })()
-    }, [address])
+    }, [requestId])
+
+    // TODO:
+    // Fetch historical events to determine status of the generation process
+    // Will be helpful if a user accidentally leaves a page
 
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
@@ -116,25 +66,38 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 await generate(requestId)
             }
         } catch (error) {
-            console.error(error)
-            // if (isError(error, "UNKNOWN_ERROR")) {
-            //     const errorDecoder = ErrorDecoder.create([
-            //         generatorContract.interface,
-            //     ])
-            //     const decoded = await errorDecoder.decode(error)
-            //     console.log(decoded)
-            // }
-            // console.log(error)
-            // if(error.data )
-            // const errMsg =
-            //     (error as Error).message.length > 64
-            //         ? (error as Error).message.substring(0, 64) + " (...)"
-            //         : (error as Error).message
-            // console.error("[useGenerate] err during tx init: ", error as Error)
-            // setTxPopup({
-            //     type: "err",
-            //     message: `An error occurred. Message: ${errMsg}`,
-            // })
+            console.error("[useGenerate] err during tx init:", error)
+            if (isError(error, "UNKNOWN_ERROR")) {
+                // @ts-ignore
+                const revertData = error.error?.data?.data
+                if (revertData === "0x" || revertData === null) {
+                    setTxPopup({
+                        type: "err",
+                        message: `An error occurred. Message: ${error.error?.message}`,
+                    })
+                    return
+                }
+
+                // generate.
+
+                const decodedError =
+                    generatorContract.interface.parseError(revertData)
+                if (decodedError) {
+                    setTxPopup({
+                        type: "err",
+                        message: `An error occurred. ${decodedError.name}`,
+                    })
+                }
+            }
+
+            const errMsg =
+                (error as Error).message.length > 64
+                    ? (error as Error).message.substring(0, 64) + " (...)"
+                    : (error as Error).message
+            setTxPopup({
+                type: "err",
+                message: `An error occurred. Message: ${errMsg}`,
+            })
         }
     }
 
@@ -144,12 +107,11 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     }
 
     const prepare = async () => {
-        const estimatedServiceFee = 101 // TODO: calculate
-        const serviceFee = isDevMode ? 100000 : estimatedServiceFee
+        const estimatedServiceFee = await generatorContract.estimateServiceFee()
 
         const tx = await generatorContract.prepare({
-            value: serviceFee,
-            gasLimit: 200_000,
+            value: estimatedServiceFee * 2n,
+            gasLimit: 1_000_000,
         })
         setTxStatus("PREP_AWAIT_CONFIRM")
 
@@ -162,7 +124,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
     const generate = async (requestId: bigint) => {
         const tx = await generatorContract.generate(requestId, {
-            gasLimit: 700_000,
+            gasLimit: 2_000_000,
         })
         setTxStatus("GEN_AWAIT_CONFIRM")
 
@@ -174,12 +136,6 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     }
 
     const initCallbacks = () => {
-        if (callbacksInit) {
-            console.warn("[useGenerate] Can't init callbacks more than once")
-            return
-        }
-        setCallbacksInit(true)
-
         generatorContract.on(
             generatorContract.filters.RequestVRFFulfilled,
             onVRFResponse,
@@ -194,18 +150,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     }
 
     const disableCallbacks = () => {
-        if (!callbacksInit) return
-
-        generatorContract.off(
-            generatorContract.filters.RequestVRFFulfilled,
-            onVRFResponse,
-        )
-        collectionContract.off(
-            collectionContract.filters.ImageAdded,
-            onImageAdded,
-        )
+        generatorContract.removeAllListeners()
+        collectionContract.removeAllListeners()
         console.log("[useGenerate] callbacks disable OK")
-        setCallbacksInit(false)
     }
 
     const onVRFResponse = async (initiator: AddressLike, requestId: bigint) => {
