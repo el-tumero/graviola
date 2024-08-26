@@ -5,6 +5,7 @@ import { PopupBase } from "../components/Popup"
 import useWallet from "./useWallet"
 import { AddressLike, isError } from "ethers"
 import useTransactionStatus from "./useTransactionStatus"
+import useLocalStorage from "./useLocalStorage"
 
 type TradeUpArgs = number[]
 
@@ -19,11 +20,13 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const [txPopup, setTxPopup] = useState<PopupBase>()
     const [rolledNFT, setRolledNFT] = useState<NFT | undefined>()
 
-    const [requestId, setRequestId] = useState<bigint | undefined>()
+    // const [requestId, setRequestId] = useState<bigint | undefined>()
+    const [requestId, setRequestId, clearRequestId] =
+        useLocalStorage<bigint>("requestId")
 
     // Automatically update Tx status messages based on status
     useEffect(() => {
-        // console.log(txStatus)
+        console.log("status:", txStatus)
         setTxMsg(txMessages[txStatus])
     }, [txStatus])
 
@@ -36,8 +39,17 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     useEffect(() => {
         ;(async () => {
             if (requestId) {
-                console.log(await generatorContract.getRequestStatus(requestId))
-                if (requestId > 1n) {
+                const requestStatus =
+                    await generatorContract.getRequestStatus(requestId)
+                console.log(requestStatus)
+
+                if (requestStatus === 4n) {
+                    clearRequestId()
+                    setTxStatus("NONE")
+                    return
+                }
+
+                if (requestStatus > 1n) {
                     setTxStatus("PREP_READY")
                 }
             }
@@ -78,8 +90,6 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                     return
                 }
 
-                // generate.
-
                 const decodedError =
                     generatorContract.interface.parseError(revertData)
                 if (decodedError) {
@@ -117,6 +127,16 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
 
         const receipt = await tx.wait()
         if (receipt) {
+            const events = receipt.logs.map((log) =>
+                generatorContract.interface.parseLog(log),
+            )
+            const foundEvent = events.find(
+                (event) => event?.name === "RequestVRFSent",
+            )
+            if (foundEvent) {
+                setRequestId(foundEvent.args[1])
+            }
+
             console.log("[useGenerate] prepare tx - receipt OK")
             setTxStatus("PREP_WAIT")
         }
@@ -156,6 +176,7 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     }
 
     const onVRFResponse = async (initiator: AddressLike, requestId: bigint) => {
+        console.log("VRF!!!")
         if (initiator !== address) return
         setRequestId(requestId)
         setTxStatus("PREP_READY")
