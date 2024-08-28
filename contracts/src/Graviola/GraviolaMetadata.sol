@@ -27,9 +27,9 @@ abstract contract GraviolaMetadata {
         SEASONS_ARCHIVE = IGraviolaSeasonsArchive(seasonsArchiveAddress);
     }
 
-    function getMetadata(
+    function _getMetadata(
         uint256 tokenId
-    ) external view returns (Metadata memory) {
+    ) internal view returns (Metadata memory) {
         return metadataStorage[tokenId];
     }
 

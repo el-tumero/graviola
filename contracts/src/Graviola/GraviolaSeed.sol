@@ -7,8 +7,8 @@ contract GraviolaSeed {
     IGraviolaSeasonsArchive internal archive;
 
     // How many words are drawed for prompt creation
-    uint8 private KEYWORDS_PER_TOKEN = 3;
-    uint256 private OMEGA = 100;
+    uint8 internal KEYWORDS_PER_TOKEN = 3;
+    uint256 internal DEFAULT_OMEGA = 100;
 
     /// @notice Create GraviolaSeed module
     /// @param archiveAddress GraviolaSeasonsArchive address
@@ -29,9 +29,9 @@ contract GraviolaSeed {
     /// @return keywords String of combined and separated result keywords
     /// @return score // Weight sum of rolled groups' keywords. This determines the final token Rarity
     /// @return probability // Probability (in BP) of rolling the EXACT combination of rolled keywords (excluding order)
-    /// @dev Classic implementation (non-TradeUp)
     function rollWords(
-        uint256 seed
+        uint256 seed,
+        uint256 omega
     ) public view returns (string memory, uint256, uint256) {
         uint16 i = 0;
         uint16 j = 0;
@@ -49,7 +49,7 @@ contract GraviolaSeed {
             j++;
             uint256 randNum = uint256(keccak256(abi.encode(seed, i, j)));
             // Default omega is 100, so we're going to get an index in range 0-99 (inclusive)
-            uint256 wordId = randNum % OMEGA;
+            uint256 wordId = randNum % omega;
 
             // Duplicate id, re-roll
             if (
@@ -67,7 +67,10 @@ contract GraviolaSeed {
             // Get word count for the group with given id
             uint256 groupWordCount = archive.getWordsPerRarityGroup(groupId);
 
-            probability *= _fractionToBasisPoints(groupWordCount, OMEGA);
+            probability *= _fractionToBasisPoints(
+                groupWordCount,
+                DEFAULT_OMEGA
+            );
             score += archive.getRarityGroupWeight(groupId);
 
             result = string(

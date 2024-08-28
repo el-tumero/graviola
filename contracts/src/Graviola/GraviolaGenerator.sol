@@ -46,6 +46,7 @@ contract GraviolaGenerator is
 
     error SenderNotInitiator();
     error RequestOAONotFound();
+    error TradeUpIllegal();
 
     enum RequestStatus {
         NON_EXISTENT, // Request hasn't been made
@@ -132,7 +133,7 @@ contract GraviolaGenerator is
         emit RequestVRFFulfilled(request.initiator, _requestId);
     }
 
-    function generate(uint256 requestId) external {
+    function _generate(uint256 requestId, uint256 omega) internal {
         Request storage request = requests[requestId];
         // check if the request has random value attached
         if (request.status != RequestStatus.VRF_RESPONSE) {
@@ -147,7 +148,8 @@ contract GraviolaGenerator is
 
         // perform process of selecting random words
         (string memory result, uint256 score, uint256 probability) = rollWords(
-            request.seed
+            request.seed,
+            omega
         );
 
         uint256 tokenId = collection.mint(request.initiator);
@@ -177,6 +179,27 @@ contract GraviolaGenerator is
         request.status = RequestStatus.OAO_WAIT;
 
         emit RequestOAOSent(request.initiator, requestId);
+    }
+
+    function generate(uint256 requestId) external {
+        _generate(requestId, DEFAULT_OMEGA);
+    }
+
+    function tradeUp(
+        uint256 requestId,
+        uint256[] memory tokensToBurn
+    ) external {
+        uint256 totalScore = 0;
+
+        for (uint256 i = 0; i < tokensToBurn.length; i++) {
+            if (collection.ownerOf(tokensToBurn[i]) != msg.sender) {
+                revert TradeUpIllegal();
+            }
+            totalScore += collection.getMetadata(tokensToBurn[i]).score;
+            collection.burnByOwner(tokensToBurn[i]);
+        }
+
+        _generate(requestId, DEFAULT_OMEGA - totalScore * 3);
     }
 
     function aiOracleCallback(
