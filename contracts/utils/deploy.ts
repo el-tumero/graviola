@@ -3,6 +3,7 @@ import { writeFileSync } from 'fs'
 import hardhat from 'hardhat'
 import sendRpcCall from './rpcCall'
 import deployTestnet from './deploy-testnet'
+import { generateN } from './generate'
 
 const config = {
     // Local dev (hardhat)
@@ -53,6 +54,8 @@ async function main() {
         console.log('Types generated!')
 
         if (variant === 'localhost') {
+            await generateN(addresses, 5)
+            console.log('Generated 5 collection tokens!')
             console.log('Auto-mine turned on!')
             await sendRpcCall('evm_setIntervalMining', [3000])
         }
