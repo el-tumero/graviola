@@ -2,28 +2,26 @@ import Button from "../components/ui/Button"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import Navbar from "../components/nav/Navbar"
-import { useWeb3ModalAccount } from "@web3modal/ethers/react"
 import { useEffect, useState } from "react"
 import { NFT } from "../types/NFT"
-import { ethers } from "ethers"
 import { clsx as cl } from "clsx"
-import { formatBpToPercentage } from "../utils/format"
+
 import BlockNFT from "../components/BlockNFT"
-import { RarityLevel, rarities } from "../data/rarities"
-import { tradeUpTxStatusMessages } from "../utils/statusMessages"
+import { RarityLevel } from "../data/rarities"
+
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
 import { cn } from "../utils/cn"
-import { getRarityBorder } from "../utils/getRarityBorder"
 import useRandomRarityBorder from "../hooks/useBorderAnimation"
 import { Status } from "../types/Status"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 import useWallet from "../hooks/useWallet"
 import { useAppSelector } from "../redux/hooks"
+import { tradeUpTxStatusMessages } from "../utils/statusMessages"
 
 const TradeUp = () => {
-    const { collectionContract } = useWallet()
-    const { isConnected, address } = useWeb3ModalAccount()
+    const { collectionContract, isConnected, address } = useWallet()
+
     const collection = useAppSelector(
         (state) => state.graviolaData.collection,
     ) as NFT[]
@@ -32,9 +30,6 @@ const TradeUp = () => {
         // txStatus,
         txMsg,
         // rolledNFT,
-        requestGen,
-        initCallbacks,
-        disableCallbacks,
     } = useGenerateNFT(tradeUpTxStatusMessages)
 
     const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
@@ -42,12 +37,6 @@ const TradeUp = () => {
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
     const contentReady = status === "ready" && isConnected
-
-    // Handle generate callbacks
-    useEffect(() => {
-        initCallbacks()
-        return () => disableCallbacks()
-    }, [])
 
     // Select an NFT as a trade component
     const handleNFTClick = (idx: number, rarityLevel: RarityLevel) => {
@@ -76,23 +65,31 @@ const TradeUp = () => {
 
     // Fetch contract collections on mount, wallet connect, address change etc
     useEffect(() => {
-        ; (async () => {
-            let userOwnedTokens = 0
+        ;(async () => {
             if (address) {
-
+                console.log("Hello!")
                 // TODO: fix this
-                // userOwnedTokens = await collectionContract.tokenOfOwnerByIndex(
-                //     ethers.getAddress(address),
-                //     0,
-                // )
-                // console.log(userOwnedTokens)
-            }
-            if (userOwnedTokens > 0) {
-                setOwnedTokensIds((prev) => [...prev, ...Array(userOwnedTokens)])
+                const userOwnedTokensBalance =
+                    await collectionContract.balanceOf(address)
+
+                const userOwnedTokens = []
+
+                for (let i = 0; i < userOwnedTokensBalance; i++) {
+                    userOwnedTokens.push(
+                        Number(
+                            await collectionContract.tokenOfOwnerByIndex(
+                                address,
+                                i,
+                            ),
+                        ),
+                    )
+                }
+
+                setOwnedTokensIds(userOwnedTokens)
             }
             setStatus("ready")
         })()
-    }, [isConnected, address])
+    }, [address])
 
     return (
         <FullscreenContainer>
@@ -146,13 +143,15 @@ const TradeUp = () => {
                                 {selectedIds.length === 0 ? (
                                     <p>Select the NFTs you want to trade</p>
                                 ) : (
-                                    <TradeUpGenerateContainer active={selectedIds.length === 3}>
+                                    <TradeUpGenerateContainer
+                                        active={selectedIds.length === 3}
+                                    >
                                         {selectedIds.map((id, i) => {
-                                            const randBase = Math.random()
-                                            const randRotate =
-                                                Math.floor(randBase * 30) + 1 // 15-60deg rotate
-                                            const randSign =
-                                                randBase < 0.5 ? -1 : 1
+                                            // const randBase = Math.random()
+                                            // const randRotate =
+                                            //     Math.floor(randBase * 30) + 1 // 15-60deg rotate
+                                            // const randSign =
+                                            //     randBase < 0.5 ? -1 : 1
                                             return (
                                                 <div
                                                     key={i}
@@ -208,7 +207,9 @@ const TradeUp = () => {
                             <Button
                                 text="Trade"
                                 disabled={false}
-                                onClick={() => requestGen(selectedIds)}
+                                onClick={() => {
+                                    console.log("Request GEN")
+                                }}
                                 additionalClasses={
                                     selectedIds.length === 3
                                         ? "border border-light-text/25 dark:border-dark-text/25"
@@ -225,99 +226,75 @@ const TradeUp = () => {
 
 // Owned NFTs (left panel)
 const OwnedNFTsPanel = (props: {
-    collection: NFT[],
-    selectedGroup: RarityLevel | null,
-    ownedTokenIds: number[],
-    onNFTClick: (idx: number, rarityLevel: RarityLevel) => void,
+    collection: NFT[]
+    selectedGroup: RarityLevel | null
+    ownedTokenIds: number[]
+    onNFTClick: (idx: number, rarityLevel: RarityLevel) => void
     selectedIds: number[]
 }) => {
     return (
-        <div
-        className={cl(
-            "flex-grow w-full h-0 overflow-auto",
-            "rounded-xl",
-        )}
-    >
-        <div
-            className={cl(
-                "grid gap-3 auto-rows-min",
-                "max-sm:grid-cols-3",
-                "max-md:grid-cols-4 md:grid-cols-5",
-            )}
-        >
-            {" "}
-            {props.collection.map((nft: NFT, i) => {
-                const keywordsArray: string[] =
-                    nft.description
+        <div className={cl("flex-grow w-full h-0 overflow-auto", "rounded-xl")}>
+            <div
+                className={cl(
+                    "grid gap-3 auto-rows-min",
+                    "max-sm:grid-cols-3",
+                    "max-md:grid-cols-4 md:grid-cols-5",
+                )}
+            >
+                {" "}
+                {props.collection.map((nft: NFT, i) => {
+                    const keywordsArray: string[] = nft.description
                         .split(":")
                         .pop()!
                         .trim()
                         .split(",")
-                const keywords: string[] =
-                    keywordsArray.map((keyword) =>
+                    const keywords: string[] = keywordsArray.map((keyword) =>
                         keyword.trim(),
                     )
-                if (
-                    props.selectedGroup !== null &&
-                    props.selectedGroup !== nft.rarityGroup
-                ) {
-                    return null
-                } else if (
-                    !props.ownedTokenIds.includes(i)
-                ) {
-                    return null
-                } else {
-                    return (
-                        <div
-                            key={i}
-                            onClick={() =>
-                                props.onNFTClick(
-                                    i,
-                                    nft.rarityGroup,
-                                )
-                            }
-                            className={cn(
-                                // Fancy NFT hover selection animations & borders
-                                "flex flex-col justify-center items-center rounded-xl",
-                                "gap-2 cursor-pointer hover:cursor-pointer",
-                                "border border-light-border dark:border-dark-border rounded-xl",
-                                "hover:border-light-text/40 dark:hover:border-dark-text/40",
-                                "hover:scale-95 transition-transform duration-300",
-                                props.selectedIds.includes(
-                                    i,
-                                )
-                                    ? "opacity-50 scale-95"
-                                    : "opacity-100",
-                            )}
-                        >
+                    if (
+                        props.selectedGroup !== null &&
+                        props.selectedGroup !== nft.rarityGroup
+                    ) {
+                        return null
+                    } else if (!props.ownedTokenIds.includes(i)) {
+                        return null
+                    } else {
+                        return (
                             <div
-                                className={cl(
-                                    "m-4",
+                                key={i}
+                                onClick={() =>
+                                    props.onNFTClick(i, nft.rarityGroup)
+                                }
+                                className={cn(
+                                    // Fancy NFT hover selection animations & borders
+                                    "flex flex-col justify-center items-center rounded-xl",
+                                    "gap-2 cursor-pointer hover:cursor-pointer",
+                                    "border border-light-border dark:border-dark-border rounded-xl",
+                                    "hover:border-light-text/40 dark:hover:border-dark-text/40",
+                                    "hover:scale-95 transition-transform duration-300",
+                                    props.selectedIds.includes(i)
+                                        ? "opacity-50 scale-95"
+                                        : "opacity-100",
                                 )}
                             >
-                                <BlockNFT
-                                    nftData={nft}
-                                    glowColor={
-                                        "auto"
-                                    }
-                                    disableMetadataOnHover
-                                    additionalClasses={`w-fit h-fit max-w-[12em]`}
-                                />
+                                <div className={cl("m-4")}>
+                                    <BlockNFT
+                                        nftData={nft}
+                                        glowColor={"auto"}
+                                        disableMetadataOnHover
+                                        additionalClasses={`w-fit h-fit max-w-[12em]`}
+                                    />
+                                </div>
+                                <div className="flex flex-col gap-2 justify-center items-center">
+                                    {/* Keywords */}
+                                    <KeywordBlocks keywords={keywords} />
+                                </div>
                             </div>
-                            <div className="flex flex-col gap-2 justify-center items-center">
-                                {/* Keywords */}
-                                <KeywordBlocks
-                                    keywords={
-                                        keywords
-                                    }
-                                />
-                            </div>
-                        </div>
-                    )
-                }
-            })}
+                        )
+                    }
+                })}
+            </div>
         </div>
-    </div>
     )
 }
 
