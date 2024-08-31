@@ -41,9 +41,9 @@ const Drops = () => {
         setFetchingCollection(true)
         let userOwnedTokens: number = 0
         if (address) {
-            userOwnedTokens = Number(await collectionContract.balanceOf(
-                ethers.getAddress(address),
-            ))
+            userOwnedTokens = Number(
+                await collectionContract.balanceOf(ethers.getAddress(address)),
+            )
         }
         if (userOwnedTokens > 0)
             setOwnedTokensIds([...Array(userOwnedTokens).keys()])
@@ -247,7 +247,9 @@ const CollectionList = (props: {
                                         <span
                                             className={"font-normal"}
                                             style={{
-                                                color: rarityColors[nft.rarityGroup],
+                                                color: rarityColors[
+                                                    nft.rarityGroup
+                                                ],
                                             }}
                                         >
                                             {nft.rarityGroup}

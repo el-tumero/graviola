@@ -10,7 +10,7 @@ export const fallbackNFT: NFT = {
     attributes: [
         {
             trait_type: "Score",
-            value: 36
+            value: 36,
         },
         {
             trait_type: "Probability",
@@ -28,7 +28,7 @@ export const fallbackNFTsRarityList: NFT[] = [
         attributes: [
             {
                 trait_type: "Score",
-                value: 3
+                value: 3,
             },
             {
                 trait_type: "Probability",
@@ -44,7 +44,7 @@ export const fallbackNFTsRarityList: NFT[] = [
         attributes: [
             {
                 trait_type: "Score",
-                value: 7
+                value: 7,
             },
             {
                 trait_type: "Probability",
@@ -60,7 +60,7 @@ export const fallbackNFTsRarityList: NFT[] = [
         attributes: [
             {
                 trait_type: "Score",
-                value: 18
+                value: 18,
             },
             {
                 trait_type: "Probability",
@@ -76,7 +76,7 @@ export const fallbackNFTsRarityList: NFT[] = [
         attributes: [
             {
                 trait_type: "Score",
-                value: 25
+                value: 25,
             },
             {
                 trait_type: "Probability",
@@ -92,7 +92,7 @@ export const fallbackNFTsRarityList: NFT[] = [
         attributes: [
             {
                 trait_type: "Score",
-                value: 36
+                value: 36,
             },
             {
                 trait_type: "Probability",

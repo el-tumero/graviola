@@ -19,6 +19,7 @@ import { rarities, rarityColors, RarityLevel } from "../data/rarities"
 import Popup from "../components/Popup"
 import camelToPascal from "../utils/camelToPascal"
 import useArchive from "../hooks/useArchive"
+import FeatureCard from "../components/ui/FeatureCard"
 
 const Home = () => {
     const navigate = useNavigate()
@@ -31,7 +32,7 @@ const Home = () => {
 
             <ContentContainer additionalClasses="flex-col">
                 <div className="flex flex-col p-4 gap-3">
-                    <Popup
+                    {/* <Popup
                         additionalClasses="w-full max-w-full relative top-0 right-0 z-2"
                         onClickClose={() => {}}
                         disableCloseButton
@@ -39,69 +40,101 @@ const Home = () => {
                         message={`
                         Graviola is growing rapidly; we're introducing big changes lately.
                         If you encounter bugs or unexpected errors, please open an Issue on Github.`}
-                    />
+                    /> */}
+
+                    <SectionContainer additionalClasses="border-none justify-center text-center">
+                        <h1 className="text-accent font-title font-semibold text-3xl">
+                            Graviola is an autonomous NFT collection powered by
+                            opML.
+                            <br />
+                            Second header some text.
+                        </h1>
+                    </SectionContainer>
 
                     <SectionContainer>
                         <div
                             className={cl(
-                                "flex flex-col gap-1 justify-start items-center",
-                                "h-full",
-                                "max-sm:w-full max-lg:w-1/3 lg:w-1/2",
+                                "flex flex-col justify-between items-center w-full",
+                                "md:flex-row md:items-start",
                             )}
                         >
-                            <h1 className="text-accent font-title font-semibold text-2xl">
-                                Unique, dynamically generated character portrait
-                                NFTs
-                            </h1>
-                            <h2 className="text-light-text dark:text-dark-text text-lg">
-                                Own a piece of our limited-time, algorithmically
-                                generated character NFTs! Each one is a fun,
-                                unique creation blending art and tech. It&apos;s
-                                like collecting digital trading cards with a
-                                twist. Dive in, grab a quirky NFT, and join our
-                                chill community of enthusiasts
-                            </h2>
-                        </div>
-
-                        <div
-                            className={cl(
-                                "flex max-sm:justify-center justify-end items-center w-1/2 max-sm:w-full sm:w-1/3",
-                            )}
-                        >
-                            <AutoBlockNFT />
+                            <div className={cl("flex mb-4 md:w-3/5 md:mb-0")}>
+                                <h2 className="text-light-text dark:text-dark-text text-xl">
+                                    Lorem ipsum dolor sit amet consectetur,
+                                    adipisicing elit. Quisquam eaque adipisci
+                                    facilis fugiat ad consectetur laboriosam!
+                                    Omnis, enim est! Id autem unde voluptate
+                                    atque necessitatibus obcaecati. Perspiciatis
+                                    illo repudiandae accusamus. Lorem ipsum
+                                    dolor sit amet consectetur adipisicing elit.
+                                    At mollitia magnam dicta rerum perspiciatis
+                                    nihil. Pariatur, odio magni esse beatae
+                                    accusantium architecto tenetur corrupti in
+                                    fugit obcaecati! Reprehenderit, voluptates
+                                    animi.
+                                </h2>
+                            </div>
+                            <div
+                                className={cl(
+                                    "flex max-sm:justify-center justify-end items-center",
+                                )}
+                            >
+                                <AutoBlockNFT />
+                            </div>
                         </div>
                     </SectionContainer>
 
-                    {/* Header buttons - get yours now, browse collection */}
-                    <div>
-                        <div
-                            className={cl([
-                                "flex justify-end items-center gap-4 w-full",
-                                "max-sm:flex-col mt-4 mb-8",
-                            ])}
-                        >
-                            <Button
-                                text="Get yours now!"
-                                onClick={() => navigate(routerPaths.generate)}
-                                additionalClasses={`
+                    <SectionContainer additionalClasses="border-none justify-center text-center mb-64">
+                        <Button
+                            text="Browse Drops"
+                            onClick={() => navigate(routerPaths.drops)}
+                            additionalClasses={`hover:translate-x-2 hover:cursor-pointer`}
+                            arrowIcon={true}
+                        />
+                        <Button
+                            text="Get yours now!"
+                            onClick={() => navigate(routerPaths.generate)}
+                            additionalClasses={`
                                     hover:translate-x-2 hover:cursor-pointer
                                     border border-accent bg-gradient-to-tr from-accent/25 to-accent/40
                                     hover:border-accent dark:hover:border-accent
                                 `}
-                                arrowIcon={true}
+                            arrowIcon={true}
+                        />
+                    </SectionContainer>
+
+                    {/* Features */}
+                    <SectionContainer>
+                        <div
+                            className={cl(
+                                "flex flex-col gap-6 w-full h-fit justify-between items-center",
+                                "md:flex-row",
+                            )}
+                        >
+                            <FeatureCard
+                                icon="verified"
+                                title="Verifiable Process"
+                                content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi distinctio vel labore dolorem molestias iure natus veritatis consequuntur laudantium voluptas. Perferendis beatae explicabo quas! Magni cumque consectetur autem quidem hic!"
+                                accentColor="#2f4d5c"
                             />
-                            <Button
-                                text="Browse Drops"
-                                onClick={() => navigate(routerPaths.drops)}
-                                additionalClasses={`
-                                    hover:translate-x-2 hover:cursor-pointer
-                                `}
-                                arrowIcon={true}
+
+                            <FeatureCard
+                                icon="valueGrowth"
+                                title="Limited Keywords"
+                                content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi distinctio vel labore dolorem molestias iure natus veritatis consequuntur laudantium voluptas. Perferendis beatae explicabo quas! Magni cumque consectetur autem quidem hic!"
+                                accentColor="#4b2752"
+                            />
+
+                            <FeatureCard
+                                icon="openSeaLogo"
+                                title="Rich Metadata"
+                                content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi distinctio vel labore dolorem molestias iure natus veritatis consequuntur laudantium voluptas. Perferendis beatae explicabo quas! Magni cumque consectetur autem quidem hic!"
+                                accentColor="#306148"
                             />
                         </div>
-                    </div>
+                    </SectionContainer>
 
-                    <SectionContainer>
+                    <SectionContainer additionalClasses="mt-12">
                         <div
                             className={cl(
                                 "flex flex-col gap-3 justify-start items-start",
@@ -174,7 +207,9 @@ const Home = () => {
                                     >
                                         <div>
                                             <BlockNFT
-                                                nftData={fallbackNFTsRarityList[i]}
+                                                nftData={
+                                                    fallbackNFTsRarityList[i]
+                                                }
                                                 glowColor={rarity}
                                                 additionalClasses="xl:w-[8em] xl:h-[8em] sm:w-[10em] sm:h-[10em]"
                                             />
@@ -188,9 +223,7 @@ const Home = () => {
                                             >
                                                 {camelToPascal(rarity)}
                                             </p>
-                                            <span>
-                                                {groupSizes[i]}%
-                                            </span>
+                                            <span>{groupSizes[i]}%</span>
                                         </div>
                                     </div>
                                 )

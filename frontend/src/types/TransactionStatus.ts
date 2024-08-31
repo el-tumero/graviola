@@ -2,7 +2,7 @@ export type TransactionStatus =
     | "NONE"
     // Prepare transactions
     | "PREP_AWAIT_CONFIRM"
-    | "PREP_REJECTED"      
+    | "PREP_REJECTED"
     | "PREP_WAIT" // waiting for VRF to be fulfilled
     | "PREP_READY"
     // Generate transactions

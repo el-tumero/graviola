@@ -60,7 +60,7 @@ const AutoBlockNFT = () => {
                     "flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1",
                 )}
             >
-                {targetNFTList.map((_:NFT,idx) => {
+                {targetNFTList.map((_: NFT, idx) => {
                     return (
                         <div
                             key={idx}
@@ -85,7 +85,7 @@ const AutoBlockNFT = () => {
                     <div
                         key={idx}
                         className={cl(
-                            "absolute top-0 left-0 w-full h-full transition-opacity duration-600 p-4",
+                            "absolute top-0 left-0 w-full h-full transition-opacity duration-600",
                             idx === activeNFT ? "opacity-100" : "opacity-0",
                         )}
                     >

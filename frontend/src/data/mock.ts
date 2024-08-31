@@ -9,12 +9,14 @@ export const mockMetaBannerData: MetadataMockProperty[] = [
     {
         name: "Score",
         val: "7",
-        comment: "Score is the sum of rolled keywords' weights. It determines what Rarity the token is.",
+        comment:
+            "Score is the sum of rolled keywords' weights. It determines what Rarity the token is.",
     },
     {
         name: "Probability",
         val: "681472",
-        comment: "The chance of getting these 3 keywords in any order (68.1472%).",
+        comment:
+            "The chance of getting these 3 keywords in any order (68.1472%).",
     },
     {
         name: "Season",

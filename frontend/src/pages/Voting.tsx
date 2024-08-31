@@ -39,7 +39,6 @@ const PopupContainer = (props: { children: ReactNode }) => {
 }
 
 const Voting = () => {
-
     const [activePage, setActivePage] = useState<ActivePage>("Voting")
     // Info tooltip - "What is this?"
     const [infoVisible, setInfoVisible] = useState<boolean>(false)
@@ -53,65 +52,93 @@ const Voting = () => {
     // Submitting new candidate through the form
     const handleSubmitKeyword = async (keyword: string) => {
         const encodedCandidateId = encodeKeyword(keyword)
-        console.log('encoded ', encodedCandidateId)
-        const res = await seasonsGovernorContract.addCandidate(encodedCandidateId)
+        console.log("encoded ", encodedCandidateId)
+        const res =
+            await seasonsGovernorContract.addCandidate(encodedCandidateId)
         const recp = await res.wait()
         console.log(res)
         console.log(recp)
         console.log(recp?.logs)
     }
 
-    const handleCandidateUpvoted = async (word: bigint) => { 
-
-    }
-    const handleCandidateDownvoted = async (word: bigint) => {
-
-    }
-    const handleCandidateCancelVote = async (word: bigint) => {
-
-    }
-    const handleCandidatePromoted = async (word: bigint) => { 
-
-    }
+    const handleCandidateUpvoted = async (word: bigint) => {}
+    const handleCandidateDownvoted = async (word: bigint) => {}
+    const handleCandidateCancelVote = async (word: bigint) => {}
+    const handleCandidatePromoted = async (word: bigint) => {}
 
     const handleCandidateAdded = async (word: bigint) => {
-        console.log('awdawd ' ,word)
+        console.log("awdawd ", word)
     }
 
     useEffect(() => {
-        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateAdded, handleCandidateAdded)
-        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateUpvoted, handleCandidateUpvoted)
-        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateDownvoted, handleCandidateDownvoted)
-        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateCancelVote, handleCandidateCancelVote)
-        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidatePromoted, handleCandidatePromoted)
+        seasonsGovernorContract.on(
+            seasonsGovernorContract.filters.CandidateAdded,
+            handleCandidateAdded,
+        )
+        seasonsGovernorContract.on(
+            seasonsGovernorContract.filters.CandidateUpvoted,
+            handleCandidateUpvoted,
+        )
+        seasonsGovernorContract.on(
+            seasonsGovernorContract.filters.CandidateDownvoted,
+            handleCandidateDownvoted,
+        )
+        seasonsGovernorContract.on(
+            seasonsGovernorContract.filters.CandidateCancelVote,
+            handleCandidateCancelVote,
+        )
+        seasonsGovernorContract.on(
+            seasonsGovernorContract.filters.CandidatePromoted,
+            handleCandidatePromoted,
+        )
 
         return () => {
-            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateAdded, handleCandidateAdded)
-            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateUpvoted, handleCandidateUpvoted)
-            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateDownvoted, handleCandidateDownvoted)
-            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateCancelVote, handleCandidateCancelVote)
-            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidatePromoted, handleCandidatePromoted)
+            seasonsGovernorContract.off(
+                seasonsGovernorContract.filters.CandidateAdded,
+                handleCandidateAdded,
+            )
+            seasonsGovernorContract.off(
+                seasonsGovernorContract.filters.CandidateUpvoted,
+                handleCandidateUpvoted,
+            )
+            seasonsGovernorContract.off(
+                seasonsGovernorContract.filters.CandidateDownvoted,
+                handleCandidateDownvoted,
+            )
+            seasonsGovernorContract.off(
+                seasonsGovernorContract.filters.CandidateCancelVote,
+                handleCandidateCancelVote,
+            )
+            seasonsGovernorContract.off(
+                seasonsGovernorContract.filters.CandidatePromoted,
+                handleCandidatePromoted,
+            )
         }
     }, [])
 
     useEffect(() => {
         if (candidatesReady) return
-
-        (async () => {
-            const candList = await seasonsGovernorContract.getTopCandidatesInfo(100n)
-            setCandidates(candList.map((cand, idx) => {
-                const c: CandidateInfo = {
-                    id: idx,
-                    keyword: cand[1],
-                    score: Number(cand[2].toString().substring(0, cand[2].toString().length - 19)),
-                    author: cand[3],
-                    iteration: 1
-                }
-                return c
-            }))
+        ;(async () => {
+            const candList =
+                await seasonsGovernorContract.getTopCandidatesInfo(100n)
+            setCandidates(
+                candList.map((cand, idx) => {
+                    const c: CandidateInfo = {
+                        id: idx,
+                        keyword: cand[1],
+                        score: Number(
+                            cand[2]
+                                .toString()
+                                .substring(0, cand[2].toString().length - 19),
+                        ),
+                        author: cand[3],
+                        iteration: 1,
+                    }
+                    return c
+                }),
+            )
             setCandidatesReady(true)
         })()
-
     }, [candidates, candidatesReady])
 
     return (
@@ -196,13 +223,13 @@ const Voting = () => {
                             "p-2 rounded-l-lg",
                             activePage === "Voting"
                                 ? [
-                                    "border border-light-text/25 dark:border-dark-text/25",
-                                    "bg-light-border/30 dark:bg-dark-border/30",
-                                ]
+                                      "border border-light-text/25 dark:border-dark-text/25",
+                                      "bg-light-border/30 dark:bg-dark-border/30",
+                                  ]
                                 : [
-                                    "cursor-pointer",
-                                    "border-light-border dark:border-dark-border",
-                                ],
+                                      "cursor-pointer",
+                                      "border-light-border dark:border-dark-border",
+                                  ],
                         )}
                     >
                         <p className="select-none">Voting</p>
@@ -215,13 +242,13 @@ const Voting = () => {
                             "p-2 rounded-r-lg",
                             activePage === "Archive"
                                 ? [
-                                    "border border-light-text/25 dark:border-dark-text/25",
-                                    "bg-light-border/30 dark:bg-dark-border/30",
-                                ]
+                                      "border border-light-text/25 dark:border-dark-text/25",
+                                      "bg-light-border/30 dark:bg-dark-border/30",
+                                  ]
                                 : [
-                                    "cursor-pointer",
-                                    "border-light-border dark:border-dark-border",
-                                ],
+                                      "cursor-pointer",
+                                      "border-light-border dark:border-dark-border",
+                                  ],
                         )}
                     >
                         <p className="select-none">Archive</p>
@@ -335,7 +362,7 @@ const KeywordVotingPage = (props: {
                     "border border-light-border dark:border-dark-border rounded-lg p-1",
                 )}
             >
-                {props.candidates.length > 0 &&
+                {props.candidates.length > 0 && (
                     <ul
                         role="list"
                         className="w-full divide-y divide-light-border dark:divide-dark-border"
@@ -346,11 +373,10 @@ const KeywordVotingPage = (props: {
                                 <KeywordCandidate data={candData} key={idx} />
                             ))}
                     </ul>
-                }
+                )}
             </div>
         </div>
     )
 }
-
 
 export default Voting
