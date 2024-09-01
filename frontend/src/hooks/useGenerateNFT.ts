@@ -1,7 +1,4 @@
-import {
-    tradeUpTxStatusMessages,
-    TxStatusMessagesMap,
-} from "../utils/statusMessages"
+import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
@@ -9,6 +6,8 @@ import useWallet from "./useWallet"
 import { AddressLike, isError } from "ethers"
 import useTransactionStatus from "./useTransactionStatus"
 import useLocalStorage from "./useLocalStorage"
+import { decodeTokenURI } from "../utils/decodeTokenURI"
+import { gerRarityFromScoreDefault } from "../utils/getRarityFromScore"
 
 type TradeUpArgs = bigint[]
 
@@ -204,11 +203,17 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         console.log(`[useGenerate] onImageAdded: tokenId ${Number(tokenId)}`)
 
         const uri = await collectionContract.tokenURI(tokenId)
-        const metadata = await (await fetch(uri)).json()
+        const decoded = decodeTokenURI(uri)
+        const [probability, score, seasonId] = decoded.attributes.map(
+            (attribute) => attribute.value,
+        )
 
         const nftBase: NFT = {
-            id: tokenId,
-            ...metadata,
+            id: Number(tokenId),
+            rarityGroup: gerRarityFromScoreDefault(score),
+            seasonId: seasonId,
+            probability: probability,
+            ...decoded,
         }
 
         setRolledNFT(nftBase)

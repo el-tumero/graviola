@@ -17,7 +17,10 @@ import { Status } from "../types/Status"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 import useWallet from "../hooks/useWallet"
 import { useAppDispatch, useAppSelector } from "../redux/hooks"
-import { tradeUpTxStatusMessages } from "../utils/statusMessages"
+import {
+    tradeUpTxStatusMessages,
+    TransactionStatusEnum,
+} from "../utils/statusMessages"
 import { fetchUserCollection } from "../web3"
 import { setUserCollection } from "../redux/reducers/graviola"
 
@@ -26,11 +29,9 @@ const TradeUp = () => {
 
     const dispatch = useAppDispatch()
 
-    const {
-        requestGen,
-        txMsg,
-        // rolledNFT,
-    } = useGenerateNFT(tradeUpTxStatusMessages)
+    const { txStatus, requestGen, txMsg, rolledNFT } = useGenerateNFT(
+        tradeUpTxStatusMessages,
+    )
 
     // const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [status, setStatus] = useState<Status>("loading")
@@ -135,50 +136,64 @@ const TradeUp = () => {
                                     <p>Select the NFTs you want to trade</p>
                                 ) : (
                                     <TradeUpGenerateContainer
-                                        active={selectedIds.length === 3}
+                                        active={
+                                            selectedIds.length === 3 &&
+                                            !rolledNFT
+                                        }
                                     >
-                                        {selectedIds.map((id, i) => {
-                                            // console.log("123", id)
-                                            // const randBase = Math.random()
-                                            // const randRotate =
-                                            //     Math.floor(randBase * 30) + 1 // 15-60deg rotate
-                                            // const randSign =
-                                            //     randBase < 0.5 ? -1 : 1
-                                            return (
-                                                <div
-                                                    key={i}
-                                                    className={cl(
-                                                        "flex justify-center items-center",
-                                                        "w-16 h-16 rounded-xl",
-                                                        "bg-light-bgPrimary dark:bg-dark-bgPrimary",
-                                                        "border border-light-border dark:border-dark-border",
-                                                        "hover:cursor-pointer",
-                                                    )}
-                                                    // style={{
-                                                    //     ...getRarityBorder(
-                                                    //         rGroupData,
-                                                    //         true,
-                                                    //     ).style,
-                                                    //     zIndex: `${selectedIds.length}`,
-                                                    //     rotate: `${randSign * randRotate}deg`,
-                                                    // }}
-                                                    onClick={() =>
-                                                        handleSelectedNFTClick(
-                                                            id,
-                                                        )
-                                                    }
-                                                >
-                                                    <BlockNFT
-                                                        nftData={
-                                                            userCollection![i]
+                                        {rolledNFT ? (
+                                            <BlockNFT
+                                                nftData={rolledNFT}
+                                                glowColor={
+                                                    rolledNFT.rarityGroup
+                                                }
+                                                disableMetadataOnHover
+                                            />
+                                        ) : (
+                                            selectedIds.map((id, i) => {
+                                                // const randBase = Math.random()
+                                                // const randRotate =
+                                                //     Math.floor(randBase * 30) + 1 // 15-60deg rotate
+                                                // const randSign =
+                                                //     randBase < 0.5 ? -1 : 1
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        className={cl(
+                                                            "flex justify-center items-center",
+                                                            "w-16 h-16 rounded-xl",
+                                                            "bg-light-bgPrimary dark:bg-dark-bgPrimary",
+                                                            "border border-light-border dark:border-dark-border",
+                                                            "hover:cursor-pointer",
+                                                        )}
+                                                        // style={{
+                                                        //     ...getRarityBorder(
+                                                        //         rGroupData,
+                                                        //         true,
+                                                        //     ).style,
+                                                        //     zIndex: `${selectedIds.length}`,
+                                                        //     rotate: `${randSign * randRotate}deg`,
+                                                        // }}
+                                                        onClick={() =>
+                                                            handleSelectedNFTClick(
+                                                                id,
+                                                            )
                                                         }
-                                                        glowColor="none"
-                                                        additionalClasses="w-12 h-12"
-                                                        disableMetadataOnHover
-                                                    />
-                                                </div>
-                                            )
-                                        })}
+                                                    >
+                                                        <BlockNFT
+                                                            nftData={
+                                                                userCollection![
+                                                                    i
+                                                                ]
+                                                            }
+                                                            glowColor="none"
+                                                            additionalClasses="w-12 h-12"
+                                                            disableMetadataOnHover
+                                                        />
+                                                    </div>
+                                                )
+                                            })
+                                        )}
                                     </TradeUpGenerateContainer>
                                 )}
                             </div>
@@ -199,8 +214,18 @@ const TradeUp = () => {
                             </div>
 
                             <Button
-                                text="Trade"
-                                disabled={false}
+                                text={
+                                    TransactionStatusEnum[txStatus] < 4
+                                        ? "Prepare!"
+                                        : "Trade!"
+                                }
+                                disabled={
+                                    selectedIds.length != 3 ||
+                                    !(
+                                        txStatus == "NONE" ||
+                                        txStatus == "PREP_READY"
+                                    )
+                                }
                                 onClick={() => {
                                     requestGen(
                                         selectedIds.map((id) => BigInt(id)),
@@ -298,17 +323,19 @@ const TradeUpGenerateContainer = (props: {
 }) => {
     const rarityAnimBorder = useRandomRarityBorder(true, 750)
     return (
-        <div
-            className={cl(
-                "flex w-full h-full justify-center items-center",
-                "p-3 rounded-xl",
-                "bg-light-bgLight/25 dark:bg-dark-bgLight/25",
-                "border border-light-border dark:border-dark-border border-dashed",
-            )}
-            style={props.active ? rarityAnimBorder : {}}
-        >
-            {props.children}
-        </div>
+        <>
+            <div
+                className={cl(
+                    "flex w-full h-full justify-center items-center",
+                    "p-3 rounded-xl",
+                    "bg-light-bgLight/25 dark:bg-dark-bgLight/25",
+                    "border border-light-border dark:border-dark-border border-dashed",
+                )}
+                style={props.active ? rarityAnimBorder : {}}
+            >
+                {props.children}
+            </div>
+        </>
     )
 }
 
