@@ -16,27 +16,30 @@ import useRandomRarityBorder from "../hooks/useBorderAnimation"
 import { Status } from "../types/Status"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 import useWallet from "../hooks/useWallet"
-import { useAppSelector } from "../redux/hooks"
+import { useAppDispatch, useAppSelector } from "../redux/hooks"
 import { tradeUpTxStatusMessages } from "../utils/statusMessages"
+import { fetchUserCollection } from "../web3"
+import { setUserCollection } from "../redux/reducers/graviola"
 
 const TradeUp = () => {
-    const { collectionContract, isConnected, address } = useWallet()
+    const { isConnected, address } = useWallet()
 
-    const collection = useAppSelector(
-        (state) => state.graviolaData.collection,
-    ) as NFT[]
+    const dispatch = useAppDispatch()
 
     const {
-        // txStatus,
+        requestGen,
         txMsg,
         // rolledNFT,
     } = useGenerateNFT(tradeUpTxStatusMessages)
 
-    const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
+    // const [ownedTokenIds, setOwnedTokensIds] = useState<Array<number>>([])
     const [status, setStatus] = useState<Status>("loading")
     const [selectedIds, setSelectedIds] = useState<Array<number>>([])
     const [selectedGroup, setSelectedGroup] = useState<RarityLevel | null>(null)
     const contentReady = status === "ready" && isConnected
+    const userCollection = useAppSelector(
+        (state) => state.graviolaData.userCollection,
+    )
 
     // Select an NFT as a trade component
     const handleNFTClick = (idx: number, rarityLevel: RarityLevel) => {
@@ -63,31 +66,16 @@ const TradeUp = () => {
         }
     }
 
-    // Fetch contract collections on mount, wallet connect, address change etc
+    // Fetch user collection on wallet connect, address change etc
     useEffect(() => {
         ;(async () => {
             if (address) {
-                console.log("Hello!")
-                // TODO: fix this
-                const userOwnedTokensBalance =
-                    await collectionContract.balanceOf(address)
-
-                const userOwnedTokens = []
-
-                for (let i = 0; i < userOwnedTokensBalance; i++) {
-                    userOwnedTokens.push(
-                        Number(
-                            await collectionContract.tokenOfOwnerByIndex(
-                                address,
-                                i,
-                            ),
-                        ),
-                    )
+                if (userCollection === undefined) {
+                    const owned = await fetchUserCollection(address)
+                    dispatch(setUserCollection(owned))
                 }
-
-                setOwnedTokensIds(userOwnedTokens)
+                setStatus("ready")
             }
-            setStatus("ready")
         })()
     }, [address])
 
@@ -99,7 +87,7 @@ const TradeUp = () => {
 
                 {!contentReady ? (
                     <SectionContainer additionalClasses="self-center w-fit justify-center">
-                        {status === "loading" ? (
+                        {address ? (
                             <p>Loading...</p>
                         ) : (
                             <p>You need to connect your wallet first!</p>
@@ -124,9 +112,12 @@ const TradeUp = () => {
                                 )}
                             >
                                 <OwnedNFTsPanel
-                                    collection={collection}
+                                    collection={
+                                        userCollection === undefined
+                                            ? []
+                                            : userCollection
+                                    }
                                     selectedGroup={selectedGroup}
-                                    ownedTokenIds={ownedTokenIds}
                                     onNFTClick={handleNFTClick}
                                     selectedIds={selectedIds}
                                 />
@@ -147,6 +138,7 @@ const TradeUp = () => {
                                         active={selectedIds.length === 3}
                                     >
                                         {selectedIds.map((id, i) => {
+                                            // console.log("123", id)
                                             // const randBase = Math.random()
                                             // const randRotate =
                                             //     Math.floor(randBase * 30) + 1 // 15-60deg rotate
@@ -177,7 +169,9 @@ const TradeUp = () => {
                                                     }
                                                 >
                                                     <BlockNFT
-                                                        nftData={collection[id]}
+                                                        nftData={
+                                                            userCollection![i]
+                                                        }
                                                         glowColor="none"
                                                         additionalClasses="w-12 h-12"
                                                         disableMetadataOnHover
@@ -208,7 +202,9 @@ const TradeUp = () => {
                                 text="Trade"
                                 disabled={false}
                                 onClick={() => {
-                                    console.log("Request GEN")
+                                    requestGen(
+                                        selectedIds.map((id) => BigInt(id)),
+                                    )
                                 }}
                                 additionalClasses={
                                     selectedIds.length === 3
@@ -228,7 +224,6 @@ const TradeUp = () => {
 const OwnedNFTsPanel = (props: {
     collection: NFT[]
     selectedGroup: RarityLevel | null
-    ownedTokenIds: number[]
     onNFTClick: (idx: number, rarityLevel: RarityLevel) => void
     selectedIds: number[]
 }) => {
@@ -242,7 +237,7 @@ const OwnedNFTsPanel = (props: {
                 )}
             >
                 {" "}
-                {props.collection.map((nft: NFT, i) => {
+                {props.collection.map((nft: NFT) => {
                     const keywordsArray: string[] = nft.description
                         .split(":")
                         .pop()!
@@ -256,14 +251,12 @@ const OwnedNFTsPanel = (props: {
                         props.selectedGroup !== nft.rarityGroup
                     ) {
                         return null
-                    } else if (!props.ownedTokenIds.includes(i)) {
-                        return null
                     } else {
                         return (
                             <div
-                                key={i}
+                                key={nft.id}
                                 onClick={() =>
-                                    props.onNFTClick(i, nft.rarityGroup)
+                                    props.onNFTClick(nft.id, nft.rarityGroup)
                                 }
                                 className={cn(
                                     // Fancy NFT hover selection animations & borders
@@ -272,7 +265,7 @@ const OwnedNFTsPanel = (props: {
                                     "border border-light-border dark:border-dark-border rounded-xl",
                                     "hover:border-light-text/40 dark:hover:border-dark-text/40",
                                     "hover:scale-95 transition-transform duration-300",
-                                    props.selectedIds.includes(i)
+                                    props.selectedIds.includes(nft.id)
                                         ? "opacity-50 scale-95"
                                         : "opacity-100",
                                 )}

@@ -21,6 +21,11 @@ interface IGraviolaCollection is IERC721 {
         uint256 tokenId
     ) external view returns (Metadata memory);
 
+    function tokenURIRange(
+        uint256 start,
+        uint256 stop
+    ) external view returns (string[] memory);
+
     function burn(uint256 tokenId) external;
 
     function burnByOwner(uint256 tokenId) external;

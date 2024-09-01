@@ -14,7 +14,9 @@ import {
     GraviolaSeasonsArchive,
     GraviolaSeasonsArchive__factory,
 } from "../../contracts/typechain-types/index"
-import { NFT } from "./types/NFT"
+import { NFT, RawNFTData } from "./types/NFT"
+import { gerRarityFromScoreDefault } from "./utils/getRarityFromScore"
+import { decodeTokenURI } from "./utils/decodeTokenURI"
 
 const addresses = isDevMode ? addressesLocal : addressesTestnet
 
@@ -61,19 +63,70 @@ export function connectContractsToSigner() {
 
 export async function fetchCollection(): Promise<NFT[]> {
     const totalSupply = await collectionContract.totalSupply()
-    const collectionData = []
-    for (let i = 0; i < totalSupply; i++) {
-        const encoded = await collectionContract.tokenURI(i)
-        const decoded = await (await fetch(encoded)).json()
-        collectionData.push(decoded)
+    const collectionData: NFT[] = []
+
+    const urisToFetch = totalSupply < 5 ? totalSupply : 5
+
+    const [tokensIds, encoded] = await collectionContract.tokenRange(
+        0,
+        urisToFetch,
+    )
+    const decoded = encoded.map<RawNFTData>((data) => decodeTokenURI(data))
+
+    for (let i = 0; i < urisToFetch; i++) {
+        const [probability, score, seasonId] = decoded[i].attributes.map(
+            (attribute) => attribute.value,
+        )
+
+        collectionData.push({
+            id: Number(tokensIds[i]),
+            description: decoded[i].description,
+            image: decoded[i].image,
+            rarityGroup: gerRarityFromScoreDefault(score),
+            seasonId,
+            probability,
+            attributes: decoded[i].attributes,
+        })
     }
+
+    return collectionData
+}
+
+export async function fetchUserCollection(address: string): Promise<NFT[]> {
+    const collectionData: NFT[] = []
+    const balance = await collectionContract.balanceOf(address)
+    if (balance === 0n) return []
+    const tokenIds = await collectionContract.tokenOfOwnerRange(
+        address,
+        0,
+        balance,
+    )
+
+    for (let i = 0; i < balance; i++) {
+        const encoded = await collectionContract.tokenURI(tokenIds[i])
+        const decoded = decodeTokenURI(encoded)
+
+        const [probability, score, seasonId] = decoded.attributes.map(
+            (attribute) => attribute.value,
+        )
+
+        collectionData.push({
+            id: Number(tokenIds[i]),
+            description: decoded.description,
+            image: decoded.image,
+            rarityGroup: gerRarityFromScoreDefault(score),
+            seasonId,
+            probability,
+            attributes: decoded.attributes,
+        })
+    }
+
     console.log(collectionData)
+
     return collectionData
 }
 
 export async function fetchGroupSizes(): Promise<number[]> {
-    // const groupSizes = await seasonsArchiveContract.getGroupSizes()
-    // return groupSizes.map((size: bigint) => Number(size))
     return [77, 15, 5, 2, 1]
 }
 

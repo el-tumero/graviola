@@ -15,7 +15,6 @@ import useArchive from "./hooks/useArchive"
 import { setCollection } from "./redux/reducers/graviola"
 import { useAppDispatch } from "./redux/hooks"
 import { fetchCollection } from "./web3"
-import { fallbackNFT } from "./data/fallbacks"
 
 const App = (props: { children: ReactNode }) => {
     const modal = createWeb3Modal({
@@ -61,16 +60,10 @@ const App = (props: { children: ReactNode }) => {
             const nftTotalSupply = await collectionContract.totalSupply()
             await fetchArchive()
             console.log("[App] totalSupply: ", Number(nftTotalSupply))
-            // console.log("[App] fetched collection ", collectionData)
+            console.log("[App] fetched collection ", collectionData)
 
-            if (collectionData.length < 5) {
-                dispatch(setCollection(new Array(5).fill(fallbackNFT)))
-            } else {
-                dispatch(setCollection(collectionData))
-            }
-
+            dispatch(setCollection(collectionData))
             setLoading(false)
-            // console.log("[App] collection loaded!")
         }
 
         fetchContractData()

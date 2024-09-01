@@ -1,4 +1,7 @@
-import { TxStatusMessagesMap } from "../utils/statusMessages"
+import {
+    tradeUpTxStatusMessages,
+    TxStatusMessagesMap,
+} from "../utils/statusMessages"
 import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
 import { PopupBase } from "../components/Popup"
@@ -7,7 +10,7 @@ import { AddressLike, isError } from "ethers"
 import useTransactionStatus from "./useTransactionStatus"
 import useLocalStorage from "./useLocalStorage"
 
-type TradeUpArgs = number[]
+type TradeUpArgs = bigint[]
 
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     // const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
@@ -20,7 +23,6 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
     const [txPopup, setTxPopup] = useState<PopupBase>()
     const [rolledNFT, setRolledNFT] = useState<NFT | undefined>()
 
-    // const [requestId, setRequestId] = useState<bigint | undefined>()
     const [requestId, setRequestId, clearRequestId] =
         useLocalStorage<bigint>("requestId")
 
@@ -56,10 +58,6 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         })()
     }, [requestId])
 
-    // TODO:
-    // Fetch historical events to determine status of the generation process
-    // Will be helpful if a user accidentally leaves a page
-
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
         console.log(
@@ -75,7 +73,11 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
                 if (requestId === undefined) {
                     throw Error("No requestId provided for generate call!")
                 }
-                await generate(requestId)
+                if (tradeupArgs) {
+                    await tradeUp(requestId, tradeupArgs)
+                } else {
+                    await generate(requestId)
+                }
             }
         } catch (error) {
             console.error("[useGenerate] err during tx init:", error)
@@ -151,6 +153,19 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         const receipt = await tx.wait()
         if (receipt) {
             console.log("[useGenerate] generate tx - receipt OK")
+            setTxStatus("GEN_WAIT")
+        }
+    }
+
+    const tradeUp = async (requestId: bigint, tradeupArgs: bigint[]) => {
+        const tx = await generatorContract.tradeUp(requestId, tradeupArgs, {
+            gasLimit: 2_200_000,
+        })
+        setTxStatus("GEN_AWAIT_CONFIRM")
+
+        const receipt = await tx.wait()
+        if (receipt) {
+            console.log("[useGenerate] tradeup tx - receipt OK")
             setTxStatus("GEN_WAIT")
         }
     }

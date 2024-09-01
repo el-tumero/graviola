@@ -190,8 +190,11 @@ contract GraviolaGenerator is
         uint256[] memory tokensToBurn
     ) external {
         uint256 totalScore = 0;
+        if (tokensToBurn.length != 3) {
+            revert TradeUpIllegal();
+        }
 
-        for (uint256 i = 0; i < tokensToBurn.length; i++) {
+        for (uint256 i = 0; i < 3; i++) {
             if (collection.ownerOf(tokensToBurn[i]) != msg.sender) {
                 revert TradeUpIllegal();
             }
@@ -199,7 +202,7 @@ contract GraviolaGenerator is
             collection.burnByOwner(tokensToBurn[i]);
         }
 
-        _generate(requestId, DEFAULT_OMEGA - totalScore * 3);
+        _generate(requestId, DEFAULT_OMEGA - totalScore);
     }
 
     function aiOracleCallback(

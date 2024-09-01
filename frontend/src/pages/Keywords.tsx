@@ -5,7 +5,12 @@ import Navbar from "../components/nav/Navbar"
 import PageTitle from "../components/ui/layout/PageTitle"
 import { useState } from "react"
 import icons from "../data/icons"
-import { rarities, rarityColors, RarityLevel } from "../data/rarities"
+import {
+    minWeightGroup,
+    rarities,
+    rarityColors,
+    RarityLevel,
+} from "../data/rarities"
 import useArchive from "../hooks/useArchive"
 
 interface RarityGroupData {
@@ -51,7 +56,11 @@ const KeywordGroupBlock = (props: {
                 </div>
 
                 {/* Weight, Min NFT Weight sum */}
-                <div className={cl("flex justify-between items-center w-full select-none")}>
+                <div
+                    className={cl(
+                        "flex justify-between items-center w-full select-none",
+                    )}
+                >
                     <div className="flex justify-center items-center">
                         <div className="w-6 h-6">{icons.weight}</div>
                         <span>{props.data.keywordWeight}</span>
@@ -81,13 +90,11 @@ const KeywordGroupBlock = (props: {
                         "bg-light-bgLight/50 dark:bg-dark-bgLight/50",
                     )}
                 >
-                    {props.data.keywords.map(
-                        (keyword: string, idx: number) => (
-                            <li key={idx} className={cl("px-3 py-1.5")}>
-                                {keyword}
-                            </li>
-                        ),
-                    )}
+                    {props.data.keywords.map((keyword: string, idx: number) => (
+                        <li key={idx} className={cl("px-3 py-1.5")}>
+                            {keyword}
+                        </li>
+                    ))}
                 </ul>
             </div>
         </div>
@@ -95,17 +102,18 @@ const KeywordGroupBlock = (props: {
 }
 
 const Keywords = () => {
-
     const { weights, groupSizes, keywords } = useArchive()
-    const [groupBlocks, setGroupBlocks] = useState<Record<string, RarityGroupData>>(() => {
+    const [groupBlocks, setGroupBlocks] = useState<
+        Record<string, RarityGroupData>
+    >(() => {
         const res: Record<string, RarityGroupData> = {}
         let startIndex = 0
-    
+
         rarities.forEach((rarity: RarityLevel, idx: number) => {
             const endIndex = startIndex + groupSizes[idx]
             res[rarity] = {
                 rarity,
-                minWeight: 0,
+                minWeight: minWeightGroup[idx],
                 maxWeight: 0,
                 keywords: keywords.slice(startIndex, endIndex),
                 keywordWeight: weights[idx],
@@ -156,12 +164,17 @@ const Keywords = () => {
                                 <KeywordGroupBlock
                                     data={rarityGroupData}
                                     blockStateSetter={() => {
-                                        setGroupBlocks(prevGroupBlocks => ({
+                                        setGroupBlocks((prevGroupBlocks) => ({
                                             ...prevGroupBlocks,
                                             [rarityGroupData.rarity]: {
-                                                ...prevGroupBlocks[rarityGroupData.rarity],
-                                                unfolded: !prevGroupBlocks[rarityGroupData.rarity].unfolded
-                                            }
+                                                ...prevGroupBlocks[
+                                                    rarityGroupData.rarity
+                                                ],
+                                                unfolded:
+                                                    !prevGroupBlocks[
+                                                        rarityGroupData.rarity
+                                                    ].unfolded,
+                                            },
                                         }))
                                     }}
                                 />

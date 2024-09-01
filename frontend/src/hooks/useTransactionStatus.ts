@@ -9,11 +9,14 @@ export default function useTransactionStatus(): [
     const [txStatus, _setTxStatus] = useState<TransactionStatus>("NONE")
 
     function setTxStatus(newTxStatus: TransactionStatus) {
-        if (
-            TransactionStatusEnum[newTxStatus] > TransactionStatusEnum[txStatus]
-        ) {
-            _setTxStatus(newTxStatus)
-        }
+        _setTxStatus((prev) => {
+            if (
+                TransactionStatusEnum[newTxStatus] > TransactionStatusEnum[prev]
+            ) {
+                return newTxStatus
+            }
+            return prev
+        })
     }
 
     return [txStatus, setTxStatus]

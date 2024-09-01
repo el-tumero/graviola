@@ -17,13 +17,13 @@ export default function useArchive() {
     async function fetchArchive() {
         try {
             const groupSizes = await fetchGroupSizes()
-            const weights = [12, 8, 5, 3, 1]
+            const weights = [1, 3, 5, 8, 12]
 
             const keywords =
                 await seasonsArchiveContract.getKeywordsCurrentSeason()
 
             dispatch(setGroupSizes(groupSizes))
-            dispatch(setWeights(weights.map((w) => Number(w))))
+            dispatch(setWeights(weights))
             dispatch(setKeywords(keywords))
         } catch (error) {
             console.error(error)

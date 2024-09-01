@@ -3,16 +3,17 @@ import { TransactionStatus } from "../types/TransactionStatus"
 export type TxStatusMessagesMap = Record<TransactionStatus, string>
 
 export const tradeUpTxStatusMessages: TxStatusMessagesMap = {
-    NONE: "Select TradeUp components and click 'Trade'",
+    NONE: "Select TradeUp components and click 'Prepare'",
     PREP_AWAIT_CONFIRM: "Waiting for transaction confirmation...",
     PREP_REJECTED:
         "Either something went wrong or the transaction was rejected. Care to try again?",
     PREP_WAIT: "Transaction confirmed. Preparing the TradeUp...",
-    PREP_READY: "TradeUp complete! Adding metadata...",
-    GEN_AWAIT_CONFIRM: "",
-    GEN_REJECTED: "",
+    PREP_READY: "Prepration completed! Time to perform the TradeUp!",
+    GEN_AWAIT_CONFIRM: "Waiting for transaction confirmation...",
+    GEN_REJECTED:
+        "Either something went wrong or the transaction was rejected. Care to try again?",
     GEN_WAIT: "Hang tight! It's almost ready.",
-    DONE: "",
+    DONE: "TradeUp completed!",
     ERROR: "An error occurred. Please check the popup for more info.",
 }
 
