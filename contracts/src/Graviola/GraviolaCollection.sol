@@ -18,18 +18,32 @@ contract GraviolaCollection is
 
     uint256 private nextTokenId;
 
+    address private generatorAddress;
+
     event ImageAdded(uint256 tokenId, address tokenOwner);
 
+    error NotGenerator();
+
     constructor(
-        address ownerAddress,
-        address archiveAddress
+        address ownerAddress
     )
         ERC721("GraviolaCollection", "GRVC")
         Ownable(ownerAddress)
-        GraviolaMetadata(archiveAddress)
+        GraviolaMetadata()
     {}
 
-    function mint(address to) external onlyOwner returns (uint256) {
+    modifier onlyGenerator() {
+        if (generatorAddress != msg.sender) {
+            revert NotGenerator();
+        }
+        _;
+    }
+
+    function setGenerator(address generator) external onlyOwner {
+        generatorAddress = generator;
+    }
+
+    function mint(address to) external onlyGenerator returns (uint256) {
         uint256 tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         return tokenId;
@@ -38,7 +52,7 @@ contract GraviolaCollection is
     function createMetadata(
         uint256 tokenId,
         Metadata memory metadata
-    ) external onlyOwner {
+    ) external onlyGenerator {
         _createMetadata(tokenId, metadata);
     }
 
@@ -48,7 +62,10 @@ contract GraviolaCollection is
         return _getMetadata(tokenId);
     }
 
-    function addImage(uint256 tokenId, string memory image) external onlyOwner {
+    function addImage(
+        uint256 tokenId,
+        string memory image
+    ) external onlyGenerator {
         _addImage(tokenId, image);
         emit ImageAdded(tokenId, ownerOf(tokenId));
     }
@@ -88,7 +105,7 @@ contract GraviolaCollection is
         return output;
     }
 
-    function burnByOwner(uint256 tokenId) external onlyOwner {
+    function burnByGenerator(uint256 tokenId) external onlyGenerator {
         _burn(tokenId);
     }
 

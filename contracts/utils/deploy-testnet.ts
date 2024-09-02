@@ -41,7 +41,7 @@ export default async function deployTestnet() {
     await gsg.waitForDeployment()
     console.log('GraviolaSeasonsGovernor deployed!')
 
-    const collection = await GraviolaCollection.deploy(tm, gsa)
+    const collection = await GraviolaCollection.deploy(owner)
     await collection.waitForDeployment()
     console.log('GraviolaCollection deployed!')
 
@@ -59,18 +59,6 @@ export default async function deployTestnet() {
 
     await (
         await tm.addDeployedContractAddress(
-            DeployedContractEnum.COLLECTION,
-            collection,
-        )
-    ).wait()
-    await (
-        await tm.addDeployedContractAddress(
-            DeployedContractEnum.GENERATOR,
-            generator,
-        )
-    ).wait()
-    await (
-        await tm.addDeployedContractAddress(
             DeployedContractEnum.SEASONS_ARCHIVE,
             gsa,
         )
@@ -78,6 +66,10 @@ export default async function deployTestnet() {
 
     const setupTx = await tm.setup()
     await setupTx.wait()
+    console.log('Migrator setup done!')
+
+    await (await gsa.setSeasonsGovernor(gsg)).wait()
+    await (await collection.setGenerator(generator)).wait()
 
     console.log('Contracts configured!')
 

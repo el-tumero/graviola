@@ -14,14 +14,12 @@ contract LocalMigration is Migration {
     constructor() Migration() {}
 
     function deploy() external {
-        address migrator = address(this);
-
         vrf = new VRFV2PlusWrapperMock();
         oao = new AIOracleMock();
         gt = new GraviolaToken(msg.sender);
         gsa = new GraviolaSeasonsArchive(migrator);
         gsg = new TGraviolaSeasonsGovernor(address(gsa), address(gt));
-        collection = new GraviolaCollection(migrator, address(gsa));
+        collection = new GraviolaCollection(migrator);
         generator = new GraviolaGenerator(
             address(gt),
             address(gsa),

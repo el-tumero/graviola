@@ -28,5 +28,5 @@ interface IGraviolaCollection is IERC721 {
 
     function burn(uint256 tokenId) external;
 
-    function burnByOwner(uint256 tokenId) external;
+    function burnByGenerator(uint256 tokenId) external;
 }

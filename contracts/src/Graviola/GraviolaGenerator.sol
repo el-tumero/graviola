@@ -199,7 +199,7 @@ contract GraviolaGenerator is
                 revert TradeUpIllegal();
             }
             totalScore += collection.getMetadata(tokensToBurn[i]).score;
-            collection.burnByOwner(tokensToBurn[i]);
+            collection.burnByGenerator(tokensToBurn[i]);
         }
 
         _generate(requestId, DEFAULT_OMEGA - totalScore);
@@ -243,6 +243,7 @@ contract GraviolaGenerator is
         if (msg.sender != request.initiator) {
             revert SenderNotInitiator();
         }
+        requests[requestId].balance = 0;
         payable(msg.sender).transfer(requests[requestId].balance);
     }
 }

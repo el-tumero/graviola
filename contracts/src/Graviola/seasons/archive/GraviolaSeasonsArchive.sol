@@ -9,7 +9,7 @@ import "./IGraviolaSeasonsArchive.sol";
 /// @notice Contract created for storing keywords and coordinating
 /// Season logic
 contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
-    constructor(address owner) Ownable(owner) {}
+    address private seasonsGovernorAddress;
 
     // How many words can be added to single season's well
     uint16 private constant WELL_SIZE = 100;
@@ -44,6 +44,19 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     // Represents weights of keywords assigned to specific group
     uint8[TOTAL_RARITY_GROUPS] private rarityGroupWeights = [1, 3, 5, 8, 12];
 
+    constructor(address owner) Ownable(owner) {}
+
+    modifier onlySeasonsGovernor() {
+        if (seasonsGovernorAddress != msg.sender) {
+            revert NotSeasonsGovernor();
+        }
+        _;
+    }
+
+    function setSeasonsGovernor(address seasonsGovernor) external onlyOwner {
+        seasonsGovernorAddress = seasonsGovernor;
+    }
+
     /// @notice Name the season with the given id
     /// @param seasonId id of the season
     /// @param name name for the season (e.g. Summer 2024)
@@ -51,7 +64,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     function nameSeason(
         uint256 seasonId,
         string calldata name
-    ) external onlyOwner {
+    ) external onlySeasonsGovernor {
         seasons[seasonId].name = name;
     }
 
@@ -62,7 +75,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     function addPromptBaseToSeason(
         uint256 seasonId,
         string calldata promptBase
-    ) external onlyOwner {
+    ) external onlySeasonsGovernor {
         seasons[seasonId].promptBase = promptBase;
     }
 
@@ -74,7 +87,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
     function addKeywordToSeason(
         uint256 seasonId,
         string calldata keyword
-    ) external onlyOwner {
+    ) external onlySeasonsGovernor {
         Season storage season = seasons[seasonId];
         if (season.well.length > WELL_SIZE) {
             revert WellFull();
@@ -86,7 +99,7 @@ contract GraviolaSeasonsArchive is Ownable, IGraviolaSeasonsArchive {
 
     /// @notice Start new seaons
     /// @dev Can be called only by the contract owner
-    function nextSeason() external onlyOwner {
+    function nextSeason() external onlySeasonsGovernor {
         ++currentSeasonId;
     }
 

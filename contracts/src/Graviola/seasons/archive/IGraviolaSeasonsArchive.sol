@@ -13,6 +13,10 @@ interface IGraviolaSeasonsArchive {
     /// during addKeywordToSeasons function execution
     error WellFull();
 
+    error NotSeasonsGovernor();
+
+    function setSeasonsGovernor(address seasonsGovernor) external;
+
     // **************************************************
     // Setters for Season logic
     // **************************************************

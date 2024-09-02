@@ -4,6 +4,6 @@
     "solidity.formatter": "prettier",
 
     "[solidity]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+        "editor.defaultFormatter": "JuanBlanco.solidity"
     }
 }
