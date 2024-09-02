@@ -2,7 +2,7 @@
 
 # Script for setting up the project
 # This script assumes a unix environment
-# Last modified: 21/08/2024
+# Last modified: 02/09/2024
 
 HARDHAT_DEFAULT_PORT=8545
 
@@ -12,6 +12,10 @@ cmd_exists() {
 
 if ! cmd_exists yarn; then
     echo "Error: yarn is not installed or not in PATH"; exit 1
+fi
+
+if ! cmd_exists nc; then
+    echo "Error: nc (netcat) is not installed or not in PATH"; exit 1
 fi
 
 require_ok() {
