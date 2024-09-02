@@ -3,28 +3,29 @@ import { JsonRpcProvider } from "ethers"
 import {
     setSigner,
     connectContractsToSigner,
-    graviolaContract,
+    generatorContract,
+    collectionContract,
     tokenContract,
     seasonsGovernorContract,
+    seasonsArchiveContract,
+    getBlockNumber,
 } from "../web3"
 
 import localhostConfig from "../../../contracts/localhost-config.json"
 import { useAppSelector, useAppDispatch } from "../redux/hooks"
 import { setConnected, setAddress } from "../redux/reducers/wallet"
+
 import { Web3Address } from "../redux/reducers/wallet"
 import { BrowserProvider } from "ethers"
 
 export default function useWallet() {
     const isConnected = useAppSelector((state) => state.wallet.isConnected)
     const address = useAppSelector((state) => state.wallet.address)
-
-    const graviola = graviolaContract
-    const grvSeasonsGovernor = seasonsGovernorContract
-    const grvToken = tokenContract
+    const collection = useAppSelector((state) => state.graviolaData.collection)
 
     const dispatch = useAppDispatch()
 
-    function connectDevWallet() {
+    async function connectDevWallet() {
         const provider = new JsonRpcProvider(localhostConfig.rpcUrl)
         const wallet = new Wallet(localhostConfig.privKey, provider)
         dispatch(setAddress(wallet.address as Web3Address))
@@ -45,10 +46,14 @@ export default function useWallet() {
     return {
         connectWallet,
         connectDevWallet,
+        getBlockNumber,
         isConnected,
         address,
-        graviola,
-        grvToken,
-        grvSeasonsGovernor
+        collection,
+        generatorContract,
+        collectionContract,
+        tokenContract,
+        seasonsGovernorContract,
+        seasonsArchiveContract,
     }
 }

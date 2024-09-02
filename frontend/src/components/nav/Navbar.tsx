@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import Logo from "../../assets/logo.webp"
 import NavElement from "./NavElement"
 import { useNavigate } from "react-router-dom"
@@ -9,45 +9,55 @@ import NavListDesktop from "./NavList"
 import icons from "../../data/icons"
 import { links } from "../../links"
 import { isDevMode } from "../../utils/mode"
-import { userStatsSlice } from "../../redux/reducers/stats"
+// import { userStatsSlice } from "../../redux/reducers/stats"
 import useTheme from "../../hooks/useTheme"
 import useWallet from "../../hooks/useWallet"
-import { useAppDispatch } from "../../redux/hooks"
+// import { useAppDispatch } from "../../redux/hooks"
 
 const Navbar = () => {
-
-    const dispatch = useAppDispatch()
+    // const dispatch = useAppDispatch()
     const navigate = useNavigate()
     const [mobileListVisible, setMobileListVisible] = useState<boolean>(false)
-    const [userStatsFetched, setUserStatsFetched] = useState<boolean>(false)
+    // const [userStatsFetched, setUserStatsFetched] = useState<boolean>(false)
     const { theme, toggleTheme } = useTheme(true)
-    const { address, connectDevWallet, isConnected, grvToken, graviola } = useWallet()
+    const {
+        // address,
+        connectDevWallet,
+        isConnected,
+        // tokenContract,
+        // collectionContract,
+    } = useWallet()
 
     // fetch user stats
-    useEffect(() => {
-        if (!address || !isConnected || userStatsFetched) return
-        (async () => {
-            try {
-                const ownedNfts = await graviola.balanceOf(address)
-                // console.log(ownedNfts)
-                const tokenBalance = await grvToken.balanceOf(address)
-                // console.log(tokenBalance)
-                const grvAddress = await graviola.getAddress()
-                const filter = graviola.filters.Transfer(grvAddress, address)
-                const events = await graviola.queryFilter(filter)
-                const droppedNfts = events.length
-                // console.log(droppedNfts)
-                dispatch(userStatsSlice.actions.setUserStats({
-                    tokenBalance: Number(tokenBalance),
-                    nftsOwned: Number(ownedNfts),
-                    nftsDropped: droppedNfts
-                }))
-                setUserStatsFetched(true)
-            } catch (err) {
-                console.error(err)
-            }
-        })()
-    }, [address, isConnected])
+    // useEffect(() => {
+    //     if (!address || !isConnected || userStatsFetched) return
+    //     ;(async () => {
+    //         try {
+    //             const ownedNfts = await collectionContract.balanceOf(address)
+    //             // console.log(ownedNfts)
+    //             const tokenBalance = await tokenContract.balanceOf(address)
+    //             // console.log(tokenBalance)
+    //             const collectionAddress = await collectionContract.getAddress()
+    //             const filter = collectionContract.filters.Transfer(
+    //                 collectionAddress,
+    //                 address,
+    //             )
+    //             const events = await collectionContract.queryFilter(filter)
+    //             const droppedNfts = events.length
+    //             // console.log(droppedNfts)
+    //             dispatch(
+    //                 userStatsSlice.actions.setUserStats({
+    //                     tokenBalance: Number(tokenBalance),
+    //                     nftsOwned: Number(ownedNfts),
+    //                     nftsDropped: droppedNfts,
+    //                 }),
+    //             )
+    //             setUserStatsFetched(true)
+    //         } catch (err) {
+    //             console.error(err)
+    //         }
+    //     })()
+    // }, [address, isConnected])
 
     /* eslint-disable */
     const navItems = [
@@ -68,7 +78,7 @@ const Navbar = () => {
         </NavElement>,
 
         <NavElement onClick={() => navigate(routerPaths.voting)}>
-            <p className="font-bold">Vote!</p>
+            <p>Voting</p>
         </NavElement>,
 
         <NavElement onClick={() => openURL(links.repo)}>
@@ -166,7 +176,7 @@ const Navbar = () => {
                             />
                         </div>
                         <p className="font-semibold font-mono text-accentDark dark:text-accent opacity-100">
-                            graviolaNFT
+                            GraviolaNFT
                         </p>
                     </div>
 

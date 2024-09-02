@@ -6,61 +6,53 @@ import { clsx as cl } from "clsx"
 import { NFT } from "../types/NFT"
 import Button from "../components/ui/Button"
 import BlockNFT from "../components/BlockNFT"
-import { getRarityFromPerc } from "../utils/getRarityData"
-import { formatBpToPercentage } from "../utils/format"
-import { ethers } from "ethers"
-import { RaritiesData } from "../types/RarityGroup"
 import { cn } from "../utils/cn"
 import PageTitle from "../components/ui/layout/PageTitle"
 import icons from "../data/icons"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-import useWeb3 from "../hooks/useWallet"
+import { useAppDispatch, useAppSelector } from "../redux/hooks"
+import { rarityColors } from "../data/rarities"
+import camelToPascal from "../utils/camelToPascal"
+import { fetchUserCollection } from "../web3"
+import { setUserCollection } from "../redux/reducers/graviola"
 import useWallet from "../hooks/useWallet"
-import { useAppSelector } from "../redux/hooks"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"
 
 const Drops = () => {
-    // TODO: Add options to filter by Rarity, or by included Keywords.
-    const { isConnected, address } = useWeb3()
-    const { graviola } = useWallet()
-    const collection = useAppSelector(
-        (state) => state.graviolaData.collection,
-    ) as NFT[]
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
+    // TODO: MAINNET: Add options to filter by Rarity, or by included Keywords.
+    const { isConnected, address } = useWallet()
+    const collection = useAppSelector((state) => state.graviolaData.collection)
+    const userCollection = useAppSelector(
+        (state) => state.graviolaData.userCollection,
+    )
+
+    const dispatch = useAppDispatch()
 
     const [filterMode, setFilterMode] =
         useState<DropFilterMode>("Everyone's Drops")
-    const [ownedTokensIds, setOwnedTokensIds] = useState<Array<number>>([])
-    const [isLoading, setIsLoading] = useState<boolean>(true)
+    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [fetchingCollection, setFetchingCollection] = useState<boolean>(false)
     const [backToTopVisible, setBackToTopVisible] = useState<boolean>(false)
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
     const contentReady = !isLoading && isConnected
 
-    const fetchCollectionTokens = async () => {
+    const fetchUserOwnedTokens = async () => {
         setFetchingCollection(true)
-        let userOwnedTokens
-        if (address) {
-            userOwnedTokens = await graviola.ownedTokens(
-                ethers.getAddress(address),
-            )
+        if (address && userCollection === undefined) {
+            const owned = await fetchUserCollection(address)
+            dispatch(setUserCollection(owned))
         }
-        userOwnedTokens &&
-            userOwnedTokens.forEach((token) => {
-                setOwnedTokensIds((prev) => [...prev, Number(token)])
-            })
-        // console.log(ownedTokensIds)
         setIsLoading(false)
         setFetchingCollection(false)
     }
 
     useEffect(() => {
-        fetchCollectionTokens()
-    }, [])
+        if (filterMode === "My Drops") {
+            fetchUserOwnedTokens()
+        }
+    }, [filterMode])
 
     const scrollToTop = () => {
         scrollContainerRef.current?.scrollTo({
@@ -79,7 +71,6 @@ const Drops = () => {
                 const scrolledPercentage =
                     (scrollTop / (scrollHeight - clientHeight)) * 100
 
-                // console.log("scroll ", scrolledPercentage)
                 if (scrolledPercentage < scrollThresholdPerc) {
                     setBackToTopVisible(false)
                     return
@@ -136,7 +127,7 @@ const Drops = () => {
                             <div className="flex gap-3">
                                 <Button
                                     text="Refresh"
-                                    onClick={() => fetchCollectionTokens()}
+                                    onClick={() => fetchUserOwnedTokens()}
                                     disabled={fetchingCollection}
                                 />
                                 <Button
@@ -161,10 +152,13 @@ const Drops = () => {
                             )}
                         >
                             <CollectionList
-                                contractNFTs={collection}
-                                collectionMode={filterMode}
-                                ownedTokenIds={ownedTokensIds}
-                                rGroups={rarities}
+                                contractNFTs={
+                                    filterMode === "Everyone's Drops"
+                                        ? collection
+                                        : userCollection === undefined
+                                          ? []
+                                          : userCollection
+                                }
                             />
 
                             {/* Scroll to Top Button */}
@@ -192,16 +186,10 @@ const Drops = () => {
     )
 }
 
-const CollectionList = (props: {
-    contractNFTs: Array<NFT>
-    collectionMode: DropFilterMode
-    ownedTokenIds: Array<number>
-    rGroups: RaritiesData
-}) => {
+const CollectionList = (props: { contractNFTs: Array<NFT> }) => {
     return (
         <>
             {props.contractNFTs.map((nft: NFT, idx) => {
-                const percRarity = formatBpToPercentage(nft.attributes[0].value)
                 const keywordsArray: string[] = nft.description
                     .split(":")
                     .pop()!
@@ -210,88 +198,79 @@ const CollectionList = (props: {
                 const keywords: string[] = keywordsArray.map((keyword) =>
                     keyword.trim(),
                 )
-                const [, rarityData] = getRarityFromPerc(
-                    percRarity,
-                    props.rGroups,
-                )
-                if (
-                    props.collectionMode === "My Drops" &&
-                    !props.ownedTokenIds.includes(idx)
-                ) {
-                    return null
-                } else {
-                    return (
+
+                return (
+                    <div
+                        key={idx}
+                        className={cl(
+                            "flex flex-col justify-between items-center",
+                            "gap-3 p-3 rounded-xl",
+                            "border border-light-border dark:border-dark-border",
+                        )}
+                    >
+                        {/* Preview */}
                         <div
-                            key={idx}
+                            className="p-px"
+                            style={{
+                                borderRadius: 16,
+                                borderWidth: 1,
+                            }}
+                        >
+                            <BlockNFT
+                                nftData={nft}
+                                glowColor={"auto"}
+                                additionalClasses={`w-fit h-fit max-w-[14em]`}
+                            />
+                        </div>
+
+                        {/* Stats, info */}
+                        <div
                             className={cl(
-                                "flex flex-col justify-between items-center",
-                                "gap-3 p-3 rounded-xl",
-                                "border border-light-border dark:border-dark-border",
+                                "flex flex-col gap-1 h-full justify-between items-between",
                             )}
                         >
-                            {/* Preview */}
-                            <div
-                                className="p-px"
-                                style={{
-                                    borderRadius: 16,
-                                    borderWidth: 1,
-                                    borderColor: rarityData.color,
-                                }}
-                            >
-                                <BlockNFT
-                                    nftData={nft}
-                                    glowColor={"auto"}
-                                    additionalClasses={`w-fit h-fit max-w-[14em]`}
-                                />
-                            </div>
-
-                            {/* Stats, info */}
                             <div
                                 className={cl(
-                                    "flex flex-col gap-1 h-full justify-between items-between",
+                                    "flex flex-col w-full h-fit gap-1",
+                                    "justify-start items-start",
                                 )}
                             >
-                                <div
-                                    className={cl(
-                                        "flex flex-col w-full h-fit gap-1",
-                                        "justify-start items-start",
-                                    )}
-                                >
-                                    <p>id: {nft.id}</p>
-                                    <p>
-                                        Rarity:{" "}
-                                        <span
-                                            className={"font-normal"}
-                                            style={{
-                                                color: rarityData.color,
-                                            }}
-                                        >
-                                            {rarityData.name}
-                                        </span>
-                                    </p>
-                                </div>
-                                <div
-                                    className={cl(
-                                        "flex flex-wrap w-full h-fit",
-                                        "gap-1 justify-start items-start",
-                                    )}
-                                >
-                                    {keywords.map((keyword, idx) => (
-                                        <span
-                                            className={cl(
-                                                "py-1 px-2 rounded-md",
-                                                "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
-                                            )}
-                                            key={idx}
-                                        >
-                                            {keyword}
-                                        </span>
-                                    ))}
-                                </div>
+                                <p>id: {nft.id}</p>
+                                <p>
+                                    Rarity:&nbsp;
+                                    <span
+                                        className={"font-normal"}
+                                        style={{
+                                            color: rarityColors[
+                                                nft.rarityGroup
+                                            ],
+                                        }}
+                                    >
+                                        {camelToPascal(nft.rarityGroup)}
+                                    </span>
+                                </p>
+                            </div>
+                            <div
+                                className={cl(
+                                    "flex flex-wrap w-full h-fit",
+                                    "gap-1 justify-start items-start",
+                                )}
+                            >
+                                {keywords.map((keyword, idx) => (
+                                    <span
+                                        className={cl(
+                                            "py-1 px-2 rounded-md",
+                                            "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
+                                        )}
+                                        key={idx}
+                                    >
+                                        {keyword}
+                                    </span>
+                                ))}
                             </div>
                         </div>
-                    )
-                }
+                    </div>
+                )
             })}
         </>
     )

@@ -1,138 +1,223 @@
-import { parseEther, toBigInt } from "ethers"
-import { NFTExt } from "../pages/Generate"
-import { TransactionStatus } from "../types/TransactionStatus"
 import { TxStatusMessagesMap } from "../utils/statusMessages"
 import { useState, useEffect } from "react"
 import { NFT } from "../types/NFT"
-import { getRarityFromPerc } from "../utils/getRarityData"
 import { PopupBase } from "../components/Popup"
 import useWallet from "./useWallet"
-import { useAppSelector } from "../redux/hooks"
-import { RaritiesData } from "../types/RarityGroup"
-import { ContractTransactionResponse } from "ethers"
+import { AddressLike, isError } from "ethers"
+import useTransactionStatus from "./useTransactionStatus"
+import useLocalStorage from "./useLocalStorage"
+import { decodeTokenURI } from "../utils/decodeTokenURI"
+import { gerRarityFromScoreDefault } from "../utils/getRarityFromScore"
 
-type TradeUpArgs = number[]
+type TradeUpArgs = bigint[]
 
-// TODO: Add a timer feature after the tx.receit() arrives. If we go beyond 4-5 mintues,
-// Display a warning popup or provide a link to tx explorer
 export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
-    const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
+    // const ERR_TIMEOUT_MS = 8000 // Tx gets rejected => wait x MS and reset tx status
 
-    const rarities = useAppSelector(state => state.graviolaData.rarities) as RaritiesData
-    const collection = useAppSelector(state => state.graviolaData.collection)
-    const { graviola, address } = useWallet()
-    const [callbacksInit, setCallbacksInit] = useState<boolean>(false)
+    const { address, generatorContract, collectionContract } = useWallet()
 
-    const [txStatus, setTxStatus] = useState<TransactionStatus>("NONE")
+    const [txStatus, setTxStatus] = useTransactionStatus()
+
     const [txMsg, setTxMsg] = useState<string>(txMessages["NONE"])
     const [txPopup, setTxPopup] = useState<PopupBase>()
-    const [rolledNFT, setRolledNFT] = useState<NFTExt | undefined>()
+    const [rolledNFT, setRolledNFT] = useState<NFT | undefined>()
+
+    const [requestId, setRequestId, clearRequestId] =
+        useLocalStorage<bigint>("requestId")
 
     // Automatically update Tx status messages based on status
     useEffect(() => {
+        console.log("status:", txStatus)
         setTxMsg(txMessages[txStatus])
     }, [txStatus])
 
+    useEffect(() => {
+        if (!address) return
+        initCallbacks()
+        return () => disableCallbacks()
+    }, [address])
+
+    useEffect(() => {
+        ;(async () => {
+            if (requestId) {
+                const requestStatus =
+                    await generatorContract.getRequestStatus(requestId)
+                console.log(requestStatus)
+
+                if (requestStatus === 4n) {
+                    clearRequestId()
+                    setTxStatus("NONE")
+                    return
+                }
+
+                if (requestStatus > 1n) {
+                    setTxStatus("PREP_READY")
+                }
+            }
+        })()
+    }, [requestId])
+
     // Tx function
     const txFunc = async (tradeupArgs?: TradeUpArgs) => {
-        const estFee: bigint = await graviola.estimateFee()
-        console.log("estfee ", estFee)
-        let tx: ContractTransactionResponse | null = null
         console.log(
             "[useGenerate] tx init. mode: ",
             tradeupArgs ? "trade up" : "generate",
         )
         try {
-            if (tradeupArgs) {
-                const args: bigint[] = tradeupArgs.map((id) => toBigInt(id))
-                tx = await graviola.tradeUp([args[0], args[1], args[2]], {
-                    value: estFee + parseEther("0.006"),
-                })
-            } else {
-                tx = await graviola.mint({
-                    value: parseEther("0.006"),
-                    // gasLimit: 900_000
-                })
+            if (txStatus == "NONE") {
+                await prepare()
             }
-            const receipt = await tx.wait()
-            if (receipt) {
-                console.log("[useGenerate] tx receipt OK")
-                setTxStatus("BEFORE_MINT")
+
+            if (txStatus == "PREP_READY") {
+                if (requestId === undefined) {
+                    throw Error("No requestId provided for generate call!")
+                }
+                if (tradeupArgs) {
+                    await tradeUp(requestId, tradeupArgs)
+                } else {
+                    await generate(requestId)
+                }
             }
         } catch (error) {
+            console.error("[useGenerate] err during tx init:", error)
+            if (isError(error, "UNKNOWN_ERROR")) {
+                // @ts-ignore
+                const revertData = error.error?.data?.data
+                if (revertData === "0x" || revertData === null) {
+                    setTxPopup({
+                        type: "err",
+                        message: `An error occurred. Message: ${error.error?.message}`,
+                    })
+                    return
+                }
+
+                const decodedError =
+                    generatorContract.interface.parseError(revertData)
+                if (decodedError) {
+                    setTxPopup({
+                        type: "err",
+                        message: `An error occurred. ${decodedError.name}`,
+                    })
+                }
+            }
+
             const errMsg =
                 (error as Error).message.length > 64
                     ? (error as Error).message.substring(0, 64) + " (...)"
                     : (error as Error).message
-            console.error("[useGenerate] err during tx init: ", error as Error)
             setTxPopup({
                 type: "err",
                 message: `An error occurred. Message: ${errMsg}`,
             })
-            setTimeout(() => setTxStatus("NONE"), ERR_TIMEOUT_MS)
-            setTxStatus("REJECTED")
         }
     }
 
     // This should be called by main button: "Generate" or "Trade up"
     const requestGen = async (tradeupData?: TradeUpArgs) => {
-        setTxStatus("AWAIT_CONFIRM")
         await txFunc(tradeupData)
     }
 
-    const initCallbacks = () => {
-        if (callbacksInit) {
-            console.warn("[useGenerate] Can't init callbacks more than once")
-            return
-        }
-        setCallbacksInit(true)
+    const prepare = async () => {
+        const estimatedServiceFee = await generatorContract.estimateServiceFee()
 
-        graviola.once(graviola.filters.Mint, onMint)
-        graviola.once(graviola.filters.TokenReady, onTokenReady)
-        console.log("[useGenerate] callbacks init OK")
+        const tx = await generatorContract.prepare({
+            value: estimatedServiceFee * 2n,
+            gasLimit: 1_000_000,
+        })
+        setTxStatus("PREP_AWAIT_CONFIRM")
+
+        const receipt = await tx.wait()
+        if (receipt) {
+            const events = receipt.logs.map((log) =>
+                generatorContract.interface.parseLog(log),
+            )
+            const foundEvent = events.find(
+                (event) => event?.name === "RequestVRFSent",
+            )
+            if (foundEvent) {
+                setRequestId(foundEvent.args[1])
+            }
+
+            console.log("[useGenerate] prepare tx - receipt OK")
+            setTxStatus("PREP_WAIT")
+        }
+    }
+
+    const generate = async (requestId: bigint) => {
+        const tx = await generatorContract.generate(requestId, {
+            gasLimit: 2_000_000,
+        })
+        setTxStatus("GEN_AWAIT_CONFIRM")
+
+        const receipt = await tx.wait()
+        if (receipt) {
+            console.log("[useGenerate] generate tx - receipt OK")
+            setTxStatus("GEN_WAIT")
+        }
+    }
+
+    const tradeUp = async (requestId: bigint, tradeupArgs: bigint[]) => {
+        const tx = await generatorContract.tradeUp(requestId, tradeupArgs, {
+            gasLimit: 2_200_000,
+        })
+        setTxStatus("GEN_AWAIT_CONFIRM")
+
+        const receipt = await tx.wait()
+        if (receipt) {
+            console.log("[useGenerate] tradeup tx - receipt OK")
+            setTxStatus("GEN_WAIT")
+        }
+    }
+
+    const initCallbacks = () => {
+        generatorContract.on(
+            generatorContract.filters.RequestVRFFulfilled,
+            onVRFResponse,
+        )
+
+        collectionContract.on(
+            collectionContract.filters.ImageAdded,
+            onImageAdded,
+        )
+
+        console.log(`[useGenerate] callbacks init OK, address ${address}`)
     }
 
     const disableCallbacks = () => {
-        if (!callbacksInit) return
-        graviola.off(graviola.filters.Mint, onMint)
-        graviola.off(graviola.filters.TokenReady, onTokenReady)
+        generatorContract.removeAllListeners()
+        collectionContract.removeAllListeners()
         console.log("[useGenerate] callbacks disable OK")
-        setCallbacksInit(false)
     }
 
-    const onMint = (addr: string, tokenId: bigint) => {
-        if (addr != address) return
-        console.log(`[useGenerate] onMint: tokenId ${tokenId}`)
-        setTxStatus("MINTED")
+    const onVRFResponse = async (initiator: AddressLike, requestId: bigint) => {
+        console.log("VRF!!!")
+        if (initiator !== address) return
+        setRequestId(requestId)
+        setTxStatus("PREP_READY")
+        console.log(`[useGenerate] onVRFResponse: requestId ${requestId}`)
     }
 
-    const onTokenReady = async (addr: string, tokenId: bigint) => {
-        if (addr != address) return // Don't eavesdrop other people's drops
-        console.log(`[useGenerate] onTokenReady: tokenId ${Number(tokenId)}`)
+    const onImageAdded = async (tokenId: bigint, tokenOwner: AddressLike) => {
+        if (tokenOwner !== address) return
 
-        const uri = await graviola.tokenURI(tokenId)
-        const response = await fetch(uri)
-        const nextIdx = collection.length
-        const nftData = await response.json()
-        const [rLevel, rData] = getRarityFromPerc(
-            nftData.attributes[0].value,
-            rarities,
+        console.log(`[useGenerate] onImageAdded: tokenId ${Number(tokenId)}`)
+
+        const uri = await collectionContract.tokenURI(tokenId)
+        const decoded = decodeTokenURI(uri)
+        const [probability, score, seasonId] = decoded.attributes.map(
+            (attribute) => attribute.value,
         )
 
         const nftBase: NFT = {
-            id: nextIdx,
-            ...nftData,
+            id: Number(tokenId),
+            rarityGroup: gerRarityFromScoreDefault(score),
+            seasonId: seasonId,
+            probability: probability,
+            ...decoded,
         }
 
-        const nftRes: NFTExt = {
-            rarityLevel: rLevel,
-            rarityData: rData,
-            ...nftBase,
-        }
-        console.log("[useGenerate] nftRes: ", JSON.stringify(nftRes, null, 4)) // DEBUG
-
+        setRolledNFT(nftBase)
         setTxStatus("DONE")
-        setRolledNFT(nftRes)
     }
 
     const closePopup = () => {
@@ -144,10 +229,9 @@ export default function useGenerateNFT(txMessages: TxStatusMessagesMap) {
         txMsg,
         txPopup,
         rolledNFT,
+        requestId,
 
         requestGen,
-        initCallbacks,
-        disableCallbacks,
         closePopup,
     }
 }

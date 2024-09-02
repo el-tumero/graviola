@@ -1,66 +1,31 @@
-import { useEffect } from "react"
 import GenerateContainer from "../components/ui/layout/GenerateContainer"
 import Navbar from "../components/nav/Navbar"
 import Button from "../components/ui/Button"
 import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
-import { NFT } from "../types/NFT"
 import { clsx as cl } from "clsx"
 import Popup from "../components/Popup"
-import { generateTxStatusMessages } from "../utils/statusMessages"
-import { RarityGroupData, RarityLevel } from "../types/Rarity"
-import { RaritiesData } from "../types/RarityGroup"
+import {
+    generateTxStatusMessages,
+    TransactionStatusEnum,
+} from "../utils/statusMessages"
 import { routerPaths } from "../router"
 import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
-import useWeb3 from "../hooks/useWallet"
-import { useAppSelector } from "../redux/hooks"
-
-// Extended NFT interface to avoid computing the same properties multiple times
-export interface NFTExt extends NFT {
-    rarityLevel: RarityLevel
-    rarityData: RarityGroupData
-}
+import useWallet from "../hooks/useWallet"
+import { gerRarityFromScoreDefault } from "../utils/getRarityFromScore"
+import { getRarityColorFromScoreDefault } from "../utils/getRarityColorFromScore"
+import camelToPascal from "../utils/camelToPascal"
 
 const Generate = () => {
     const navigate = useNavigate()
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
-    const { isConnected } = useWeb3()
 
-    // // MOCK
-    // const mockBehavior = {
-    //     performSteps: [false, true, true, true],
-    //     doNotResetOnError: false
-    // }
-    // const {
-    //     txStatus,
-    //     txMsg,
-    //     txErr,
-    //     rolledNFT,
-    //     requestGen,
-    //     closeTxErr
-    // } = useGenerateMock(generateTxStatusMessages, mockBehavior)
+    const { isConnected } = useWallet()
 
     // Gen data
-    const {
-        txStatus,
-        txMsg,
-        txPopup,
-        rolledNFT,
-        requestGen,
-        initCallbacks,
-        disableCallbacks,
-        closePopup,
-    } = useGenerateNFT(generateTxStatusMessages)
-
-    // Handle generate callbacks
-    useEffect(() => {
-        initCallbacks()
-        return () => disableCallbacks()
-    }, [])
+    const { txStatus, txMsg, txPopup, rolledNFT, requestGen, closePopup } =
+        useGenerateNFT(generateTxStatusMessages)
 
     return (
         <FullscreenContainer>
@@ -80,7 +45,6 @@ const Generate = () => {
                         <GenerateContainer
                             rolledNFT={rolledNFT}
                             runBorderAnim={!rolledNFT}
-                            rGroups={rarities}
                         />
                     </div>
 
@@ -97,14 +61,23 @@ const Generate = () => {
                                     Congratulations! You rolled a&nbsp;
                                     <span
                                         style={{
-                                            color: rolledNFT.rarityData.color,
+                                            color: getRarityColorFromScoreDefault(
+                                                rolledNFT.attributes[1].value,
+                                            ),
                                             borderBottomWidth: 1,
                                             borderBottomColor:
-                                                rolledNFT.rarityData.color,
+                                                getRarityColorFromScoreDefault(
+                                                    rolledNFT.attributes[1]
+                                                        .value,
+                                                ),
                                         }}
                                         className="font-bold"
                                     >
-                                        {rolledNFT.rarityLevel}
+                                        {camelToPascal(
+                                            gerRarityFromScoreDefault(
+                                                rolledNFT.attributes[1].value,
+                                            ),
+                                        )}
                                     </span>
                                     &nbsp;NFT!!!
                                 </p>
@@ -117,8 +90,18 @@ const Generate = () => {
 
                         <span data-testid="generate-btn">
                             <Button
-                                text={"Generate!"}
-                                disabled={!isConnected || txStatus !== "NONE"}
+                                text={
+                                    TransactionStatusEnum[txStatus] < 4
+                                        ? "Prepare!"
+                                        : "Generate!"
+                                }
+                                disabled={
+                                    !isConnected ||
+                                    !(
+                                        txStatus == "NONE" ||
+                                        txStatus == "PREP_READY"
+                                    )
+                                }
                                 onClick={() => requestGen()}
                             />
                         </span>

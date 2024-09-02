@@ -1,8 +1,8 @@
-// https://github.com/ora-io/OAO/blob/main/contracts/interfaces/IAIOracle.sol
+// SampleContract.sol
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "./IAIOracle.sol";
+import {IAIOracle} from "./IAIOracle.sol";
 
 /// @notice A base contract for writing a AIOracle app
 abstract contract AIOracleCallbackReceiver {
@@ -13,8 +13,8 @@ abstract contract AIOracleCallbackReceiver {
     error UnauthorizedCallbackSource(IAIOracle expected, IAIOracle found);
 
     /// @notice Initialize the contract, binding it to a specified AIOracle contract
-    constructor(IAIOracle _aiOracle) {
-        aiOracle = _aiOracle;
+    constructor(address _aiOracle) {
+        aiOracle = IAIOracle(_aiOracle);
     }
 
     /// @notice Verify this is a callback by the aiOracle contract

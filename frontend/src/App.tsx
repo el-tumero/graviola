@@ -1,4 +1,5 @@
 import { useEffect, useState, ReactNode, Fragment } from "react"
+import { isDevMode } from "./utils/mode"
 import tailwindConfig from "../tailwind.config"
 import {
     createWeb3Modal,
@@ -6,16 +7,14 @@ import {
     useWeb3ModalProvider,
 } from "@web3modal/ethers/react"
 
-import { NFT } from "./types/NFT"
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-import { rarityScale, rarityGroupColors } from "./data/rarityData"
-import { RarityLevel, RarityGroupData } from "./types/Rarity"
-import { fallbackNFT } from "./data/fallbacks"
 import useWallet from "./hooks/useWallet"
-import { isDevMode } from "./utils/mode"
-import { setCollection, setRarities } from "./redux/reducers/graviola"
+import useArchive from "./hooks/useArchive"
+
+import { setCollection } from "./redux/reducers/graviola"
 import { useAppDispatch } from "./redux/hooks"
+import { fetchCollection } from "./web3"
 
 const App = (props: { children: ReactNode }) => {
     const modal = createWeb3Modal({
@@ -35,8 +34,8 @@ const App = (props: { children: ReactNode }) => {
                 chainId: 421614,
                 name: "Arbitrum Sepolia",
                 currency: "ETH",
-                explorerUrl: "https://sepolia.etherscan.io/",
-                rpcUrl: "https://endpoints.omniatech.io/v1/arbitrum/sepolia/public",
+                explorerUrl: "https://sepolia.arbiscan.io",
+                rpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
             },
         ],
         projectId: "a09890b34dc1551c2534337dbc22de8c",
@@ -45,83 +44,30 @@ const App = (props: { children: ReactNode }) => {
     const dispatch = useAppDispatch()
     useTheme(modal === undefined)
     const { walletProvider } = useWeb3ModalProvider()
-    const { connectWallet, graviola } = useWallet()
+    const { connectWallet, collectionContract } = useWallet()
     const [loading, setLoading] = useState<boolean>(true)
+
+    const { fetchArchive } = useArchive()
 
     // Fetch contract data
     useEffect(() => {
-        if (!graviola || !loading) return
+        if (!loading) return
 
-        const fetchCollection = async () => {
-            const rarityGroupsData = await graviola.getRarityGroups()
-            const nftTotalSupply = await graviola.totalSupply()
+        console.log("[App] is dev mode: ", isDevMode)
+
+        const fetchContractData = async () => {
+            const collectionData = await fetchCollection()
+            const nftTotalSupply = await collectionContract.totalSupply()
+            await fetchArchive()
             console.log("[App] totalSupply: ", Number(nftTotalSupply))
-            const promises = Array.from(
-                {
-                    length: Number(nftTotalSupply),
-                },
-                async (_, idx) => {
-                    try {
-                        const uri = await graviola.tokenURI(BigInt(idx))
-                        const response = await fetch(uri)
-                        const nftData = await response.json()
-                        return {
-                            id: idx,
-                            ...nftData,
-                        }
-                    } catch (error) {
-                        console.warn(
-                            "[App]",
-                            (error as Error).message.substring(0, 72) + "...",
-                        )
-                        return fallbackNFT
-                    }
-                },
-            )
+            console.log("[App] fetched collection ", collectionData)
 
-            // Nfts
-            const collection: NFT[] = await Promise.all(promises)
-            console.log("[App] fetched collection ", collection) // DEBUG
-            collection.length < 5
-                ? (() => {
-                      console.warn(
-                          "Collection is smaller than (5). Using fallback collection",
-                      )
-                      dispatch(setCollection(new Array(5).fill(fallbackNFT)))
-                  })()
-                : dispatch(setCollection(collection))
-
-            const raritiesData = rarityGroupsData.reduce<
-                Record<RarityLevel, RarityGroupData>
-            >(
-                (acc, groupData, idx) => {
-                    const obj = groupData as unknown as RarityGroupData
-                    const gData: RarityGroupData = {
-                        name: obj.name,
-                        color: rarityGroupColors[rarityScale[idx]],
-                        keywords: obj.keywords.map((kword) => kword),
-                        startRange: Number(obj.startRange),
-                        endRange: Number(obj.endRange),
-                        weight: Number(obj.weight),
-                        minTokenWeight: Number(obj.minTokenWeight),
-                    }
-                    acc[rarityScale[idx]] = gData
-                    return acc
-                },
-                {} as Record<RarityLevel, RarityGroupData>,
-            )
-
-            // console.log("[App] raritiesData: ", raritiesData) // DEBUG
-            dispatch(setRarities(raritiesData))
-            console.log("[App] collection loaded!")
-
+            dispatch(setCollection(collectionData))
             setLoading(false)
         }
 
-
-        console.log("[App] Is running in dev mode?: ", isDevMode)
-        fetchCollection()
-    }, [graviola])
+        fetchContractData()
+    }, [loading])
 
     useEffect(() => {
         if (walletProvider) {

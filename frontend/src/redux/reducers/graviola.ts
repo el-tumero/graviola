@@ -1,15 +1,20 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { NFT } from "../../types/NFT";
-import { RaritiesData } from "../../types/RarityGroup";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
+import { NFT } from "../../types/NFT"
 
 interface GraviolaData {
     collection: NFT[]
-    rarities: RaritiesData | null
+    userCollection: NFT[] | undefined
+    groupSizes: number[]
+    weights: number[]
+    keywords: string[]
 }
 
 const initialState: GraviolaData = {
     collection: [],
-    rarities: null
+    userCollection: undefined,
+    groupSizes: [],
+    weights: [],
+    keywords: [],
 }
 
 export const graviolaDataSlice = createSlice({
@@ -19,11 +24,26 @@ export const graviolaDataSlice = createSlice({
         setCollection: (state, action: PayloadAction<NFT[]>) => {
             state.collection = action.payload
         },
-        setRarities: (state, action: PayloadAction<RaritiesData>) => {
-            state.rarities = action.payload
-        }
-    }
+        setUserCollection: (state, action: PayloadAction<NFT[]>) => {
+            state.userCollection = action.payload
+        },
+        setGroupSizes: (state, action: PayloadAction<number[]>) => {
+            state.groupSizes = action.payload
+        },
+        setWeights: (state, action: PayloadAction<number[]>) => {
+            state.weights = action.payload
+        },
+        setKeywords: (state, action: PayloadAction<string[]>) => {
+            state.keywords = action.payload
+        },
+    },
 })
 
-export const { setCollection, setRarities } = graviolaDataSlice.actions
+export const {
+    setCollection,
+    setUserCollection,
+    setGroupSizes,
+    setWeights,
+    setKeywords,
+} = graviolaDataSlice.actions
 export default graviolaDataSlice.reducer

@@ -3,7 +3,7 @@ pragma solidity ^0.8.24;
 import "./IAIOracle.sol";
 
 contract AIOracleMock is IAIOracle {
-    uint256 public fee = 0;
+    uint256 public fee = 100;
 
     struct AICallbackRequestData {
         address account;
@@ -46,7 +46,7 @@ contract AIOracleMock is IAIOracle {
                 revert(add(data, 32), mload(data))
             }
         }
-        emit AICallbackResult(msg.sender, requestId, output);
+        emit AICallbackResult(msg.sender, requestId, msg.sender, output);
     }
 
     function requestCallback(

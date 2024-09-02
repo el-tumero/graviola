@@ -1,22 +1,23 @@
-import "dotenv/config"
-import hardhat from "hardhat"
+import 'dotenv/config'
+import hardhat from 'hardhat'
+import { DeployedContractEnum } from './deployed-contract'
 
 export default async function deployLocal() {
-    const lm = await hardhat.ethers.deployContract("LocalMigration")
-    console.log("Migration deployed!")
+    const lm = await hardhat.ethers.deployContract('LocalMigration')
+    await lm.waitForDeployment()
+    console.log('Migration deployed!')
 
-    const tx = await lm.run()
-    await tx.wait()
-    console.log("Contracts deployed!")
+    await (await lm.deploy()).wait()
+    console.log('Contracts deployed!')
 
-    const names = await lm.getNames()
-    const addresses = await lm.getAddresses()
+    await (await lm.setup()).wait()
+    console.log('Contracts configured!')
 
     const output: Record<string, string> = {}
 
-    names.forEach((name: string, index: number) => {
-        output[`${name}_ADDRESS`] = addresses[index]
-    })
+    for (const [key, value] of Object.entries(DeployedContractEnum)) {
+        output[`${key}_ADDRESS`] = await lm.getDeployedContractAddress(value)
+    }
 
     return output
 }

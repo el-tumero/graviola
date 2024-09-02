@@ -3,7 +3,6 @@ import { Status } from "../types/Status"
 import { clsx as cl } from "clsx"
 import { NFT } from "../types/NFT"
 import BlockNFT from "./BlockNFT"
-import { nftRarityScaleArr } from "../data/fallbacks"
 import { useAppSelector } from "../redux/hooks"
 
 const NFT_AMOUNT = 5 // 5 is sweet spot
@@ -14,14 +13,12 @@ const AutoBlockNFT = () => {
         (state) => state.graviolaData.collection,
     ) as NFT[]
 
-    const shouldUseFallbackNFTList = collection.length < NFT_AMOUNT
     const [status, setStatus] = useState<Status>("loading")
     const [randomNFTs, setRandomNFTs] = useState<NFT[]>([])
     const [activeNFT, setActiveNFT] = useState<number>(-1)
     const [blockAutoChange, setBlockAutoChange] = useState<boolean>(false)
 
     useEffect(() => {
-        if (shouldUseFallbackNFTList) return
         const clonedCollection = JSON.parse(JSON.stringify(collection))
         const shuffled = clonedCollection.sort(() => 0.5 - Math.random())
         const randNfts = shuffled.slice(0, NFT_AMOUNT)
@@ -29,8 +26,6 @@ const AutoBlockNFT = () => {
             setRandomNFTs(randNfts)
             setActiveNFT(0)
             setStatus("ready")
-            // console.log('randnfts ', randNfts)
-            // console.log('init ok')
         }
     }, [collection])
 
@@ -47,9 +42,10 @@ const AutoBlockNFT = () => {
     }, [status, activeNFT, blockAutoChange, randomNFTs.length])
 
     // If the contract has less than NFT_AMOUNT nfts, show the fallbacks instead.
-    const targetNFTList = shouldUseFallbackNFTList
-        ? nftRarityScaleArr
-        : randomNFTs
+    // const targetNFTList: NFT[] = shouldUseFallbackNFTList
+    //     ? fallbackNFTsRarityList
+    //     : randomNFTs
+    const targetNFTList = randomNFTs
 
     return status !== "ready" ? (
         <div>
@@ -62,7 +58,7 @@ const AutoBlockNFT = () => {
                     "flex flex-col max-sm:flex-row flex-grow gap-5 justify-center items-center p-4 mr-1",
                 )}
             >
-                {targetNFTList.map((_, idx) => {
+                {targetNFTList.map((_: NFT, idx) => {
                     return (
                         <div
                             key={idx}
@@ -81,21 +77,6 @@ const AutoBlockNFT = () => {
                         />
                     )
                 })}
-                {/* {randomNFTs.map((_, idx) => (
-                    <div
-                        key={idx}
-                        className={cl(
-                            "w-3 h-3 rounded-full cursor-pointer",
-                            "transition-colors duration-300",
-                            "hover:bg-light-text dark:hover:bg-dark-text",
-                            idx === activeNFT ? "bg-light-text dark:bg-dark-text" : "bg-light-text/25 dark:bg-dark-text/25",
-                        )}
-                        onClick={() => {
-                            setActiveNFT(idx)
-                            setBlockAutoChange(true)
-                        }}
-                    />
-                ))} */}
             </div>
             <div className="w-64 h-64 relative">
                 {randomNFTs.map((nft, idx) => (

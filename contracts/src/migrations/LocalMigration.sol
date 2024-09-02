@@ -1,62 +1,39 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {Graviola} from "../Graviola/GraviolaMain.sol";
+import {GraviolaGenerator} from "../Graviola/GraviolaGenerator.sol";
 import {AIOracleMock} from "../OAO/AIOracleMock.sol";
 import {GraviolaToken} from "../Graviola/GraviolaToken.sol";
-import {GraviolaSeasonsArchive} from "../Graviola/seasons/GraviolaSeasonsArchive.sol";
-import {TGraviolaSeasonsGovernor} from "../Graviola/seasons/TGraviolaSeasonsGovernor.sol";
+import {GraviolaSeasonsArchive} from "../Graviola/seasons/archive/GraviolaSeasonsArchive.sol";
+import {TGraviolaSeasonsGovernor} from "../Graviola/seasons/governor/TGraviolaSeasonsGovernor.sol";
+import {VRFV2PlusWrapperMock} from "../utils/VRFV2PlusWrapperMock.sol";
+import {GraviolaCollection} from "../Graviola/GraviolaCollection.sol";
+import {Migration} from "./Migration.sol";
 
-contract LocalMigration {
-    uint256 constant NUMBER_OF_CONTRACTS = 5;
+contract LocalMigration is Migration {
+    constructor() Migration() {}
 
-    string[NUMBER_OF_CONTRACTS] private names = [
-        "GRAVIOLA",
-        "OAO",
-        "TOKEN",
-        "SEASONS_ARCHIVE",
-        "SEASONS_GOVERNOR"
-    ];
-
-    AIOracleMock private oao;
-    Graviola private graviola;
-    GraviolaToken private gt;
-    GraviolaSeasonsArchive private gsa;
-    TGraviolaSeasonsGovernor private gsg;
-
-    function run() external {
+    function deploy() external {
+        vrf = new VRFV2PlusWrapperMock();
         oao = new AIOracleMock();
-        graviola = new Graviola(address(oao), address(1));
-
         gt = new GraviolaToken(msg.sender);
-
-        gsa = new GraviolaSeasonsArchive(msg.sender);
+        gsa = new GraviolaSeasonsArchive(migrator);
         gsg = new TGraviolaSeasonsGovernor(address(gsa), address(gt));
-
-        for (uint i = 1; i < 100; i++) {
-            gsg.addAndUpvote(i);
-        }
-    }
-
-    function getNames()
-        external
-        view
-        returns (string[NUMBER_OF_CONTRACTS] memory)
-    {
-        return names;
-    }
-
-    function getAddresses()
-        external
-        view
-        returns (address[NUMBER_OF_CONTRACTS] memory)
-    {
-        return [
-            address(graviola),
-            address(oao),
+        collection = new GraviolaCollection(migrator);
+        generator = new GraviolaGenerator(
             address(gt),
             address(gsa),
-            address(gsg)
-        ];
+            address(collection),
+            address(oao),
+            address(vrf)
+        );
+
+        addresses[DeployedContract.VRF] = address(vrf);
+        addresses[DeployedContract.OAO] = address(oao);
+        addresses[DeployedContract.TOKEN] = address(gt);
+        addresses[DeployedContract.SEASONS_ARCHIVE] = address(gsa);
+        addresses[DeployedContract.SEASONS_GOVERNOR] = address(gsg);
+        addresses[DeployedContract.COLLECTION] = address(collection);
+        addresses[DeployedContract.GENERATOR] = address(generator);
     }
 }

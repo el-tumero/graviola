@@ -2,37 +2,26 @@ import { useEffect, useState } from "react"
 import useRandomRarityBorder from "../../../hooks/useBorderAnimation"
 import { getRarityBorder } from "../../../utils/getRarityBorder"
 import { NFT } from "../../../types/NFT"
-import { getRarityFromPerc } from "../../../utils/getRarityData"
 import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
-import { RaritiesData } from "../../../types/RarityGroup"
-import { formatBpToPercentage } from "../../../utils/format"
 import { cn } from "../../../utils/cn"
-import { useAppSelector } from "../../../redux/hooks"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
     runBorderAnim: boolean
-    rGroups: RaritiesData
 }
 
 const GenerateContainer = ({
     rolledNFT,
     runBorderAnim,
-    rGroups,
 }: GenerateContainerProps) => {
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
-    const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750, rGroups)
+    const rarityAnimBorder = useRandomRarityBorder(runBorderAnim, 750)
     const [resOpacity, setResOpacity] = useState<number>(0)
 
     // Dynamic styles based on rolledNFT
     let rarityBorderObject = { style: {} as React.CSSProperties, className: "" }
 
     if (rolledNFT) {
-        const percentage = formatBpToPercentage(rolledNFT.attributes[0].value)
-        const rarity = getRarityFromPerc(percentage, rarities)[1]
-        rarityBorderObject = getRarityBorder(rarity, true)
+        rarityBorderObject = getRarityBorder(rolledNFT.rarityGroup, true) // FIXME
     }
 
     const {

@@ -1,4 +1,5 @@
 import Navbar from "../components/nav/Navbar"
+import AddKeywordForm from "../components/AddKeywordForm"
 import { clsx as cl } from "clsx"
 import {
     compareById,
@@ -9,38 +10,18 @@ import ContentContainer from "../components/ui/layout/ContentContainer"
 import FullscreenContainer from "../components/ui/layout/FullscreenContainer"
 import PageTitle from "../components/ui/layout/PageTitle"
 import SectionContainer from "../components/ui/layout/SectionContainer"
-import candJson from "../../../contracts/candidates.json"
-import { ChangeEvent, ReactNode, Fragment, useState, useEffect } from "react"
-import { getKeyword } from "../utils/getKeyword"
-import { RaritiesData } from "../types/RarityGroup"
+import { ReactNode, Fragment, useState, useEffect } from "react"
 import icons from "../data/icons"
 import Button from "../components/ui/Button"
-import { Candidate } from "../types/Candidate"
-import { useAppSelector } from "../redux/hooks"
+import { CandidateInfo } from "../types/CandidateInfo"
+import { SortingType } from "../types/VotingSort"
+import useWallet from "../hooks/useWallet"
+import KeywordCandidate from "../components/KeywordCandidate"
+import { encodeKeyword } from "../utils/keywordEncoding"
 
 type ActivePage = "Voting" | "Archive"
 
-export interface CandidateInfo {
-    id: number
-    badge?: null // Cache server
-    author: string
-    keyword: string
-    iteration: number
-    score: number
-}
-
-enum SortingType {
-    BY_ID = 1,
-    BY_SCORE_ASC,
-    BY_SCORE_DESC,
-    BY_KEYWORD_ASC,
-    BY_KEYWORD_DESC,
-    // BY_KWORD_ITER_ASC, // Future default?
-    // BY_KWORD_ITER_DESC,
-    // BY_BADGE           // Cache
-    // BY_TRENDING
-}
-
+// TODO: MAINNET: much better popup and dedicated component
 const PopupContainer = (props: { children: ReactNode }) => {
     return (
         <div
@@ -57,92 +38,81 @@ const PopupContainer = (props: { children: ReactNode }) => {
     )
 }
 
-const AddKeywordForm = (props: { onClickClose: () => void }) => {
-    const KEYWORD_MIN_LENGTH = 3
-    const [keyword, setKeyword] = useState<string>("")
-    const [valid, setValid] = useState<boolean>(false)
-    const displayErrMsg = keyword.length > KEYWORD_MIN_LENGTH && !valid
-
-    // TODO: Need better regex for keywords later
-    const isValid = (str: string) => /^[a-z]{3,32}$/.test(str)
-
-    useEffect(() => {
-        if (keyword.length < KEYWORD_MIN_LENGTH) {
-            setValid(false)
-            return
-        }
-        setValid(isValid(keyword))
-    }, [keyword, valid])
-
-    const handleSubmitKeyword = async () => {
-        // Call contract
-    }
-
-    return (
-        <Fragment>
-            <div
-                onClick={props.onClickClose}
-                className={cl(
-                    "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
-                )}
-            >
-                {icons.close}
-            </div>
-            <div className={cl("flex flex-col gap-3 px-3 grow")}>
-                <div className={cl("flex flex-col grow gap-1.5")}>
-                    <p className="font-mono font-semibold mb-1.5">
-                        Add your keyword
-                    </p>
-                    <input
-                        placeholder="Your keyword"
-                        type="text"
-                        value={keyword}
-                        className={cl(
-                            "self-center w-full h-fit rounded-lg p-3",
-                            "bg-light-bgDark/20 dark:bg-dark-bgLight/20",
-                            "border border-light-border dark:border-dark-border",
-                        )}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                            setKeyword(e.target.value)
-                        }
-                    />
-                </div>
-
-                {/* Err msg */}
-                <div
-                    className={cl(
-                        "flex flex-col gap-1 relative w-full h-fit rounded-lg border p-3",
-                        "border-amber-600 dark:border-amber-600",
-                        "bg-amber-500/50 dark:bg-amber-500/50",
-                        "backdrop-blur-md font-mono",
-                        displayErrMsg ? "opacity-100" : "invisible",
-                    )}
-                >
-                    <p className="font-semibold">
-                        Your keyword candidate must be:
-                    </p>
-                    <p>— Between 3 and 32 characters long</p>
-                    <p>— Contain only lowercase a-z characters</p>
-                </div>
-
-                <div>
-                    <Button
-                        text="Add"
-                        disabled={!valid}
-                        onClick={() => handleSubmitKeyword()}
-                    />
-                </div>
-            </div>
-        </Fragment>
-    )
-}
-
 const Voting = () => {
+
     const [activePage, setActivePage] = useState<ActivePage>("Voting")
     // Info tooltip - "What is this?"
     const [infoVisible, setInfoVisible] = useState<boolean>(false)
     // Add your keyword form
     const [addKeywordVisible, setAddKeywordVisible] = useState<boolean>(false)
+
+    const [candidatesReady, setCandidatesReady] = useState<boolean>(false)
+    const [candidates, setCandidates] = useState<CandidateInfo[]>([])
+    const { seasonsGovernorContract } = useWallet()
+
+    // Submitting new candidate through the form
+    const handleSubmitKeyword = async (keyword: string) => {
+        const encodedCandidateId = encodeKeyword(keyword)
+        console.log('encoded ', encodedCandidateId)
+        const res = await seasonsGovernorContract.addCandidate(encodedCandidateId)
+        const recp = await res.wait()
+        console.log(res)
+        console.log(recp)
+        console.log(recp?.logs)
+    }
+
+    const handleCandidateUpvoted = async (word: bigint) => { 
+
+    }
+    const handleCandidateDownvoted = async (word: bigint) => {
+
+    }
+    const handleCandidateCancelVote = async (word: bigint) => {
+
+    }
+    const handleCandidatePromoted = async (word: bigint) => { 
+
+    }
+
+    const handleCandidateAdded = async (word: bigint) => {
+        console.log('awdawd ' ,word)
+    }
+
+    useEffect(() => {
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateAdded, handleCandidateAdded)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateUpvoted, handleCandidateUpvoted)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateDownvoted, handleCandidateDownvoted)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidateCancelVote, handleCandidateCancelVote)
+        seasonsGovernorContract.on(seasonsGovernorContract.filters.CandidatePromoted, handleCandidatePromoted)
+
+        return () => {
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateAdded, handleCandidateAdded)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateUpvoted, handleCandidateUpvoted)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateDownvoted, handleCandidateDownvoted)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidateCancelVote, handleCandidateCancelVote)
+            seasonsGovernorContract.off(seasonsGovernorContract.filters.CandidatePromoted, handleCandidatePromoted)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (candidatesReady) return
+
+        (async () => {
+            const candList = await seasonsGovernorContract.getTopCandidatesInfo(100n)
+            setCandidates(candList.map((cand, idx) => {
+                const c: CandidateInfo = {
+                    id: idx,
+                    keyword: cand[1],
+                    score: Number(cand[2].toString().substring(0, cand[2].toString().length - 19)),
+                    author: cand[3],
+                    iteration: 1
+                }
+                return c
+            }))
+            setCandidatesReady(true)
+        })()
+
+    }, [candidates, candidatesReady])
 
     return (
         <FullscreenContainer>
@@ -156,6 +126,7 @@ const Voting = () => {
                         <PopupContainer>
                             <AddKeywordForm
                                 onClickClose={() => setAddKeywordVisible(false)}
+                                onSubmit={handleSubmitKeyword}
                             />
                         </PopupContainer>
                     )}
@@ -225,13 +196,13 @@ const Voting = () => {
                             "p-2 rounded-l-lg",
                             activePage === "Voting"
                                 ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
+                                    "border border-light-text/25 dark:border-dark-text/25",
+                                    "bg-light-border/30 dark:bg-dark-border/30",
+                                ]
                                 : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
+                                    "cursor-pointer",
+                                    "border-light-border dark:border-dark-border",
+                                ],
                         )}
                     >
                         <p className="select-none">Voting</p>
@@ -244,13 +215,13 @@ const Voting = () => {
                             "p-2 rounded-r-lg",
                             activePage === "Archive"
                                 ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
+                                    "border border-light-text/25 dark:border-dark-text/25",
+                                    "bg-light-border/30 dark:bg-dark-border/30",
+                                ]
                                 : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
+                                    "cursor-pointer",
+                                    "border-light-border dark:border-dark-border",
+                                ],
                         )}
                     >
                         <p className="select-none">Archive</p>
@@ -259,6 +230,7 @@ const Voting = () => {
 
                 {activePage === "Voting" ? (
                     <KeywordVotingPage
+                        candidates={candidates}
                         onClickInfo={() => setInfoVisible(true)}
                         onClickAddKeyword={() => setAddKeywordVisible(true)}
                     />
@@ -273,12 +245,10 @@ const Voting = () => {
 const ArchivePage = () => <p className="self-center">Soon</p>
 
 const KeywordVotingPage = (props: {
+    candidates: CandidateInfo[]
     onClickInfo: () => void
     onClickAddKeyword: () => void
 }) => {
-    const rarities = useAppSelector(
-        (state) => state.graviolaData.rarities,
-    ) as RaritiesData
     // Default sort is always by id (same order as we got from the contract)
     const [sorting, setSorting] = useState<SortingType>(SortingType["BY_ID"])
     // Map sorting types (enum) to compare fns
@@ -292,19 +262,6 @@ const KeywordVotingPage = (props: {
         4: compareAlphabetically("Ascending"), // BY_KEYWORD_ASC
         5: compareAlphabetically("Descending"), // BY_K2EYWORD_ASC
     }
-
-    const mockCandidates = candJson.candidates.map(
-        (data: Candidate, i: number) => {
-            const candidateData: CandidateInfo = {
-                id: i,
-                author: data.author || "UNKNOWN",
-                keyword: getKeyword((+data.id || -1) - 1, rarities)[0], // -1 to avoid out of bounds absIdx
-                iteration: 0,
-                score: +data.score || -1,
-            }
-            return candidateData
-        },
-    )
 
     return (
         <div
@@ -378,100 +335,22 @@ const KeywordVotingPage = (props: {
                     "border border-light-border dark:border-dark-border rounded-lg p-1",
                 )}
             >
-                <ul
-                    role="list"
-                    className="w-full divide-y divide-light-border dark:divide-dark-border"
-                >
-                    {mockCandidates
-                        .sort(sortCompareFns[sorting])
-                        .map((candInfo, idx) => (
-                            <KeywordCandidate {...candInfo} key={idx} />
-                        ))}
-                </ul>
+                {props.candidates.length > 0 &&
+                    <ul
+                        role="list"
+                        className="w-full divide-y divide-light-border dark:divide-dark-border"
+                    >
+                        {props.candidates
+                            .sort(sortCompareFns[sorting])
+                            .map((candData, idx) => (
+                                <KeywordCandidate data={candData} key={idx} />
+                            ))}
+                    </ul>
+                }
             </div>
         </div>
     )
 }
 
-const KeywordCandidate = (props: CandidateInfo) => (
-    <div
-        className={cl(
-            "flex w-full h-fit p-3 justify-between items-center overflow-x-hidden",
-            "max-md:gap-2 max-md:justify-start max-md:items-start",
-            "even:bg-light-border/30 even:dark:bg-dark-border/30",
-            "odd:bg-light-bgDark/30 odd:dark:bg-dark-bgLight/30",
-            "first:rounded-t-md last:rounded-b-md",
-        )}
-    >
-        {/* Pre-left part: global item index */}
-        <div className="mr-2 self-center w-6">
-            <span className="font-mono text-light-text/75 dark:text-dark-text/75">
-                {props.id}.
-            </span>
-        </div>
-        {/* Left part: Id, Badge, Keyword, Iteration info */}
-        <div
-            className={cl(
-                "flex flex-nowrap gap-3 justify-center items-center w-1/2 h-full",
-                "max-md:w-full",
-            )}
-        >
-            <div
-                className={cl(
-                    "w-8 h-8 flex justify-center items-center",
-                    !props.badge && [
-                        "border-2 border-light-border dark:border-dark-border",
-                        "border-dashed rounded-md",
-                    ],
-                )}
-            >
-                {props.badge && <img src={props.badge} />}
-            </div>
-            <div className="flex w-full flex-1 gap-0.5 justify-start items-center">
-                <p className="mr-1 font-mono text-light-text/75 dark:text-dark-text/75 text-[10px] mb-1.5">
-                    ({props.iteration})
-                </p>
-                <p>{props.keyword}</p>
-            </div>
-        </div>
-        {/* Right part: Score, Upvote, Downvote */}
-        <div
-            className={cl(
-                "w-1/2 flex justify-end items-center h-full gap-3",
-                "max-md:w-full",
-            )}
-        >
-            <div className={cl("flex w-24 justify-end items-center")}>
-                <span className="font-semibold font-mono">{props.score}</span>
-            </div>
-            <div className="flex gap-1.5 flex-nowrap">
-                <div
-                    className={cl(
-                        "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer -rotate-90",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                        "hover:bg-accentDark/50 hover:dark:bg-accent/50 duration-300 transition-colors",
-                        "hover:border-accentDark hover:dark:border-accent",
-                        "text-accentDark dark:text-accent",
-                    )}
-                >
-                    {icons.arrow}
-                </div>
-                <div
-                    className={cl(
-                        "rounded-lg w-8 h-8 p-1 flex justify-center items-center cursor-pointer rotate-90",
-                        "border border-light-border dark:border-dark-border",
-                        "bg-light-bgDark/50 dark:bg-dark-bgLight/20",
-                        "hover:bg-red-500/50 hover:dark:bg-red-500/50 duration-300 transition-colors",
-                        "hover:border-red-500 hover:dark:border-red-500",
-                        "text-red-500 dark:text-red-500",
-                    )}
-                >
-                    {icons.arrow}
-                </div>
-            </div>
-        </div>
-    </div>
-)
 
 export default Voting

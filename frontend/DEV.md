@@ -2,12 +2,13 @@
 
 ### Local blockchain
 
--   VITE_DEV_PROVIDER : bool
+-   VITE_DEV_PROVIDER : bool `set to true for local dev`
 -   VITE_DEV_RPC : string `http://localhost:8545 for local dev`
+-   VITE_TESTNET_RPC: string `needs to be WSS`
 
 ### Running local blockchain
 
-1. (frontend) - `yarn dev:test` - This runs hardhat network in background and starts the website on port `5173`
+1. (frontend) - `yarn dev` - This runs hardhat network in background and starts the website on port `5173`
 2. (contracts) - `yarn deploy:local` - Deploy the localhost contract and types
 3. (frontend) - Refresh website (addresses-local.json should be available by now)
 
