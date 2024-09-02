@@ -3,9 +3,7 @@ import useRandomRarityBorder from "../../../hooks/useBorderAnimation"
 import { getRarityBorder } from "../../../utils/getRarityBorder"
 import { NFT } from "../../../types/NFT"
 import { convertToIfpsURL } from "../../../utils/convertToIpfsURL"
-import { formatBpToPercentage } from "../../../utils/format"
 import { cn } from "../../../utils/cn"
-import { rarities } from "../../../data/rarities"
 
 interface GenerateContainerProps {
     rolledNFT?: NFT
@@ -23,9 +21,7 @@ const GenerateContainer = ({
     let rarityBorderObject = { style: {} as React.CSSProperties, className: "" }
 
     if (rolledNFT) {
-        const percentage = formatBpToPercentage(rolledNFT.attributes[0].value)
-        // const weights = rolledNFT.attributes TODO
-        rarityBorderObject = getRarityBorder("common", true) // FIXME
+        rarityBorderObject = getRarityBorder(rolledNFT.rarityGroup, true) // FIXME
     }
 
     const {
