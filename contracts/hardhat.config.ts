@@ -2,9 +2,11 @@ import 'dotenv/config'
 import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox'
 import '@nomiclabs/hardhat-solhint'
+import '@nomicfoundation/hardhat-verify'
 
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 const API_KEY_INFURA = process.env.API_KEY_INFURA
+const ARBISCAN_API_KEY = process.env.ARBISCAN_API_KEY
 
 const config: HardhatUserConfig = {
     networks: {
@@ -17,9 +19,14 @@ const config: HardhatUserConfig = {
                 blockNumber: 71109865,
             },
         },
-        testnet: {
+        arbitrumSepolia: {
             url: `https://arbitrum-sepolia.infura.io/v3/${API_KEY_INFURA}`,
             accounts: PRIVATE_KEY ? [PRIVATE_KEY] : undefined,
+        },
+    },
+    etherscan: {
+        apiKey: {
+            arbitrumSepolia: ARBISCAN_API_KEY ?? '',
         },
     },
     solidity: {
