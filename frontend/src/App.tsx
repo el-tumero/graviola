@@ -1,150 +1,81 @@
-import "./App.css"
-import { useEffect, useState, ReactNode } from 'react'
-import { createWeb3Modal, defaultConfig, useWeb3ModalProvider } from '@web3modal/ethers/react'
-import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers'
-import { Graviola } from "../../contracts/typechain-types/contracts/Graviola"
-import { Graviola__factory as GraviolaFactory } from "../../contracts/typechain-types/factories/contracts/Graviola__factory"
-import { GraviolaContext } from "./contexts/GraviolaContext"
-import { NFT } from "./types/NFT"
+import { useEffect, useState, ReactNode, Fragment } from "react"
+import { isDevMode } from "./utils/mode"
+import tailwindConfig from "../tailwind.config"
+import {
+    createWeb3Modal,
+    defaultConfig,
+    useWeb3ModalProvider,
+} from "@web3modal/ethers/react"
+
 import Loading from "./pages/Loading"
 import useTheme from "./hooks/useTheme"
-import { GRAVIOLA_ADDRESS } from "../../contracts/scripts/constants"
-import { rarityScale, rarityGroupColors } from "./rarityData"
-import { RarityLevel, RarityGroupData } from "./types/Rarity"
-import { Keyword } from "./types/Keyword"
-import { RaritiesData } from "./types/RarityGroup"
-import { fallbackNFT } from "./utils/fallbackNFT"
+import useWallet from "./hooks/useWallet"
+import useArchive from "./hooks/useArchive"
 
-
-// No wallet connected (read-only)
-async function connectContract(): Promise<Graviola> {
-    console.log("[readonly] connecting to contract...")
-    const provider = new JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com")
-    const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, provider)
-    console.log("[readonly] connected")
-    return graviola as unknown as Graviola
-}
-
-// Conn to contract with wallet
-async function connectContractWallet(walletProvider: Eip1193Provider): Promise<Graviola> {
-    console.log("[wallet] connecting to contract...")
-    const provider = new BrowserProvider(walletProvider)
-    const signer = await provider.getSigner()
-    const graviola = GraviolaFactory.connect(GRAVIOLA_ADDRESS, signer)
-    console.log("[wallet] connected")
-    return graviola as unknown as Graviola
-}
+import { setCollection } from "./redux/reducers/graviola"
+import { useAppDispatch } from "./redux/hooks"
+import { fetchCollection } from "./web3"
 
 const App = (props: { children: ReactNode }) => {
-
-    const projectId = 'a09890b34dc1551c2534337dbc22de8c'
-    const sepolia = {
-        chainId: 11155111,
-        name: 'Sepolia testnet',
-        currency: 'ETH',
-        explorerUrl: 'https://sepolia.etherscan.io/',
-        rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com'
-    }
-    const metadata = {
-        name: 'Graviola NFT',
-        description: 'NFT generator powered by opML',
-        url: 'https://mywebsite.com', // origin must match your domain & subdomain
-        icons: ['https://avatars.mywebsite.com/']
-    }
-
     const modal = createWeb3Modal({
-        ethersConfig: defaultConfig({ metadata }),
-        chains: [sepolia],
-        projectId
+        themeVariables: {
+            "--w3m-accent": tailwindConfig.theme.extend.colors.accentDark,
+        },
+        ethersConfig: defaultConfig({
+            metadata: {
+                name: "graviola NFT",
+                description: "NFT generator powered by opML",
+                url: "https://el-tumero.github.io/graviola/",
+                icons: [],
+            },
+        }),
+        chains: [
+            {
+                chainId: 421614,
+                name: "Arbitrum Sepolia",
+                currency: "ETH",
+                explorerUrl: "https://sepolia.arbiscan.io",
+                rpcUrl: "https://sepolia-rollup.arbitrum.io/rpc",
+            },
+        ],
+        projectId: "a09890b34dc1551c2534337dbc22de8c",
     })
 
-
+    const dispatch = useAppDispatch()
+    useTheme(modal === undefined)
     const { walletProvider } = useWeb3ModalProvider()
-    const [,] = useTheme((modal === undefined))
-
-    const [graviola, setGraviola] = useState<Graviola | null>(null)
+    const { connectWallet, collectionContract } = useWallet()
     const [loading, setLoading] = useState<boolean>(true)
 
-    // Contract data    
-    const [dataFetched, setDataFetched] = useState<boolean>(false)
-    const [collection, setCollection] = useState<NFT[]>([])
-    const [rarities, setRarities] = useState<RaritiesData | null>(null)
-
-    const graviolaContextValue = {
-        contract: graviola,
-        collection: collection,
-        rarities: rarities
-    }
+    const { fetchArchive } = useArchive()
 
     // Fetch contract data
     useEffect(() => {
+        if (!loading) return
 
-        if (!graviola || dataFetched) return
-    
-        const fetchCollection = async () => {
+        console.log("[App] is dev mode: ", isDevMode)
 
-            const rarityGroupsData = await graviola.getRarityGroups()
-            const nftTotalSupply = await graviola.totalSupply()
-            console.log("[info] totalSupply: ", Number(nftTotalSupply))
-            const promises = Array.from({ length: Number(nftTotalSupply)}, async (_, i) => {
-                try {
-                    const uri = await graviola.tokenURI(BigInt(i))
-                    const response = await fetch(uri)
-                    return response.json()
-                } catch (error) {
-                    // console.warn(`[warn] err while fetching collection: ${error}`)
-                    return fallbackNFT
-                }
-            })
-            
-            // Nfts
-            const collection: NFT[] = await Promise.all(promises)
-            console.log("[info] fetched collection ", collection)
-            setCollection(prev => [...prev, ...collection])
+        const fetchContractData = async () => {
+            const collectionData = await fetchCollection()
+            const nftTotalSupply = await collectionContract.totalSupply()
+            await fetchArchive()
+            console.log("[App] totalSupply: ", Number(nftTotalSupply))
+            console.log("[App] fetched collection ", collectionData)
 
-            const raritiesData = rarityGroupsData.reduce<Record<RarityLevel, RarityGroupData>>((acc, groupData, index) => {
-
-                // Cast keywords
-                const keywords: Keyword[] = groupData.keywords.map((keyword) => ({
-                    name: keyword[0],
-                    lowerRange: Number(keyword[1]),
-                    upperRange: Number(keyword[2]),
-                }))
-            
-                const rarityGroupData: RarityGroupData = {
-                    name: groupData.name,
-                    rarityPerc: Number(groupData.rarityPerc),
-                    color: rarityGroupColors[rarityScale[index]],
-                    keywords,
-                }
-
-                acc[rarityScale[index] as RarityLevel] = rarityGroupData
-                return acc
-            }, {} as Record<RarityLevel, RarityGroupData>)
-
-            console.log("[info] raritiesData: ", raritiesData)
-            setRarities(raritiesData)
-
+            dispatch(setCollection(collectionData))
             setLoading(false)
         }
 
-        fetchCollection()
-        setDataFetched(true)
-
-    }, [graviola])
+        fetchContractData()
+    }, [loading])
 
     useEffect(() => {
-        if (walletProvider) connectContractWallet(walletProvider).then(contract => setGraviola(contract)) // override readonly contract conn
-        else connectContract().then(noWalletContract => setGraviola(noWalletContract))
+        if (walletProvider) {
+            connectWallet(walletProvider)
+        }
     }, [walletProvider])
 
-    return (
-        (loading)
-        ? <Loading />
-        : <GraviolaContext.Provider value={graviolaContextValue}>
-            {props.children}
-          </GraviolaContext.Provider>
-    )
+    return loading ? <Loading /> : <Fragment>{props.children}</Fragment>
 }
 
 export default App

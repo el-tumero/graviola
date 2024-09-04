@@ -1,0 +1,13 @@
+[profile.default]
+    src = "src"
+    script = "script"
+    test = "test"
+    out = "out"
+    solc = "0.8.24"
+    evm_version = "shanghai"
+    cache_path="cache_forge"
+
+[rpc_endpoints]
+    sepolia = "https://sepolia.infura.io/v3/${API_KEY_INFURA}"
+    arb_sepolia = "https://arbitrum-sepolia.infura.io/v3/${API_KEY_INFURA}"
+    localhost = "http://localhost:8545"

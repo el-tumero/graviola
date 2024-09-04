@@ -1,24 +1,30 @@
-import { RarityGroupData, RarityLevel } from "../types/Rarity";
-import { rarityScale } from "../rarityData";
+import { RarityLevel, rarities, rarityColors } from "../data/rarities"
 
-export function getRarityBorder(rarityGroup: RarityGroupData, breathingEffect?: boolean): { style: React.CSSProperties, className?: string } {
+export function getRarityBorder(
+    rarityGroup: RarityLevel,
+    breathingEffect?: boolean,
+): {
+    style: React.CSSProperties
+    className: string
+} {
+    const rarityGroupColor = rarityColors[rarityGroup]
     const baseStyle = {
-        boxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
-        WebkitBoxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
-        MozBoxShadow: `0px 0px 20px 6px ${rarityGroup.color}`,
-        '--rarity-color': rarityGroup.color,
+        boxShadow: `0px 0px 20px 6px ${rarityGroupColor}`,
+        WebkitBoxShadow: `0px 0px 20px 6px ${rarityGroupColor}`,
+        MozBoxShadow: `0px 0px 20px 6px ${rarityGroupColor}`,
+        "--rarity-color": rarityGroupColor,
     }
     if (breathingEffect) {
         return {
             style: baseStyle,
-            className: 'breathing-effect'
+            className: "breathing-effect",
         }
     } else {
-        return { style: baseStyle }
+        return { style: baseStyle, className: "" }
     }
 }
 
 export function getRandomRarity(): RarityLevel {
-    const randomIndex = Math.floor(Math.random() * rarityScale.length)
-    return rarityScale[randomIndex]
+    const randomIndex = Math.floor(Math.random() * rarities.length)
+    return rarities[randomIndex]
 }

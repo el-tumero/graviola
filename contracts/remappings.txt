@@ -1,0 +1,5 @@
+@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/
+forge-std/=node_modules/forge-std/
+solidity-json-writer/contracts/=node_modules/solidity-json-writer/contracts/
+solidity-linked-list/contracts/=node_modules/solidity-linked-list/contracts/
+@chainlink/contracts/=node_modules/@chainlink/contracts/

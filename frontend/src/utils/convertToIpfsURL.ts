@@ -1,3 +1,3 @@
-export function convertToIfpsURL(cid:string) {
-    return "https://ipfs.io/ipfs/" + cid
+export function convertToIfpsURL(cid: string) {
+    return "https://gateway.pinata.cloud/ipfs/" + cid
 }
