@@ -7,7 +7,6 @@ export default function useTheme(web3ModalLoaded: boolean): {
     theme: Theme
     toggleTheme: () => void
 } {
-
     const dispatch = useAppDispatch()
     const { setThemeMode } = useWeb3ModalTheme()
     const { theme } = useAppSelector((state) => state.theme)

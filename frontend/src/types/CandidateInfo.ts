@@ -1,4 +1,3 @@
-
 export interface CandidateInfo {
     id: number
     badge?: null // Cache server

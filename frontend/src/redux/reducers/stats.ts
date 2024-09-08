@@ -1,4 +1,4 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 interface UserStats {
     tokenBalance: number
@@ -27,9 +27,10 @@ export const userStatsSlice = createSlice({
         },
         setUserStats: (_, action: PayloadAction<UserStats>) => {
             return action.payload
-        }
-    }
+        },
+    },
 })
 
-export const { setTokenBalance, setNftsDropped, setNftsOwned, setUserStats } = userStatsSlice.actions
+export const { setTokenBalance, setNftsDropped, setNftsOwned, setUserStats } =
+    userStatsSlice.actions
 export default userStatsSlice.reducer

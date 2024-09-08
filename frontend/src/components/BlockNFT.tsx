@@ -32,7 +32,8 @@ const BlockNFT = ({
 
     let style: React.CSSProperties = {}
     if (glowColor !== "none") {
-        if (glowColor === "auto") style = getRarityBorder(nftData.rarityGroup).style
+        if (glowColor === "auto")
+            style = getRarityBorder(nftData.rarityGroup).style
         else {
             // handle custom glow color
             style = getRarityBorder(glowColor).style
@@ -87,10 +88,14 @@ const BlockNFTMetadata = (props: { metadata: NFTAttributes[] }) => {
             {props.metadata.map((attr, idx) => {
                 let val: number | string = attr.value
                 // Human-readable probability percentage (instead of BP)
-                if (attr.trait_type === "Probability"){ val = formatBpToPercentage(val) + "%"}
-                return (<p key={idx}>
-                    {attr.trait_type}: &quot;{val}&quot;
-                </p>)
+                if (attr.trait_type === "Probability") {
+                    val = formatBpToPercentage(val) + "%"
+                }
+                return (
+                    <p key={idx}>
+                        {attr.trait_type}: &quot;{val}&quot;
+                    </p>
+                )
             })}
         </div>
     )

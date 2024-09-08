@@ -11,7 +11,7 @@ const MetadataMock = (props: { metadata: MetadataMockProperty[] }) => {
         <div
             className={cl(
                 "font-mono rounded-xl break-words",
-                "bg-light-border/30 dark:bg-dark-border/30",
+                "bg-light-border/50 dark:bg-dark-border/50",
                 "px-6 py-9",
             )}
         >

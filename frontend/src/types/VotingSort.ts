@@ -1,4 +1,3 @@
-
 export enum SortingType {
     BY_ID = 1,
     BY_SCORE_ASC,
