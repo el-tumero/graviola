@@ -5,11 +5,15 @@ export interface NFTAttributes {
     value: number
 }
 
-export interface NFT {
-    id: number
+export interface RawNFTData {
     description: string
     image: string
-    rarityGroup: RarityLevel
-    seasonId?: number
     attributes: Array<NFTAttributes> // Meta attributes object (ERC721 opensea metadata standard)
+}
+
+export interface NFT extends RawNFTData {
+    id: number
+    rarityGroup: RarityLevel
+    seasonId: number
+    probability: number
 }

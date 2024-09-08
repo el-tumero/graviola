@@ -7,6 +7,8 @@ export const fallbackNFT: NFT = {
     image: "QmSmZ7GBc3TssiZnZRazxCBSeenL2iSYmfQtNELGLCfg9d",
     description: "This is a fallback NFT image.",
     rarityGroup: "legendary",
+    seasonId: 0,
+    probability: 1000,
     attributes: [
         {
             trait_type: "Score",
@@ -25,6 +27,8 @@ export const fallbackNFTsRarityList: NFT[] = [
         image: "QmNjGp4AKSoooj4YAdknye1RuWE3whGETa4h9VKZ13fVu5",
         description: "Fallback COMMON NFT image.",
         rarityGroup: "common",
+        seasonId: 0,
+        probability: 600000,
         attributes: [
             {
                 trait_type: "Score",
@@ -41,6 +45,8 @@ export const fallbackNFTsRarityList: NFT[] = [
         image: "QmS6Fp3nXyXhAYzGNwVBEfegtiPQLPnSn4dhCyemaaR4Fc",
         description: "Fallback UNCOMMON NFT image.",
         rarityGroup: "uncommon",
+        seasonId: 0,
+        probability: 120000,
         attributes: [
             {
                 trait_type: "Score",
@@ -57,6 +63,8 @@ export const fallbackNFTsRarityList: NFT[] = [
         image: "QmXjxcyEjt9WayCAasfh1gsWN8XFXDPZmm3BZyGY2RJAJ8",
         description: "Fallback RARE NFT image.",
         rarityGroup: "rare",
+        seasonId: 0,
+        probability: 30967,
         attributes: [
             {
                 trait_type: "Score",
@@ -71,8 +79,10 @@ export const fallbackNFTsRarityList: NFT[] = [
     {
         id: 9998,
         image: "QmattqkasNWK55V84B5162sbjHh4whRefHjuY4w892dn3o",
-        rarityGroup: "veryRare",
         description: "Fallback VERY RARE NFT image.",
+        rarityGroup: "veryRare",
+        seasonId: 0,
+        probability: 15460,
         attributes: [
             {
                 trait_type: "Score",
@@ -89,6 +99,8 @@ export const fallbackNFTsRarityList: NFT[] = [
         image: "QmZYffseN7YhEa3AukpjohJWhWeBG6mJ2YBF8QYgf6sU7h",
         rarityGroup: "legendary",
         description: "Fallback LEGENDARY NFT image.",
+        seasonId: 0,
+        probability: 2500,
         attributes: [
             {
                 trait_type: "Score",

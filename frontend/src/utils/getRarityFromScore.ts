@@ -1,4 +1,4 @@
-import { RarityLevel } from "../data/rarities"
+import { minWeightGroup, RarityLevel } from "../data/rarities"
 
 export function getRarityFromScore(
     weights: number[],
@@ -9,4 +9,8 @@ export function getRarityFromScore(
     if (score < weights[2]) return "rare"
     if (score < weights[3]) return "veryRare"
     return "legendary"
+}
+
+export function gerRarityFromScoreDefault(score: number) {
+    return getRarityFromScore(minWeightGroup.slice(1), score)
 }

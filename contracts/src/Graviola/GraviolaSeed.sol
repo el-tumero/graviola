@@ -49,7 +49,7 @@ contract GraviolaSeed {
             j++;
             uint256 randNum = uint256(keccak256(abi.encode(seed, i, j)));
             // Default omega is 100, so we're going to get an index in range 0-99 (inclusive)
-            uint256 wordId = randNum % omega;
+            uint256 wordId = (DEFAULT_OMEGA - omega) + (randNum % omega);
 
             // Duplicate id, re-roll
             if (

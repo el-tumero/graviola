@@ -28,6 +28,8 @@ abstract contract Migration is KeywordConverter {
 
     mapping(DeployedContract => address) internal addresses;
 
+    address internal migrator = address(this);
+
     VRFV2PlusWrapperMock internal vrf;
     AIOracleMock internal oao;
     GraviolaToken internal gt;
@@ -140,11 +142,8 @@ abstract contract Migration is KeywordConverter {
     ];
 
     function setup() external virtual {
-        collection.transferOwnership(address(generator));
-
-        for (uint256 i = 0; i < 100; i++) {
-            gsg.addAndUpvote(_encodeKeyword(keywords[i]), (i + 1) * (1 ether));
-        }
+        // ARCHIVE setup
+        gsa.setSeasonsGovernor(migrator);
 
         gsa.nameSeason(0, "Summer 2024");
         gsa.addPromptBaseToSeason(0, DEFAULT_PROMPT_BASE);
@@ -153,6 +152,17 @@ abstract contract Migration is KeywordConverter {
         for (uint256 i = 0; i < NUMBER_OF_KEYWORDS; i++) {
             gsa.addKeywordToSeason(0, keywords[i]);
         }
+
+        gsa.setSeasonsGovernor(address(gsg));
+
+        // GOVERNOR setup
+
+        for (uint256 i = 0; i < 100; i++) {
+            gsg.addAndUpvote(_encodeKeyword(keywords[i]), (i + 1) * (1 ether));
+        }
+
+        // COLLECTION setup
+        collection.setGenerator(address(generator));
     }
 
     function getDeployedContractAddress(

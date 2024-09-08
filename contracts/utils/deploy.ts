@@ -4,6 +4,7 @@ import hardhat from 'hardhat'
 import sendRpcCall from './rpcCall'
 import deployTestnet from './deploy-testnet'
 import { generateN } from './generate'
+import { transfer } from './collection'
 
 const config = {
     // Local dev (hardhat)
@@ -56,6 +57,7 @@ async function main() {
         if (variant === 'localhost') {
             await generateN(addresses, 5)
             console.log('Generated 5 collection tokens!')
+            await transfer(2, addresses)
             console.log('Auto-mine turned on!')
             await sendRpcCall('evm_setIntervalMining', [3000])
         }

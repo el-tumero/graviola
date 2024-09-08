@@ -14,16 +14,14 @@ import { useNavigate } from "react-router-dom"
 import PageTitle from "../components/ui/layout/PageTitle"
 import useGenerateNFT from "../hooks/useGenerateNFT"
 import useWallet from "../hooks/useWallet"
-import { getRarityFromScore } from "../utils/getRarityFromScore"
-import useArchive from "../hooks/useArchive"
-import { getRarityColorFromScore } from "../utils/getRarityColorFromScore"
+import { gerRarityFromScoreDefault } from "../utils/getRarityFromScore"
+import { getRarityColorFromScoreDefault } from "../utils/getRarityColorFromScore"
+import camelToPascal from "../utils/camelToPascal"
 
 const Generate = () => {
     const navigate = useNavigate()
 
     const { isConnected } = useWallet()
-
-    const { weights } = useArchive()
 
     // Gen data
     const { txStatus, txMsg, txPopup, rolledNFT, requestGen, closePopup } =
@@ -63,23 +61,22 @@ const Generate = () => {
                                     Congratulations! You rolled a&nbsp;
                                     <span
                                         style={{
-                                            color: getRarityColorFromScore(
-                                                weights,
+                                            color: getRarityColorFromScoreDefault(
                                                 rolledNFT.attributes[1].value,
                                             ),
                                             borderBottomWidth: 1,
                                             borderBottomColor:
-                                                getRarityColorFromScore(
-                                                    weights,
+                                                getRarityColorFromScoreDefault(
                                                     rolledNFT.attributes[1]
                                                         .value,
                                                 ),
                                         }}
                                         className="font-bold"
                                     >
-                                        {getRarityFromScore(
-                                            weights,
-                                            rolledNFT.attributes[1].value,
+                                        {camelToPascal(
+                                            gerRarityFromScoreDefault(
+                                                rolledNFT.attributes[1].value,
+                                            ),
                                         )}
                                     </span>
                                     &nbsp;NFT!!!

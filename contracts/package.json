@@ -7,7 +7,8 @@
         "build": "forge build",
         "deploy": "ts-node --transpile-only utils/deploy.ts",
         "deploy:local": "HARDHAT_NETWORK=localhost yarn deploy",
-        "deploy:testnet": "HARDHAT_NETWORK=testnet yarn deploy",
+        "deploy:testnet": "HARDHAT_NETWORK=arbitrumSepolia yarn deploy",
+        "verify": "HARDHAT_NETWORK=arbitrumSepolia ts-node --transpile-only utils/verify.ts",
         "local-node": "hardhat node",
         "mock-bot": "HARDHAT_NETWORK=localhost ts-node --transpile-only utils/mock-bot.ts",
         "test": "forge test -vv",
@@ -17,6 +18,7 @@
         "lint": "solhint '**/*.sol'"
     },
     "dependencies": {
+        "@inquirer/prompts": "^5.4.0",
         "@openzeppelin/contracts": "^5.0.2",
         "dotenv": "^16.4.5",
         "solidity-json-writer": "^1.1.0",
@@ -31,7 +33,7 @@
         "@nomicfoundation/hardhat-ignition-ethers": "^0.15.0",
         "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
         "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-        "@nomicfoundation/hardhat-verify": "^2.0.0",
+        "@nomicfoundation/hardhat-verify": "^2.0.10",
         "@nomiclabs/hardhat-solhint": "^4.0.0",
         "@typechain/ethers-v6": "^0.5.1",
         "@typechain/hardhat": "^9.0.0",

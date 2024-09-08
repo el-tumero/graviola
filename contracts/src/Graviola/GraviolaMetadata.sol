@@ -1,9 +1,8 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
 import {JsonWriter} from "solidity-json-writer/contracts/JsonWriter.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
-import {IGraviolaSeasonsArchive} from "./seasons/archive/IGraviolaSeasonsArchive.sol";
 
 struct Metadata {
     string description;
@@ -20,12 +19,6 @@ abstract contract GraviolaMetadata {
     error MetadataEmpty();
 
     mapping(uint256 => Metadata) private metadataStorage;
-
-    IGraviolaSeasonsArchive private immutable SEASONS_ARCHIVE;
-
-    constructor(address seasonsArchiveAddress) {
-        SEASONS_ARCHIVE = IGraviolaSeasonsArchive(seasonsArchiveAddress);
-    }
 
     function _getMetadata(
         uint256 tokenId
@@ -98,7 +91,6 @@ abstract contract GraviolaMetadata {
             );
     }
 
-    // NOTE: public only for local tests
     function _tokenURI(uint256 tokenId) internal view returns (string memory) {
         if (!metadataStorage[tokenId].isReady) {
             revert MetadataEmpty();

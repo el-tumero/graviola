@@ -176,7 +176,7 @@ const Navbar = () => {
                             />
                         </div>
                         <p className="font-semibold font-mono text-accentDark dark:text-accent opacity-100">
-                            graviolaNFT
+                            GraviolaNFT
                         </p>
                     </div>
 

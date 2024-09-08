@@ -5,7 +5,12 @@ import Navbar from "../components/nav/Navbar"
 import PageTitle from "../components/ui/layout/PageTitle"
 import { useState } from "react"
 import icons from "../data/icons"
-import { rarities, rarityColors, RarityLevel } from "../data/rarities"
+import {
+    minWeightGroup,
+    rarities,
+    rarityColors,
+    RarityLevel,
+} from "../data/rarities"
 import useArchive from "../hooks/useArchive"
 
 interface RarityGroupData {
@@ -108,7 +113,7 @@ const Keywords = () => {
             const endIndex = startIndex + groupSizes[idx]
             res[rarity] = {
                 rarity,
-                minWeight: 0,
+                minWeight: minWeightGroup[idx],
                 maxWeight: 0,
                 keywords: keywords.slice(startIndex, endIndex),
                 keywordWeight: weights[idx],
