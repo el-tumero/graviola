@@ -33,10 +33,9 @@ const Home = () => {
                 <div className="flex flex-col p-4 gap-3">
                     <SectionContainer additionalClasses="border-none justify-center text-center">
                         <h1 className="text-accent font-title font-semibold text-3xl">
-                            Graviola is an autonomous NFT collection powered by
-                            opML.
+                            Graviola is a community-driven NFT collection of
                             <br />
-                            Second header some text.
+                            randomly AI-generated characters
                         </h1>
                     </SectionContainer>
 
@@ -49,18 +48,17 @@ const Home = () => {
                         >
                             <div className={cl("flex mb-4 md:w-3/5 md:mb-0")}>
                                 <h2 className="text-light-text dark:text-dark-text text-xl">
-                                    Lorem ipsum dolor sit amet consectetur,
-                                    adipisicing elit. Quisquam eaque adipisci
-                                    facilis fugiat ad consectetur laboriosam!
-                                    Omnis, enim est! Id autem unde voluptate
-                                    atque necessitatibus obcaecati. Perspiciatis
-                                    illo repudiandae accusamus. Lorem ipsum
-                                    dolor sit amet consectetur adipisicing elit.
-                                    At mollitia magnam dicta rerum perspiciatis
-                                    nihil. Pariatur, odio magni esse beatae
-                                    accusantium architecto tenetur corrupti in
-                                    fugit obcaecati! Reprehenderit, voluptates
-                                    animi.
+                                    <span className="text-accent">
+                                        Graviola
+                                    </span>{" "}
+                                    is a collection that utilizes decentralized
+                                    and trustless solutions to ensure full
+                                    verifiability and security throughout the
+                                    generation process. The project is governed
+                                    by a community (DAO) that has the power to
+                                    modify the keyword pool used for character
+                                    generation and adjust the operation of the
+                                    entire Graviola ecosystem.
                                 </h2>
                             </div>
                             <div
@@ -96,28 +94,28 @@ const Home = () => {
                     <SectionContainer>
                         <div
                             className={cl(
-                                "flex flex-col gap-6 w-full h-fit justify-between items-center",
+                                "flex flex-col gap-6 w-full justify-between items-center",
                                 "md:flex-row",
                             )}
                         >
                             <FeatureCard
                                 icon="verified"
                                 title="Verifiable Process"
-                                content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi distinctio vel labore dolorem molestias iure natus veritatis consequuntur laudantium voluptas. Perferendis beatae explicabo quas! Magni cumque consectetur autem quidem hic!"
+                                content="The whole process of token generation is recorded on-chain, so anyone can check its validity. Thanks to opML (provided in OAO by ORA), it is possible to verify the correctness of AI inference—whether the correct model with the correct prompt was called and executed."
                                 accentColor="#2f4d5c"
                             />
 
                             <FeatureCard
                                 icon="valueGrowth"
                                 title="Limited Keywords"
-                                content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi distinctio vel labore dolorem molestias iure natus veritatis consequuntur laudantium voluptas. Perferendis beatae explicabo quas! Magni cumque consectetur autem quidem hic!"
+                                content="Every character is generated from a prompt that includes keywords chosen by our community in seasonal votings. To make things more interesting, the most demanded keywords occur only in one season, making them time-limited!"
                                 accentColor="#4b2752"
                             />
 
                             <FeatureCard
                                 icon="openSeaLogo"
                                 title="Rich Metadata"
-                                content="Lorem ipsum dolor sit amet consectetur adipisicing elit. Eligendi distinctio vel labore dolorem molestias iure natus veritatis consequuntur laudantium voluptas. Perferendis beatae explicabo quas! Magni cumque consectetur autem quidem hic!"
+                                content="Every character is described through its metadata, which provides information about the image, rarity, and input prompt of a token."
                                 accentColor="#306148"
                             />
                         </div>
@@ -135,10 +133,12 @@ const Home = () => {
                                 secondaryContent={
                                     <p className="text-lg leading-6 opacity-85">
                                         The metadata object contains valuable
-                                        information about your image. Graviola
-                                        supports the official ERC721 (OpenSea)
-                                        standard for all tokens. Learn more
-                                        about meta properties{" "}
+                                        information about your character.
+                                        Graviola supports the official ERC721
+                                        (OpenSea) metadata standard for all
+                                        tokens. Metadata is entirely stored
+                                        on-chain. Learn more about meta
+                                        properties{" "}
                                         <span
                                             onClick={() =>
                                                 navigate(routerPaths.generate)
@@ -164,7 +164,7 @@ const Home = () => {
                             title="Limited Keywords"
                             secondaryContent={`Token holders have the power to shape the future of Graviola. 
                                 Every season, you can vote on and suggest new keywords in the Voting Panel.
-                                The top hundred keywords will be introduced in the next Season of graviolaNFT.
+                                The top 100 keywords will be introduced in the next Season of Graviola.
                                 Basic keywords can move between Common and Uncommon groups. They can also occur in multiple seasons,
                                 if the Hodlers choose to keep them.
                                 At the end of each season, all Rare, Very Rare, and Legendary keywords will be retired forever, 
@@ -224,13 +224,21 @@ const Home = () => {
                     <SectionContainer additionalClasses="my-12">
                         <SectionTitle
                             title="Verifiable Process"
-                            secondaryContent={`
-                                Graviola uses Ora, a verifiable oracle protocol, alongside Stable Diffusion 2 to create NFTs on-chain.
-                                All processes are decentralized, open-source, and transparent.
-                                By leveraging opML capabilities,
-                                Graviola can generate NFTs in a trustless manner, meaning you can verify every step of the process.
-                                The NFTs are securely stored using decentralized networks like IPFS, making them easily accessible and tamperproof
-                            `}
+                            secondaryContent={
+                                <p className="text-lg leading-6 opacity-85">
+                                    Graviola uses Onchain AI Oracle created by{" "}
+                                    <span className="text-cyan-400">ORA</span> —
+                                    a verifiable AI oracle protocol, alongside
+                                    Stable Diffusion 2 to dynamically create
+                                    NFTs on-chain. All processes are
+                                    decentralized, open-source, and transparent.
+                                    By leveraging opML capabilities and
+                                    blockchain technology, Graviola can generate
+                                    new collection tokens in a trustless manner,
+                                    meaning you can verify every step of the
+                                    process.
+                                </p>
+                            }
                         />
                         <div className="w-min justify-end items-center">
                             <div
@@ -257,10 +265,15 @@ const Home = () => {
                     <SectionContainer additionalClasses="my-12">
                         <SectionTitle
                             title="Join our community!"
-                            secondaryContent={`
-                                Join our Discord and become part of an exciting community of NFT enthusiasts!
-                                Whether you're a seasoned collector or just getting started, we want you to have fun and connect with others
-                            `}
+                            secondaryContent={
+                                <p className="text-lg leading-6 opacity-85">
+                                    Join our Discord and become part of an
+                                    exciting community of <b>on-chain AI NFT</b>{" "}
+                                    enthusiasts! Whether you&#39;re a seasoned
+                                    collector or just getting started, we want
+                                    you to have fun and connect with others!
+                                </p>
+                            }
                         />
                         <div
                             onClick={() =>
