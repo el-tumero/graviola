@@ -20,7 +20,7 @@ const FeatureCard = ({
     return (
         <div
             className={cl(
-                "z-10 relative flex w-full h-96 flex-col justify-start items-start p-6 pb-16",
+                "z-10 relative flex w-full lg:h-96 h-fit flex-col justify-start items-start p-6 pb-16",
                 "rounded-xl",
             )}
             style={{ backgroundColor: color }}

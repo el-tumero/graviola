@@ -48,10 +48,7 @@ const Home = () => {
                         >
                             <div className={cl("flex mb-4 md:w-3/5 md:mb-0")}>
                                 <h2 className="text-light-text dark:text-dark-text text-xl">
-                                    <span className="text-accent">
-                                        Graviola
-                                    </span>{" "}
-                                    is a collection that utilizes decentralized
+                                    Graviola is a collection that utilizes decentralized
                                     and trustless solutions to ensure full
                                     verifiability and security throughout the
                                     generation process. The project is governed
@@ -95,7 +92,7 @@ const Home = () => {
                         <div
                             className={cl(
                                 "flex flex-col gap-6 w-full justify-between items-center",
-                                "md:flex-row",
+                                "lg:flex-row",
                             )}
                         >
                             <FeatureCard
