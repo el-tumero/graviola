@@ -16,7 +16,6 @@ import LimitedKeywordsScale from "../components/LimitedKeywordsScale"
 import { fallbackNFTsRarityList } from "../data/fallbacks"
 import Button from "../components/ui/Button"
 import { rarities, rarityColors, RarityLevel } from "../data/rarities"
-import Popup from "../components/Popup"
 import camelToPascal from "../utils/camelToPascal"
 import useArchive from "../hooks/useArchive"
 import FeatureCard from "../components/ui/FeatureCard"
@@ -32,16 +31,6 @@ const Home = () => {
 
             <ContentContainer additionalClasses="flex-col">
                 <div className="flex flex-col p-4 gap-3">
-                    {/* <Popup
-                        additionalClasses="w-full max-w-full relative top-0 right-0 z-2"
-                        onClickClose={() => {}}
-                        disableCloseButton
-                        type="neutral"
-                        message={`
-                        Graviola is growing rapidly; we're introducing big changes lately.
-                        If you encounter bugs or unexpected errors, please open an Issue on Github.`}
-                    /> */}
-
                     <SectionContainer additionalClasses="border-none justify-center text-center">
                         <h1 className="text-accent font-title font-semibold text-3xl">
                             Graviola is an autonomous NFT collection powered by
@@ -146,8 +135,10 @@ const Home = () => {
                                 secondaryContent={
                                     <p className="text-lg leading-6 opacity-85">
                                         The metadata object contains valuable
-                                        information about your image. Graviola supports the official ERC721 (OpenSea)
-                                        standard for all tokens. Learn more about meta properties{" "}
+                                        information about your image. Graviola
+                                        supports the official ERC721 (OpenSea)
+                                        standard for all tokens. Learn more
+                                        about meta properties{" "}
                                         <span
                                             onClick={() =>
                                                 navigate(routerPaths.generate)

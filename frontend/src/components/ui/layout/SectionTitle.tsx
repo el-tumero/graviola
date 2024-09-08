@@ -16,19 +16,22 @@ const SectionTitle = ({
     return (
         <div
             className={cn(
-                "flex w-full flex-col gap-1 justify-start items-start", additionalClasses,
+                "flex w-full flex-col gap-1 justify-start items-start",
+                additionalClasses,
             )}
         >
-            <p className={cl("text-xl font-content font-bold mb-1")}>
-                {title}
-            </p>
+            <p className={cl("text-xl font-content font-bold mb-1")}>{title}</p>
             {secondaryContent ? (
-                typeof secondaryContent === "string" ?
+                typeof secondaryContent === "string" ? (
                     <p className="text-lg leading-6 opacity-85">
                         {secondaryContent}
                     </p>
-                    : secondaryContent)
-                : <React.Fragment />}
+                ) : (
+                    secondaryContent
+                )
+            ) : (
+                <React.Fragment />
+            )}
         </div>
     )
 }

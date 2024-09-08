@@ -39,6 +39,7 @@ const PopupContainer = (props: { children: ReactNode }) => {
 }
 
 const Voting = () => {
+    const TESTNET = true // temp
     const [activePage, setActivePage] = useState<ActivePage>("Voting")
     // Info tooltip - "What is this?"
     const [infoVisible, setInfoVisible] = useState<boolean>(false)
@@ -144,10 +145,16 @@ const Voting = () => {
     return (
         <FullscreenContainer>
             <Navbar />
-            <ContentContainer additionalClasses="flex-col gap-4 h-full">
-                <PageTitle title="Voting Panel" additionalClasses="mb-3" />
 
-                {/* Add keyword form */}
+            {TESTNET ? (
+                <SectionContainer additionalClasses="self-center w-fit justify-center border-none">
+                    <p>Coming soon!</p>
+                </SectionContainer>
+            ) : (
+                <ContentContainer additionalClasses="flex-col gap-4 h-full">
+                    <PageTitle title="Voting Panel" additionalClasses="mb-3" />
+
+                    {/* Add keyword form
                 <div className="relative">
                     {addKeywordVisible && (
                         <PopupContainer>
@@ -160,111 +167,112 @@ const Voting = () => {
                 </div>
 
                 {/* What is this: Floating Popup */}
-                <div className="relative">
-                    {infoVisible && (
-                        <PopupContainer>
-                            <Fragment>
-                                <div
-                                    onClick={() => setInfoVisible(false)}
-                                    className={cl(
-                                        "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
-                                    )}
-                                >
-                                    {icons.close}
-                                </div>
-                                <div
-                                    className={cl(
-                                        "flex flex-col w-full px-3 leading-6",
-                                    )}
-                                >
-                                    <div className="mb-1.5">
-                                        <p>
-                                            {
-                                                "Each graviolaNFT season lasts exactly "
-                                            }
-                                            <span className="font-semibold underline underline-offset-2">
-                                                3 months
-                                            </span>
-                                            {"."}
-                                        </p>
+                    <div className="relative">
+                        {infoVisible && (
+                            <PopupContainer>
+                                <Fragment>
+                                    <div
+                                        onClick={() => setInfoVisible(false)}
+                                        className={cl(
+                                            "flex w-6 h-6 justify-center items-center cursor-pointer place-self-start",
+                                        )}
+                                    >
+                                        {icons.close}
                                     </div>
-                                    <div className="text-light-textSecondary dark:text-dark-textSecondary">
-                                        <p>
-                                            During each season, holders can add
-                                            new keyword candidates for the
-                                            upcoming season.
-                                        </p>
-                                        <p>
-                                            The community can then judge and
-                                            pick which of these keywords
-                                            they&apos;d like to see in use.
-                                        </p>
-                                        <p>
-                                            This panel allows to vote, track and
-                                            browse all current keyword
-                                            candidates.
-                                        </p>
-                                        <p>
-                                            Go ahead and add your own keyword to
-                                            the list {":)"}
-                                        </p>
+                                    <div
+                                        className={cl(
+                                            "flex flex-col w-full px-3 leading-6",
+                                        )}
+                                    >
+                                        <div className="mb-1.5">
+                                            <p>
+                                                {
+                                                    "Each graviolaNFT season lasts exactly "
+                                                }
+                                                <span className="font-semibold underline underline-offset-2">
+                                                    3 months
+                                                </span>
+                                                {"."}
+                                            </p>
+                                        </div>
+                                        <div className="text-light-textSecondary dark:text-dark-textSecondary">
+                                            <p>
+                                                During each season, holders can
+                                                add new keyword candidates for
+                                                the upcoming season.
+                                            </p>
+                                            <p>
+                                                The community can then judge and
+                                                pick which of these keywords
+                                                they&apos;d like to see in use.
+                                            </p>
+                                            <p>
+                                                This panel allows to vote, track
+                                                and browse all current keyword
+                                                candidates.
+                                            </p>
+                                            <p>
+                                                Go ahead and add your own
+                                                keyword to the list {":)"}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                            </Fragment>
-                        </PopupContainer>
+                                </Fragment>
+                            </PopupContainer>
+                        )}
+                    </div>
+
+                    <SectionContainer additionalClasses="gap-0 p-1 w-2/3 self-center">
+                        <div
+                            onClick={() => setActivePage("Voting")}
+                            className={cl(
+                                "flex justify-center items-center w-1/2 h-fit",
+                                "p-2 rounded-l-lg",
+                                activePage === "Voting"
+                                    ? [
+                                          "border border-light-text/25 dark:border-dark-text/25",
+                                          "bg-light-border/30 dark:bg-dark-border/30",
+                                      ]
+                                    : [
+                                          "cursor-pointer",
+                                          "border-light-border dark:border-dark-border",
+                                      ],
+                            )}
+                        >
+                            <p className="select-none">Voting</p>
+                        </div>
+
+                        <div
+                            onClick={() => setActivePage("Archive")}
+                            className={cl(
+                                "flex justify-center items-center w-1/2 h-fit",
+                                "p-2 rounded-r-lg",
+                                activePage === "Archive"
+                                    ? [
+                                          "border border-light-text/25 dark:border-dark-text/25",
+                                          "bg-light-border/30 dark:bg-dark-border/30",
+                                      ]
+                                    : [
+                                          "cursor-pointer",
+                                          "border-light-border dark:border-dark-border",
+                                      ],
+                            )}
+                        >
+                            <p className="select-none">Archive</p>
+                        </div>
+                    </SectionContainer>
+
+                    {activePage === "Voting" ? (
+                        <KeywordVotingPage
+                            candidates={candidates}
+                            onClickInfo={() => setInfoVisible(true)}
+                            onClickAddKeyword={() => setAddKeywordVisible(true)}
+                        />
+                    ) : (
+                        <ArchivePage />
                     )}
-                </div>
-
-                <SectionContainer additionalClasses="gap-0 p-1 w-2/3 self-center">
-                    <div
-                        onClick={() => setActivePage("Voting")}
-                        className={cl(
-                            "flex justify-center items-center w-1/2 h-fit",
-                            "p-2 rounded-l-lg",
-                            activePage === "Voting"
-                                ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
-                                : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
-                        )}
-                    >
-                        <p className="select-none">Voting</p>
-                    </div>
-
-                    <div
-                        onClick={() => setActivePage("Archive")}
-                        className={cl(
-                            "flex justify-center items-center w-1/2 h-fit",
-                            "p-2 rounded-r-lg",
-                            activePage === "Archive"
-                                ? [
-                                      "border border-light-text/25 dark:border-dark-text/25",
-                                      "bg-light-border/30 dark:bg-dark-border/30",
-                                  ]
-                                : [
-                                      "cursor-pointer",
-                                      "border-light-border dark:border-dark-border",
-                                  ],
-                        )}
-                    >
-                        <p className="select-none">Archive</p>
-                    </div>
-                </SectionContainer>
-
-                {activePage === "Voting" ? (
-                    <KeywordVotingPage
-                        candidates={candidates}
-                        onClickInfo={() => setInfoVisible(true)}
-                        onClickAddKeyword={() => setAddKeywordVisible(true)}
-                    />
-                ) : (
-                    <ArchivePage />
-                )}
-            </ContentContainer>
+                </ContentContainer>
+            )}
         </FullscreenContainer>
     )
 }
