@@ -142,13 +142,12 @@ const Home = () => {
                             )}
                         >
                             <SectionTitle
-                                title="Inspect to see more details"
+                                title="Rich Metadata"
                                 secondaryContent={
-                                    <p>
+                                    <p className="text-lg leading-6 opacity-85">
                                         The metadata object contains valuable
-                                        information about your image. Hover any
-                                        NFT on this website to see its metadata.
-                                        Learn more about meta properties{" "}
+                                        information about your image. Graviola supports the official ERC721 (OpenSea)
+                                        standard for all tokens. Learn more about meta properties{" "}
                                         <span
                                             onClick={() =>
                                                 navigate(routerPaths.generate)
@@ -171,7 +170,7 @@ const Home = () => {
 
                     <SectionContainer additionalClasses="flex-col my-12">
                         <SectionTitle
-                            title="Seasonal Keywords"
+                            title="Limited Keywords"
                             secondaryContent={`Token holders have the power to shape the future of Graviola. 
                                 Every season, you can vote on and suggest new keywords in the Voting Panel.
                                 The top hundred keywords will be introduced in the next Season of graviolaNFT.
@@ -233,7 +232,7 @@ const Home = () => {
 
                     <SectionContainer additionalClasses="my-12">
                         <SectionTitle
-                            title="How does Graviola work?"
+                            title="Verifiable Process"
                             secondaryContent={`
                                 Graviola uses Ora, a verifiable oracle protocol, alongside Stable Diffusion 2 to create NFTs on-chain.
                                 All processes are decentralized, open-source, and transparent.

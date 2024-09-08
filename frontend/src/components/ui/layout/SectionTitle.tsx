@@ -1,3 +1,4 @@
+import React from "react"
 import { cn } from "../../../utils/cn"
 import { clsx as cl } from "clsx"
 
@@ -15,18 +16,19 @@ const SectionTitle = ({
     return (
         <div
             className={cn(
-                "flex w-full flex-col gap-1 justify-start items-start",
-                additionalClasses,
+                "flex w-full flex-col gap-1 justify-start items-start", additionalClasses,
             )}
         >
-            <p className={cl("text-md font-title font-semibold mb-1")}>
+            <p className={cl("text-xl font-content font-bold mb-1")}>
                 {title}
             </p>
-            {secondaryContent && typeof secondaryContent === "string" ? (
-                <p className="text-sm">{secondaryContent}</p>
-            ) : (
-                <div className="text-sm">{secondaryContent}</div>
-            )}
+            {secondaryContent ? (
+                typeof secondaryContent === "string" ?
+                    <p className="text-lg leading-6 opacity-85">
+                        {secondaryContent}
+                    </p>
+                    : secondaryContent)
+                : <React.Fragment />}
         </div>
     )
 }
