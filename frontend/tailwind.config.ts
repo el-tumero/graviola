@@ -45,7 +45,7 @@ export default {
                     bgPrimary: "#e6ede8",
                     bgLight: "#f7f7f7",
                     bgDark: "#d5dbd7",
-                    border: "#cbd1cd",
+                    border: "#bbbfbd"
                 },
                 dark: {
                     text: "#fff",
@@ -53,7 +53,7 @@ export default {
                     bgPrimary: "#0c0c0d",
                     bgLight: "#252625",
                     bgDark: "#000000",
-                    border: "#1e1e1e",
+                    border: "#2f2f2f",
                 },
             },
         },

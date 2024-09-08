@@ -1,4 +1,4 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit"
 
 export type Theme = "light" | "dark"
 
@@ -7,7 +7,7 @@ interface ThemeSettings {
 }
 
 const initialState: ThemeSettings = {
-    theme: localStorage.getItem("theme") as Theme
+    theme: localStorage.getItem("theme") as Theme,
 }
 
 export const themeSlice = createSlice({

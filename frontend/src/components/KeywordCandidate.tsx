@@ -1,6 +1,6 @@
-import { CandidateInfo } from "../types/CandidateInfo";
-import { clsx as cl } from "clsx";
-import icons from "../data/icons";
+import { CandidateInfo } from "../types/CandidateInfo"
+import { clsx as cl } from "clsx"
+import icons from "../data/icons"
 
 const KeywordCandidate = (props: { data: CandidateInfo }) => (
     <div
@@ -51,7 +51,9 @@ const KeywordCandidate = (props: { data: CandidateInfo }) => (
             )}
         >
             <div className={cl("flex w-24 justify-end items-center")}>
-                <span className="font-semibold font-mono">{props.data.score}</span>
+                <span className="font-semibold font-mono">
+                    {props.data.score}
+                </span>
             </div>
             <div className="flex gap-1.5 flex-nowrap">
                 <div
