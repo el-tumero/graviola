@@ -32,7 +32,7 @@ const Home = () => {
             <ContentContainer additionalClasses="flex-col">
                 <div className="flex flex-col p-4 gap-3">
                     <SectionContainer additionalClasses="border-none justify-center text-center">
-                        <h1 className="text-accent font-title font-semibold text-3xl">
+                        <h1 className="text-accent font-semibold text-3xl">
                             Graviola is a community-driven NFT collection of
                             <br />
                             randomly AI-generated characters
