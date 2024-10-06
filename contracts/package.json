@@ -6,8 +6,10 @@
     "scripts": {
         "build": "forge build",
         "deploy": "ts-node --transpile-only utils/deploy.ts",
+        "redeploy": "ts-node --transpile-only utils/redeploy.ts",
         "deploy:local": "HARDHAT_NETWORK=localhost yarn deploy",
         "deploy:testnet": "HARDHAT_NETWORK=arbitrumSepolia yarn deploy",
+        "redeploy:testnet": "HARDHAT_NETWORK=arbitrumSepolia yarn redeploy",
         "verify": "HARDHAT_NETWORK=arbitrumSepolia ts-node --transpile-only utils/verify.ts",
         "local-node": "hardhat node",
         "mock-bot": "HARDHAT_NETWORK=localhost ts-node --transpile-only utils/mock-bot.ts",
