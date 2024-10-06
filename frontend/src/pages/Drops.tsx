@@ -13,8 +13,8 @@ import SectionContainer from "../components/ui/layout/SectionContainer"
 import { useAppDispatch, useAppSelector } from "../redux/hooks"
 import { rarityColors } from "../data/rarities"
 import camelToPascal from "../utils/camelToPascal"
-import { fetchUserCollection } from "../web3"
-import { setUserCollection } from "../redux/reducers/graviola"
+import { fetchCollection, fetchUserCollection } from "../web3"
+import { setCollection, setUserCollection } from "../redux/reducers/graviola"
 import useWallet from "../hooks/useWallet"
 
 type DropFilterMode = "Everyone's Drops" | "My Drops"
@@ -23,6 +23,10 @@ const Drops = () => {
     // TODO: MAINNET: Add options to filter by Rarity, or by included Keywords.
     const { isConnected, address } = useWallet()
     const collection = useAppSelector((state) => state.graviolaData.collection)
+    const collectionTotalSupply = useAppSelector(
+        (state) => state.graviolaData.collectionTotalSupply,
+    )
+
     const userCollection = useAppSelector(
         (state) => state.graviolaData.userCollection,
     )
@@ -59,6 +63,19 @@ const Drops = () => {
             top: 0,
             behavior: "smooth",
         })
+    }
+
+    const loadMore = async () => {
+        const loaded = collection.length
+
+        const collectionData = await fetchCollection(
+            loaded,
+            loaded + 6 > collectionTotalSupply
+                ? collectionTotalSupply
+                : loaded + 6,
+        )
+
+        dispatch(setCollection(collection.concat(collectionData)))
     }
 
     useEffect(() => {
@@ -160,7 +177,6 @@ const Drops = () => {
                                           : userCollection
                                 }
                             />
-
                             {/* Scroll to Top Button */}
                             {backToTopVisible && (
                                 <div className="flex absolute bottom-0 right-0 w-12 h-12 mx-10 my-6 bg-transparent">
@@ -176,6 +192,21 @@ const Drops = () => {
                                     >
                                         {icons.arrow}
                                     </div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex mx-auto my-6">
+                            {collection.length != collectionTotalSupply && (
+                                <div
+                                    className={cn(
+                                        "rounded-xl p-3 text-base cursor-pointer ",
+                                        "bg-light-bgLight dark:bg-dark-bgLight",
+                                        "border border-light-border dark:border-dark-border",
+                                        "dark:hover:bg-neutral-700",
+                                    )}
+                                    onClick={loadMore}
+                                >
+                                    Load more...
                                 </div>
                             )}
                         </div>

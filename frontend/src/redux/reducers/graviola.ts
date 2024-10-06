@@ -4,6 +4,7 @@ import { NFT } from "../../types/NFT"
 interface GraviolaData {
     collection: NFT[]
     userCollection: NFT[] | undefined
+    collectionTotalSupply: number
     groupSizes: number[]
     weights: number[]
     keywords: string[]
@@ -12,6 +13,7 @@ interface GraviolaData {
 const initialState: GraviolaData = {
     collection: [],
     userCollection: undefined,
+    collectionTotalSupply: 0,
     groupSizes: [],
     weights: [],
     keywords: [],
@@ -26,6 +28,9 @@ export const graviolaDataSlice = createSlice({
         },
         setUserCollection: (state, action: PayloadAction<NFT[]>) => {
             state.userCollection = action.payload
+        },
+        setCollectionTotalSupply: (state, action: PayloadAction<number>) => {
+            state.collectionTotalSupply = action.payload
         },
         setGroupSizes: (state, action: PayloadAction<number[]>) => {
             state.groupSizes = action.payload
@@ -42,6 +47,7 @@ export const graviolaDataSlice = createSlice({
 export const {
     setCollection,
     setUserCollection,
+    setCollectionTotalSupply,
     setGroupSizes,
     setWeights,
     setKeywords,

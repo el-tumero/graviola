@@ -61,19 +61,20 @@ export function connectContractsToSigner() {
     seasonsGovernorContract = seasonsGovernorContract.connect(signer)
 }
 
-export async function fetchCollection(): Promise<NFT[]> {
-    const totalSupply = await collectionContract.totalSupply()
+export async function fetchCollection(
+    start: number,
+    stop: number,
+): Promise<NFT[]> {
     const collectionData: NFT[] = []
 
-    const urisToFetch = totalSupply < 5 ? totalSupply : 5
-
     const [tokensIds, encoded] = await collectionContract.tokenRange(
-        0,
-        urisToFetch,
+        start,
+        stop,
     )
+
     const decoded = encoded.map<RawNFTData>((data) => decodeTokenURI(data))
 
-    for (let i = 0; i < urisToFetch; i++) {
+    for (let i = 0; i < stop - start; i++) {
         const [probability, score, seasonId] = decoded[i].attributes.map(
             (attribute) => attribute.value,
         )
@@ -120,8 +121,6 @@ export async function fetchUserCollection(address: string): Promise<NFT[]> {
             attributes: decoded.attributes,
         })
     }
-
-    console.log(collectionData)
 
     return collectionData
 }
