@@ -12,6 +12,7 @@ import {
     RarityLevel,
 } from "../data/rarities"
 import useArchive from "../hooks/useArchive"
+import camelToPascal from "../utils/camelToPascal"
 
 interface RarityGroupData {
     rarity: RarityLevel
@@ -42,7 +43,8 @@ const KeywordGroupBlock = (props: {
                 {/* Title & Fold Button*/}
                 <div className={cl("flex justify-between items-center gap-6")}>
                     <p className="font-medium">
-                        {props.data.rarity} ({props.data.keywords.length})
+                        {camelToPascal(props.data.rarity, true)} (
+                        {props.data.keywords.length})
                     </p>
                     <div
                         className={cl(

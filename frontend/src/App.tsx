@@ -12,7 +12,10 @@ import useTheme from "./hooks/useTheme"
 import useWallet from "./hooks/useWallet"
 import useArchive from "./hooks/useArchive"
 
-import { setCollection } from "./redux/reducers/graviola"
+import {
+    setCollection,
+    setCollectionTotalSupply,
+} from "./redux/reducers/graviola"
 import { useAppDispatch } from "./redux/hooks"
 import { fetchCollection } from "./web3"
 
@@ -56,7 +59,12 @@ const App = (props: { children: ReactNode }) => {
         console.log("[App] is dev mode: ", isDevMode)
 
         const fetchContractData = async () => {
-            const collectionData = await fetchCollection()
+            const totalSupply = await collectionContract.totalSupply()
+            dispatch(setCollectionTotalSupply(Number(totalSupply)))
+            const collectionData = await fetchCollection(
+                0,
+                totalSupply < 6 ? Number(totalSupply) : 6,
+            )
             const nftTotalSupply = await collectionContract.totalSupply()
             await fetchArchive()
             console.log("[App] totalSupply: ", Number(nftTotalSupply))
