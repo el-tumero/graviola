@@ -1,6 +1,4 @@
-# Graviola
-
-# [GraviolaNFT](https://el-tumero.github.io/graviola/)
+# [Graviola](https://el-tumero.github.io/graviola/)
 
 > [!NOTE]
 > Graviola is growing rapidly; we're introducing big changes lately. If you encounter bugs or unexpected errors, please open an [Issue](https://github.com/el-tumero/graviola/issues).
@@ -21,7 +19,7 @@ https://el-tumero.github.io/graviola/
 | **Contract**           | **Address**                                | **Block explorer**                                                             |
 | ---------------------- | ------------------------------------------ | ------------------------------------------------------------------------------ |
 | GraviolaCollection     | 0x5DeA8a4062E82CB44EBCA7CeBaa37B510eB6a6A9 | https://sepolia.arbiscan.io/address/0x5DeA8a4062E82CB44EBCA7CeBaa37B510eB6a6A9 |
-| GraviolaGenerator      | 0xAe48A15dE641fAC97AD5DC4faB28d31EF0c0B428 | https://sepolia.arbiscan.io/address/0xAe48A15dE641fAC97AD5DC4faB28d31EF0c0B428 |
+| GraviolaGenerator      | 0x29d3aCC61fc5550F23B22a86A5E43116CeC9dE81 | https://sepolia.arbiscan.io/address/0x29d3aCC61fc5550F23B22a86A5E43116CeC9dE81 |
 | GraviolaSeasonsArchive | 0x6772D1461977f02D540108fFB8f33E8218DeCAc1 | https://sepolia.arbiscan.io/address/0x6772D1461977f02D540108fFB8f33E8218DeCAc1 |
 
 ## How it works?
