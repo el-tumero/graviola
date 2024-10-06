@@ -16,8 +16,8 @@ contract GraviolaGenerator is
     VRFV2PlusWrapperConsumerBase,
     AIOracleCallbackReceiver
 {
-    /// @dev Stable Diffusion model id in the OAO
-    uint256 private constant MODEL_ID = 50;
+    /// @dev Stable Diffusion 3 model id in the OAO
+    uint256 private constant MODEL_ID = 503;
 
     /// @dev Callback gas limit for the VRF request
     uint32 private constant VRF_CALLBACK_GAS_LIMIT = 100000;
