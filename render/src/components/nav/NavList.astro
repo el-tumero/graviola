@@ -1,0 +1,14 @@
+---
+const desktopStyles = "flex justify-center items-center gap-3"
+const mobileStyles = "flex flex-col items-center w-full gap-3 p-3"
+
+interface Props {
+    isMobile: boolean
+}
+
+const { isMobile } = Astro.props
+---
+
+<div class={isMobile ? mobileStyles : desktopStyles}>
+    <slot />
+</div>

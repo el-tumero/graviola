@@ -1,0 +1,46 @@
+---
+import { cn } from "../../utils/cn"
+import NavbarLogo from "./NavbarLogo.astro"
+import NavElementIcon from "./NavElementIcon.astro"
+import NavElementText from "./NavElementText.astro"
+import NavList from "./NavList.astro"
+
+interface Props {
+    isMobile: boolean
+}
+
+const { isMobile } = Astro.props
+---
+
+<div class="sticky top-0 z-30">
+    <div
+        class={cn(
+            "flex flex-col",
+            "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
+            "w-screen backdrop-blur-lg",
+            "bg-transparent",
+            isMobile && "border-b border-light-border dark:border-dark-border"
+        )}
+    >
+        <div
+            class={cn(
+                "flex justify-between items-center",
+                "py-2 px-[2.5%]",
+                "select-none font-content",
+                !isMobile &&
+                    "border-b border-light-border dark:border-dark-border"
+            )}
+        >
+            <NavbarLogo />
+            <NavList isMobile={isMobile}>
+                <NavElementText title="Generate" url="/" />
+                <NavElementText title="Drops" url="/" />
+                <NavElementText title="Trade Up" url="/" />
+                <NavElementText title="Keywords" url="/" />
+                <NavElementIcon icon="flowbite:github-solid" />
+                <NavElementIcon icon="flowbite:discord-solid" />
+                <NavElementIcon icon="flowbite:moon-outline" />
+            </NavList>
+        </div>
+    </div>
+</div>

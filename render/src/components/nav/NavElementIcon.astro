@@ -1,0 +1,15 @@
+---
+import { Icon } from "astro-icon/components"
+import NavElementWrapper from "./NavElementWrapper.astro"
+
+interface Props {
+    icon: string
+    additionalClasses?: string
+}
+
+const { icon } = Astro.props
+---
+
+<NavElementWrapper>
+    <Icon size="24" name={icon} />
+</NavElementWrapper>

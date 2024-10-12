@@ -1,22 +1,7 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import CardCarousel from '../components/CardCarousel';
-import { getCards } from '../web3.ts';
-
-
-const cards = await getCards()
-
+import Layout from "../layouts/Layout.astro"
 ---
 
-<Layout title="Welcome to Astro.">
-	<main>
-		<h1 class="text-3xl font-bold underline">Hello world!</h1>
-		<CardCarousel cards={cards} client:load />
-		<button hx-post="/partials/drops"
-    		hx-trigger="click"
-    		hx-target="#drops"
-    		hx-swap="outerHTML"
-		> Click!</button>
-		<div id="drops"></div>
-	</main>
+<Layout>
+    <main>Main page</main>
 </Layout>
