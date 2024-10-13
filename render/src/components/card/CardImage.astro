@@ -1,0 +1,25 @@
+---
+import { cn } from "../../utils/cn"
+import { convertCidToUrl } from "../../utils/convertCidToUrl"
+
+interface Props {
+    cid: string
+}
+
+const { cid } = Astro.props
+---
+
+<div
+    class={cn(
+        "flex w-36 h-36 shadow-sm",
+        "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
+        "border-light-border dark:border-dark-border select-none"
+    )}
+>
+    <img
+        class={cn("w-full h-full rounded-lg")}
+        crossorigin="anonymous"
+        src={convertCidToUrl(cid)}
+        alt="Card image"
+    />
+</div>

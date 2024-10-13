@@ -8,25 +8,23 @@ const rpcUrl = "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
 
 const provider = new JsonRpcProvider(rpcUrl)
 
-export const getCollection: () => GraviolaCollection = () => {
+export const getCollectionContract: () => GraviolaCollection = () => {
     return GraviolaCollection__factory.connect(
         addresses.COLLECTION_ADDRESS,
         provider,
     )
 }
 
-export const getCards: () => Promise<Card[]> = async () => {
-    const collection = getCollection()
+export const getCards: (start: number, end: number) => Promise<Card[]> = async (
+    start,
+    end,
+) => {
+    const collection = getCollectionContract()
 
-    const [ids, rawData] = await collection.tokenRange(0, 5)
+    const [ids, rawData] = await collection.tokenRange(start, end)
 
-    const data = rawData.map((raw, i) => ({
+    return rawData.map((raw, i) => ({
         id: ids[i],
         ...JSON.parse(Buffer.from(raw.slice(29), "base64url").toString()),
-    }))
-
-    return data.map((card) => ({
-        ...card,
-        image: `https://gateway.pinata.cloud/ipfs/${card.image}`,
     }))
 }

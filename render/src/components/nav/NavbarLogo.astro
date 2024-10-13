@@ -2,19 +2,21 @@
 import logo from "../../assets/logo.webp"
 ---
 
-<div
-    class:list={[
-        "grid grid-flow-col items-center",
-        "cursor-pointer",
-        "py-1 px-1.5 rounded-xl",
-        "hover:bg-accent/25",
-        "transition-colors duration-300",
-    ]}
->
-    <img src={logo.src} width="16" class="mb-1" />
-    <p
-        class="font-semibold font-mono text-accentDark dark:text-accent opacity-100 mx-1"
+<a href="/">
+    <div
+        class:list={[
+            "grid grid-flow-col items-center",
+            "cursor-pointer",
+            "py-1 px-1.5 rounded-xl",
+            "hover:bg-accent/25",
+            "transition-colors duration-300",
+        ]}
     >
-        Graviola
-    </p>
-</div>
+        <img src={logo.src} width="16" class="mb-1" />
+        <p
+            class="font-semibold font-mono text-accentDark dark:text-accent opacity-100 mx-1"
+        >
+            Graviola
+        </p>
+    </div>
+</a>

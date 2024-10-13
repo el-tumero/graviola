@@ -1,0 +1,14 @@
+---
+import Layout from "../layouts/Layout.astro"
+import { getCards } from "../web3"
+import CardCollection from "../components/card/CardCollection.astro"
+
+const cards = await getCards(0, 6)
+---
+
+<Layout>
+    <main>
+        <div class="h-5"></div>
+        <CardCollection cards={cards} />
+    </main>
+</Layout>

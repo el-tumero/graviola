@@ -1,0 +1,21 @@
+---
+import type { Card } from "../../types/Card"
+import CardComponent from "./Card.astro"
+
+interface Props {
+    cards: Card[]
+}
+
+const { cards } = Astro.props
+---
+
+<div
+    class:list={[
+        "grid gap-4 w-full",
+        "max-sm:grid-cols-2",
+        "max-md:grid-cols-3 md:grid-cols-4",
+        "xl:grid-cols-6",
+    ]}
+>
+    {cards.map((card) => <CardComponent card={card} />)}
+</div>

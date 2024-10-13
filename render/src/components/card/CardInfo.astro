@@ -1,0 +1,43 @@
+---
+import type { Card } from "../../types/Card"
+import camelToPascal from "../../utils/camelToPascal"
+
+interface Props {
+    card: Card
+}
+
+const { card } = Astro.props
+---
+
+<div
+    class:list={[
+        "flex flex-col w-full h-fit gap-1",
+        "justify-start items-start",
+    ]}
+>
+    <p>id: {card.id}</p>
+    <p>
+        Rarity:&nbsp;
+        <!-- soon -->
+    </p>
+</div>
+<div
+    class:list={[
+        "flex flex-wrap w-full h-fit",
+        "gap-1 justify-start items-start",
+    ]}
+>
+    <!-- {
+            keywords.map((keyword, idx) => (
+                <span
+                    className={cl(
+                        "py-1 px-2 rounded-md",
+                        "bg-light-bgLight/75 dark:bg-dark-bgLight/75"
+                    )}
+                    key={idx}
+                >
+                    {keyword}
+                </span>
+            ))
+        } -->
+</div>
