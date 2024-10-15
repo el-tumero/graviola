@@ -1,5 +1,18 @@
 ---
-export const partial = true;
+import CardCollection from "../../components/card/CardCollection.astro"
+import { getCards } from "../../web3"
+
+export const partial = true
+
+const cards = await getCards(6, 12)
 ---
 
-<li>Drops</li>
+<CardCollection cards={cards} />
+<span
+    class:list={[
+        "rounded-xl p-3 text-base mx-auto cursor-pointer",
+        "bg-light-bgLight dark:bg-dark-bgLight",
+        "border border-light-border dark:border-dark-border",
+        "dark:hover:bg-neutral-700",
+    ]}>Load more...</span
+>

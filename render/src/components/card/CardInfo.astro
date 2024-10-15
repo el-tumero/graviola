@@ -1,6 +1,7 @@
 ---
 import type { Card } from "../../types/Card"
 import camelToPascal from "../../utils/camelToPascal"
+import { rarityToColor } from "../../web3"
 
 interface Props {
     card: Card
@@ -17,8 +18,9 @@ const { card } = Astro.props
 >
     <p>id: {card.id}</p>
     <p>
-        Rarity:&nbsp;
-        <!-- soon -->
+        Rarity:&nbsp;<span style={{ color: rarityToColor(card.rarity) }}
+            >{camelToPascal(card.rarity, true)}</span
+        >
     </p>
 </div>
 <div
@@ -27,17 +29,16 @@ const { card } = Astro.props
         "gap-1 justify-start items-start",
     ]}
 >
-    <!-- {
-            keywords.map((keyword, idx) => (
-                <span
-                    className={cl(
-                        "py-1 px-2 rounded-md",
-                        "bg-light-bgLight/75 dark:bg-dark-bgLight/75"
-                    )}
-                    key={idx}
-                >
-                    {keyword}
-                </span>
-            ))
-        } -->
+    {
+        card.keywords.map((keyword) => (
+            <span
+                class:list={[
+                    "py-1 px-2 rounded-md",
+                    "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
+                ]}
+            >
+                {keyword}
+            </span>
+        ))
+    }
 </div>

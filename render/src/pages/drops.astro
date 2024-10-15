@@ -9,6 +9,27 @@ const cards = await getCards(0, 6)
 <Layout>
     <main>
         <div class="h-5"></div>
-        <CardCollection cards={cards} />
+        <div
+            class:list={[
+                "flex w-full flex-col gap-4 max-w-7xl",
+                "max-lg:px-6 max-lg:py-2",
+                "lg:px-8 lg:py-4",
+            ]}
+        >
+            <CardCollection cards={cards} />
+            <span
+                class:list={[
+                    "rounded-xl p-3 text-base mx-auto cursor-pointer",
+                    "bg-light-bgLight dark:bg-dark-bgLight",
+                    "border border-light-border dark:border-dark-border",
+                    "dark:hover:bg-neutral-700",
+                ]}
+                ,
+                hx-post="/partials/drops"
+                hx-trigger="click"
+                hx-target="this"
+                hx-swap="outerHTML">Load more...</span
+            >
+        </div>
     </main>
 </Layout>
