@@ -1,12 +1,15 @@
 ---
-import type { Card } from "../../types/Card"
+import { getCards, getCardsTotalSupply } from "../../web3"
 import CardComponent from "./Card.astro"
 
-interface Props {
-    cards: Card[]
-}
+const totalSupply = await getCardsTotalSupply()
 
-const { cards } = Astro.props
+const defaultCardsToDisplay = 6
+
+const cardsToDisplay =
+    totalSupply < defaultCardsToDisplay ? totalSupply : defaultCardsToDisplay
+
+const cards = await getCards(0, cardsToDisplay)
 ---
 
 <div
@@ -18,4 +21,19 @@ const { cards } = Astro.props
     ]}
 >
     {cards.map((card) => <CardComponent card={card} />)}
+    <button
+        class:list={[
+            "rounded-xl p-3 text-base mx-auto cursor-pointer",
+            "bg-light-bgLight dark:bg-dark-bgLight",
+            "border border-light-border dark:border-dark-border",
+            "dark:hover:bg-neutral-700",
+            "col-span-full",
+        ]}
+        id="load-more-btn"
+        ,
+        hx-get="/partials/drops?page=1"
+        hx-trigger="click"
+        hx-target="this"
+        hx-swap="outerHTML">Load more...</button
+    >
 </div>

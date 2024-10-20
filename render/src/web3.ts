@@ -41,6 +41,11 @@ export const rarityToColor: (rarity: Rarity) => string = (rarity) => {
     return rarityColors[rarity]
 }
 
+export const getCardsTotalSupply: () => Promise<number> = async () => {
+    const collection = getCollectionContract()
+    return Number(await collection.totalSupply())
+}
+
 export const getCards: (start: number, end: number) => Promise<Card[]> = async (
     start,
     end,

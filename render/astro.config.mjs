@@ -1,25 +1,32 @@
 // @ts-check
 import { defineConfig } from "astro/config"
 
-import tailwind from "@astrojs/tailwind";
+import tailwind from "@astrojs/tailwind"
 
-import react from "@astrojs/react";
+import react from "@astrojs/react"
 
-import node from "@astrojs/node";
+import node from "@astrojs/node"
 
-import icon from "astro-icon";
+import icon from "astro-icon"
 
 // https://astro.build/config
 export default defineConfig({
-  output: "hybrid",
-  integrations: [tailwind(), react(), icon({
-    include: {
-      mdi: ['discord-solid', 'github-solid'],
-      uis: ['*'],
-    }
-  })],
+    output: "hybrid",
+    devToolbar: {
+        enabled: false,
+    },
+    integrations: [
+        tailwind(),
+        react(),
+        icon({
+            include: {
+                mdi: ["discord-solid", "github-solid"],
+                uis: ["*"],
+            },
+        }),
+    ],
 
-  adapter: node({
-    mode: "standalone",
-  }),
+    adapter: node({
+        mode: "standalone",
+    }),
 })
