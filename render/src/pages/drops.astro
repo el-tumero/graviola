@@ -1,14 +1,13 @@
 ---
 import Layout from "../layouts/Layout.astro"
-import { getCards, getCardsTotalSupply } from "../web3"
 import CardCollection from "../components/card/CardCollection.astro"
+import CardCollectionFilterPanel from "../components/card/CardCollectionFilterPanel.astro"
 
 export const prerender = false
 ---
 
 <Layout>
     <main>
-        <div class="h-5"></div>
         <div
             class:list={[
                 "flex w-full flex-col gap-4 max-w-7xl",
@@ -16,6 +15,8 @@ export const prerender = false
                 "lg:px-8 lg:py-4",
             ]}
         >
+            <h3 class="font-semibold font-title text-lg text-center">Drops</h3>
+            <CardCollectionFilterPanel />
             <CardCollection />
         </div>
     </main>

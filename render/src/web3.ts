@@ -1,6 +1,12 @@
 import { JsonRpcProvider } from "ethers"
-import type { GraviolaCollection } from "../../contracts/typechain-types"
-import { GraviolaCollection__factory } from "../../contracts/typechain-types/index"
+import type {
+    GraviolaCollection,
+    GraviolaCollectionReadProxy,
+} from "../../contracts/typechain-types"
+import {
+    GraviolaCollection__factory,
+    GraviolaCollectionReadProxy__factory,
+} from "../../contracts/typechain-types/index"
 import addresses from "../../contracts/addresses-testnet.json"
 import {
     rarityColors,
@@ -16,6 +22,13 @@ const provider = new JsonRpcProvider(rpcUrl)
 export const getCollectionContract: () => GraviolaCollection = () => {
     return GraviolaCollection__factory.connect(
         addresses.COLLECTION_ADDRESS,
+        provider,
+    )
+}
+
+export const getCollectionReadProxy: () => GraviolaCollectionReadProxy = () => {
+    return GraviolaCollectionReadProxy__factory.connect(
+        addresses.COLLECTION_READ_PROXY_ADDRESS,
         provider,
     )
 }
@@ -46,13 +59,23 @@ export const getCardsTotalSupply: () => Promise<number> = async () => {
     return Number(await collection.totalSupply())
 }
 
-export const getCards: (start: number, end: number) => Promise<Card[]> = async (
-    start,
-    end,
-) => {
+export const getCardsTotalSupplyByOwner: (
+    owner: string,
+) => Promise<number> = async (owner) => {
     const collection = getCollectionContract()
+    return Number(await collection.balanceOf(owner))
+}
 
-    const [ids, rawData] = await collection.tokenRange(start, end)
+export const getCards: (
+    start: number,
+    end: number,
+    owner?: string,
+) => Promise<Card[]> = async (start, end, owner) => {
+    const collection = getCollectionReadProxy()
+
+    const [ids, rawData] = owner
+        ? await collection.tokenOfOwnerRange(owner, start, end)
+        : await collection.tokenRange(start, end)
 
     const metadata = rawData.map<Metadata>((raw) => ({
         ...JSON.parse(Buffer.from(raw.slice(29), "base64url").toString()),

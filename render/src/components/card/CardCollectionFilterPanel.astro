@@ -1,0 +1,32 @@
+---
+
+---
+
+<div
+    class:list={[
+        "flex justify-between items-center",
+        "max-sm:flex-col max-sm:gap-3 max-sm:mt-3",
+        "p-3 rounded-xl border border-light-border dark:border-dark-border",
+    ]}
+>
+    <select
+        name="owner"
+        class="text-black"
+        hx-get="/partials/drops?page=0"
+        hx-target="#card-collection"
+        hx-replace="outerHTML"
+    >
+        <option value="*">everyone's drops</option>
+        <option id="address-option" value="0x" disabled>my drops</option>
+    </select>
+</div>
+
+<script>
+    const address = "0x4EEf993E6C1E67c76512B18A13D57671E1f78c24"
+
+    const addressOption = document.getElementById(
+        "address-option"
+    ) as HTMLOptionElement
+    addressOption.value = address
+    addressOption.disabled = false
+</script>

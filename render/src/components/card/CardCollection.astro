@@ -19,6 +19,7 @@ const cards = await getCards(0, cardsToDisplay)
         "max-md:grid-cols-3 md:grid-cols-4",
         "xl:grid-cols-6",
     ]}
+    id="card-collection"
 >
     {cards.map((card) => <CardComponent card={card} />)}
     <button
