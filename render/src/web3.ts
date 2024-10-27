@@ -2,96 +2,79 @@ import { JsonRpcProvider } from "ethers"
 import type {
     GraviolaCollection,
     GraviolaCollectionReadProxy,
+    GraviolaSeasonsArchive,
 } from "../../contracts/typechain-types"
 import {
     GraviolaCollection__factory,
     GraviolaCollectionReadProxy__factory,
+    GraviolaSeasonsArchive__factory,
 } from "../../contracts/typechain-types/index"
 import addresses from "../../contracts/addresses-testnet.json"
-import {
-    rarityColors,
-    type Card,
-    type Metadata,
-    type Rarity,
-} from "./types/Card"
+import { type Card, type Metadata } from "./types/Card"
+import type { Keyword } from "./types/Keyword"
+import { keywordToRarity, scoreToRarity } from "./utils/rarity"
 
 const rpcUrl = "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
 
 const provider = new JsonRpcProvider(rpcUrl)
 
-export const getCollectionContract: () => GraviolaCollection = () => {
-    return GraviolaCollection__factory.connect(
-        addresses.COLLECTION_ADDRESS,
-        provider,
-    )
-}
+export const getCollectionContract = (): GraviolaCollection =>
+    GraviolaCollection__factory.connect(addresses.COLLECTION_ADDRESS, provider)
 
-export const getCollectionReadProxy: () => GraviolaCollectionReadProxy = () => {
-    return GraviolaCollectionReadProxy__factory.connect(
+export const getCollectionReadProxy = (): GraviolaCollectionReadProxy =>
+    GraviolaCollectionReadProxy__factory.connect(
         addresses.COLLECTION_READ_PROXY_ADDRESS,
         provider,
     )
-}
 
-const descriptionToKeywords: (description: string) => string[] = (
-    description,
-) => {
+export const getArchiveContract = (): GraviolaSeasonsArchive =>
+    GraviolaSeasonsArchive__factory.connect(
+        addresses.SEASONS_ARCHIVE_ADDRESS,
+        provider,
+    )
+
+const descriptionToKeywords = (description: string): string[] => {
     return description.slice(130).trim().split(",")
 }
 
-const scoreToRarity: (score: number, weights: number[]) => Rarity = (
-    score,
-    weights,
-) => {
-    if (score < weights[0]) return "common"
-    if (score < weights[1]) return "uncommon"
-    if (score < weights[2]) return "rare"
-    if (score < weights[3]) return "veryRare"
-    return "legendary"
-}
+// export const getRarityBorderStyles = (
+//     rarity: Rarity,
+//     breathingEffect: boolean,
+// ): { style: Record<string, string>; className: string } => {
+//     const rarityColor = rarityToColor(rarity)
+//     const baseStyle = {
+//         boxShadow: `0px 0px 20px 6px ${rarityColor}`,
+//         WebkitBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
+//         MozBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
+//         "--rarity-color": rarityColor,
+//     }
+//     if (breathingEffect) {
+//         return {
+//             style: baseStyle,
+//             className: "breathing-effect",
+//         }
+//     } else {
+//         return { style: baseStyle, className: "" }
+//     }
+// }
 
-export const rarityToColor: (rarity: Rarity) => string = (rarity) => {
-    return rarityColors[rarity]
-}
-
-export const getRarityBorderStyles = (
-    rarity: Rarity,
-    breathingEffect: boolean,
-): { style: Record<string, string>; className: string } => {
-    const rarityColor = rarityToColor(rarity)
-    const baseStyle = {
-        boxShadow: `0px 0px 20px 6px ${rarityColor}`,
-        WebkitBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
-        MozBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
-        "--rarity-color": rarityColor,
-    }
-    if (breathingEffect) {
-        return {
-            style: baseStyle,
-            className: "breathing-effect",
-        }
-    } else {
-        return { style: baseStyle, className: "" }
-    }
-}
-
-export const getCardsTotalSupply: () => Promise<number> = async () => {
+export const getCardsTotalSupply = async (): Promise<number> => {
     const collection = getCollectionContract()
     return Number(await collection.totalSupply())
 }
 
-export const getCardsTotalSupplyByOwner: (
+export const getCardsTotalSupplyByOwner = async (
     owner: string,
-) => Promise<number> = async (owner) => {
+): Promise<number> => {
     const collection = getCollectionContract()
     return Number(await collection.balanceOf(owner))
 }
 
-export const getCards: (
+export const getCards = async (
     start: number,
     end: number,
     owner?: string,
-) => Promise<Card[]> = async (start, end, owner) => {
+): Promise<Card[]> => {
     const collection = getCollectionReadProxy()
 
     const [ids, rawData] = owner
@@ -116,4 +99,13 @@ export const getCards: (
             score: score.value,
         }
     })
+}
+
+export const getKeywords = async (): Promise<Keyword[]> => {
+    const archive = getArchiveContract()
+    const keywords = await archive.getKeywordsCurrentSeason()
+    return keywords.map((keyword, id) => ({
+        name: keyword,
+        rarity: keywordToRarity(id),
+    }))
 }

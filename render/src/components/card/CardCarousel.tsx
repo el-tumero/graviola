@@ -1,5 +1,5 @@
 import { useState } from "react"
-import type { Card } from "../types/Card"
+import type { Card } from "../../types/Card"
 
 const CardCarousel = ({ cards }: { cards: Card[] }) => {
     const [displayedCard, setDisplayedCard] = useState(0)

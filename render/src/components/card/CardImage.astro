@@ -2,7 +2,7 @@
 import type { Card } from "../../types/Card"
 import { cn } from "../../utils/cn"
 import { convertCidToUrl } from "../../utils/convertCidToUrl"
-import { getRarityBorderStyles } from "../../web3"
+import { rarityBoxShadow, rarityToColor } from "../../utils/rarity"
 
 interface Props {
     card: Card
@@ -14,17 +14,21 @@ const {
     breathingEffect,
 } = Astro.props
 
-const { style, className } = getRarityBorderStyles(rarity, breathingEffect)
+const style = {
+    "--rarity-color": rarityToColor(rarity),
+}
 ---
 
 <div
     style={style}
-    class={cn(
-        "flex w-36 h-36 shadow-sm",
+    class:list={[
+        "flex w-36 h-36",
         "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
         "border-light-border dark:border-dark-border select-none",
-        className
-    )}
+        "shadow-card",
+        rarityBoxShadow[rarity],
+        breathingEffect && "breathing-effect",
+    ]}
 >
     <img
         class={cn("w-full h-full rounded-lg")}

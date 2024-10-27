@@ -36,6 +36,10 @@ export default {
                 },
             },
 
+            boxShadow: {
+                'card': '0px 0px 20px 6px',
+            },
+
             colors: {
                 accent: "#2cde59",
                 accentDark: "#19b540",
@@ -55,6 +59,13 @@ export default {
                     bgDark: "#000000",
                     border: "#2f2f2f",
                 },
+                rarity: {
+                    common: "rgba(140, 140, 155, 0.8)",
+                    uncommon: "rgba(54, 202, 108, 0.8)",
+                    rare: "rgba(37, 99, 235, 0.8)",
+                    veryRare: "rgba(147, 51, 234, 0.8)",
+                    legendary: "rgba(239, 68, 68, 0.8)",
+                }
             },
         },
     },

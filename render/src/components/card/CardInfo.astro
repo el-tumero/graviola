@@ -1,7 +1,7 @@
 ---
 import type { Card } from "../../types/Card"
 import camelToPascal from "../../utils/camelToPascal"
-import { rarityToColor } from "../../web3"
+import { rarityTextColor } from "../../utils/rarity"
 
 interface Props {
     card: Card
@@ -18,7 +18,7 @@ const { card } = Astro.props
 >
     <p>id: {card.id}</p>
     <p>
-        Rarity:&nbsp;<span style={{ color: rarityToColor(card.rarity) }}
+        Rarity:&nbsp;<span class={rarityTextColor[card.rarity]}
             >{camelToPascal(card.rarity, true)}</span
         >
     </p>
