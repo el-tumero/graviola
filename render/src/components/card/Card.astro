@@ -2,12 +2,14 @@
 import type { Card } from "../../types/Card"
 import CardImage from "./CardImage.astro"
 import CardInfo from "./CardInfo.astro"
+import "./card.css"
 
 interface Props {
     card: Card
+    breathingEffect?: boolean
 }
 
-const { card } = Astro.props
+const { card, breathingEffect } = Astro.props
 ---
 
 <div
@@ -17,6 +19,6 @@ const { card } = Astro.props
         "border border-light-border dark:border-dark-border",
     ]}
 >
-    <CardImage cid={card.image} />
+    <CardImage card={card} breathingEffect={breathingEffect ?? false} />
     <CardInfo card={card} />
 </div>

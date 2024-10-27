@@ -19,7 +19,6 @@ if (!page) {
 
 const totalSupply = owner ? await getCardsTotalSupplyByOwner(owner) : await getCardsTotalSupply()
 
-console.log(`total ${owner}`, totalSupply)
 
 const start = Number(page) * defaultCardsPerPage
 if (start > totalSupply) {
@@ -33,9 +32,6 @@ const defaultEnd = start + defaultCardsPerPage
 const end = defaultEnd < totalSupply ? defaultEnd : totalSupply
 
 const isLastPage = defaultEnd >= totalSupply
-
-console.log("end", end)
-console.log("lastPage", isLastPage)
 
 const cards = await getCards(start, end, owner)
 

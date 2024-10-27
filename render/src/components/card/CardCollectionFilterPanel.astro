@@ -4,14 +4,20 @@
 
 <div
     class:list={[
-        "flex justify-between items-center",
+        "mb-8",
         "max-sm:flex-col max-sm:gap-3 max-sm:mt-3",
         "p-3 rounded-xl border border-light-border dark:border-dark-border",
     ]}
 >
+    <span class="px-2">Showing:</span>
     <select
         name="owner"
-        class="text-black"
+        class:list={[
+            "p-1.5",
+            "rounded-lg border-r-8 border-transparent outline outline-2 outline-transparent",
+            "bg-light-border/50 dark:bg-dark-border",
+            "focus:outline-blue-500",
+        ]}
         hx-get="/partials/drops?page=0"
         hx-target="#card-collection"
         hx-replace="outerHTML"

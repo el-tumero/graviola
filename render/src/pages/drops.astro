@@ -7,17 +7,7 @@ export const prerender = false
 ---
 
 <Layout>
-    <main>
-        <div
-            class:list={[
-                "flex w-full flex-col gap-4 max-w-7xl",
-                "max-lg:px-6 max-lg:py-2",
-                "lg:px-8 lg:py-4",
-            ]}
-        >
-            <h3 class="font-semibold font-title text-lg text-center">Drops</h3>
-            <CardCollectionFilterPanel />
-            <CardCollection />
-        </div>
-    </main>
+    <h3 class="font-semibold font-title text-lg text-center mb-4">Drops</h3>
+    <CardCollectionFilterPanel />
+    <CardCollection />
 </Layout>

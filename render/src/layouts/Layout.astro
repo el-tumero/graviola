@@ -18,13 +18,14 @@ import { cn } from "../utils/cn"
     <body
         class={cn(
             "w-screen h-screen min-w-screen min-h-screen",
-            "overflow-x-hidden relative",
-            "flex flex-col items-center",
+            "overflow-x-hidden",
             "text-sm font-content",
             "text-light-text dark:text-dark-text bg-light-bgPrimary dark:bg-dark-bgPrimary"
         )}
     >
         <Navbar isMobile={false} />
-        <slot />
+        <main class="max-lg:px-6 max-lg:py-2 lg:px-8 lg:py-4">
+            <slot />
+        </main>
     </body>
 </html>

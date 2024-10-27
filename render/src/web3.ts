@@ -54,6 +54,27 @@ export const rarityToColor: (rarity: Rarity) => string = (rarity) => {
     return rarityColors[rarity]
 }
 
+export const getRarityBorderStyles = (
+    rarity: Rarity,
+    breathingEffect: boolean,
+): { style: Record<string, string>; className: string } => {
+    const rarityColor = rarityToColor(rarity)
+    const baseStyle = {
+        boxShadow: `0px 0px 20px 6px ${rarityColor}`,
+        WebkitBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
+        MozBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
+        "--rarity-color": rarityColor,
+    }
+    if (breathingEffect) {
+        return {
+            style: baseStyle,
+            className: "breathing-effect",
+        }
+    } else {
+        return { style: baseStyle, className: "" }
+    }
+}
+
 export const getCardsTotalSupply: () => Promise<number> = async () => {
     const collection = getCollectionContract()
     return Number(await collection.totalSupply())
