@@ -29,3 +29,30 @@ import { cn } from "../utils/cn"
         </main>
     </body>
 </html>
+
+<script>
+    import { createAppKit } from "@reown/appkit/react"
+    import { EthersAdapter } from "@reown/appkit-adapter-ethers"
+    import { arbitrumSepolia } from "@reown/appkit/networks"
+
+    const projectId = "a09890b34dc1551c2534337dbc22de8c"
+    const metadata = {
+        name: "Graviola",
+        description:
+            "Community driven collection of randomly generated characters",
+        url: "https://graviola.app",
+        icons: [],
+    }
+
+    createAppKit({
+        adapters: [new EthersAdapter()],
+        defaultNetwork: arbitrumSepolia,
+        networks: [arbitrumSepolia],
+        themeVariables: {
+            "--w3m-accent": "#19b540",
+            "--w3m-font-size-master": "13",
+        },
+        metadata,
+        projectId,
+    })
+</script>

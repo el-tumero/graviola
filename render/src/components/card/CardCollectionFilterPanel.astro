@@ -28,11 +28,19 @@
 </div>
 
 <script>
-    const address = "0x4EEf993E6C1E67c76512B18A13D57671E1f78c24"
+    import { listenKeys, subscribeKeys } from "nanostores"
+    import { $user } from "../../store/web3"
 
-    const addressOption = document.getElementById(
-        "address-option"
-    ) as HTMLOptionElement
-    addressOption.value = address
-    addressOption.disabled = false
+    listenKeys($user, ["address"], ({ address }) => {
+        const addressOption = document.getElementById(
+            "address-option"
+        ) as HTMLOptionElement
+
+        if (address !== "0x") {
+            addressOption.value = address
+            addressOption.disabled = false
+        } else {
+            addressOption.disabled = true
+        }
+    })
 </script>

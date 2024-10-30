@@ -10,6 +10,6 @@ interface Props {
 const { title, url, additionalClasses } = Astro.props
 ---
 
-<NavElementWrapper additionalClasses={additionalClasses}>
-    <a class="whitespace-nowrap" href={url}>{title}</a>
+<NavElementWrapper url={url} additionalClasses={additionalClasses}>
+    <span class="whitespace-nowrap">{title}</span>
 </NavElementWrapper>

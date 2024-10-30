@@ -2,10 +2,11 @@
 import { cn } from "../../utils/cn"
 
 interface Props {
+    url?: string
     additionalClasses?: string
 }
 
-const { additionalClasses } = Astro.props
+const { url, additionalClasses } = Astro.props
 ---
 
 <div
@@ -19,5 +20,7 @@ const { additionalClasses } = Astro.props
         additionalClasses
     )}
 >
-    <slot />
+    <a href={url ? url : "#"}>
+        <slot />
+    </a>
 </div>

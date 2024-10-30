@@ -1,5 +1,6 @@
 ---
 import { cn } from "../../utils/cn"
+import Wallet from "../Wallet"
 import NavbarLogo from "./NavbarLogo.astro"
 import NavElementIcon from "./NavElementIcon.astro"
 import NavElementText from "./NavElementText.astro"
@@ -40,6 +41,7 @@ const { isMobile } = Astro.props
                 <NavElementIcon icon="flowbite:github-solid" />
                 <NavElementIcon icon="flowbite:discord-solid" />
                 <NavElementIcon icon="flowbite:moon-outline" />
+                <Wallet client:load />
             </NavList>
         </div>
     </div>
