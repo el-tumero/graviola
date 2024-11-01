@@ -1,6 +1,6 @@
 ---
 import { cn } from "../../utils/cn"
-import Wallet from "../Wallet"
+import Wallet from "./Wallet"
 import NavbarLogo from "./NavbarLogo.astro"
 import NavElementIcon from "./NavElementIcon.astro"
 import NavElementText from "./NavElementText.astro"
@@ -34,14 +34,16 @@ const { isMobile } = Astro.props
         >
             <NavbarLogo />
             <NavList isMobile={isMobile}>
-                <NavElementText title="Generate" url="/" />
+                <NavElementText title="Generate" url="/generate" />
                 <NavElementText title="Drops" url="/drops" />
-                <NavElementText title="Trade Up" url="/" />
+                <!-- <NavElementText title="Trade Up" url="/" /> -->
                 <NavElementText title="Keywords" url="/keywords" />
                 <NavElementIcon icon="flowbite:github-solid" />
                 <NavElementIcon icon="flowbite:discord-solid" />
                 <NavElementIcon icon="flowbite:moon-outline" />
-                <Wallet client:load />
+                <div class="w-64">
+                    <Wallet client:load />
+                </div>
             </NavList>
         </div>
     </div>

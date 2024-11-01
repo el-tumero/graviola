@@ -37,27 +37,6 @@ const descriptionToKeywords = (description: string): string[] => {
     return description.slice(130).trim().split(",")
 }
 
-// export const getRarityBorderStyles = (
-//     rarity: Rarity,
-//     breathingEffect: boolean,
-// ): { style: Record<string, string>; className: string } => {
-//     const rarityColor = rarityToColor(rarity)
-//     const baseStyle = {
-//         boxShadow: `0px 0px 20px 6px ${rarityColor}`,
-//         WebkitBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
-//         MozBoxShadow: `0px 0px 20px 6px ${rarityColor}`,
-//         "--rarity-color": rarityColor,
-//     }
-//     if (breathingEffect) {
-//         return {
-//             style: baseStyle,
-//             className: "breathing-effect",
-//         }
-//     } else {
-//         return { style: baseStyle, className: "" }
-//     }
-// }
-
 export const getCardsTotalSupply = async (): Promise<number> => {
     const collection = getCollectionContract()
     return Number(await collection.totalSupply())

@@ -28,10 +28,10 @@
 </div>
 
 <script>
-    import { listenKeys, subscribeKeys } from "nanostores"
-    import { $user } from "../../store/web3"
+    import { subscribeKeys } from "nanostores"
+    import { $user } from "../../store/user"
 
-    listenKeys($user, ["address"], ({ address }) => {
+    subscribeKeys($user, ["address"], ({ address }) => {
         const addressOption = document.getElementById(
             "address-option"
         ) as HTMLOptionElement
