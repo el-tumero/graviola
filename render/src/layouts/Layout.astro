@@ -17,14 +17,14 @@ import { cn } from "../utils/cn"
 
     <body
         class={cn(
-            "w-screen h-screen min-w-screen min-h-screen",
-            "overflow-x-hidden",
+            "m-0",
+            "overflow-auto",
             "text-sm font-content",
             "text-light-text dark:text-dark-text bg-light-bgPrimary dark:bg-dark-bgPrimary"
         )}
     >
-        <Navbar isMobile={false} />
-        <main class="max-lg:px-12 max-lg:py-2 lg:px-16 lg:py-4">
+        <Navbar />
+        <main class="max-lg:px-12 lg:px-16 py-4 mt-14">
             <slot />
         </main>
     </body>

@@ -5,46 +5,43 @@ import NavbarLogo from "./NavbarLogo.astro"
 import NavElementIcon from "./NavElementIcon.astro"
 import NavElementText from "./NavElementText.astro"
 import NavList from "./NavList.astro"
-
-interface Props {
-    isMobile: boolean
-}
-
-const { isMobile } = Astro.props
+import NavToggle from "./NavToggle.astro"
+import { links } from "../../utils/links"
 ---
 
-<div class="sticky top-0 z-30">
+<nav
+    class:list={[
+        "fixed top-0 z-30",
+        "bg-light-bgPrimary dark:bg-dark-bgPrimary",
+        "w-screen",
+        "border-b border-light-border dark:border-dark-border",
+    ]}
+>
     <div
         class={cn(
-            "flex flex-col",
-            "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
-            "w-screen backdrop-blur-lg",
-            "bg-transparent",
-            isMobile && "border-b border-light-border dark:border-dark-border"
+            "grid grid-cols-[112px_1fr]",
+            "content-center",
+            "gap-2",
+            "py-2 px-10",
+            "max-lg:px-5",
+            "max-lg:grid-cols-2",
+            "h-14",
+            "select-none font-content"
         )}
     >
-        <div
-            class={cn(
-                "flex justify-between items-center",
-                "py-2 px-[2.5%]",
-                "select-none font-content",
-                !isMobile &&
-                    "border-b border-light-border dark:border-dark-border"
-            )}
-        >
-            <NavbarLogo />
-            <NavList isMobile={isMobile}>
-                <NavElementText title="Generate" url="/generate" />
-                <NavElementText title="Drops" url="/drops" />
-                <!-- <NavElementText title="Trade Up" url="/" /> -->
-                <NavElementText title="Keywords" url="/keywords" />
-                <NavElementIcon icon="flowbite:github-solid" />
-                <NavElementIcon icon="flowbite:discord-solid" />
-                <NavElementIcon icon="flowbite:moon-outline" />
-                <div class="w-64">
-                    <Wallet client:load />
-                </div>
-            </NavList>
-        </div>
+        <NavbarLogo />
+        <NavToggle />
+
+        <NavList>
+            <NavElementText title="Generate" url="/generate" />
+            <NavElementText title="Drops" url="/drops" />
+            <NavElementText title="Keywords" url="/keywords" />
+            <NavElementIcon icon="flowbite:github-solid" url={links.repo} />
+            <NavElementIcon icon="flowbite:discord-solid" url={links.discord} />
+            <!-- <NavElementIcon icon="flowbite:moon-outline" /> -->
+            <div class="ml-auto max-lg:ml-0">
+                <Wallet client:load />
+            </div>
+        </NavList>
     </div>
-</div>
+</nav>
