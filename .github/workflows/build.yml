@@ -3,7 +3,7 @@ name: "Build and publish image"
 on:
     push:
         branches:
-            - feature/ssr-intro
+            - dev
 
 jobs:
     publish_image:
