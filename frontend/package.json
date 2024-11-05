@@ -1,5 +1,5 @@
 {
-    "name": "graviola_frontend",
+    "name": "@graviola/frontend",
     "private": true,
     "homepage": "https://el-tumero.github.io/graviola/",
     "version": "0.0.0",

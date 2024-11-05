@@ -11,7 +11,7 @@ import icon from "astro-icon"
 
 // https://astro.build/config
 export default defineConfig({
-    output: "hybrid",
+    output: "server",
     devToolbar: {
         enabled: false,
     },

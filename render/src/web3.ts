@@ -3,13 +3,16 @@ import type {
     GraviolaCollection,
     GraviolaCollectionReadProxy,
     GraviolaSeasonsArchive,
-} from "../../contracts/typechain-types"
+} from "@graviola/contracts"
+
 import {
     GraviolaCollection__factory,
     GraviolaCollectionReadProxy__factory,
     GraviolaSeasonsArchive__factory,
-} from "../../contracts/typechain-types/index"
-import addresses from "../../contracts/addresses-testnet.json"
+} from "@graviola/contracts"
+
+import { addresses } from "@graviola/contracts"
+
 import { type Card, type Metadata } from "./types/Card"
 import type { Keyword } from "./types/Keyword"
 import { keywordToRarity, scoreToRarity } from "./utils/rarity"

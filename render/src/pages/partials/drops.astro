@@ -3,7 +3,6 @@ import CardComponent from "../../components/card/Card.astro"
 import { getCards, getCardsTotalSupply, getCardsTotalSupplyByOwner } from "../../web3"
 
 export const partial = true
-export const prerender = false
 
 const page = Astro.url.searchParams.get("page")
 let owner = Astro.url.searchParams.get("owner") ?? undefined

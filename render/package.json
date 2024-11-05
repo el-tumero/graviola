@@ -1,34 +1,40 @@
 {
-    "name": "render",
+    "name": "@graviola/render",
     "type": "module",
     "version": "0.0.1",
     "scripts": {
         "dev": "astro dev",
         "start": "astro dev",
-        "build": "astro check && astro build",
+        "build": "yarn clean ; astro check && astro build",
         "preview": "astro preview",
-        "astro": "astro"
+        "astro": "astro",
+        "clean": "rm -r ./dist",
+        "start:prod": "node dist/server/entry.mjs",
+        "remove-dev-deps": "node removeDevDependencies.js"
     },
     "dependencies": {
-        "@astrojs/check": "^0.9.4",
-        "@astrojs/node": "^8.3.4",
-        "@astrojs/react": "^3.6.2",
-        "@astrojs/tailwind": "^5.1.2",
-        "@coinbase/wallet-sdk": "^4.1.0",
-        "@iconify-json/flowbite": "^1.2.2",
-        "@reown/appkit": "^1.2.0",
-        "@reown/appkit-adapter-ethers": "^1.2.0",
-        "@types/react": "^18.3.11",
-        "@types/react-dom": "^18.3.0",
         "astro": "^4.16.0",
+        "@astrojs/node": "^8.3.4",
         "astro-icon": "^1.1.1",
-        "clsx": "^2.1.1",
+        "@iconify-json/flowbite": "^1.2.2",
+        "@coinbase/wallet-sdk": "^4.2.0",
+        "@reown/appkit": "1.2.1",
+        "@reown/appkit-adapter-ethers": "1.2.1",
         "ethers": "6.13.1",
         "nanostores": "^0.11.3",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
-        "tailwind-merge": "^2.5.3",
+        "tailwind-merge": "^2.5.3"
+    },
+    "devDependencies": {
+        "@graviola/contracts": "*",
+        "@astrojs/check": "^0.9.4",
+        "@astrojs/react": "^3.6.2",
+        "@astrojs/tailwind": "^5.1.2",
+        "typescript": "^5.6.3",
         "tailwindcss": "^3.4.13",
-        "typescript": "^5.6.3"
+        "clsx": "^2.1.1",
+        "@types/react": "^18.3.11",
+        "@types/react-dom": "^18.3.0"
     }
 }
