@@ -20,4 +20,4 @@ jobs:
             - name: Build and push
               run: |
                   docker build . -t ghcr.io/el-tumero/graviola/graviola-render:latest
-                  docker push ghcr.io/el-tumero/graviola-render:latest
+                  docker push ghcr.io/el-tumero/graviola/graviola-render:latest
