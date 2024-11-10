@@ -1,6 +1,13 @@
 ---
+import Card from "../components/card/Card.astro"
+import CardCarousel from "../components/card/CardCarousel"
+import CardImage from "../components/card/CardImage.astro"
+import GenerationProcess from "../components/main/GenerationProcess.astro"
 import SectionContainer from "../components/main/SectionContainer.astro"
 import Layout from "../layouts/Layout.astro"
+import { getCards } from "../web3"
+
+const cards = await getCards(30, 35)
 ---
 
 <Layout>
@@ -10,6 +17,16 @@ import Layout from "../layouts/Layout.astro"
             AI-generated characters
         </h1>
 
-        <SectionContainer>test</SectionContainer>
+        <SectionContainer>
+            <p class="text-xl self-start">
+                Graviola is a collection that utilizes decentralized and
+                trustless solutions to ensure full verifiability and security
+                throughout the generation process. The project is governed by a
+                community (DAO) that has the power to modify the keyword pool
+                used for character generation and adjust the operation of the
+                entire Graviola ecosystem.
+            </p>
+            <CardCarousel cards={cards} client:load />
+        </SectionContainer>
     </div>
 </Layout>
