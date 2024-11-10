@@ -1,0 +1,10 @@
+---
+import { getKeywords } from "../../web3"
+import Keyword from "./Keyword.astro"
+
+const keywords = (await getKeywords()).reverse()
+---
+
+<div class="flex flex-wrap gap-4 justify-center">
+    {keywords.map((keyword) => <Keyword keyword={keyword} />)}
+</div>

@@ -1,3 +1,7 @@
 {
-    "recommendations": ["juanblanco.solidity", "esbenp.prettier-vscode"]
+    "recommendations": [
+        "juanblanco.solidity",
+        "esbenp.prettier-vscode",
+        "astro-build.astro-vscode"
+    ]
 }

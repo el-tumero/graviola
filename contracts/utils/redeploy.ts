@@ -15,6 +15,7 @@ async function main() {
         choices: [
             { name: 'SeasonsGovernor', value: redeploySeasonsGovernor },
             { name: 'Generator', value: redeployGenerator },
+            { name: 'CollectionReadProxy', value: redeployCollectionReadProxy },
         ],
     })
 
@@ -80,5 +81,21 @@ async function redeploySeasonsGovernor() {
 
     editAddress('SEASONS_GOVERNOR_ADDRESS', seasonsGovernorAddress)
     console.log(`SeasonsGovernor address (${seasonsGovernorAddress}) saved!`)
+}
+
+async function redeployCollectionReadProxy() {
+    const CollectionReadProxy = await hardhat.ethers.getContractFactory(
+        'GraviolaCollectionReadProxy',
+    )
+    const collectionReadProxy = await CollectionReadProxy.deploy(
+        addresses.COLLECTION_ADDRESS,
+    )
+    await collectionReadProxy.waitForDeployment
+    console.log('CollectionReadProxy redeployed!')
+    const collectionReadProxyAddress = await collectionReadProxy.getAddress()
+    editAddress('COLLECTION_READ_PROXY_ADDRESS', collectionReadProxyAddress)
+    console.log(
+        `CollectionReadProxy address (${collectionReadProxyAddress}) saved!`,
+    )
 }
 main()
