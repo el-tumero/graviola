@@ -1,7 +1,7 @@
 {
-    "name": "@graviola/contracts",
-    "version": "0.0.1",
-    "main": "src/index.ts",
+    "name": "contracts",
+    "version": "0.0.2",
+    "main": "index.js",
     "license": "MIT",
     "scripts": {
         "build": "forge build",
