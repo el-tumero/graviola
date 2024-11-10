@@ -1,0 +1,45 @@
+---
+import type { Card } from "../../types/Card"
+import { cn } from "../../utils/cn"
+import { convertCidToUrl } from "../../utils/convertCidToUrl"
+import { rarityBoxShadow, rarityToColor } from "../../utils/rarity"
+
+type CardImageSize = "medium" | "large"
+
+interface Props {
+    card: Card
+    breathingEffect: boolean
+    size?: CardImageSize
+}
+
+const {
+    card: { image, rarity },
+    breathingEffect,
+    size = "medium",
+} = Astro.props
+
+const style = {
+    "--rarity-color": rarityToColor(rarity),
+}
+---
+
+<div
+    style={style}
+    class:list={[
+        "flex",
+        size === "medium" && "w-36 h-36",
+        size === "large" && "w-64 h-64",
+        "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
+        "border-light-border dark:border-dark-border select-none",
+        "shadow-card",
+        rarityBoxShadow[rarity],
+        breathingEffect && "breathing-effect",
+    ]}
+>
+    <img
+        class={cn("w-full h-full rounded-lg")}
+        crossorigin="anonymous"
+        src={convertCidToUrl(image)}
+        alt="Card image"
+    />
+</div>

@@ -1,0 +1,58 @@
+---
+import CardComponent from "../../components/card/Card.astro"
+import { getCards, getCardsTotalSupply, getCardsTotalSupplyByOwner } from "../../web3"
+
+export const partial = true
+
+const page = Astro.url.searchParams.get("page")
+let owner = Astro.url.searchParams.get("owner") ?? undefined
+owner = owner === "*" ? undefined : owner 
+const defaultCardsPerPage = 6
+
+if (!page) {
+    return new Response(null, {
+        status: 400,
+        statusText: "Page parameter not provided!",
+    })
+}
+
+const totalSupply = owner ? await getCardsTotalSupplyByOwner(owner) : await getCardsTotalSupply()
+
+
+const start = Number(page) * defaultCardsPerPage
+if (start > totalSupply) {
+    return new Response(null, {
+        status: 400,
+        statusText: "Page out of range!",
+    })
+}
+
+const defaultEnd = start + defaultCardsPerPage
+const end = defaultEnd < totalSupply ? defaultEnd : totalSupply
+
+const isLastPage = defaultEnd >= totalSupply
+
+const cards = await getCards(start, end, owner)
+
+const nextPage = Number(page) + 1
+
+const ownerQuery = owner ? `&owner=${owner}` : ''
+const loadMoreURI = `/partials/drops?page=${nextPage}${ownerQuery}`
+---
+
+{cards.map((card) => <CardComponent card={card} />)}
+{!isLastPage && <button
+    class:list={[
+        "rounded-xl p-3 text-base mx-auto cursor-pointer",
+        "bg-light-bgLight dark:bg-dark-bgLight",
+        "border border-light-border dark:border-dark-border",
+        "dark:hover:bg-neutral-700",
+        "col-span-full",
+    ]}
+    id="load-more-btn"
+    ,
+    hx-get={loadMoreURI}
+    hx-trigger="click"
+    hx-target="this"
+    hx-swap="outerHTML">Load more...</button
+>}

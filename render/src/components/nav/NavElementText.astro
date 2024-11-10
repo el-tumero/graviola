@@ -1,0 +1,15 @@
+---
+import NavElementWrapper from "./NavElementWrapper.astro"
+
+interface Props {
+    title: string
+    url: string
+    additionalClasses?: string
+}
+
+const { title, url, additionalClasses } = Astro.props
+---
+
+<NavElementWrapper url={url} additionalClasses={additionalClasses}>
+    <span class="whitespace-nowrap">{title}</span>
+</NavElementWrapper>

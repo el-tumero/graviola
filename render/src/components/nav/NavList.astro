@@ -1,0 +1,20 @@
+---
+import { cn } from "../../utils/cn"
+---
+
+<div
+    id="nav-list"
+    class={cn(
+        "flex items-center",
+        "gap-3",
+        "bg-light-bgPrimary/60 dark:bg-dark-bgPrimary/60",
+        "backdrop-blur-md",
+        "max-lg:absolute max-lg:top-14 max-lg:left-0 max-lg:w-full",
+        "max-lg:flex-col max-lg:hidden",
+        "max-lg:col-span-2",
+        "max-lg:border-y border-light-border dark:border-dark-border",
+        "max-lg:p-3"
+    )}
+>
+    <slot />
+</div>

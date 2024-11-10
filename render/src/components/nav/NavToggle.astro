@@ -1,0 +1,34 @@
+---
+import { Icon } from "astro-icon/components"
+---
+
+<div
+    id="nav-toggle"
+    class:list={[
+        "hidden max-lg:block cursor-pointer ml-auto my-auto",
+        "p-2 rounded-xl",
+        "dark:text-dark-textSecondary dark:hover:text-dark-text",
+        "hover:bg-light-text/10 dark:hover:bg-dark-text/10",
+        "transition-colors duration-300",
+    ]}
+>
+    <span id="nav-bars" class="hidden max-lg:inline"
+        ><Icon size="24" name={"flowbite:bars-outline"} /></span
+    >
+    <span id="nav-close" class="hidden max-lg:hidden"
+        ><Icon size="24" name={"flowbite:close-outline"} /></span
+    >
+</div>
+<script>
+    const bars = document.querySelector("#nav-bars")
+    const close = document.querySelector("#nav-close")
+    const navToggle = document.querySelector("#nav-toggle")
+    const navList = document.querySelector("#nav-list")
+
+    navToggle?.addEventListener("click", () => {
+        navList?.classList.toggle("max-lg:hidden")
+        bars?.classList.toggle("max-lg:hidden")
+        close?.classList.toggle("max-lg:hidden")
+        close?.classList.toggle("max-lg:inline")
+    })
+</script>

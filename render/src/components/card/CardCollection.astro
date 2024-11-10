@@ -1,0 +1,40 @@
+---
+import { getCards, getCardsTotalSupply } from "../../web3"
+import CardComponent from "./Card.astro"
+
+const totalSupply = await getCardsTotalSupply()
+
+const defaultCardsToDisplay = 6
+
+const cardsToDisplay =
+    totalSupply < defaultCardsToDisplay ? totalSupply : defaultCardsToDisplay
+
+const cards = await getCards(0, cardsToDisplay)
+---
+
+<div
+    class:list={[
+        "grid gap-4 w-full",
+        "max-sm:grid-cols-2",
+        "max-md:grid-cols-3 md:grid-cols-4",
+        "xl:grid-cols-6",
+    ]}
+    id="card-collection"
+>
+    {cards.map((card) => <CardComponent card={card} />)}
+    <button
+        class:list={[
+            "rounded-xl p-3 text-base mx-auto cursor-pointer",
+            "bg-light-bgLight dark:bg-dark-bgLight",
+            "border border-light-border dark:border-dark-border",
+            "dark:hover:bg-neutral-700",
+            "col-span-full",
+        ]}
+        id="load-more-btn"
+        ,
+        hx-get="/partials/drops?page=1"
+        hx-trigger="click"
+        hx-target="this"
+        hx-swap="outerHTML">Load more...</button
+    >
+</div>

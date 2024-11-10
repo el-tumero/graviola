@@ -1,0 +1,44 @@
+---
+import type { Card } from "../../types/Card"
+import camelToPascal from "../../utils/camelToPascal"
+import { rarityTextColor } from "../../utils/rarity"
+
+interface Props {
+    card: Card
+}
+
+const { card } = Astro.props
+---
+
+<div
+    class:list={[
+        "flex flex-col w-full h-fit gap-1",
+        "justify-start items-start",
+    ]}
+>
+    <p>id: {card.id}</p>
+    <p>
+        Rarity:&nbsp;<span class={rarityTextColor[card.rarity]}
+            >{camelToPascal(card.rarity, true)}</span
+        >
+    </p>
+</div>
+<div
+    class:list={[
+        "flex flex-wrap w-full h-fit",
+        "gap-1 justify-start items-start",
+    ]}
+>
+    {
+        card.keywords.map((keyword) => (
+            <span
+                class:list={[
+                    "py-1 px-2 rounded-md",
+                    "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
+                ]}
+            >
+                {keyword}
+            </span>
+        ))
+    }
+</div>
