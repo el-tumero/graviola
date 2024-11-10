@@ -6,7 +6,6 @@ export const DeployedContractEnum = {
     SEASONS_ARCHIVE: 4,
     SEASONS_GOVERNOR: 5,
     GENERATOR: 6,
-    COLLECTION_READ_PROXY: 7,
 }
 
 export const DeployedContractAddressEnum = {
@@ -17,5 +16,4 @@ export const DeployedContractAddressEnum = {
     SEASONS_ARCHIVE_ADDRESS: 4,
     SEASONS_GOVERNOR_ADDRESS: 5,
     GENERATOR_ADDRESS: 6,
-    COLLECTION_READ_PROXY_ADDRESS: 7,
 }
