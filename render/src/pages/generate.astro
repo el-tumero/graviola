@@ -9,3 +9,8 @@ import Layout from "../layouts/Layout.astro"
         <Generator client:load />
     </h3>
 </Layout>
+
+<script>
+    const socket = new WebSocket("ws://localhost:8080")
+    socket.addEventListener("message", ({ data }) => console.log(data))
+</script>
