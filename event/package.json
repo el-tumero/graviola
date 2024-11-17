@@ -1,5 +1,5 @@
 {
-    "name": "event",
+    "name": "@graviola/event",
     "module": "index.ts",
     "type": "module",
     "devDependencies": {
@@ -9,6 +9,7 @@
         "typescript": "^5.0.0"
     },
     "dependencies": {
-        "ethers": "6.13.1"
+        "ethers": "6.13.1",
+        "@graviola/contracts": "workspace:*"
     }
 }
