@@ -1,13 +1,3 @@
 node_modules
 .DS_Store
-.dockerignore
-Dockerfile
-package.json
-pnpm-lock.yaml
-pnpm-workspace.yaml
-yarn.lock
-contracts/package.json
-event/bun.lockb
-event/package.json
-render/package.json
-render/removeDevDependencies.js
+
