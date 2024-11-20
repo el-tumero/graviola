@@ -3,8 +3,7 @@ import type { Card } from "../../types/Card"
 import { cn } from "../../utils/cn"
 import { convertCidToUrl } from "../../utils/convertCidToUrl"
 import { rarityBoxShadow, rarityToColor } from "../../utils/rarity"
-
-type CardImageSize = "medium" | "large"
+import type { CardImageSize } from "./card"
 
 interface Props {
     card: Card
@@ -15,7 +14,7 @@ interface Props {
 const {
     card: { image, rarity },
     breathingEffect,
-    size = "medium",
+    size = "small",
 } = Astro.props
 
 const style = {
@@ -27,7 +26,8 @@ const style = {
     style={style}
     class:list={[
         "flex",
-        size === "medium" && "w-36 h-36",
+        size === "small" && "w-36 h-36",
+        size === "medium" && "w-52 h-52",
         size === "large" && "w-64 h-64",
         "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
         "border-light-border dark:border-dark-border select-none",

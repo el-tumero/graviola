@@ -3,8 +3,7 @@ import type { Card } from "../../types/Card"
 import cl from "clsx"
 import { convertCidToUrl } from "../../utils/convertCidToUrl"
 import { rarityBoxShadow, rarityToColor } from "../../utils/rarity"
-
-type CardImageSize = "medium" | "large"
+import type { CardImageSize } from "./card"
 
 interface Props {
     card: Card
@@ -15,7 +14,7 @@ interface Props {
 const CardImage: React.FC<Props> = ({
     card,
     breathingEffect,
-    size = "medium",
+    size = "small",
 }) => {
     const { image, rarity } = card
 
@@ -29,6 +28,7 @@ const CardImage: React.FC<Props> = ({
             className={cl(
                 "flex",
                 size === "medium" && "w-36 h-36",
+                size === "medium" && "w-52 h-52",
                 size === "large" && "w-64 h-64",
                 "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
                 "border-light-border dark:border-dark-border select-none",

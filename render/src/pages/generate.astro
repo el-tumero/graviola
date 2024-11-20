@@ -1,13 +1,13 @@
 ---
-import Generator from "../components/generator/Generator"
+import Generator from "../components/generator/Generator.tsx"
 import Layout from "../layouts/Layout.astro"
 ---
 
 <Layout>
     <h3 class="font-semibold font-title text-lg text-center mb-4">
-        Cards generator
-        <Generator client:load />
+        Card Generator
     </h3>
+    <Generator client:load />
 </Layout>
 
 <script>

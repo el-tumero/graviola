@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
-	theme: {
+    content: ["./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}"],
+    theme: {
         extend: {
             fontFamily: {
                 title: ['"Noto Sans Mono"', "monospace"],
@@ -15,6 +15,7 @@ export default {
             animation: {
                 marquee: "marquee 25s linear infinite",
                 marquee2: "marquee2 25s linear infinite",
+                fadeIn: "fadeIn 1s linear",
             },
 
             keyframes: {
@@ -34,10 +35,18 @@ export default {
                         transform: "translateX(0%)",
                     },
                 },
+                fadeIn: {
+                    "0%": {
+                        opacity: "0",
+                    },
+                    "100%": {
+                        opacity: "1",
+                    },
+                },
             },
 
             boxShadow: {
-                'card': '0px 0px 20px 6px',
+                card: "0px 0px 20px 6px",
             },
 
             colors: {
@@ -49,7 +58,7 @@ export default {
                     bgPrimary: "#e6ede8",
                     bgLight: "#f7f7f7",
                     bgDark: "#d5dbd7",
-                    border: "#bbbfbd"
+                    border: "#bbbfbd",
                 },
                 dark: {
                     text: "#fff",
@@ -65,9 +74,9 @@ export default {
                     rare: "rgba(37, 99, 235, 0.8)",
                     veryRare: "rgba(147, 51, 234, 0.8)",
                     legendary: "rgba(239, 68, 68, 0.8)",
-                }
+                },
             },
         },
     },
-	plugins: [],
+    plugins: [],
 }
