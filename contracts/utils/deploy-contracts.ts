@@ -1,20 +1,35 @@
 import 'dotenv/config'
 import hardhat from 'hardhat'
-import { DeployedContractEnum } from './deployed-contract'
+import { DeployedContractEnum } from './contracts'
+import { GraviolaMigrator } from '../typechain-types'
 
 // Values for Arbitrum Sepolia
 const VRF_WRAPPER_ADDRESS = '0x29576aB8152A09b9DC634804e4aDE73dA1f3a3CC'
 const OAO_PROXY_ADDRESS = '0x0A0f4321214BB6C7811dD8a71cF587bdaF03f0A0'
 
-export default async function deployTestnet() {
+async function addAddressToMigrator(
+    migrator: GraviolaMigrator,
+    contract: number,
+    address: string,
+) {
+    return await migrator.addDeployedContractAddress(contract, address)
+}
+
+export default async function deployContracts(
+    variant: 'localhost' | 'testnet',
+) {
     console.log('Deployment start...')
-    const tm = await hardhat.ethers.deployContract('TestnetMigration')
-    await tm.waitForDeployment()
+    const gm = await hardhat.ethers.deployContract('GraviolaMigrator')
+    await gm.waitForDeployment()
     console.log('Migration deployed!')
-    console.log('Migrator address:', await tm.getAddress())
+    console.log('Migrator address:', await gm.getAddress())
 
     const [owner] = await hardhat.ethers.getSigners()
 
+    const AIOracleMock = await hardhat.ethers.getContractFactory('AIOracleMock')
+    const VRFV2PlusWrapperMock = await hardhat.ethers.getContractFactory(
+        'VRFV2PlusWrapperMock',
+    )
     const GraviolaToken =
         await hardhat.ethers.getContractFactory('GraviolaToken')
     const GraviolaSeasonsArchive = await hardhat.ethers.getContractFactory(
@@ -29,11 +44,27 @@ export default async function deployTestnet() {
         await hardhat.ethers.getContractFactory('GraviolaGenerator')
 
     // Deployments
+
+    const oao =
+        variant === 'localhost'
+            ? await (
+                  await (await AIOracleMock.deploy()).waitForDeployment()
+              ).getAddress()
+            : OAO_PROXY_ADDRESS
+    const vrf =
+        variant === 'localhost'
+            ? await (
+                  await (
+                      await VRFV2PlusWrapperMock.deploy()
+                  ).waitForDeployment()
+              ).getAddress()
+            : VRF_WRAPPER_ADDRESS
+
     const gt = await GraviolaToken.deploy(owner)
     await gt.waitForDeployment()
     console.log('GraviolaToken deployed!')
 
-    const gsa = await GraviolaSeasonsArchive.deploy(tm)
+    const gsa = await GraviolaSeasonsArchive.deploy(gm)
     await gsa.waitForDeployment()
     console.log('GraviolaSeasonsArchive deployed!')
 
@@ -41,7 +72,7 @@ export default async function deployTestnet() {
     await gsg.waitForDeployment()
     console.log('GraviolaSeasonsGovernor deployed!')
 
-    const collection = await GraviolaCollection.deploy(owner)
+    const collection = await GraviolaCollection.deploy(gm)
     await collection.waitForDeployment()
     console.log('GraviolaCollection deployed!')
 
@@ -49,29 +80,11 @@ export default async function deployTestnet() {
         gt,
         gsa,
         collection,
-        OAO_PROXY_ADDRESS,
-        VRF_WRAPPER_ADDRESS,
+        oao,
+        vrf,
     )
     await generator.waitForDeployment()
     console.log('GraviolaGenerator deployed!')
-
-    console.log('All contracts deployed!')
-
-    await (
-        await tm.addDeployedContractAddress(
-            DeployedContractEnum.SEASONS_ARCHIVE,
-            gsa,
-        )
-    ).wait()
-
-    const setupTx = await tm.setup()
-    await setupTx.wait()
-    console.log('Migrator setup done!')
-
-    await (await gsa.setSeasonsGovernor(gsg)).wait()
-    await (await collection.setGenerator(generator)).wait()
-
-    console.log('Contracts configured!')
 
     const [
         tokenAddress,
@@ -87,9 +100,37 @@ export default async function deployTestnet() {
         generator.getAddress(),
     ])
 
+    console.log('All contracts deployed!')
+
+    await addAddressToMigrator(
+        gm,
+        DeployedContractEnum.SEASONS_ARCHIVE,
+        gsaAddress,
+    )
+    await addAddressToMigrator(
+        gm,
+        DeployedContractEnum.SEASONS_GOVERNOR,
+        gsgAddress,
+    )
+    await addAddressToMigrator(
+        gm,
+        DeployedContractEnum.GENERATOR,
+        generatorAddress,
+    )
+    await addAddressToMigrator(
+        gm,
+        DeployedContractEnum.COLLECTION,
+        collectionAddress,
+    )
+
+    const setup = await gm.setup()
+    await setup.wait()
+
+    console.log('Migrator setup done!')
+
     const output = {
-        VRF_ADDRESS: VRF_WRAPPER_ADDRESS,
-        OAO_ADDRESS: OAO_PROXY_ADDRESS,
+        VRF_ADDRESS: vrf,
+        OAO_ADDRESS: oao,
         TOKEN_ADDRESS: tokenAddress,
         COLLECTION_ADDRESS: collectionAddress,
         SEASONS_ARCHIVE_ADDRESS: gsaAddress,

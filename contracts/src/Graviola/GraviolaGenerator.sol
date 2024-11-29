@@ -65,6 +65,7 @@ contract GraviolaGenerator is
     }
 
     mapping(uint256 => Request) private requests;
+    mapping(address => uint256[]) private userRequests;
     mapping(uint256 => uint256) private oaoRequestIds;
 
     constructor(
@@ -98,6 +99,9 @@ contract GraviolaGenerator is
             oaoRequestId: 0,
             balance: msg.value - reqPrice
         });
+        // add requestId to userRequests storage
+        userRequests[msg.sender].push(requestId);
+
         emit RequestVRFSent(msg.sender, requestId);
     }
 
