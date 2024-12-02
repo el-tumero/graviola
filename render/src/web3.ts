@@ -11,13 +11,22 @@ import {
     GraviolaSeasonsArchive__factory,
 } from "@graviola/contracts"
 
-import { addresses } from "@graviola/contracts"
+import { addresses as target } from "@graviola/contracts"
 
 import { type Card, type Metadata } from "./types/Card"
 import type { Keyword } from "./types/Keyword"
 import { keywordToRarity, scoreToRarity } from "./utils/rarity"
+import type { DeployedContractAddressData } from "@graviola/contracts/utils/contracts"
 
-const rpcUrl = "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
+let rpcUrl: string =
+    "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
+
+let addresses: DeployedContractAddressData = target.testnet
+
+if (import.meta.env.CHAIN_NET === "local") {
+    rpcUrl = "http://localhost:8545"
+    addresses = target.local
+}
 
 const provider = new JsonRpcProvider(rpcUrl)
 

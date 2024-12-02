@@ -1,6 +1,6 @@
 import 'dotenv/config'
 import hardhat from 'hardhat'
-import { DeployedContractEnum } from './contracts'
+import { DeployedContractEnum, DeployedContractAddressData } from './contracts'
 import { GraviolaMigrator } from '../typechain-types'
 
 // Values for Arbitrum Sepolia
@@ -21,8 +21,9 @@ export default async function deployContracts(
     console.log('Deployment start...')
     const gm = await hardhat.ethers.deployContract('GraviolaMigrator')
     await gm.waitForDeployment()
+    const migratorAddress = await gm.getAddress()
     console.log('Migration deployed!')
-    console.log('Migrator address:', await gm.getAddress())
+    console.log('Migrator address:', migratorAddress)
 
     const [owner] = await hardhat.ethers.getSigners()
 
@@ -40,6 +41,9 @@ export default async function deployContracts(
     )
     const GraviolaCollection =
         await hardhat.ethers.getContractFactory('GraviolaCollection')
+    const GraviolaCollectionReadProxy = await hardhat.ethers.getContractFactory(
+        'GraviolaCollectionReadProxy',
+    )
     const GraviolaGenerator =
         await hardhat.ethers.getContractFactory('GraviolaGenerator')
 
@@ -76,6 +80,12 @@ export default async function deployContracts(
     await collection.waitForDeployment()
     console.log('GraviolaCollection deployed!')
 
+    const collectionReadProxy = await GraviolaCollectionReadProxy.deploy(
+        collection.getAddress(),
+    )
+    await collectionReadProxy.waitForDeployment()
+    console.log('GraviolaCollectionReadProxy deployed!')
+
     const generator = await GraviolaGenerator.deploy(
         gt,
         gsa,
@@ -89,12 +99,14 @@ export default async function deployContracts(
     const [
         tokenAddress,
         collectionAddress,
+        collectionReadProxyAddress,
         gsaAddress,
         gsgAddress,
         generatorAddress,
     ] = await Promise.all([
         gt.getAddress(),
         collection.getAddress(),
+        collectionReadProxy.getAddress(),
         gsa.getAddress(),
         gsg.getAddress(),
         generator.getAddress(),
@@ -122,13 +134,18 @@ export default async function deployContracts(
         DeployedContractEnum.COLLECTION,
         collectionAddress,
     )
+    await addAddressToMigrator(
+        gm,
+        DeployedContractEnum.COLLECTION_READ_PROXY,
+        collectionReadProxyAddress,
+    )
 
     const setup = await gm.setup()
     await setup.wait()
 
     console.log('Migrator setup done!')
 
-    const output = {
+    const output: DeployedContractAddressData = {
         VRF_ADDRESS: vrf,
         OAO_ADDRESS: oao,
         TOKEN_ADDRESS: tokenAddress,
@@ -136,6 +153,8 @@ export default async function deployContracts(
         SEASONS_ARCHIVE_ADDRESS: gsaAddress,
         SEASONS_GOVERNOR_ADDRESS: gsgAddress,
         GENERATOR_ADDRESS: generatorAddress,
+        COLLECTION_READ_PROXY_ADDRESS: collectionReadProxyAddress,
+        MIGRATOR_ADDRESS: migratorAddress,
     }
 
     return output

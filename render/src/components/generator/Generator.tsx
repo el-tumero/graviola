@@ -1,14 +1,58 @@
 import CardGenerate from "../card/generator/CardGenerate"
 import GeneratorButton from "./GeneratorButton"
-import { useState } from "react"
-import { generationPhase, type GenerationPhase } from "./generator"
+import { useEffect, useRef, useState } from "react"
+import { GenerationPhase } from "./generator"
+import { useStore } from "@nanostores/react"
+import { $user } from "../../store/user"
+import cl from "clsx"
+import { type EventMessage } from "@graviola/event"
 
 interface Props {}
 
 const Generator: React.FC<Props> = () => {
-    const [phase, setPhase] = useState<GenerationPhase>("NONE")
-    const [phaseIndex, setPhaseIndex] = useState(0)
+    const [phase, setPhase] = useState<number>(GenerationPhase.NONE)
     const [keywords, setKeywords] = useState<string[]>([])
+    const user = useStore($user)
+    const ws = useRef<WebSocket | null>(null)
+    const [requestId, setRequestId] = useState<string>("")
+
+    useEffect(() => {
+        if (user.address === "0x") return
+
+        ws.current = new WebSocket("ws://localhost:8085")
+        ws.current.onopen = () => console.log("ws opened")
+        ws.current.onclose = () => console.log("ws closed")
+
+        const wsCurrent = ws.current
+
+        if (ws.current) {
+            ws.current.onmessage = (e) => {
+                const message: EventMessage = JSON.parse(e.data)
+                if (message.initiator !== user.address) return
+                console.log(message)
+
+                switch (message.eventName) {
+                    case "RequestVRFFulfilled": {
+                        setPhase(GenerationPhase.PREPARE_COMPLETE)
+                        setRequestId(message.requestId)
+                        break
+                    }
+                    case "RequestOAOFulfilled": {
+                        setPhase(GenerationPhase.GENERATE_COMPLETE)
+                        console.log(message.metadata)
+                        break
+                    }
+                    default: {
+                        break
+                    }
+                }
+            }
+        }
+
+        return () => {
+            wsCurrent.close()
+        }
+    }, [user])
 
     const addKeywords = async () => {
         setKeywords((keywords) => [...keywords, "keyword1"])
@@ -19,11 +63,20 @@ const Generator: React.FC<Props> = () => {
     }
 
     const nextPhase = () => {
-        setPhase(generationPhase[phaseIndex])
-        if (generationPhase[phaseIndex] === "GENERATE_KEYWORDS") {
+        if (phase === GenerationPhase.GENERATE_KEYWORDS) {
             addKeywords()
         }
-        setPhaseIndex((phaseIndex + 1) % generationPhase.length)
+        setPhase((phase + 1) % Object.keys(GenerationPhase).length)
+    }
+
+    const prevPhase = () => {
+        if (phase === GenerationPhase.PREPARE_LOAD) {
+            setPhase(GenerationPhase.NONE)
+        }
+
+        if (phase === GenerationPhase.GENERATE_LOAD) {
+            setPhase(GenerationPhase.PREPARE_COMPLETE)
+        }
     }
 
     return (
@@ -32,9 +85,27 @@ const Generator: React.FC<Props> = () => {
                 <CardGenerate keywords={keywords} />
             </div>
             <div className="flex justify-center">
-                <GeneratorButton phase={phase} nextPhase={nextPhase} />
+                {user.address !== "0x" ? (
+                    <GeneratorButton
+                        phase={phase}
+                        requestId={requestId}
+                        nextPhase={nextPhase}
+                        prevPhase={prevPhase}
+                    />
+                ) : (
+                    <p
+                        className={cl(
+                            "px-5 py-2 w-64 text-center text-lg rounded-xl",
+                            "text-light-textSecondary dark:text-dark-textSecondary",
+                            "uppercase",
+                            "cursor-default",
+                            "bg-dark-bgLight",
+                        )}
+                    >
+                        Please connect your wallet
+                    </p>
+                )}
             </div>
-            {/* <p className="animate-fadeIn">Test</p> */}
         </>
     )
 }

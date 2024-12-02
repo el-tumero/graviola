@@ -1,17 +1,76 @@
 import cl from "clsx"
-import { useState } from "react"
-import { generationPhaseMessages, type GenerationPhase } from "./generator"
+import { GenerationPhase, generationPhaseMessages } from "./generator"
+import { GraviolaGenerator__factory } from "@graviola/contracts"
+import { addresses } from "@graviola/contracts"
+import { getSigner } from "../../wallet"
 
 interface Props {
-    phase: GenerationPhase
+    phase: number
+    requestId: string
     nextPhase: () => void
+    prevPhase: () => void
 }
 
-const GeneratorButton: React.FC<Props> = ({ phase, nextPhase }) => {
+const GeneratorButton: React.FC<Props> = ({
+    phase,
+    requestId,
+    nextPhase,
+    prevPhase,
+}) => {
     const enabled =
-        phase == "NONE" ||
-        phase == "PREPARE_COMPLETE" ||
-        phase == "GENERATE_COMPLETE"
+        phase == GenerationPhase.NONE ||
+        phase == GenerationPhase.PREPARE_COMPLETE ||
+        phase == GenerationPhase.GENERATE_COMPLETE
+
+    const handleClick = async () => {
+        const signer = getSigner()
+        if (!signer) return
+
+        const generator = GraviolaGenerator__factory.connect(
+            addresses.local.GENERATOR_ADDRESS,
+            signer,
+        )
+
+        switch (phase) {
+            case GenerationPhase.NONE: {
+                nextPhase()
+                try {
+                    const fee = await generator.estimateServiceFee()
+                    const prepare = await generator.prepare({
+                        gasLimit: 1_000_000,
+                        value: fee + 1_000n,
+                    })
+                    const tx = await prepare.wait()
+                    console.log(tx)
+                } catch (err) {
+                    console.log(err)
+                    prevPhase()
+                }
+                break
+            }
+            case GenerationPhase.PREPARE_COMPLETE: {
+                nextPhase()
+                try {
+                    if (!requestId) return
+                    const generate = await generator.generate(
+                        BigInt(requestId),
+                        {
+                            gasLimit: 1_000_000,
+                        },
+                    )
+                    const tx = await generate.wait()
+                    console.log(tx)
+                } catch (err) {
+                    console.log(err)
+                    prevPhase()
+                }
+                break
+            }
+            default: {
+                break
+            }
+        }
+    }
 
     return (
         <button
@@ -36,7 +95,7 @@ const GeneratorButton: React.FC<Props> = ({ phase, nextPhase }) => {
                           "animate-pulse",
                       ],
             )}
-            onClick={nextPhase}
+            onClick={handleClick}
         >
             {generationPhaseMessages[phase]}
         </button>

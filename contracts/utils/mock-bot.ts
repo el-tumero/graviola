@@ -23,6 +23,7 @@ async function main() {
     generator.on(
         generator.filters.RequestVRFSent,
         async (initiator: ethers.AddressLike, requestId: bigint) => {
+            await new Promise((r) => setTimeout(r, 2000))
             const tx = await vrf.fulfillRandomWords(requestId)
             const recp = await tx.wait()
             if (recp?.status === 1) {
@@ -36,6 +37,7 @@ async function main() {
     generator.on(
         generator.filters.RequestOAOSent,
         async (initiator: ethers.AddressLike, requestId: bigint) => {
+            await new Promise((r) => setTimeout(r, 2000))
             const tx = await oao.invokeNextCallback(toUtf8Bytes(IMG_CID))
             const recp = await tx.wait()
             if (recp?.status === 1) {

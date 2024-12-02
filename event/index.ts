@@ -1,58 +1,29 @@
-import { WebSocketProvider } from "ethers"
-import { GeneratorEventTester__factory } from "@graviola/contracts"
+export const GENERATION_TOPIC = "generation"
 
-const provider = new WebSocketProvider("ws://127.0.0.1:8545/")
+export type SupportedEvents =
+    | "RequestVRFSent"
+    | "RequestVRFFulfilled"
+    | "RequestOAOSent"
+    | "RequestOAOFulfilled"
 
-const GENERATION_TOPIC = "generation"
+export type Metadata = {
+    description: string
+    image: string
+    probability: number
+    score: number
+    seasonId: number
+}
 
-const server = Bun.serve({
-    port: 8080,
-    fetch(req, server) {
-        if (server.upgrade(req)) {
-            return
-        }
-        return new Response("Upgrade failed", { status: 500 })
-    },
-    websocket: {
-        message(ws, message) {},
-        open(ws) {
-            ws.subscribe(GENERATION_TOPIC)
-        },
-        close(ws) {
-            ws.unsubscribe(GENERATION_TOPIC)
-        },
-    },
-})
+type EventMessageVRF = {
+    eventName: "RequestVRFSent" | "RequestVRFFulfilled"
+}
 
-const eventTester = GeneratorEventTester__factory.connect(
-    "0x5FbDB2315678afecb367f032d93F642f64180aa3",
-    provider,
-)
+type EventMessageOAO = {
+    eventName: "RequestOAOSent" | "RequestOAOFulfilled"
+    metadata: Metadata
+}
 
-eventTester.on(eventTester.filters.RequestVRFSent, (initiator, requestId) => {
-    server.publish(GENERATION_TOPIC, `RequestVRFSent ${initiator}:${requestId}`)
-})
-
-eventTester.on(
-    eventTester.filters.RequestVRFFulfilled,
-    (initiator, requestId) => {
-        server.publish(
-            GENERATION_TOPIC,
-            `RequestVRFFulfilled ${initiator}:${requestId}`,
-        )
-    },
-)
-
-eventTester.on(eventTester.filters.RequestOAOSent, (initiator, requestId) => {
-    server.publish(GENERATION_TOPIC, `RequestOAOSent ${initiator}:${requestId}`)
-})
-
-eventTester.on(
-    eventTester.filters.RequestOAOFulfilled,
-    (initiator, requestId) => {
-        server.publish(
-            GENERATION_TOPIC,
-            `RequestOAOFulfilled ${initiator}:${requestId}`,
-        )
-    },
-)
+export type EventMessage = {
+    requestId: string
+    initiator: string
+} & (EventMessageVRF | EventMessageOAO)

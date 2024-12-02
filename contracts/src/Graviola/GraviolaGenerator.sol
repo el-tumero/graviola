@@ -242,6 +242,10 @@ contract GraviolaGenerator is
         return requests[requestId].status;
     }
 
+    function getTokenId(uint256 requestId) external view returns (uint256) {
+        return oaoRequestIds[requests[requestId].oaoRequestId];
+    }
+
     function withdraw(uint256 requestId) external {
         Request storage request = requests[requestId];
         if (msg.sender != request.initiator) {

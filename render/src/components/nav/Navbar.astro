@@ -7,6 +7,7 @@ import NavElementText from "./NavElementText.astro"
 import NavList from "./NavList.astro"
 import NavToggle from "./NavToggle.astro"
 import { links } from "../../utils/links"
+import DevWallet from "./DevWallet"
 ---
 
 <nav
@@ -40,7 +41,8 @@ import { links } from "../../utils/links"
             <NavElementIcon icon="flowbite:x-solid" url={links.x} />
             <NavElementIcon icon="flowbite:discord-solid" url={links.discord} />
 
-            <!-- <NavElementIcon icon="flowbite:moon-outline" /> -->
+            {import.meta.env.CHAIN_NET === "local" && <DevWallet client:load />}
+
             <div class="ml-auto max-lg:ml-0">
                 <Wallet client:load />
             </div>

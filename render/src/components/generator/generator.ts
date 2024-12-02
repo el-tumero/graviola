@@ -1,19 +1,19 @@
-export const generationPhase = [
-    "NONE",
-    "PREPARE_LOAD",
-    "PREPARE_COMPLETE",
-    "GENERATE_LOAD",
-    "GENERATE_KEYWORDS",
-    "GENERATE_COMPLETE",
-] as const
+export const generationPhaseMessages = [
+    "Prepare",
+    "Waiting for generation seed...",
+    "Generate",
+    "Generating...",
+    "Generating...",
+    "Completed",
+]
 
-export const generationPhaseMessages = {
-    NONE: "Prepare",
-    PREPARE_LOAD: "Waiting for generation seed...",
-    PREPARE_COMPLETE: "Generate",
-    GENERATE_LOAD: "Generating...",
-    GENERATE_KEYWORDS: "Generating...",
-    GENERATE_COMPLETE: "Completed",
-}
+export const GenerationPhase = {
+    NONE: 0,
+    PREPARE_LOAD: 1,
+    PREPARE_COMPLETE: 2,
+    GENERATE_LOAD: 3,
+    GENERATE_KEYWORDS: 4,
+    GENERATE_COMPLETE: 5,
+} as const
 
-export type GenerationPhase = (typeof generationPhase)[number]
+// export type GenerationPhase = (typeof generationPhase)[number]
