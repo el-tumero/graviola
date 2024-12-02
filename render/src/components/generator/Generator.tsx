@@ -6,6 +6,8 @@ import { useStore } from "@nanostores/react"
 import { $user } from "../../store/user"
 import cl from "clsx"
 import { type EventMessage } from "@graviola/event"
+import type { Card } from "../../types/Card"
+import { descriptionToKeywords, metadataFlatToCard } from "../../web3"
 
 interface Props {}
 
@@ -15,6 +17,7 @@ const Generator: React.FC<Props> = () => {
     const user = useStore($user)
     const ws = useRef<WebSocket | null>(null)
     const [requestId, setRequestId] = useState<string>("")
+    const [card, setCard] = useState<Card | undefined>(undefined)
 
     useEffect(() => {
         if (user.address === "0x") return
@@ -37,11 +40,19 @@ const Generator: React.FC<Props> = () => {
                         setRequestId(message.requestId)
                         break
                     }
-                    case "RequestOAOFulfilled": {
-                        setPhase(GenerationPhase.GENERATE_COMPLETE)
-                        console.log(message.metadata)
+
+                    case "RequestOAOSent": {
+                        const { description } = message.metadata
+                        addKeywords(descriptionToKeywords(description))
                         break
                     }
+
+                    case "RequestOAOFulfilled": {
+                        setPhase(GenerationPhase.GENERATE_COMPLETE)
+                        setCard(metadataFlatToCard(message.metadata))
+                        break
+                    }
+
                     default: {
                         break
                     }
@@ -54,18 +65,15 @@ const Generator: React.FC<Props> = () => {
         }
     }, [user])
 
-    const addKeywords = async () => {
-        setKeywords((keywords) => [...keywords, "keyword1"])
+    const addKeywords = async (keywordsToAdd: string[]) => {
+        setKeywords((keywords) => [...keywords, keywordsToAdd[0]])
         await new Promise((r) => setTimeout(r, 1000))
-        setKeywords((keywords) => [...keywords, "keyword2"])
+        setKeywords((keywords) => [...keywords, keywordsToAdd[1]])
         await new Promise((r) => setTimeout(r, 1000))
-        setKeywords((keywords) => [...keywords, "keyword3"])
+        setKeywords((keywords) => [...keywords, keywordsToAdd[2]])
     }
 
     const nextPhase = () => {
-        if (phase === GenerationPhase.GENERATE_KEYWORDS) {
-            addKeywords()
-        }
         setPhase((phase + 1) % Object.keys(GenerationPhase).length)
     }
 
@@ -82,7 +90,7 @@ const Generator: React.FC<Props> = () => {
     return (
         <>
             <div className="flex justify-center my-8">
-                <CardGenerate keywords={keywords} />
+                <CardGenerate keywords={keywords} card={card} />
             </div>
             <div className="flex justify-center">
                 {user.address !== "0x" ? (

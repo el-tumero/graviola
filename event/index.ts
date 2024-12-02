@@ -6,7 +6,7 @@ export type SupportedEvents =
     | "RequestOAOSent"
     | "RequestOAOFulfilled"
 
-export type Metadata = {
+export type MetadataFlat = {
     description: string
     image: string
     probability: number
@@ -20,7 +20,7 @@ type EventMessageVRF = {
 
 type EventMessageOAO = {
     eventName: "RequestOAOSent" | "RequestOAOFulfilled"
-    metadata: Metadata
+    metadata: MetadataFlat
 }
 
 export type EventMessage = {

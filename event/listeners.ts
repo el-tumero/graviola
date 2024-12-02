@@ -6,7 +6,7 @@ import {
 } from "@graviola/contracts"
 import { WebSocketProvider } from "ethers"
 import { GENERATION_TOPIC } from "./index"
-import type { SupportedEvents, Metadata, EventMessage } from "./index"
+import type { SupportedEvents, MetadataFlat } from "./index"
 import { createEventMessage } from "./message"
 
 const provider = new WebSocketProvider("ws://127.0.0.1:8545/")
@@ -26,7 +26,7 @@ const publishEventMessage = (
     requestId: bigint,
     eventName: SupportedEvents,
     initiator: string,
-    metadata?: Metadata,
+    metadata?: MetadataFlat,
 ) => {
     server.publish(
         GENERATION_TOPIC,

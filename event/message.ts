@@ -1,4 +1,4 @@
-import type { EventMessage, Metadata, SupportedEvents } from "."
+import type { EventMessage, MetadataFlat, SupportedEvents } from "."
 
 const isVRFEventName = (
     eventName: SupportedEvents,
@@ -9,7 +9,7 @@ export const createEventMessage = (
     requestId: bigint,
     eventName: SupportedEvents,
     initiator: string,
-    metadata?: Metadata,
+    metadata?: MetadataFlat,
 ): EventMessage => {
     if (isVRFEventName(eventName)) {
         return {
