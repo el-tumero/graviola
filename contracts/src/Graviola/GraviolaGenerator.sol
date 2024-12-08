@@ -236,6 +236,10 @@ contract GraviolaGenerator is
             );
     }
 
+    function isFinalized(uint256 tokenId) external view returns (bool) {
+        return aiOracle.isFinalized(requests[tokenId].oaoRequestId);
+    }
+
     function getRequestStatus(
         uint256 requestId
     ) external view returns (RequestStatus) {
