@@ -58,10 +58,8 @@ contract GraviolaCollection is
         schema = GraviolaSchema(schemaAddress);
     }
 
-    function mint(address to) external onlyGenerator returns (uint256) {
-        uint256 tokenId = nextTokenId++;
+    function mint(uint256 tokenId, address to) external onlyGenerator {
         _safeMint(to, tokenId);
-        return tokenId;
     }
 
     function getMetadata(
@@ -89,10 +87,10 @@ contract GraviolaCollection is
         bytes calldata /*proof*/
     ) external view returns (bool) {
         uint256 id = tokenId[prompt];
-        if (_getMetadata(id)[1] != string(aigcData)) {
-            return false;
-        }
-        return generator.isFinalized(id);
+
+        return
+            generator.isFinalized(id) &&
+            (keccak256(bytes(_getMetadata(id)[1])) == keccak256(aigcData));
     }
 
     function tokenURI(

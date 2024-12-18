@@ -18,25 +18,24 @@ contract GraviolaSeed {
 
     /// @notice Convert a fraction to basis points (BP)
     function _fractionToBasisPoints(
-        uint256 _numerator,
-        uint256 _denumerator
+        uint256 numerator,
+        uint256 denumerator
     ) internal pure returns (uint256) {
-        return (_numerator * 100) / _denumerator;
+        return (numerator * 100) / denumerator;
     }
 
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @param seed Random input seed
     /// @return keywords String of combined and separated result keywords
-    /// @return score // Weight sum of rolled groups' keywords. This determines the final token Rarity
-    /// @return probability // Probability (in BP) of rolling the EXACT combination of rolled keywords (excluding order)
+    /// @return groups // Array of keyword groupIds. This determines the final token Rarity
     function rollWords(
         uint256 seed,
         uint256 omega
-    ) public view returns (string memory, uint256, uint256) {
+    ) public view returns (string memory, uint256[] memory) {
         uint16 i = 0;
         uint16 j = 0;
-        uint256 probability = 1;
-        uint256 score = 0;
+
+        uint256[] memory groups = new uint256[](KEYWORDS_PER_TOKEN);
         int256[] memory used = new int256[](KEYWORDS_PER_TOKEN);
         string memory result = "";
 
@@ -63,15 +62,7 @@ contract GraviolaSeed {
             used[i] = int256(wordId);
 
             // Get group of rolled word
-            uint256 groupId = archive.getRarityGroupById(wordId);
-            // Get word count for the group with given id
-            uint256 groupWordCount = archive.getWordsPerRarityGroup(groupId);
-
-            probability *= _fractionToBasisPoints(
-                groupWordCount,
-                DEFAULT_OMEGA
-            );
-            score += archive.getRarityGroupWeight(groupId);
+            groups[i] = archive.getRarityGroupById(wordId);
 
             result = string(
                 abi.encodePacked(
@@ -83,6 +74,6 @@ contract GraviolaSeed {
             i++;
         }
 
-        return (result, score, probability);
+        return (result, groups);
     }
 }
