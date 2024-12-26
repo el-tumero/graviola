@@ -114,7 +114,7 @@ abstract contract GraviolaMetadata {
     function _readProperty(
         uint256 tokenId,
         bytes32 property
-    ) private view returns (bytes memory) {
+    ) internal view returns (bytes memory) {
         return properties[property].values[tokenId];
     }
 

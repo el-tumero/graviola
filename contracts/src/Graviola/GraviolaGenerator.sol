@@ -163,8 +163,7 @@ contract GraviolaGenerator is
         uint256 tokenId = uint256(keccak256(prompt));
         collection.mint(tokenId, request.initiator);
 
-        collection._addProperty(tokenId, propertyId, value);
-
+        // collection._addProperty(tokenId, propertyId, value);
         // TODO: add props to collection
         // TODO: abi encode properties + save types
         // collection.addProperty(tokenId, )

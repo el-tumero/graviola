@@ -62,12 +62,6 @@ contract GraviolaCollection is
         _safeMint(to, tokenId);
     }
 
-    function getMetadata(
-        uint256 tokenId
-    ) external view returns (string[] memory) {
-        return _getMetadata(tokenId);
-    }
-
     function addAigcData(
         uint256 tokenId,
         bytes calldata prompt,
@@ -90,13 +84,15 @@ contract GraviolaCollection is
 
         return
             generator.isFinalized(id) &&
-            (keccak256(bytes(_getMetadata(id)[1])) == keccak256(aigcData));
+            (keccak256(_readProperty(id, bytes32("prompt"))) ==
+                keccak256(aigcData));
     }
 
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
-        return schema._tokenURI(tokenId, _getMetadata(tokenId));
+        return "todo";
+        // return schema._tokenURI(tokenId, _getMetadata(tokenId));
     }
 
     function burnByGenerator(uint256 tokenId) external onlyGenerator {
