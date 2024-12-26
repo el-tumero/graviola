@@ -9,13 +9,14 @@
         "build": "pnpm clean ; astro check && astro build",
         "preview": "astro preview",
         "astro": "astro",
+        "check": "tsc --noEmit",
         "clean": "rm -f -r ./dist"
     },
     "dependencies": {
         "@astrojs/node": "^8.3.4",
         "@coinbase/wallet-sdk": "4.0.3",
         "@graviola/contracts": "workspace:*",
-        "@graviola/event": "workspace:*",
+        "@graviola/core": "workspace:*",
         "@iconify-json/flowbite": "^1.2.2",
         "@nanostores/react": "^0.8.2",
         "@reown/appkit": "1.2.1",

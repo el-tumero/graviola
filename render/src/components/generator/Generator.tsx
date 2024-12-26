@@ -5,9 +5,7 @@ import { GenerationPhase } from "./generator"
 import { useStore } from "@nanostores/react"
 import { $user } from "../../store/user"
 import cl from "clsx"
-import { type EventMessage } from "@graviola/event"
-import type { Card } from "../../types/Card"
-import { descriptionToKeywords, metadataFlatToCard } from "../../web3"
+import type { EventMessage, Card } from "@graviola/core"
 
 interface Props {}
 
@@ -42,14 +40,13 @@ const Generator: React.FC<Props> = () => {
                     }
 
                     case "RequestOAOSent": {
-                        const { description } = message.metadata
-                        addKeywords(descriptionToKeywords(description))
+                        addKeywords(message.card.keywords)
                         break
                     }
 
                     case "RequestOAOFulfilled": {
                         setPhase(GenerationPhase.GENERATE_COMPLETE)
-                        setCard(metadataFlatToCard(message.metadata))
+                        setCard(message.card)
                         break
                     }
 

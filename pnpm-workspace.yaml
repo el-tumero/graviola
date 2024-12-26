@@ -1,4 +1,5 @@
 packages:
-    - 'contracts'
-    - 'event'
-    - 'render'
+    - "core"
+    - "contracts"
+    - "event"
+    - "render"

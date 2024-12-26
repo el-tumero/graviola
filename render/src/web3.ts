@@ -13,11 +13,13 @@ import {
 
 import { addresses as target } from "@graviola/contracts"
 
-import { type Card, type Metadata } from "./types/Card"
-import type { Keyword } from "./types/Keyword"
-import { keywordToRarity, scoreToRarity } from "./utils/rarity"
+import type { Card, Metadata, Keyword } from "@graviola/core"
+import {
+    descriptionToKeywords,
+    keywordToRarity,
+    scoreToRarity,
+} from "@graviola/core"
 import type { DeployedContractAddressData } from "@graviola/contracts/utils/contracts"
-import type { MetadataFlat } from "@graviola/event"
 
 let rpcUrl: string =
     "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
@@ -45,10 +47,6 @@ export const getArchiveContract = (): GraviolaSeasonsArchive =>
         addresses.SEASONS_ARCHIVE_ADDRESS,
         provider,
     )
-
-export const descriptionToKeywords = (description: string): string[] => {
-    return description.slice(130).trim().split(",")
-}
 
 export const getCardsTotalSupply = async (): Promise<number> => {
     const collection = getCollectionContract()
@@ -82,7 +80,7 @@ export const getCards = async (
         const [probability, score] = data.attributes
 
         return {
-            id: ids[i],
+            id: ids[i].toString(),
             description,
             image,
             keywords: descriptionToKeywords(description),
@@ -91,23 +89,6 @@ export const getCards = async (
             score: score.value,
         }
     })
-}
-
-export const metadataFlatToCard = (
-    metadata: MetadataFlat,
-    id?: bigint,
-): Card => {
-    const { description, image, probability, score, seasonId } = metadata
-
-    return {
-        id: id ?? 0n,
-        description,
-        image,
-        keywords: descriptionToKeywords(description),
-        rarity: scoreToRarity(score, [4, 11, 15, 20]),
-        probability: probability,
-        score: score,
-    }
 }
 
 export const getKeywords = async (): Promise<Keyword[]> => {

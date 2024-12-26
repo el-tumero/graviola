@@ -1,4 +1,4 @@
-import type { Rarity } from "./Rarity"
+import type { Rarity } from "./rarity"
 
 export type Metadata = {
     description: string
@@ -7,7 +7,7 @@ export type Metadata = {
 }
 
 export type Card = {
-    id: bigint
+    id: string
     description: string
     image: string
     keywords: string[]
@@ -15,6 +15,8 @@ export type Card = {
     probability: number
     score: number
 }
+
+export type CardImageSize = "small" | "medium" | "large"
 
 export type MetadataAttribute = {
     trait_type: string

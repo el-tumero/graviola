@@ -1,8 +1,7 @@
-import { useState } from "react"
 import CardGenerateDetails from "./CardGenerateDetails"
 import CardGenerateImage from "./CardGenerateImage"
 import cl from "clsx"
-import type { Card } from "../../../types/Card"
+import type { Card } from "@graviola/core"
 import CardImage from "../CardImage"
 
 interface Props {

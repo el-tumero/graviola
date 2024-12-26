@@ -1,9 +1,8 @@
 import React from "react"
-import type { Card } from "../../types/Card"
+import type { Card, CardImageSize } from "@graviola/core"
 import cl from "clsx"
 import { convertCidToUrl } from "../../utils/convertCidToUrl"
 import { rarityBoxShadow, rarityToColor } from "../../utils/rarity"
-import type { CardImageSize } from "./card"
 
 interface Props {
     card: Card

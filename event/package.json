@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "ethers": "6.13.1",
+        "@graviola/core": "workspace:*",
         "@graviola/contracts": "workspace:*"
     }
 }

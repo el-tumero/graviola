@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react"
 import cl from "clsx"
 import { rarityBoxShadow } from "../../../utils/rarity"
-import { RarityName } from "../../../types/Rarity"
-import type { CardImageSize } from "../card"
+import { RarityName, type CardImageSize } from "@graviola/core"
 import goblin from "../../../assets/unknowngoblin.jpg"
 
 interface Props {
