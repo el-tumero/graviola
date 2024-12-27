@@ -62,6 +62,8 @@ contract GraviolaCollection is
         _safeMint(to, tokenId);
     }
 
+    // == Metadata and ERC7007 related functions ==
+
     function addAigcData(
         uint256 tokenId,
         bytes calldata prompt,
@@ -73,6 +75,21 @@ contract GraviolaCollection is
         }
         _addAigcData(tokenId, prompt, aigcData);
         emit AigcData(tokenId, prompt, aigcData, proof);
+    }
+
+    function addProperty(
+        uint256 tokenId,
+        bytes32 property,
+        bytes calldata value
+    ) external onlyGenerator {
+        _addProperty(tokenId, property, value);
+    }
+
+    function readProperty(
+        uint256 tokenId,
+        bytes32 property
+    ) external view returns (bytes memory) {
+        return _readProperty(tokenId, property);
     }
 
     function verify(
@@ -91,13 +108,14 @@ contract GraviolaCollection is
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
-        return "todo";
-        // return schema._tokenURI(tokenId, _getMetadata(tokenId));
+        return schema._tokenURI(tokenId);
     }
 
     function burnByGenerator(uint256 tokenId) external onlyGenerator {
         _burn(tokenId);
     }
+
+    // == Overrides ==
 
     function _update(
         address to,

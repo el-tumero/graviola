@@ -162,11 +162,7 @@ contract GraviolaGenerator is
 
         uint256 tokenId = uint256(keccak256(prompt));
         collection.mint(tokenId, request.initiator);
-
-        // collection._addProperty(tokenId, propertyId, value);
-        // TODO: add props to collection
-        // TODO: abi encode properties + save types
-        // collection.addProperty(tokenId, )
+        collection.addUintArrayProperty(tokenId, bytes32("groups"), groups);
 
         uint256 oaoRequestId = aiOracle.requestCallback{value: fee}(
             MODEL_ID,
