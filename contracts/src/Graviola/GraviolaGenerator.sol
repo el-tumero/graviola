@@ -28,7 +28,7 @@ contract GraviolaGenerator is
     uint32 private constant VRF_NUM_WORDS = 1;
 
     /// @dev Callback gas limit for the OAO request
-    uint64 private constant OAO_CALLBACK_GAS_LIMIT = 150000;
+    uint64 private constant OAO_CALLBACK_GAS_LIMIT = 300000;
 
     IERC20 private token;
     GraviolaCollection private collection;
@@ -150,7 +150,7 @@ contract GraviolaGenerator is
         }
 
         // perform process of selecting random words
-        (string memory result, uint256[] memory groups) = rollWords(
+        (string memory result, bytes memory wordIds) = rollWords(
             request.seed,
             omega
         );
@@ -162,7 +162,7 @@ contract GraviolaGenerator is
 
         uint256 tokenId = uint256(keccak256(prompt));
         collection.mint(tokenId, request.initiator);
-        collection.addUintArrayProperty(tokenId, bytes32("groups"), groups);
+        collection.addProperty(tokenId, "wordIds", wordIds);
 
         uint256 oaoRequestId = aiOracle.requestCallback{value: fee}(
             MODEL_ID,

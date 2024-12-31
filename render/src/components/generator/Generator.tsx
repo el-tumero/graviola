@@ -5,13 +5,13 @@ import { GenerationPhase } from "./generator"
 import { useStore } from "@nanostores/react"
 import { $user } from "../../store/user"
 import cl from "clsx"
-import type { EventMessage, Card } from "@graviola/core"
+import type { EventMessage, Card, Keyword } from "@graviola/core"
 
 interface Props {}
 
 const Generator: React.FC<Props> = () => {
     const [phase, setPhase] = useState<number>(GenerationPhase.NONE)
-    const [keywords, setKeywords] = useState<string[]>([])
+    const [keywords, setKeywords] = useState<Keyword[]>([])
     const user = useStore($user)
     const ws = useRef<WebSocket | null>(null)
     const [requestId, setRequestId] = useState<string>("")
@@ -62,7 +62,7 @@ const Generator: React.FC<Props> = () => {
         }
     }, [user])
 
-    const addKeywords = async (keywordsToAdd: string[]) => {
+    const addKeywords = async (keywordsToAdd: Keyword[]) => {
         setKeywords((keywords) => [...keywords, keywordsToAdd[0]])
         await new Promise((r) => setTimeout(r, 1000))
         setKeywords((keywords) => [...keywords, keywordsToAdd[1]])

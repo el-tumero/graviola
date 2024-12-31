@@ -12,7 +12,9 @@ async function addAddressToMigrator(
     contract: number,
     address: string,
 ) {
-    return await migrator.addDeployedContractAddress(contract, address)
+    return await (
+        await migrator.addDeployedContractAddress(contract, address)
+    ).wait()
 }
 
 export default async function deployContracts(
@@ -39,6 +41,8 @@ export default async function deployContracts(
     const GraviolaSeasonsGovernor = await hardhat.ethers.getContractFactory(
         'GraviolaSeasonsGovernor',
     )
+    const GraviolaSchema =
+        await hardhat.ethers.getContractFactory('GraviolaSchema')
     const GraviolaCollection =
         await hardhat.ethers.getContractFactory('GraviolaCollection')
     const GraviolaCollectionReadProxy = await hardhat.ethers.getContractFactory(
@@ -76,12 +80,17 @@ export default async function deployContracts(
     await gsg.waitForDeployment()
     console.log('GraviolaSeasonsGovernor deployed!')
 
+    const schema = await GraviolaSchema.deploy()
+    await schema.waitForDeployment()
+    console.log('GraviolaSchema deployed!')
+
     const collection = await GraviolaCollection.deploy(gm)
     await collection.waitForDeployment()
     console.log('GraviolaCollection deployed!')
 
     const collectionReadProxy = await GraviolaCollectionReadProxy.deploy(
         collection.getAddress(),
+        schema.getAddress(),
     )
     await collectionReadProxy.waitForDeployment()
     console.log('GraviolaCollectionReadProxy deployed!')
@@ -98,6 +107,7 @@ export default async function deployContracts(
 
     const [
         tokenAddress,
+        schemaAddress,
         collectionAddress,
         collectionReadProxyAddress,
         gsaAddress,
@@ -105,6 +115,7 @@ export default async function deployContracts(
         generatorAddress,
     ] = await Promise.all([
         gt.getAddress(),
+        schema.getAddress(),
         collection.getAddress(),
         collectionReadProxy.getAddress(),
         gsa.getAddress(),
@@ -119,26 +130,34 @@ export default async function deployContracts(
         DeployedContractEnum.SEASONS_ARCHIVE,
         gsaAddress,
     )
+    console.log('Seasons Archive added to migrator!')
     await addAddressToMigrator(
         gm,
         DeployedContractEnum.SEASONS_GOVERNOR,
         gsgAddress,
     )
+    console.log('Seasons Governor added to migrator!')
     await addAddressToMigrator(
         gm,
         DeployedContractEnum.GENERATOR,
         generatorAddress,
     )
+    console.log('Generator added to migrator!')
     await addAddressToMigrator(
         gm,
         DeployedContractEnum.COLLECTION,
         collectionAddress,
     )
+    console.log('Collection added to migrator!')
     await addAddressToMigrator(
         gm,
         DeployedContractEnum.COLLECTION_READ_PROXY,
         collectionReadProxyAddress,
     )
+    console.log('Collection Read Proxy added to migrator!')
+    await addAddressToMigrator(gm, DeployedContractEnum.SCHEMA, schemaAddress)
+    console.log('Schema added to migrator!')
+    console.log('Contracts added to migrator!')
 
     const setup = await gm.setup()
     await setup.wait()
@@ -155,6 +174,7 @@ export default async function deployContracts(
         GENERATOR_ADDRESS: generatorAddress,
         COLLECTION_READ_PROXY_ADDRESS: collectionReadProxyAddress,
         MIGRATOR_ADDRESS: migratorAddress,
+        SCHEMA_ADDRESS: schemaAddress,
     }
 
     return output

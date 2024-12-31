@@ -1,8 +1,9 @@
 import React from "react"
 import CardGenerateKeyword from "./CardGenerateKeyword"
+import type { Keyword } from "@graviola/core"
 
 interface Props {
-    keywords: string[]
+    keywords: Keyword[]
 }
 
 const CardGenerateDetails: React.FC<Props> = ({ keywords }) => {

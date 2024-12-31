@@ -2,11 +2,16 @@ import type { Server } from "bun"
 import {
     GraviolaGenerator__factory,
     GraviolaCollection__factory,
+    GraviolaCollectionReadProxy__factory,
     addresses,
 } from "@graviola/contracts"
 import { WebSocketProvider } from "ethers"
 import { GENERATION_TOPIC } from "./index"
-import type { SupportedEvents, MetadataFlat } from "./index"
+import {
+    type SupportedEvents,
+    type Card,
+    propertiesToCard,
+} from "@graviola/core"
 import { createEventMessage } from "./message"
 
 const provider = new WebSocketProvider("ws://127.0.0.1:8545/")
@@ -21,17 +26,22 @@ const collection = GraviolaCollection__factory.connect(
     provider,
 )
 
+const collectionReadProxy = GraviolaCollectionReadProxy__factory.connect(
+    addresses.local.COLLECTION_READ_PROXY_ADDRESS,
+    provider,
+)
+
 const publishEventMessage = (
     server: Server,
     requestId: bigint,
     eventName: SupportedEvents,
     initiator: string,
-    metadata?: MetadataFlat,
+    card?: Card,
 ) => {
     server.publish(
         GENERATION_TOPIC,
         JSON.stringify(
-            createEventMessage(requestId, eventName, initiator, metadata),
+            createEventMessage(requestId, eventName, initiator, card),
         ),
     )
 }
@@ -72,22 +82,15 @@ const requestOAOSentListener = (server: Server) => {
         async (initiator, requestId) => {
             console.log("RequestOAOSent", initiator, requestId)
             const tokenId = await generator.getTokenId(requestId)
-            const metadata = await collection.getMetadata(tokenId)
-
-            const parsedMetadata = {
-                description: metadata.description,
-                image: "",
-                probability: Number(metadata.probability),
-                score: Number(metadata.score),
-                seasonId: Number(metadata.seasonId),
-            }
+            const properties = await collectionReadProxy.getProperties(tokenId)
+            const card = propertiesToCard(tokenId, properties)
 
             publishEventMessage(
                 server,
                 requestId,
                 "RequestOAOSent",
                 initiator,
-                parsedMetadata,
+                card,
             )
         },
     )
@@ -100,22 +103,15 @@ const requestOAOFulfilled = (server: Server) => {
             console.log("RequestOAOFulfilled", initiator, requestId)
 
             const tokenId = await generator.getTokenId(requestId)
-            const metadata = await collection.getMetadata(tokenId)
-
-            const parsedMetadata = {
-                description: metadata.description,
-                image: metadata.image,
-                probability: Number(metadata.probability),
-                score: Number(metadata.score),
-                seasonId: Number(metadata.seasonId),
-            }
+            const properties = await collectionReadProxy.getProperties(tokenId)
+            const card = propertiesToCard(tokenId, properties)
 
             publishEventMessage(
                 server,
                 requestId,
                 "RequestOAOFulfilled",
                 initiator,
-                parsedMetadata,
+                card,
             )
         },
     )

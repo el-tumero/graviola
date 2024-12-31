@@ -7,8 +7,8 @@ contract GraviolaSeed {
     IGraviolaSeasonsArchive internal archive;
 
     // How many words are drawed for prompt creation
-    uint8 internal KEYWORDS_PER_TOKEN = 3;
-    uint256 internal DEFAULT_OMEGA = 100;
+    uint8 internal constant KEYWORDS_PER_TOKEN = 3;
+    uint256 internal constant DEFAULT_OMEGA = 100;
 
     /// @notice Create GraviolaSeed module
     /// @param archiveAddress GraviolaSeasonsArchive address
@@ -31,18 +31,19 @@ contract GraviolaSeed {
     function rollWords(
         uint256 seed,
         uint256 omega
-    ) public view returns (string memory, uint256[] memory) {
-        uint16 i = 0;
-        uint16 j = 0;
+    ) public view returns (string memory, bytes memory) {
+        uint256 i = 0;
+        uint256 j = 0;
 
-        uint256[] memory groups = new uint256[](KEYWORDS_PER_TOKEN);
-        int256[] memory used = new int256[](KEYWORDS_PER_TOKEN);
+        uint256[3] memory used = [
+            type(uint256).max,
+            type(uint256).max,
+            type(uint256).max
+        ];
+
+        bytes memory wordIds = new bytes(KEYWORDS_PER_TOKEN);
+
         string memory result = "";
-
-        // Init 'used' arr
-        for (uint256 x = 0; x < KEYWORDS_PER_TOKEN; x++) {
-            used[x] = -1;
-        }
 
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
@@ -51,18 +52,13 @@ contract GraviolaSeed {
             uint256 wordId = (DEFAULT_OMEGA - omega) + (randNum % omega);
 
             // Duplicate id, re-roll
-            if (
-                used[0] == int256(wordId) ||
-                used[1] == int256(wordId) ||
-                used[2] == int256(wordId)
-            ) {
+            if (used[0] == wordId || used[1] == wordId || used[2] == wordId) {
                 continue;
             }
 
-            used[i] = int256(wordId);
-
             // Get group of rolled word
-            groups[i] = archive.getRarityGroupById(wordId);
+            used[i] = wordId;
+            wordIds[i] = bytes1(uint8(wordId));
 
             result = string(
                 abi.encodePacked(
@@ -74,6 +70,6 @@ contract GraviolaSeed {
             i++;
         }
 
-        return (result, groups);
+        return (result, wordIds);
     }
 }

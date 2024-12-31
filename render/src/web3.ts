@@ -13,13 +13,10 @@ import {
 
 import { addresses as target } from "@graviola/contracts"
 
-import type { Card, Metadata, Keyword } from "@graviola/core"
-import {
-    descriptionToKeywords,
-    keywordToRarity,
-    scoreToRarity,
-} from "@graviola/core"
+import type { Card, Keyword } from "@graviola/core"
+import { propertiesToCard, wordIdToRarity } from "@graviola/core"
 import type { DeployedContractAddressData } from "@graviola/contracts/utils/contracts"
+import { reshape2d } from "./utils/reshape2d"
 
 let rpcUrl: string =
     "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
@@ -67,28 +64,15 @@ export const getCards = async (
 ): Promise<Card[]> => {
     const collection = getCollectionReadProxy()
 
-    const [ids, rawData] = owner
+    const [ids, availableProperties, values] = owner
         ? await collection.tokenOfOwnerRange(owner, start, end)
         : await collection.tokenRange(start, end)
 
-    const metadata = rawData.map<Metadata>((raw) => ({
-        ...JSON.parse(Buffer.from(raw.slice(29), "base64url").toString()),
-    }))
+    const rawPropertyValues = reshape2d(values, availableProperties.length)
 
-    return metadata.map<Card>((data, i) => {
-        const { description, image } = data
-        const [probability, score] = data.attributes
-
-        return {
-            id: ids[i].toString(),
-            description,
-            image,
-            keywords: descriptionToKeywords(description),
-            rarity: scoreToRarity(score.value, [4, 11, 15, 20]),
-            probability: probability.value,
-            score: score.value,
-        }
-    })
+    return ids.map((id, i) =>
+        propertiesToCard(id, [availableProperties, rawPropertyValues[i]]),
+    )
 }
 
 export const getKeywords = async (): Promise<Keyword[]> => {
@@ -96,6 +80,6 @@ export const getKeywords = async (): Promise<Keyword[]> => {
     const keywords = await archive.getKeywordsCurrentSeason()
     return keywords.map((keyword, id) => ({
         name: keyword,
-        rarity: keywordToRarity(id),
+        rarity: wordIdToRarity(id),
     }))
 }

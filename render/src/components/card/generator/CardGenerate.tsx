@@ -1,12 +1,12 @@
 import CardGenerateDetails from "./CardGenerateDetails"
 import CardGenerateImage from "./CardGenerateImage"
 import cl from "clsx"
-import type { Card } from "@graviola/core"
+import type { Card, Keyword } from "@graviola/core"
 import CardImage from "../CardImage"
 
 interface Props {
     card: Card | undefined
-    keywords: string[]
+    keywords: Keyword[]
 }
 
 const CardGenerate: React.FC<Props> = ({ card, keywords }) => {

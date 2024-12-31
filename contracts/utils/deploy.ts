@@ -48,9 +48,6 @@ async function main() {
         writeFileSync(output, JSON.stringify(addresses, null, 4))
         console.log(`Addresses saved to '${output}'`)
 
-        await hardhat.run('typechain')
-        console.log('Types generated!')
-
         if (variant === 'localhost') {
             await generateN(addresses, 5)
             console.log('Generated 5 collection tokens!')

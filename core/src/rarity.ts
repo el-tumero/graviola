@@ -1,4 +1,4 @@
-import type { Rarity } from "./types"
+import type { Keyword, Rarity } from "./types"
 
 export const RarityName = [
     "common",
@@ -16,7 +16,7 @@ export const rarityColors: Record<Rarity, string> = {
     legendary: "rgba(239, 68, 68, 0.8)",
 } as const
 
-export const keywordToRarity = (id: number): Rarity => {
+export const wordIdToRarity = (id: number): Rarity => {
     if (id < 77) return "common"
     if (id < 92) return "uncommon"
     if (id < 97) return "rare"
@@ -24,10 +24,29 @@ export const keywordToRarity = (id: number): Rarity => {
     return "legendary"
 }
 
-export const scoreToRarity = (score: number, weights: number[]): Rarity => {
-    if (score < weights[0]) return "common"
-    if (score < weights[1]) return "uncommon"
-    if (score < weights[2]) return "rare"
-    if (score < weights[3]) return "veryRare"
+const keywordToWeight = ({ rarity }: Keyword): number => {
+    switch (rarity) {
+        case "common":
+            return 1
+        case "uncommon":
+            return 3
+        case "rare":
+            return 5
+        case "veryRare":
+            return 8
+        case "legendary":
+            return 12
+    }
+}
+
+export const keywordsToScore = (keywords: Keyword[]): number => {
+    return keywords.reduce((acc, keyword) => acc + keywordToWeight(keyword), 0)
+}
+
+export const scoreToRarity = (score: number): Rarity => {
+    if (score < 3) return "common"
+    if (score < 10) return "uncommon"
+    if (score < 14) return "rare"
+    if (score < 19) return "veryRare"
     return "legendary"
 }

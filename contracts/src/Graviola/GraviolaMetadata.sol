@@ -24,7 +24,7 @@ abstract contract GraviolaMetadata {
         bytes calldata prompt,
         bytes calldata aigcData
     ) internal {
-        _addProperty(tokenId, bytes32("prompt"), prompt);
-        _addProperty(tokenId, bytes32("image"), aigcData);
+        _addProperty(tokenId, "prompt", prompt);
+        _addProperty(tokenId, "image", aigcData);
     }
 }

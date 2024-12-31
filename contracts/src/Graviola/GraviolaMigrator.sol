@@ -9,6 +9,7 @@ import {GraviolaSeasonsArchive} from "./seasons/archive/GraviolaSeasonsArchive.s
 import {GraviolaSeasonsGovernor} from "./seasons/governor/GraviolaSeasonsGovernor.sol";
 import {GraviolaGenerator} from "./GraviolaGenerator.sol";
 import {GraviolaCollectionReadProxy} from "./GraviolaCollectionReadProxy.sol";
+import {GraviolaSchema} from "./GraviolaSchema.sol";
 import {KeywordConverter} from "../utils/KeywordConverter.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
@@ -26,7 +27,9 @@ contract GraviolaMigrator is KeywordConverter, Ownable {
         SEASONS_ARCHIVE,
         SEASONS_GOVERNOR,
         GENERATOR,
-        COLLECTION_READ_PROXY
+        COLLECTION_READ_PROXY,
+        MIGRATOR,
+        SCHEMA
     }
 
     mapping(DeployedContract => address) internal addresses;
@@ -41,6 +44,7 @@ contract GraviolaMigrator is KeywordConverter, Ownable {
     GraviolaSeasonsGovernor public gsg;
     GraviolaGenerator public generator;
     GraviolaCollectionReadProxy public collectionReadProxy;
+    GraviolaSchema public schema;
 
     string[NUMBER_OF_KEYWORDS] internal keywords = [
         "human",
@@ -155,6 +159,7 @@ contract GraviolaMigrator is KeywordConverter, Ownable {
             addresses[DeployedContract.SEASONS_GOVERNOR]
         );
         generator = GraviolaGenerator(addresses[DeployedContract.GENERATOR]);
+        schema = GraviolaSchema(addresses[DeployedContract.SCHEMA]);
         collection = GraviolaCollection(addresses[DeployedContract.COLLECTION]);
 
         gsa.setSeasonsGovernor(migrator);
@@ -167,6 +172,7 @@ contract GraviolaMigrator is KeywordConverter, Ownable {
         gsa.transferOwnership(address(gsg));
 
         collection.setGenerator(address(generator));
+        collection.setSchema(address(schema));
     }
 
     function getDeployedContractAddress(

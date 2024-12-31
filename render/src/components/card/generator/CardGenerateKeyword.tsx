@@ -1,7 +1,8 @@
+import type { Keyword } from "@graviola/core"
 import cl from "clsx"
 
 interface Props {
-    keyword: string
+    keyword: Keyword
 }
 
 const CardGenerateKeyword: React.FC<Props> = ({ keyword }) => {
@@ -15,7 +16,7 @@ const CardGenerateKeyword: React.FC<Props> = ({ keyword }) => {
                 "overflow-hidden",
             )}
         >
-            {keyword && <span className="animate-fadeIn">{keyword}</span>}
+            {keyword && <span className="animate-fadeIn">{keyword.name}</span>}
         </div>
     )
 }

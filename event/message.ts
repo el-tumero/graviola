@@ -1,4 +1,4 @@
-import type { EventMessage, MetadataFlat, SupportedEvents } from "."
+import type { Card, EventMessage, SupportedEvents } from "@graviola/core"
 
 const isVRFEventName = (
     eventName: SupportedEvents,
@@ -9,7 +9,7 @@ export const createEventMessage = (
     requestId: bigint,
     eventName: SupportedEvents,
     initiator: string,
-    metadata?: MetadataFlat,
+    card?: Card,
 ): EventMessage => {
     if (isVRFEventName(eventName)) {
         return {
@@ -22,14 +22,16 @@ export const createEventMessage = (
             requestId: requestId.toString(),
             initiator,
             eventName,
-            metadata: metadata
-                ? metadata
+            card: card
+                ? card
                 : {
+                      id: "",
                       description: "",
                       image: "",
+                      keywords: [],
+                      rarity: "common",
                       probability: 0,
                       score: 0,
-                      seasonId: 0,
                   },
         }
     }

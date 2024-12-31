@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {GraviolaCollection} from "./GraviolaCollection.sol";
 import {JsonWriter} from "solidity-json-writer/contracts/JsonWriter.sol";
 import {Base64} from "@openzeppelin/contracts/utils/Base64.sol";
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
@@ -12,29 +11,23 @@ contract GraviolaSchema {
     //  | name          | type            | id |
     //  |===============|=================|====|
     //  | STRING        | string          | 0  | -> convert string to bytes
-    //  | UINT          | uint256         | 1  | -> abi.encodePacked("uint256", value) or bytes(bytes32(value))
-    //  | BOOL          | bool            | 3  | -> bytes[]{0} or bytes[]{1}
-    //  | UINT_ARRAY    | uint256[]       | 5  | -> abi.encodePacked("uint256[]", value)
+    //  | UINT          | uint256         | 1  | -> abi.encodePacked(value) or bytes(bytes32(value))
+    //  | BOOL          | bool            | 2  | -> bytes[]{0} or bytes[]{1}
+    //  | BYTE_ARRAY    | bytes           | 3  | ->
 
     //  | property | id | property-type |
     //  |==========|====|===============|
     //  | prompt   | 0  | STRING        |
     //  | image    | 1  | STRING        |
-    //  | groups   | 2  | UINT_ARRAY    |
+    //  | wordIds  | 2  | BYTE_ARRAY    |
     //  | seasonId | 3  | UINT          |
 
     bytes32[] private availableProperties = [
         bytes32("prompt"),
-        bytes32("image"),
-        bytes32("groups"),
-        bytes32("seasonId")
+        "image",
+        "wordIds",
+        "seasonId"
     ];
-
-    GraviolaCollection public collection;
-
-    constructor(address collectionAddress) {
-        collection = GraviolaCollection(collectionAddress);
-    }
 
     function _addStringProperty(
         JsonWriter.Json memory writer,
@@ -81,15 +74,14 @@ contract GraviolaSchema {
             );
     }
 
-    function _tokenURI(uint256 tokenId) external view returns (string memory) {
-        bytes[] memory metadata = new bytes[](availableProperties.length);
-        for (uint256 i = 0; i < availableProperties.length; i++) {
-            metadata[i] = collection.readProperty(
-                tokenId,
-                availableProperties[i]
-            );
-        }
+    function getAvailableProperties() external view returns (bytes32[] memory) {
+        return availableProperties;
+    }
 
+    function tokenURI(
+        uint256 tokenId,
+        bytes[] memory metadata
+    ) external pure returns (string memory) {
         return
             _convertToBase64URL(bytes(_generateJSONSchema(tokenId, metadata)));
     }

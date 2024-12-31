@@ -3,6 +3,9 @@
     "type": "module",
     "version": "0.0.1",
     "main": "src/index.ts",
+    "dependencies": {
+        "ethers": "6.13.1"
+    },
     "devDependencies": {
         "typescript": "^5.6.3"
     }

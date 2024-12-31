@@ -25,15 +25,11 @@ contract GraviolaCollection is
     GraviolaMetadata,
     GraviolaEnumerable
 {
-    mapping(address => uint256[]) private _ownedTokens;
-
-    uint256 private nextTokenId;
+    error NotGenerator();
+    error NonExistentToken(uint256 tokenId);
 
     GraviolaSchema public schema;
     GraviolaGenerator public generator;
-
-    error NotGenerator();
-    error NonExistentToken(uint256 tokenId);
 
     constructor(
         address ownerAddress
@@ -62,20 +58,7 @@ contract GraviolaCollection is
         _safeMint(to, tokenId);
     }
 
-    // == Metadata and ERC7007 related functions ==
-
-    function addAigcData(
-        uint256 tokenId,
-        bytes calldata prompt,
-        bytes calldata aigcData,
-        bytes calldata proof
-    ) external onlyGenerator {
-        if (ownerOf(tokenId) == address(0)) {
-            revert NonExistentToken(tokenId);
-        }
-        _addAigcData(tokenId, prompt, aigcData);
-        emit AigcData(tokenId, prompt, aigcData, proof);
-    }
+    // == Metadata/Properties and ERC7007 related functions ==
 
     function addProperty(
         uint256 tokenId,
@@ -92,29 +75,40 @@ contract GraviolaCollection is
         return _readProperty(tokenId, property);
     }
 
+    function addAigcData(
+        uint256 tokenId,
+        bytes calldata prompt,
+        bytes calldata aigcData,
+        bytes calldata proof
+    ) external onlyGenerator {
+        if (ownerOf(tokenId) == address(0)) {
+            revert NonExistentToken(tokenId);
+        }
+        _addAigcData(tokenId, prompt, aigcData);
+        emit AigcData(tokenId, prompt, aigcData, proof);
+    }
+
     function verify(
         bytes calldata prompt,
         bytes calldata aigcData,
         bytes calldata /*proof*/
     ) external view returns (bool) {
         uint256 id = tokenId[prompt];
-
         return
             generator.isFinalized(id) &&
-            (keccak256(_readProperty(id, bytes32("prompt"))) ==
-                keccak256(aigcData));
+            (keccak256(_readProperty(id, "image")) == keccak256(aigcData));
     }
 
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
-        return schema._tokenURI(tokenId);
+        bytes32[] memory availableProperties = schema.getAvailableProperties();
+        bytes[] memory propertyValues = new bytes[](availableProperties.length);
+        for (uint256 i = 0; i < availableProperties.length; i++) {
+            propertyValues[i] = _readProperty(tokenId, availableProperties[i]);
+        }
+        return schema.tokenURI(tokenId, propertyValues);
     }
-
-    function burnByGenerator(uint256 tokenId) external onlyGenerator {
-        _burn(tokenId);
-    }
-
     // == Overrides ==
 
     function _update(

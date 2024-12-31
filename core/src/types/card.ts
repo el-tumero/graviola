@@ -1,24 +1,23 @@
+import type { Keyword } from "./keyword"
 import type { Rarity } from "./rarity"
 
+export type RawProperties = [string[], string[]]
+
 export type Metadata = {
-    description: string
+    prompt: string
     image: string
-    attributes: MetadataAttribute[]
+    wordIds: number[]
+    seasonId: string
 }
 
 export type Card = {
     id: string
     description: string
     image: string
-    keywords: string[]
+    keywords: Keyword[]
     rarity: Rarity
     probability: number
     score: number
 }
 
 export type CardImageSize = "small" | "medium" | "large"
-
-export type MetadataAttribute = {
-    trait_type: string
-    value: number
-}
