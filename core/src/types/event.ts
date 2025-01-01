@@ -1,4 +1,4 @@
-import type { Card } from "."
+import type { Card } from "./card"
 
 export type SupportedEvents =
     | "RequestVRFSent"
@@ -6,16 +6,16 @@ export type SupportedEvents =
     | "RequestOAOSent"
     | "RequestOAOFulfilled"
 
-type EventMessageVRF = {
-    eventName: "RequestVRFSent" | "RequestVRFFulfilled"
+type EventMessageDefault = {
+    eventName: "RequestVRFSent" | "RequestVRFFulfilled" | "RequestOAOSent"
 }
 
-type EventMessageOAO = {
-    eventName: "RequestOAOSent" | "RequestOAOFulfilled"
+type EventMessageCard = {
+    eventName: "RequestOAOFulfilled"
     card: Card
 }
 
 export type EventMessage = {
     requestId: string
     initiator: string
-} & (EventMessageVRF | EventMessageOAO)
+} & (EventMessageDefault | EventMessageCard)

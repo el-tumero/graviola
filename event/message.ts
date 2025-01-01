@@ -1,9 +1,11 @@
 import type { Card, EventMessage, SupportedEvents } from "@graviola/core"
 
-const isVRFEventName = (
+const isDefaultEventName = (
     eventName: SupportedEvents,
-): eventName is "RequestVRFSent" | "RequestVRFFulfilled" =>
-    eventName === "RequestVRFSent" || eventName === "RequestVRFFulfilled"
+): eventName is "RequestVRFSent" | "RequestVRFFulfilled" | "RequestOAOSent" =>
+    eventName === "RequestVRFSent" ||
+    eventName === "RequestVRFFulfilled" ||
+    eventName === "RequestOAOSent"
 
 export const createEventMessage = (
     requestId: bigint,
@@ -11,7 +13,7 @@ export const createEventMessage = (
     initiator: string,
     card?: Card,
 ): EventMessage => {
-    if (isVRFEventName(eventName)) {
+    if (isDefaultEventName(eventName)) {
         return {
             requestId: requestId.toString(),
             initiator,

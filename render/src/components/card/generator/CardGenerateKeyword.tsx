@@ -1,4 +1,4 @@
-import type { Keyword } from "@graviola/core"
+import { rarityToTextColor, type Keyword } from "@graviola/core"
 import cl from "clsx"
 
 interface Props {
@@ -14,6 +14,7 @@ const CardGenerateKeyword: React.FC<Props> = ({ keyword }) => {
                 "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
                 "text-ellipsis",
                 "overflow-hidden",
+                rarityToTextColor(keyword.rarity),
             )}
         >
             {keyword && <span className="animate-fadeIn">{keyword.name}</span>}

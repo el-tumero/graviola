@@ -21,11 +21,6 @@ const generator = GraviolaGenerator__factory.connect(
     provider,
 )
 
-const collection = GraviolaCollection__factory.connect(
-    addresses.local.COLLECTION_ADDRESS,
-    provider,
-)
-
 const collectionReadProxy = GraviolaCollectionReadProxy__factory.connect(
     addresses.local.COLLECTION_READ_PROXY_ADDRESS,
     provider,
@@ -47,72 +42,80 @@ const publishEventMessage = (
 }
 
 export const setupListeners = (server: Server) => {
-    requestVRFSentListener(server)
-    requestVRFFulfilledListener(server)
-    requestOAOSentListener(server)
-    requestOAOFulfilled(server)
+    provider.on("block", async (blockNumber: number) => {
+        console.log("Block:", blockNumber)
+
+        requestVRFSentListener(server, blockNumber)
+        requestVRFFulfilledListener(server, blockNumber)
+        requestOAOSentListener(server, blockNumber)
+        requestOAOFulfilled(server, blockNumber)
+    })
 }
 
-const requestVRFSentListener = (server: Server) => {
-    generator.on(generator.filters.RequestVRFSent, (initiator, requestId) => {
-        console.log("RequestVRFSent", initiator, requestId)
+const requestVRFSentListener = async (server: Server, blockNumber: number) => {
+    const events = await generator.queryFilter(
+        generator.filters.RequestVRFSent(),
+        blockNumber,
+        blockNumber,
+    )
 
+    events.forEach((event) => {
+        const [initiator, requestId] = event.args
+        console.log("RequestVRFSent", initiator, requestId)
         publishEventMessage(server, requestId, "RequestVRFSent", initiator)
     })
 }
 
-const requestVRFFulfilledListener = (server: Server) => {
-    generator.on(
-        generator.filters.RequestVRFFulfilled,
-        (initiator, requestId) => {
-            console.log("RequestVRFFulfilled", initiator, requestId)
-            publishEventMessage(
-                server,
-                requestId,
-                "RequestVRFFulfilled",
-                initiator,
-            )
-        },
+const requestVRFFulfilledListener = async (
+    server: Server,
+    blockNumber: number,
+) => {
+    const events = await generator.queryFilter(
+        generator.filters.RequestVRFFulfilled(),
+        blockNumber,
+        blockNumber,
     )
+
+    events.forEach((event) => {
+        const [initiator, requestId] = event.args
+        console.log("RequestVRFFulfilled", initiator, requestId)
+        publishEventMessage(server, requestId, "RequestVRFFulfilled", initiator)
+    })
 }
 
-const requestOAOSentListener = (server: Server) => {
-    generator.on(
-        generator.filters.RequestOAOSent,
-        async (initiator, requestId) => {
-            console.log("RequestOAOSent", initiator, requestId)
-            const tokenId = await generator.getTokenId(requestId)
-            const properties = await collectionReadProxy.getProperties(tokenId)
-            const card = propertiesToCard(tokenId, properties)
-
-            publishEventMessage(
-                server,
-                requestId,
-                "RequestOAOSent",
-                initiator,
-                card,
-            )
-        },
+const requestOAOSentListener = async (server: Server, blockNumber: number) => {
+    const events = await generator.queryFilter(
+        generator.filters.RequestOAOSent(),
+        blockNumber,
+        blockNumber,
     )
+
+    for (const event of events) {
+        const [initiator, requestId] = event.args
+        console.log("RequestOAOSent", initiator, requestId)
+        publishEventMessage(server, requestId, "RequestOAOSent", initiator)
+    }
 }
 
-const requestOAOFulfilled = (server: Server) => {
-    generator.on(
-        generator.filters.RequestOAOFulfilled,
-        async (initiator, requestId) => {
-            console.log("RequestOAOFulfilled", initiator, requestId)
-
-            const tokenId = await generator.getTokenId(requestId)
-            const properties = await collectionReadProxy.getProperties(tokenId)
-            const card = propertiesToCard(tokenId, properties)
-
-            publishEventMessage(
-                server,
-                requestId,
-                "RequestOAOFulfilled",
-                initiator,
-                card,
-            )
-        },
+const requestOAOFulfilled = async (server: Server, blockNumber: number) => {
+    const events = await generator.queryFilter(
+        generator.filters.RequestOAOFulfilled(),
+        blockNumber,
+        blockNumber,
     )
+
+    for (const event of events) {
+        const [initiator, requestId] = event.args
+        console.log("RequestOAOFulfilled", initiator, requestId)
+        const tokenId = await generator.getTokenId(requestId)
+        const properties = await collectionReadProxy.getProperties(tokenId)
+        const card = propertiesToCard(tokenId, properties)
+        publishEventMessage(
+            server,
+            requestId,
+            "RequestOAOFulfilled",
+            initiator,
+            card,
+        )
+    }
 }

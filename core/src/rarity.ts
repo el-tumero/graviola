@@ -39,6 +39,21 @@ const keywordToWeight = ({ rarity }: Keyword): number => {
     }
 }
 
+export const rarityToTextColor = (rarity: Rarity): string => {
+    switch (rarity) {
+        case "common":
+            return "text-rarity-common"
+        case "uncommon":
+            return "text-rarity-uncommon"
+        case "rare":
+            return "text-rarity-rare"
+        case "veryRare":
+            return "text-rarity-veryRare"
+        case "legendary":
+            return "text-rarity-legendary"
+    }
+}
+
 export const keywordsToScore = (keywords: Keyword[]): number => {
     return keywords.reduce((acc, keyword) => acc + keywordToWeight(keyword), 0)
 }

@@ -1,7 +1,7 @@
 import { metadataToKeywords } from "./keyword"
 import { keywordsToScore, scoreToRarity } from "./rarity"
 import type { Card, Metadata, RawProperties } from "./types"
-import { toUtf8String, toBigInt } from "ethers"
+import { toUtf8String } from "ethers"
 
 export const parseProperties = ([, value]: RawProperties): Metadata => {
     return {
@@ -13,7 +13,7 @@ export const parseProperties = ([, value]: RawProperties): Metadata => {
 }
 
 const hexStringToNumberArray = (hexString: string): number[] => {
-    if (hexString.length < 2 || hexString.length % 2 !== 0) return []
+    if (hexString.length <= 2 || hexString.length % 2 !== 0) return []
     return hexString
         .slice(2)
         .match(/.{1,2}/g)!

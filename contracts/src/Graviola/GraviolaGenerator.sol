@@ -59,13 +59,13 @@ contract GraviolaGenerator is
         RequestStatus status;
         uint256 seed;
         address initiator;
-        uint256 oaoRequestId;
+        uint256 tokenId;
         uint256 balance;
     }
 
-    mapping(uint256 => Request) private requests;
-    mapping(address => uint256[]) private userRequests;
-    mapping(uint256 => uint256) private oaoRequestIds;
+    mapping(uint256 => Request) private requests; // maps requestId to Request
+    mapping(uint256 => uint256) private oaoRequestIds; // maps oaoRequestId to requestId
+    mapping(address => uint256[]) private userRequests; // maps user to array of requestIds
 
     constructor(
         address tokenAddress,
@@ -95,7 +95,7 @@ contract GraviolaGenerator is
             status: RequestStatus.VRF_WAIT,
             seed: 0,
             initiator: msg.sender,
-            oaoRequestId: 0,
+            tokenId: 0,
             balance: msg.value - reqPrice
         });
         // add requestId to userRequests storage
@@ -161,6 +161,8 @@ contract GraviolaGenerator is
         );
 
         uint256 tokenId = uint256(keccak256(prompt));
+        requests[requestId].tokenId = tokenId;
+
         collection.mint(tokenId, request.initiator);
         collection.addProperty(tokenId, "wordIds", wordIds);
 
@@ -216,7 +218,7 @@ contract GraviolaGenerator is
     }
 
     function getTokenId(uint256 requestId) external view returns (uint256) {
-        return oaoRequestIds[requests[requestId].oaoRequestId];
+        return requests[requestId].tokenId;
     }
 
     function withdraw(uint256 requestId) external {

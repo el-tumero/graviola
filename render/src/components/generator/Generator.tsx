@@ -39,14 +39,10 @@ const Generator: React.FC<Props> = () => {
                         break
                     }
 
-                    case "RequestOAOSent": {
-                        addKeywords(message.card.keywords)
-                        break
-                    }
-
                     case "RequestOAOFulfilled": {
                         setPhase(GenerationPhase.GENERATE_COMPLETE)
-                        setCard(message.card)
+                        addCard(message.card)
+                        console.log("RequestOAOFulfilled", message)
                         break
                     }
 
@@ -62,12 +58,14 @@ const Generator: React.FC<Props> = () => {
         }
     }, [user])
 
-    const addKeywords = async (keywordsToAdd: Keyword[]) => {
-        setKeywords((keywords) => [...keywords, keywordsToAdd[0]])
+    const addCard = async (card: Card) => {
+        setKeywords((keywords) => [...keywords, card.keywords[0]])
         await new Promise((r) => setTimeout(r, 1000))
-        setKeywords((keywords) => [...keywords, keywordsToAdd[1]])
+        setKeywords((keywords) => [...keywords, card.keywords[1]])
         await new Promise((r) => setTimeout(r, 1000))
-        setKeywords((keywords) => [...keywords, keywordsToAdd[2]])
+        setKeywords((keywords) => [...keywords, card.keywords[2]])
+        await new Promise((r) => setTimeout(r, 1000))
+        setCard(card)
     }
 
     const nextPhase = () => {
