@@ -15,5 +15,3 @@ export const GenerationPhase = {
     GENERATE_KEYWORDS: 4,
     GENERATE_COMPLETE: 5,
 } as const
-
-// export type GenerationPhase = (typeof generationPhase)[number]

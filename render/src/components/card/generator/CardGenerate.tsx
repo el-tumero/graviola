@@ -20,7 +20,13 @@ const CardGenerate: React.FC<Props> = ({ card, keywords }) => {
             {!card ? (
                 <CardGenerateImage size="medium" />
             ) : (
-                <CardImage card={card} breathingEffect={true} size="medium" />
+                <div className="animate-fadeIn">
+                    <CardImage
+                        card={card}
+                        breathingEffect={true}
+                        size="medium"
+                    />
+                </div>
             )}
             <CardGenerateDetails keywords={keywords} />
         </div>

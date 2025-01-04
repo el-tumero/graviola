@@ -2,7 +2,7 @@ import { rarityToTextColor, type Keyword } from "@graviola/core"
 import cl from "clsx"
 
 interface Props {
-    keyword: Keyword
+    keyword?: Keyword
 }
 
 const CardGenerateKeyword: React.FC<Props> = ({ keyword }) => {
@@ -14,10 +14,18 @@ const CardGenerateKeyword: React.FC<Props> = ({ keyword }) => {
                 "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
                 "text-ellipsis",
                 "overflow-hidden",
-                rarityToTextColor(keyword.rarity),
             )}
         >
-            {keyword && <span className="animate-fadeIn">{keyword.name}</span>}
+            {keyword && (
+                <span
+                    className={cl(
+                        "animate-fadeIn",
+                        rarityToTextColor(keyword.rarity),
+                    )}
+                >
+                    {keyword.name}
+                </span>
+            )}
         </div>
     )
 }
