@@ -1,28 +1,35 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {ERC721Burnable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {GraviolaMetadata, Metadata} from "./GraviolaMetadata.sol";
+import {GraviolaMetadata} from "./GraviolaMetadata.sol";
+import {GraviolaEnumerable} from "./GraviolaEnumerable.sol";
+import {GraviolaSchema} from "./GraviolaSchema.sol";
+import {GraviolaGenerator} from "./GraviolaGenerator.sol";
+import {IERC7007} from "../OAO/IERC7007.sol";
 
 contract GraviolaCollection is
+    ERC165,
     ERC721,
     ERC721Enumerable,
     ERC721Burnable,
+    IERC7007,
     Ownable,
-    GraviolaMetadata
+    GraviolaMetadata,
+    GraviolaEnumerable
 {
-    mapping(address => uint256[]) private _ownedTokens;
-
-    uint256 private nextTokenId;
-
-    address private generatorAddress;
-
-    event ImageAdded(uint256 tokenId, address tokenOwner);
-
     error NotGenerator();
+    error NonExistentToken(uint256 tokenId);
+
+    GraviolaSchema public schema;
+    GraviolaGenerator public generator;
 
     constructor(
         address ownerAddress
@@ -33,81 +40,76 @@ contract GraviolaCollection is
     {}
 
     modifier onlyGenerator() {
-        if (generatorAddress != msg.sender) {
+        if (address(generator) != msg.sender) {
             revert NotGenerator();
         }
         _;
     }
 
-    function setGenerator(address generator) external onlyOwner {
-        generatorAddress = generator;
+    function setGenerator(address generatorAddress) external onlyOwner {
+        generator = GraviolaGenerator(generatorAddress);
     }
 
-    function mint(address to) external onlyGenerator returns (uint256) {
-        uint256 tokenId = nextTokenId++;
+    function setSchema(address schemaAddress) external onlyOwner {
+        schema = GraviolaSchema(schemaAddress);
+    }
+
+    function mint(uint256 tokenId, address to) external onlyGenerator {
         _safeMint(to, tokenId);
-        return tokenId;
     }
 
-    function createMetadata(
+    // == Metadata/Properties and ERC7007 related functions ==
+
+    function addProperty(
         uint256 tokenId,
-        Metadata memory metadata
+        bytes32 property,
+        bytes calldata value
     ) external onlyGenerator {
-        _createMetadata(tokenId, metadata);
+        _addProperty(tokenId, property, value);
     }
 
-    function getMetadata(
-        uint256 tokenId
-    ) external view returns (Metadata memory) {
-        return _getMetadata(tokenId);
-    }
-
-    function addImage(
+    function readProperty(
         uint256 tokenId,
-        string memory image
+        bytes32 property
+    ) external view returns (bytes memory) {
+        return _readProperty(tokenId, property);
+    }
+
+    function addAigcData(
+        uint256 tokenId,
+        bytes calldata prompt,
+        bytes calldata aigcData,
+        bytes calldata proof
     ) external onlyGenerator {
-        _addImage(tokenId, image);
-        emit ImageAdded(tokenId, ownerOf(tokenId));
+        if (ownerOf(tokenId) == address(0)) {
+            revert NonExistentToken(tokenId);
+        }
+        _addAigcData(tokenId, prompt, aigcData);
+        emit AigcData(tokenId, prompt, aigcData, proof);
+    }
+
+    function verify(
+        bytes calldata prompt,
+        bytes calldata aigcData,
+        bytes calldata /*proof*/
+    ) external view returns (bool) {
+        uint256 id = tokenId[prompt];
+        return
+            generator.isFinalized(id) &&
+            (keccak256(_readProperty(id, "image")) == keccak256(aigcData));
     }
 
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
-        return _tokenURI(tokenId);
-    }
-
-    function tokenRange(
-        uint256 start,
-        uint256 stop
-    ) external view returns (uint256[] memory, string[] memory) {
-        uint256[] memory ids = new uint256[](stop - start);
-        string[] memory uris = new string[](stop - start);
-
-        for (uint256 i = start; i < stop; i++) {
-            uint256 tokenId = tokenByIndex(i);
-            string memory uri = _tokenURI(tokenId);
-            ids[i - start] = tokenId;
-            uris[i - start] = uri;
+        bytes32[] memory availableProperties = schema.getAvailableProperties();
+        bytes[] memory propertyValues = new bytes[](availableProperties.length);
+        for (uint256 i = 0; i < availableProperties.length; i++) {
+            propertyValues[i] = _readProperty(tokenId, availableProperties[i]);
         }
-        return (ids, uris);
+        return schema.tokenURI(tokenId, propertyValues);
     }
-
-    function tokenOfOwnerRange(
-        address owner,
-        uint256 start,
-        uint256 stop
-    ) external view returns (uint256[] memory) {
-        uint256[] memory output = new uint256[](stop - start);
-        for (uint256 i = start; i < stop; i++) {
-            uint256 tokenId = tokenOfOwnerByIndex(owner, i);
-            output[i - start] = tokenId;
-        }
-        return output;
-    }
-
-    function burnByGenerator(uint256 tokenId) external onlyGenerator {
-        _burn(tokenId);
-    }
+    // == Overrides ==
 
     function _update(
         address to,
@@ -124,9 +126,19 @@ contract GraviolaCollection is
         super._increaseBalance(account, value);
     }
 
+    // TODO: check if is valid?
     function supportsInterface(
         bytes4 interfaceId
-    ) public view override(ERC721, ERC721Enumerable) returns (bool) {
-        return super.supportsInterface(interfaceId);
+    )
+        public
+        view
+        virtual
+        override(ERC165, ERC721, IERC165, ERC721Enumerable)
+        returns (bool)
+    {
+        return
+            interfaceId == type(IERC721).interfaceId ||
+            interfaceId == type(IERC721Metadata).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 }

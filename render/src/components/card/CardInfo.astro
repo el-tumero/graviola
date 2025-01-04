@@ -1,5 +1,5 @@
 ---
-import type { Card } from "../../types/Card"
+import { rarityToTextColor, type Card } from "@graviola/core"
 import camelToPascal from "../../utils/camelToPascal"
 import { rarityTextColor } from "../../utils/rarity"
 
@@ -35,9 +35,10 @@ const { card } = Astro.props
                 class:list={[
                     "py-1 px-2 rounded-md",
                     "bg-light-bgLight/75 dark:bg-dark-bgLight/75",
+                    rarityToTextColor(keyword.rarity),
                 ]}
             >
-                {keyword}
+                {keyword.name}
             </span>
         ))
     }

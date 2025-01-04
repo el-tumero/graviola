@@ -1,5 +1,5 @@
 ---
-import type { Card } from "../../types/Card"
+import type { Card } from "@graviola/core"
 import CardImage from "./CardImage.astro"
 import CardInfo from "./CardInfo.astro"
 import "./card.css"
@@ -15,7 +15,7 @@ const { card, breathingEffect } = Astro.props
 <div
     class:list={[
         "flex flex-col justify-between items-center",
-        "gap-3 p-3 rounded-xl",
+        "gap-3 px-3 py-4 rounded-xl",
         "border border-light-border dark:border-dark-border",
     ]}
 >

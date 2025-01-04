@@ -3,7 +3,7 @@ import { select } from '@inquirer/prompts'
 import addresses from '../addresses-testnet.json'
 import fs from 'fs'
 import path from 'path'
-import { DeployedContractAddressEnum } from './deployed-contract'
+import { DeployedContractAddressEnum } from './contracts'
 
 const addressesPath = path.resolve('addresses-testnet.json')
 

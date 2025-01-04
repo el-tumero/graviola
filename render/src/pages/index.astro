@@ -1,13 +1,18 @@
 ---
-import Card from "../components/card/Card.astro"
 import CardCarousel from "../components/card/CardCarousel"
-import CardImage from "../components/card/CardImage.astro"
-import GenerationProcess from "../components/main/GenerationProcess.astro"
 import SectionContainer from "../components/main/SectionContainer.astro"
 import Layout from "../layouts/Layout.astro"
-import { getCards } from "../web3"
 
-const cards = await getCards(30, 35)
+import { getCards, getCardsTotalSupply } from "../web3"
+
+const CARDS_TO_DISPLAY = 5
+
+const cardsTotalSupply = await getCardsTotalSupply()
+const firstCard =
+    cardsTotalSupply >= CARDS_TO_DISPLAY
+        ? cardsTotalSupply - CARDS_TO_DISPLAY
+        : 0
+const cards = await getCards(firstCard, cardsTotalSupply)
 ---
 
 <Layout>

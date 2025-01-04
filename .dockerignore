@@ -5,10 +5,12 @@
 *.log
 .DS_Store
 
-frontend
-benchmarks
+**/node_modules
+**/dist
 
-contracts/node_modules
+frontend/
+benchmarks/
+
 contracts/artifacts
 contracts/out
 contracts/cache
@@ -23,5 +25,3 @@ contracts/addresses-testnet.json
 contracts/candidates.json
 
 render/.astro
-render/dist
-render/node_modules

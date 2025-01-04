@@ -1,8 +1,7 @@
-import deployLocal from './deploy-local'
 import { writeFileSync } from 'fs'
 import hardhat from 'hardhat'
 import sendRpcCall from './rpcCall'
-import deployTestnet from './deploy-testnet'
+import deployContracts from './deploy-contracts'
 import { generateN } from './generate'
 import { transfer } from './collection'
 
@@ -10,12 +9,10 @@ const config = {
     // Local dev (hardhat)
     localhost: {
         output: 'addresses-local.json',
-        script: deployLocal,
     },
 
     testnet: {
         output: 'addresses-testnet.json',
-        script: deployTestnet,
     },
 }
 
@@ -44,15 +41,12 @@ async function main() {
 
         await hardhat.run('compile')
 
-        const { output, script } = config[variant]
+        const { output } = config[variant]
 
-        const addresses = await script()
+        const addresses = await deployContracts(variant)
 
         writeFileSync(output, JSON.stringify(addresses, null, 4))
         console.log(`Addresses saved to '${output}'`)
-
-        await hardhat.run('typechain')
-        console.log('Types generated!')
 
         if (variant === 'localhost') {
             await generateN(addresses, 5)

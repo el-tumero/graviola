@@ -7,8 +7,8 @@ contract GraviolaSeed {
     IGraviolaSeasonsArchive internal archive;
 
     // How many words are drawed for prompt creation
-    uint8 internal KEYWORDS_PER_TOKEN = 3;
-    uint256 internal DEFAULT_OMEGA = 100;
+    uint8 internal constant KEYWORDS_PER_TOKEN = 3;
+    uint256 internal constant DEFAULT_OMEGA = 100;
 
     /// @notice Create GraviolaSeed module
     /// @param archiveAddress GraviolaSeasonsArchive address
@@ -18,32 +18,32 @@ contract GraviolaSeed {
 
     /// @notice Convert a fraction to basis points (BP)
     function _fractionToBasisPoints(
-        uint256 _numerator,
-        uint256 _denumerator
+        uint256 numerator,
+        uint256 denumerator
     ) internal pure returns (uint256) {
-        return (_numerator * 100) / _denumerator;
+        return (numerator * 100) / denumerator;
     }
 
     /// @notice Roll 3 random keywords (used for Token generation later)
     /// @param seed Random input seed
     /// @return keywords String of combined and separated result keywords
-    /// @return score // Weight sum of rolled groups' keywords. This determines the final token Rarity
-    /// @return probability // Probability (in BP) of rolling the EXACT combination of rolled keywords (excluding order)
+    /// @return groups // Array of keyword groupIds. This determines the final token Rarity
     function rollWords(
         uint256 seed,
         uint256 omega
-    ) public view returns (string memory, uint256, uint256) {
-        uint16 i = 0;
-        uint16 j = 0;
-        uint256 probability = 1;
-        uint256 score = 0;
-        int256[] memory used = new int256[](KEYWORDS_PER_TOKEN);
-        string memory result = "";
+    ) public view returns (string memory, bytes memory) {
+        uint256 i = 0;
+        uint256 j = 0;
 
-        // Init 'used' arr
-        for (uint256 x = 0; x < KEYWORDS_PER_TOKEN; x++) {
-            used[x] = -1;
-        }
+        uint256[3] memory used = [
+            type(uint256).max,
+            type(uint256).max,
+            type(uint256).max
+        ];
+
+        bytes memory wordIds = new bytes(KEYWORDS_PER_TOKEN);
+
+        string memory result = "";
 
         while (i < KEYWORDS_PER_TOKEN) {
             j++;
@@ -52,26 +52,13 @@ contract GraviolaSeed {
             uint256 wordId = (DEFAULT_OMEGA - omega) + (randNum % omega);
 
             // Duplicate id, re-roll
-            if (
-                used[0] == int256(wordId) ||
-                used[1] == int256(wordId) ||
-                used[2] == int256(wordId)
-            ) {
+            if (used[0] == wordId || used[1] == wordId || used[2] == wordId) {
                 continue;
             }
 
-            used[i] = int256(wordId);
-
             // Get group of rolled word
-            uint256 groupId = archive.getRarityGroupById(wordId);
-            // Get word count for the group with given id
-            uint256 groupWordCount = archive.getWordsPerRarityGroup(groupId);
-
-            probability *= _fractionToBasisPoints(
-                groupWordCount,
-                DEFAULT_OMEGA
-            );
-            score += archive.getRarityGroupWeight(groupId);
+            used[i] = wordId;
+            wordIds[i] = bytes1(uint8(wordId));
 
             result = string(
                 abi.encodePacked(
@@ -83,6 +70,6 @@ contract GraviolaSeed {
             i++;
         }
 
-        return (result, score, probability);
+        return (result, wordIds);
     }
 }

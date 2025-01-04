@@ -7,6 +7,8 @@ export const DeployedContractEnum = {
     SEASONS_GOVERNOR: 5,
     GENERATOR: 6,
     COLLECTION_READ_PROXY: 7,
+    MIGRATOR: 8,
+    SCHEMA: 9,
 }
 
 export const DeployedContractAddressEnum = {
@@ -18,4 +20,11 @@ export const DeployedContractAddressEnum = {
     SEASONS_GOVERNOR_ADDRESS: 5,
     GENERATOR_ADDRESS: 6,
     COLLECTION_READ_PROXY_ADDRESS: 7,
+    MIGRATOR_ADDRESS: 8,
+    SCHEMA_ADDRESS: 9,
 }
+
+export type DeployedContractAddressData = Record<
+    keyof typeof DeployedContractAddressEnum,
+    string
+>

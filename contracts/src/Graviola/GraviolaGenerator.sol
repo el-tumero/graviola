@@ -4,8 +4,7 @@ pragma solidity ^0.8.24;
 import {GraviolaSeed} from "./GraviolaSeed.sol";
 
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IGraviolaCollection} from "./IGraviolaCollection.sol";
-import {Metadata} from "./GraviolaMetadata.sol";
+import {GraviolaCollection} from "./GraviolaCollection.sol";
 import {AIOracleCallbackReceiver} from "../OAO/AIOracleCallbackReceiver.sol";
 
 import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
@@ -29,10 +28,10 @@ contract GraviolaGenerator is
     uint32 private constant VRF_NUM_WORDS = 1;
 
     /// @dev Callback gas limit for the OAO request
-    uint64 private constant OAO_CALLBACK_GAS_LIMIT = 150000;
+    uint64 private constant OAO_CALLBACK_GAS_LIMIT = 300000;
 
     IERC20 private token;
-    IGraviolaCollection private collection;
+    GraviolaCollection private collection;
 
     event RequestVRFSent(address indexed initiator, uint256 requestId);
     event RequestVRFFulfilled(address indexed initiator, uint256 requestId);
@@ -60,12 +59,13 @@ contract GraviolaGenerator is
         RequestStatus status;
         uint256 seed;
         address initiator;
-        uint256 oaoRequestId;
+        uint256 tokenId;
         uint256 balance;
     }
 
-    mapping(uint256 => Request) private requests;
-    mapping(uint256 => uint256) private oaoRequestIds;
+    mapping(uint256 => Request) private requests; // maps requestId to Request
+    mapping(uint256 => uint256) private oaoRequestIds; // maps oaoRequestId to requestId
+    mapping(address => uint256[]) private userRequests; // maps user to array of requestIds
 
     constructor(
         address tokenAddress,
@@ -79,7 +79,7 @@ contract GraviolaGenerator is
         AIOracleCallbackReceiver(aiOracleAddress)
     {
         token = IERC20(tokenAddress);
-        collection = IGraviolaCollection(collectionAddress);
+        collection = GraviolaCollection(collectionAddress);
     }
 
     function prepare() external payable {
@@ -95,9 +95,12 @@ contract GraviolaGenerator is
             status: RequestStatus.VRF_WAIT,
             seed: 0,
             initiator: msg.sender,
-            oaoRequestId: 0,
+            tokenId: 0,
             balance: msg.value - reqPrice
         });
+        // add requestId to userRequests storage
+        userRequests[msg.sender].push(requestId);
+
         emit RequestVRFSent(msg.sender, requestId);
     }
 
@@ -147,32 +150,28 @@ contract GraviolaGenerator is
         }
 
         // perform process of selecting random words
-        (string memory result, uint256 score, uint256 probability) = rollWords(
+        (string memory result, bytes memory wordIds) = rollWords(
             request.seed,
             omega
         );
 
-        uint256 tokenId = collection.mint(request.initiator);
         uint256 seasonId = archive.getCurrentSeasonId();
-        string memory promptBase = archive.getSeasonPromptBase(seasonId);
+        bytes memory prompt = bytes(
+            string.concat(archive.getSeasonPromptBase(seasonId), result)
+        );
 
-        Metadata memory metadata = Metadata({
-            description: string.concat(promptBase, result),
-            image: "",
-            probability: probability,
-            score: score,
-            seasonId: seasonId,
-            isReady: false
-        });
+        uint256 tokenId = uint256(keccak256(prompt));
+        requests[requestId].tokenId = tokenId;
 
-        collection.createMetadata(tokenId, metadata);
+        collection.mint(tokenId, request.initiator);
+        collection.addProperty(tokenId, "wordIds", wordIds);
 
         uint256 oaoRequestId = aiOracle.requestCallback{value: fee}(
             MODEL_ID,
-            bytes(string.concat(promptBase, result)),
+            prompt,
             address(this),
             OAO_CALLBACK_GAS_LIMIT,
-            abi.encode(tokenId)
+            prompt
         );
 
         oaoRequestIds[oaoRequestId] = requestId;
@@ -183,26 +182,6 @@ contract GraviolaGenerator is
 
     function generate(uint256 requestId) external {
         _generate(requestId, DEFAULT_OMEGA);
-    }
-
-    function tradeUp(
-        uint256 requestId,
-        uint256[] memory tokensToBurn
-    ) external {
-        uint256 totalScore = 0;
-        if (tokensToBurn.length != 3) {
-            revert TradeUpIllegal();
-        }
-
-        for (uint256 i = 0; i < 3; i++) {
-            if (collection.ownerOf(tokensToBurn[i]) != msg.sender) {
-                revert TradeUpIllegal();
-            }
-            totalScore += collection.getMetadata(tokensToBurn[i]).score;
-            collection.burnByGenerator(tokensToBurn[i]);
-        }
-
-        _generate(requestId, DEFAULT_OMEGA - totalScore);
     }
 
     function aiOracleCallback(
@@ -216,9 +195,9 @@ contract GraviolaGenerator is
         if (request.status != RequestStatus.OAO_WAIT) {
             revert RequestOAONotFound();
         }
-        uint256 tokenId = abi.decode(callbackData, (uint256));
+        uint256 tokenId = uint256(keccak256(callbackData));
+        collection.addAigcData(tokenId, callbackData, output, bytes(""));
 
-        collection.addImage(tokenId, string(output));
         request.status = RequestStatus.OAO_RESPONSE;
         emit RequestOAOFulfilled(request.initiator, i_requestId);
     }
@@ -236,6 +215,10 @@ contract GraviolaGenerator is
         uint256 requestId
     ) external view returns (RequestStatus) {
         return requests[requestId].status;
+    }
+
+    function getTokenId(uint256 requestId) external view returns (uint256) {
+        return requests[requestId].tokenId;
     }
 
     function withdraw(uint256 requestId) external {

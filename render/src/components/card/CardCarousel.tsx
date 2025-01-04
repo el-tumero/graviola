@@ -1,5 +1,5 @@
 import cl from "clsx"
-import type { Card } from "../../types/Card"
+import type { Card } from "@graviola/core"
 import CardImage from "./CardImage.tsx"
 import { useState } from "react"
 

@@ -10,6 +10,8 @@ const cardsToDisplay =
     totalSupply < defaultCardsToDisplay ? totalSupply : defaultCardsToDisplay
 
 const cards = await getCards(0, cardsToDisplay)
+
+const isLoadMoreButtonVisible = totalSupply > defaultCardsToDisplay
 ---
 
 <div
@@ -22,7 +24,8 @@ const cards = await getCards(0, cardsToDisplay)
     id="card-collection"
 >
     {cards.map((card) => <CardComponent card={card} />)}
-    <button
+    {isLoadMoreButtonVisible &&
+        <button
         class:list={[
             "rounded-xl p-3 text-base mx-auto cursor-pointer",
             "bg-light-bgLight dark:bg-dark-bgLight",
@@ -35,6 +38,6 @@ const cards = await getCards(0, cardsToDisplay)
         hx-get="/partials/drops?page=1"
         hx-trigger="click"
         hx-target="this"
-        hx-swap="outerHTML">Load more...</button
-    >
+        hx-swap="outerHTML">Load more...</button>
+    }
 </div>
