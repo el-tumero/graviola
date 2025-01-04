@@ -3,25 +3,21 @@ import type {
     GraviolaCollection,
     GraviolaCollectionReadProxy,
     GraviolaSeasonsArchive,
-} from "@graviola/contracts"
-
+} from "@graviola/contracts/typechain"
 import {
     GraviolaCollection__factory,
     GraviolaCollectionReadProxy__factory,
     GraviolaSeasonsArchive__factory,
-} from "@graviola/contracts"
-
-import { addresses as target } from "@graviola/contracts"
-
+} from "@graviola/contracts/typechain"
+import { addresses as target } from "@graviola/contracts/addresses"
 import type { Card, Keyword } from "@graviola/core"
 import { propertiesToCard, wordIdToRarity } from "@graviola/core"
-import type { DeployedContractAddressData } from "@graviola/contracts/utils/contracts"
 import { reshape2d } from "./utils/reshape2d"
 
 let rpcUrl: string =
     "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
 
-let addresses: DeployedContractAddressData = target.testnet
+let addresses = target.testnet
 
 if (import.meta.env.CHAIN_NET === "local") {
     rpcUrl = "http://localhost:8545"

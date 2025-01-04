@@ -1,7 +1,8 @@
 import cl from "clsx"
+// TODO: move web3 logic to seperate file
 import { GenerationPhase, generationPhaseMessages } from "./generator"
-import { GraviolaGenerator__factory } from "@graviola/contracts"
-import { addresses } from "@graviola/contracts"
+import { GraviolaGenerator__factory } from "@graviola/contracts/typechain"
+import { addresses } from "@graviola/contracts/addresses"
 import { getSigner } from "../../wallet"
 
 interface Props {
@@ -26,6 +27,7 @@ const GeneratorButton: React.FC<Props> = ({
         const signer = getSigner()
         if (!signer) return
 
+        // TODO: wrong address!
         const generator = GraviolaGenerator__factory.connect(
             addresses.local.GENERATOR_ADDRESS,
             signer,

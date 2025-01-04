@@ -1,11 +1,11 @@
 import type { Server } from "bun"
+import { addresses } from "@graviola/contracts/addresses"
 import {
     GraviolaGenerator__factory,
     GraviolaCollectionReadProxy__factory,
-    addresses,
     type GraviolaGenerator,
     type GraviolaCollectionReadProxy,
-} from "@graviola/contracts"
+} from "@graviola/contracts/typechain"
 
 import { GENERATION_TOPIC } from "./index"
 import {

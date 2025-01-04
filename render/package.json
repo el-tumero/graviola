@@ -2,6 +2,7 @@
     "name": "@graviola/render",
     "type": "module",
     "version": "0.0.1",
+    "packageManager": "pnpm@9.13.2",
     "scripts": {
         "dev:local": "CHAIN_NET=local astro dev",
         "dev:testnet": "CHAIN_NET=testnet astro dev",

@@ -12,10 +12,10 @@ RUN ls
 RUN pnpm -F "@graviola/render" -F "@graviola/contracts" install
 RUN pnpm --F "@graviola/render" run build 
 
-FROM base AS runner
-WORKDIR /app
-COPY --from=prod /app/render /app/render
-COPY --from=prod /app/package.json /app/package.json
+# FROM base AS runner
+# WORKDIR /app
+# COPY --from=prod /app/render /app/render
+# COPY --from=prod /app/package.json /app/package.json
 # RUN pnpm -F "@graviola/render" install --prod
 
 # ENV HOST=0.0.0.0

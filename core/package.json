@@ -3,6 +3,10 @@
     "type": "module",
     "version": "0.0.1",
     "main": "src/index.ts",
+    "packageManager": "pnpm@9.13.2",
+    "scripts": {
+        "build": "tsc"
+    },
     "dependencies": {
         "ethers": "6.13.1"
     },

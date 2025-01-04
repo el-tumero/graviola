@@ -1,11 +1,18 @@
 {
     "name": "@graviola/contracts",
     "version": "0.0.1",
-    "main": "src/index.ts",
     "license": "MIT",
+    "packageManager": "pnpm@9.13.2",
+    "exports": {
+        "./addresses": {
+            "default": "./src/addresses.ts"
+        },
+        "./typechain": {
+            "default": "./dist/index.ts"
+        }
+    },
     "scripts": {
-        "postinstall": "hardhat compile",
-        "build": "forge build",
+        "build": "hardhat compile && [ ! -f addresses-local.json ] && cp addresses-testnet.json addresses-local.json",
         "deploy-contracts": "ts-node --transpile-only utils/deploy.ts",
         "redeploy-contracts": "ts-node --transpile-only utils/redeploy.ts",
         "deploy-contracts:local": "HARDHAT_NETWORK=localhost pnpm deploy-contracts",

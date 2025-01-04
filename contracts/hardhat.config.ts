@@ -32,6 +32,9 @@ const config: HardhatUserConfig = {
     solidity: {
         version: '0.8.24',
     },
+    typechain: {
+        outDir: 'dist',
+    },
     paths: {
         sources: './src',
         tests: './test',
