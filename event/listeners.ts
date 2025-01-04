@@ -1,11 +1,12 @@
 import type { Server } from "bun"
 import {
     GraviolaGenerator__factory,
-    GraviolaCollection__factory,
     GraviolaCollectionReadProxy__factory,
     addresses,
+    type GraviolaGenerator,
+    type GraviolaCollectionReadProxy,
 } from "@graviola/contracts"
-import { WebSocketProvider } from "ethers"
+
 import { GENERATION_TOPIC } from "./index"
 import {
     type SupportedEvents,
@@ -13,18 +14,11 @@ import {
     propertiesToCard,
 } from "@graviola/core"
 import { createEventMessage } from "./message"
+import { JsonRpcProvider, Log } from "ethers"
 
-const provider = new WebSocketProvider("ws://127.0.0.1:8545/")
+const rpcUrl = "http://127.0.0.1:8545/"
 
-const generator = GraviolaGenerator__factory.connect(
-    addresses.local.GENERATOR_ADDRESS,
-    provider,
-)
-
-const collectionReadProxy = GraviolaCollectionReadProxy__factory.connect(
-    addresses.local.COLLECTION_READ_PROXY_ADDRESS,
-    provider,
-)
+const LOGS_QUERY_INTERVAL = 5000
 
 const publishEventMessage = (
     server: Server,
@@ -41,81 +35,146 @@ const publishEventMessage = (
     )
 }
 
-export const setupListeners = (server: Server) => {
-    provider.on("block", async (blockNumber: number) => {
-        console.log("Block:", blockNumber)
-
-        requestVRFSentListener(server, blockNumber)
-        requestVRFFulfilledListener(server, blockNumber)
-        requestOAOSentListener(server, blockNumber)
-        requestOAOFulfilled(server, blockNumber)
-    })
+type GeneratorEvent = {
+    name: string
+    initiator: string
+    requestId: bigint
 }
 
-const requestVRFSentListener = async (server: Server, blockNumber: number) => {
-    const events = await generator.queryFilter(
-        generator.filters.RequestVRFSent(),
-        blockNumber,
-        blockNumber,
+export const setup = async (server: Server) => {
+    const provider = new JsonRpcProvider(rpcUrl)
+    let lastBlockNumber = await provider.getBlockNumber()
+
+    const generator = GraviolaGenerator__factory.connect(
+        addresses.local.GENERATOR_ADDRESS,
+        provider,
     )
 
-    events.forEach((event) => {
-        const [initiator, requestId] = event.args
-        console.log("RequestVRFSent", initiator, requestId)
-        publishEventMessage(server, requestId, "RequestVRFSent", initiator)
-    })
+    const collectionReadProxy = GraviolaCollectionReadProxy__factory.connect(
+        addresses.local.COLLECTION_READ_PROXY_ADDRESS,
+        provider,
+    )
+
+    const topics = [
+        [
+            generator.filters.RequestVRFSent().fragment.topicHash,
+            generator.filters.RequestVRFFulfilled().fragment.topicHash,
+            generator.filters.RequestOAOSent().fragment.topicHash,
+            generator.filters.RequestOAOFulfilled().fragment.topicHash,
+        ],
+    ]
+
+    setInterval(async () => {
+        const currentBlockNumber = await provider.getBlockNumber()
+        if (currentBlockNumber > lastBlockNumber) {
+            const filter = {
+                address: addresses.local.GENERATOR_ADDRESS,
+                topics,
+                fromBlock: lastBlockNumber + 1,
+                toBlock: currentBlockNumber,
+            }
+
+            const logs = await provider.getLogs(filter)
+            if (logs.length > 0) {
+                const events = logsToEvents(logs, generator)
+                handleEvents(server, events, generator, collectionReadProxy)
+            }
+
+            lastBlockNumber = currentBlockNumber
+        }
+    }, LOGS_QUERY_INTERVAL)
 }
 
-const requestVRFFulfilledListener = async (
-    server: Server,
-    blockNumber: number,
-) => {
-    const events = await generator.queryFilter(
-        generator.filters.RequestVRFFulfilled(),
-        blockNumber,
-        blockNumber,
-    )
+const logsToEvents = (
+    logs: Log[],
+    generator: GraviolaGenerator,
+): GeneratorEvent[] => {
+    const events: GeneratorEvent[] = []
+    for (const log of logs) {
+        const parsed = generator.interface.parseLog(log)
+        if (!parsed) {
+            continue
+        }
 
-    events.forEach((event) => {
-        const [initiator, requestId] = event.args
-        console.log("RequestVRFFulfilled", initiator, requestId)
-        publishEventMessage(server, requestId, "RequestVRFFulfilled", initiator)
-    })
-}
-
-const requestOAOSentListener = async (server: Server, blockNumber: number) => {
-    const events = await generator.queryFilter(
-        generator.filters.RequestOAOSent(),
-        blockNumber,
-        blockNumber,
-    )
-
-    for (const event of events) {
-        const [initiator, requestId] = event.args
-        console.log("RequestOAOSent", initiator, requestId)
-        publishEventMessage(server, requestId, "RequestOAOSent", initiator)
-    }
-}
-
-const requestOAOFulfilled = async (server: Server, blockNumber: number) => {
-    const events = await generator.queryFilter(
-        generator.filters.RequestOAOFulfilled(),
-        blockNumber,
-        blockNumber,
-    )
-
-    for (const event of events) {
-        const [initiator, requestId] = event.args
-        console.log("RequestOAOFulfilled", initiator, requestId)
-        const tokenId = await generator.getTokenId(requestId)
-        const properties = await collectionReadProxy.getProperties(tokenId)
-        const card = propertiesToCard(tokenId, properties)
-        publishEventMessage(
-            server,
-            requestId,
-            "RequestOAOFulfilled",
+        const [initiator, requestId] = parsed.args
+        events.push({
+            name: parsed.name,
             initiator,
-            card,
-        )
+            requestId,
+        })
     }
+    return events
+}
+
+const handleEvents = (
+    server: Server,
+    events: GeneratorEvent[],
+    generator: GraviolaGenerator,
+    collection: GraviolaCollectionReadProxy,
+) => {
+    events.forEach((event) => {
+        const { name, initiator, requestId } = event
+        switch (event.name) {
+            case "RequestVRFSent":
+                console.log("RequestVRFSent", event.initiator, event.requestId)
+                publishEventMessage(
+                    server,
+                    requestId,
+                    "RequestVRFSent",
+                    initiator,
+                )
+                break
+            case "RequestVRFFulfilled":
+                console.log(
+                    "RequestVRFFulfilled",
+                    event.initiator,
+                    event.requestId,
+                )
+                publishEventMessage(
+                    server,
+                    requestId,
+                    "RequestVRFFulfilled",
+                    initiator,
+                )
+                break
+            case "RequestOAOSent":
+                console.log("RequestOAOSent", event.initiator, event.requestId)
+                publishEventMessage(
+                    server,
+                    requestId,
+                    "RequestOAOSent",
+                    initiator,
+                )
+                break
+            case "RequestOAOFulfilled":
+                requestOAOFulfilled(
+                    server,
+                    initiator,
+                    requestId,
+                    generator,
+                    collection,
+                )
+                break
+        }
+    })
+}
+
+const requestOAOFulfilled = async (
+    server: Server,
+    initiator: string,
+    requestId: bigint,
+    generator: GraviolaGenerator,
+    collectionReadProxy: GraviolaCollectionReadProxy,
+) => {
+    console.log("RequestOAOFulfilled", initiator, requestId)
+    const tokenId = await generator.getTokenId(requestId)
+    const properties = await collectionReadProxy.getProperties(tokenId)
+    const card = propertiesToCard(tokenId, properties)
+    publishEventMessage(
+        server,
+        requestId,
+        "RequestOAOFulfilled",
+        initiator,
+        card,
+    )
 }

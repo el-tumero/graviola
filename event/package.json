@@ -3,14 +3,16 @@
     "module": "index.ts",
     "type": "module",
     "devDependencies": {
-        "@types/bun": "latest"
+        "@types/bun": "latest",
+        "@types/ws": "^8.5.13"
     },
     "peerDependencies": {
         "typescript": "^5.0.0"
     },
     "dependencies": {
-        "ethers": "6.13.1",
+        "@graviola/contracts": "workspace:*",
         "@graviola/core": "workspace:*",
-        "@graviola/contracts": "workspace:*"
+        "ethers": "6.13.1",
+        "ws": "^8.18.0"
     }
 }

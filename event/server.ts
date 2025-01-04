@@ -1,5 +1,5 @@
 import { GENERATION_TOPIC } from "./index"
-import { setupListeners } from "./listeners"
+import { setup } from "./listeners"
 
 const server = Bun.serve({
     port: 8085,
@@ -22,4 +22,4 @@ const server = Bun.serve({
 
 console.log("[EVENT] Server started on port 8085")
 
-setupListeners(server)
+setup(server)
