@@ -22,7 +22,9 @@ jobs:
             - name: Build repo
               run: pnpm build
             - name: Clean repo
-              run: pnpm run clean
+              run: pnpm clean
+            - name: Install production dependencies
+              run: pnpm install --prod
             - name: Upload a Build Artifact
               uses: actions/upload-artifact@v4
               with:
