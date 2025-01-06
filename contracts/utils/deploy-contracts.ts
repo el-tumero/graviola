@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import hardhat from 'hardhat'
 import { DeployedContractEnum, DeployedContractAddressData } from './contracts'
-import { GraviolaMigrator } from '../typechain-types'
+import { GraviolaMigrator } from '../dist'
 
 // Values for Arbitrum Sepolia
 const VRF_WRAPPER_ADDRESS = '0x29576aB8152A09b9DC634804e4aDE73dA1f3a3CC'
@@ -18,7 +18,7 @@ async function addAddressToMigrator(
 }
 
 export default async function deployContracts(
-    variant: 'localhost' | 'testnet',
+    variant: 'localhost' | 'arbitrumSepolia',
 ) {
     console.log('Deployment start...')
     const gm = await hardhat.ethers.deployContract('GraviolaMigrator')

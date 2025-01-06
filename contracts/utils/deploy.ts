@@ -11,7 +11,7 @@ const config = {
         output: 'addresses-local.json',
     },
 
-    testnet: {
+    arbitrumSepolia: {
         output: 'addresses-testnet.json',
     },
 }

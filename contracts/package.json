@@ -12,7 +12,7 @@
         }
     },
     "scripts": {
-        "build": "hardhat compile && [ ! -f addresses-local.json ] && cp addresses-testnet.json addresses-local.json",
+        "build": "hardhat compile && bash copy-addresses.sh",
         "deploy-contracts": "ts-node --transpile-only utils/deploy.ts",
         "redeploy-contracts": "ts-node --transpile-only utils/redeploy.ts",
         "deploy-contracts:local": "HARDHAT_NETWORK=localhost pnpm deploy-contracts",
@@ -28,9 +28,11 @@
         "pretty": "npx prettier --plugin=prettier-plugin-solidity --write --tab-width 4",
         "lint": "solhint '**/*.sol'"
     },
+    "dependencies": {
+        "ethers": "6.13.1"
+    },
     "devDependencies": {
         "hardhat": "^2.22.6",
-        "ethers": "6.13.1",
         "typechain": "^8.3.2",
         "chai": "^4.2.0",
         "@nomicfoundation/hardhat-ethers": "^3.0.0",

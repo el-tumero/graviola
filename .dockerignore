@@ -4,9 +4,7 @@
 *.env
 *.log
 .DS_Store
-
-**/node_modules
-**/dist
+.turbo
 
 frontend/
 benchmarks/
@@ -18,10 +16,5 @@ contracts/cache_forge
 contracts/cache_hardhat
 contracts/docs
 contracts/artifacts
-contracts/typechain-types
-
-contracts/addresses-local.json
-contracts/addresses-testnet.json
-contracts/candidates.json
 
 render/.astro

@@ -22,7 +22,6 @@
         "@nanostores/react": "^0.8.2",
         "@reown/appkit": "1.2.1",
         "@reown/appkit-adapter-ethers": "1.2.1",
-        "astro": "^4.16.0",
         "astro-icon": "^1.1.1",
         "clsx": "^2.1.1",
         "ethers": "6.13.1",
@@ -32,6 +31,7 @@
         "tailwind-merge": "^2.5.3"
     },
     "devDependencies": {
+        "astro": "^4.16.0",
         "@astrojs/check": "^0.9.4",
         "@astrojs/react": "^3.6.2",
         "@astrojs/tailwind": "^5.1.2",

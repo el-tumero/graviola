@@ -1,7 +1,5 @@
 name: CI
-on:
-    push:
-
+on: push
 jobs:
     build:
         runs-on: ubuntu-22.04
@@ -24,4 +22,23 @@ jobs:
             - name: Build repo
               run: pnpm build
             - name: Clean repo
-              run: pnpm install --prod
+              run: pnpm run clean
+            - name: Upload a Build Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: build-artifact
+                  path: .
+                  if-no-files-found: error
+                  retention-days: 5
+    containerize:
+        runs-on: ubuntu-22.04
+        needs: build
+        steps:
+            - name: Download a Build Artifact
+              uses: actions/download-artifact@v4
+              with:
+                  name: build-artifact
+            - name: Build the Docker image (render)
+              run: docker build . --file ./docker/render.Dockerfile --tag graviola/render:$(date +%s)
+            - name: Build the Docker image (event)
+              run: docker build . --file ./docker/event.Dockerfile --tag graviola/event:$(date +%s)
