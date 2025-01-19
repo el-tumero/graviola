@@ -3,5 +3,5 @@ WORKDIR /app
 COPY . .
 USER bun
 EXPOSE 8085
-ENV NODE_ENV production
+ENV NODE_ENV=production
 CMD ["bun", "event/server.ts"]

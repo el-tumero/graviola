@@ -19,7 +19,10 @@ import { JsonRpcProvider, Log } from "ethers"
 const addr =
     process.env.NODE_ENV === "production" ? addresses.testnet : addresses.local
 
-const rpcUrl = process.env.NODE_ENV === "production" ? "http://127.0.0.1:8545/" : "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
+const rpcUrl =
+    process.env.NODE_ENV === "production"
+        ? "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
+        : "http://127.0.0.1:8545/"
 
 const LOGS_QUERY_INTERVAL = 5000
 
