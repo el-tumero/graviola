@@ -1,11 +1,11 @@
 import type { Server } from "bun"
+import { addresses } from "@graviola/contracts/addresses"
 import {
     GraviolaGenerator__factory,
     GraviolaCollectionReadProxy__factory,
-    addresses,
     type GraviolaGenerator,
     type GraviolaCollectionReadProxy,
-} from "@graviola/contracts"
+} from "@graviola/contracts/typechain"
 
 import { GENERATION_TOPIC } from "./index"
 import {
@@ -16,7 +16,13 @@ import {
 import { createEventMessage } from "./message"
 import { JsonRpcProvider, Log } from "ethers"
 
-const rpcUrl = "http://127.0.0.1:8545/"
+const addr =
+    process.env.NODE_ENV === "production" ? addresses.testnet : addresses.local
+
+const rpcUrl =
+    process.env.NODE_ENV === "production"
+        ? "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
+        : "http://127.0.0.1:8545/"
 
 const LOGS_QUERY_INTERVAL = 5000
 
@@ -46,12 +52,12 @@ export const setup = async (server: Server) => {
     let lastBlockNumber = await provider.getBlockNumber()
 
     const generator = GraviolaGenerator__factory.connect(
-        addresses.local.GENERATOR_ADDRESS,
+        addr.GENERATOR_ADDRESS,
         provider,
     )
 
     const collectionReadProxy = GraviolaCollectionReadProxy__factory.connect(
-        addresses.local.COLLECTION_READ_PROXY_ADDRESS,
+        addr.COLLECTION_READ_PROXY_ADDRESS,
         provider,
     )
 

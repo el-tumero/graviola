@@ -1,21 +1,11 @@
 services:
-  contracts:
-    build:
-      context: ./contracts
-      dockerfile: Dockerfile
-    volumes:
-      - shared:/contracts
-    # command: sh -c "tail -f /dev/null" # DEBUG
-
-  website:
-    depends_on:
-      - contracts
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    volumes:
-      - shared:/contracts
-    command: sh -c "yarn build"
-
-volumes:
-  shared:
+    render:
+        image: eltumero/graviola-render
+        ports:
+            - "4321:4321"
+        depends_on:
+            - event
+    event:
+        image: eltumero/graviola-event
+        ports:
+            - "8085:8085"

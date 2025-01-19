@@ -9,6 +9,7 @@ cache_hardhat
 docs
 artifacts
 typechain-types
+dist
 
 addresses-local.json
 addresses-testnet.json

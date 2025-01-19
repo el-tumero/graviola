@@ -1,6 +1,6 @@
 import { select } from '@inquirer/prompts'
 import { ethers } from 'hardhat'
-import { GeneratorEventTester } from '../typechain-types'
+import { GeneratorEventTester } from '../dist'
 
 const testAddress = '0xB483B289C0b7E44cA59ed6E9Cd77E3FB3d7A4278'
 

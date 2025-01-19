@@ -1,4 +1,9 @@
 import {
+    GraviolaGenerator__factory,
+    type GraviolaGenerator,
+} from "@graviola/contracts/typechain"
+import { addresses as target } from "@graviola/contracts/addresses"
+import {
     BrowserProvider,
     JsonRpcProvider,
     Wallet,
@@ -9,6 +14,7 @@ import {
 let provider: BrowserProvider | JsonRpcProvider | undefined
 let signer: Signer | undefined
 let address: string | undefined
+let addresses = target.testnet
 
 export const setupProvider = async (walletProvider: Eip1193Provider) => {
     provider = new BrowserProvider(walletProvider)
@@ -24,11 +30,15 @@ export const setupDevWallet = async () => {
     )
     address = await wallet.getAddress()
     signer = wallet
+    addresses = target.local
 }
 
 export const removeProvider = () => {
     provider = undefined
 }
+
+export const getGeneratorContract = (): GraviolaGenerator =>
+    GraviolaGenerator__factory.connect(addresses.GENERATOR_ADDRESS, signer)
 
 export const getProvider = () => provider
 

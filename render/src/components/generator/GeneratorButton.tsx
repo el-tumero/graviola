@@ -1,8 +1,7 @@
 import cl from "clsx"
+// TODO: move web3 logic to seperate file
 import { GenerationPhase, generationPhaseMessages } from "./generator"
-import { GraviolaGenerator__factory } from "@graviola/contracts"
-import { addresses } from "@graviola/contracts"
-import { getSigner } from "../../wallet"
+import { getSigner, getGeneratorContract } from "../../wallet"
 
 interface Props {
     phase: number
@@ -23,13 +22,8 @@ const GeneratorButton: React.FC<Props> = ({
         phase == GenerationPhase.GENERATE_COMPLETE
 
     const handleClick = async () => {
-        const signer = getSigner()
-        if (!signer) return
-
-        const generator = GraviolaGenerator__factory.connect(
-            addresses.local.GENERATOR_ADDRESS,
-            signer,
-        )
+        if (!getSigner()) return
+        const generator = getGeneratorContract()
 
         switch (phase) {
             case GenerationPhase.NONE: {
