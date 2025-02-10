@@ -21,7 +21,7 @@ async function main() {
     console.log('Listening to events...')
 
     generator.on(
-        generator.filters.RequestVRFSent,
+        generator.filters.VRFRequestSent,
         async (initiator: ethers.AddressLike, requestId: bigint) => {
             await new Promise((r) => setTimeout(r, 2000))
             const tx = await vrf.fulfillRandomWords(requestId)
@@ -35,7 +35,7 @@ async function main() {
     )
 
     generator.on(
-        generator.filters.RequestOAOSent,
+        generator.filters.OAORequestSent,
         async (initiator: ethers.AddressLike, requestId: bigint) => {
             await new Promise((r) => setTimeout(r, 2000))
             const tx = await oao.invokeNextCallback(toUtf8Bytes(IMG_CID))

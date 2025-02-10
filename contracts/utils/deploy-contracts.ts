@@ -84,7 +84,7 @@ export default async function deployContracts(
     await schema.waitForDeployment()
     console.log('GraviolaSchema deployed!')
 
-    const collection = await GraviolaCollection.deploy(gm)
+    const collection = await GraviolaCollection.deploy(gm, oao)
     await collection.waitForDeployment()
     console.log('GraviolaCollection deployed!')
 

@@ -88,5 +88,7 @@ contract AIOracleMock is IAIOracle {
 
     function isFinalized(
         uint256 requestId
-    ) external view override returns (bool) {}
+    ) external view override returns (bool) {
+        return requestId + fee < type(uint256).max;
+    }
 }

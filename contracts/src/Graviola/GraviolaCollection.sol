@@ -14,6 +14,7 @@ import {GraviolaEnumerable} from "./GraviolaEnumerable.sol";
 import {GraviolaSchema} from "./GraviolaSchema.sol";
 import {GraviolaGenerator} from "./GraviolaGenerator.sol";
 import {IERC7007} from "../OAO/IERC7007.sol";
+import {IAIOracle} from "../OAO/IAIOracle.sol";
 
 contract GraviolaCollection is
     ERC165,
@@ -30,14 +31,20 @@ contract GraviolaCollection is
 
     GraviolaSchema public schema;
     GraviolaGenerator public generator;
+    IAIOracle public aiOracle;
+
+    mapping(uint256 => uint256) private oaoRequestIds;
 
     constructor(
-        address ownerAddress
+        address ownerAddress,
+        address aiOracleAddress
     )
         ERC721("GraviolaCollection", "GRVC")
         Ownable(ownerAddress)
         GraviolaMetadata()
-    {}
+    {
+        aiOracle = IAIOracle(aiOracleAddress);
+    }
 
     modifier onlyGenerator() {
         if (address(generator) != msg.sender) {
@@ -88,6 +95,17 @@ contract GraviolaCollection is
         emit AigcData(tokenId, prompt, aigcData, proof);
     }
 
+    function addOaoRequestId(
+        uint256 tokenId,
+        uint256 oaoRequestId
+    ) external onlyGenerator {
+        oaoRequestIds[tokenId] = oaoRequestId;
+    }
+
+    function getOaoRequestId(uint256 tokenId) external view returns (uint256) {
+        return oaoRequestIds[tokenId];
+    }
+
     function verify(
         bytes calldata prompt,
         bytes calldata aigcData,
@@ -95,7 +113,7 @@ contract GraviolaCollection is
     ) external view returns (bool) {
         uint256 id = tokenId[prompt];
         return
-            generator.isFinalized(id) &&
+            aiOracle.isFinalized(oaoRequestIds[id]) &&
             (keccak256(_readProperty(id, "image")) == keccak256(aigcData));
     }
 

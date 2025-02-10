@@ -16,9 +16,9 @@ pnpm --filter @graviola/contracts run mock-bot & # run mock bot in background
 mock_bot=$!
 echo "[DEV] Started mock bot: ${mock_bot}"
 
-bun event/server.ts & # run event server in background
-event_server=$!
-echo "[DEV] Started event server: ${event_server}"
+#bun event/server.ts & # run event server in background
+#event_server=$!
+#echo "[DEV] Started event server: ${event_server}"
 
 pnpm --filter @graviola/render run dev:local # run render in dev mode
 

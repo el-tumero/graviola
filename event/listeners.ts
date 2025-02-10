@@ -63,10 +63,10 @@ export const setup = async (server: Server) => {
 
     const topics = [
         [
-            generator.filters.RequestVRFSent().fragment.topicHash,
-            generator.filters.RequestVRFFulfilled().fragment.topicHash,
-            generator.filters.RequestOAOSent().fragment.topicHash,
-            generator.filters.RequestOAOFulfilled().fragment.topicHash,
+            generator.filters.VRFRequestSent().fragment.topicHash,
+            generator.filters.VRFRequestFulfilled().fragment.topicHash,
+            generator.filters.OAORequestSent().fragment.topicHash,
+            generator.filters.OAORequestFulfilled().fragment.topicHash,
         ],
     ]
 
