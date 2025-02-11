@@ -33,20 +33,15 @@ export default async function deployContracts(
     const VRFV2PlusWrapperMock = await hardhat.ethers.getContractFactory(
         'VRFV2PlusWrapperMock',
     )
-    const GraviolaToken =
-        await hardhat.ethers.getContractFactory('GraviolaToken')
-    const GraviolaSeasonsArchive = await hardhat.ethers.getContractFactory(
-        'GraviolaSeasonsArchive',
-    )
-    const GraviolaSeasonsGovernor = await hardhat.ethers.getContractFactory(
-        'GraviolaSeasonsGovernor',
-    )
     const GraviolaSchema =
         await hardhat.ethers.getContractFactory('GraviolaSchema')
     const GraviolaCollection =
         await hardhat.ethers.getContractFactory('GraviolaCollection')
     const GraviolaCollectionReadProxy = await hardhat.ethers.getContractFactory(
         'GraviolaCollectionReadProxy',
+    )
+    const GraviolaKeywordsVault = await hardhat.ethers.getContractFactory(
+        'GraviolaKeywordsVaultBasic',
     )
     const GraviolaGenerator =
         await hardhat.ethers.getContractFactory('GraviolaGenerator')
@@ -68,18 +63,6 @@ export default async function deployContracts(
               ).getAddress()
             : VRF_WRAPPER_ADDRESS
 
-    const gt = await GraviolaToken.deploy(owner)
-    await gt.waitForDeployment()
-    console.log('GraviolaToken deployed!')
-
-    const gsa = await GraviolaSeasonsArchive.deploy(gm)
-    await gsa.waitForDeployment()
-    console.log('GraviolaSeasonsArchive deployed!')
-
-    const gsg = await GraviolaSeasonsGovernor.deploy(gsa, gt)
-    await gsg.waitForDeployment()
-    console.log('GraviolaSeasonsGovernor deployed!')
-
     const schema = await GraviolaSchema.deploy()
     await schema.waitForDeployment()
     console.log('GraviolaSchema deployed!')
@@ -95,9 +78,12 @@ export default async function deployContracts(
     await collectionReadProxy.waitForDeployment()
     console.log('GraviolaCollectionReadProxy deployed!')
 
+    const keywordsVault = await GraviolaKeywordsVault.deploy()
+    await keywordsVault.waitForDeployment()
+    console.log('GraviolaKeywordsVault deployed!')
+
     const generator = await GraviolaGenerator.deploy(
-        gt,
-        gsa,
+        keywordsVault,
         collection,
         oao,
         vrf,
@@ -106,37 +92,21 @@ export default async function deployContracts(
     console.log('GraviolaGenerator deployed!')
 
     const [
-        tokenAddress,
         schemaAddress,
         collectionAddress,
         collectionReadProxyAddress,
-        gsaAddress,
-        gsgAddress,
+        keywordsVaultAddress,
         generatorAddress,
     ] = await Promise.all([
-        gt.getAddress(),
         schema.getAddress(),
         collection.getAddress(),
         collectionReadProxy.getAddress(),
-        gsa.getAddress(),
-        gsg.getAddress(),
+        keywordsVault.getAddress(),
         generator.getAddress(),
     ])
 
     console.log('All contracts deployed!')
 
-    await addAddressToMigrator(
-        gm,
-        DeployedContractEnum.SEASONS_ARCHIVE,
-        gsaAddress,
-    )
-    console.log('Seasons Archive added to migrator!')
-    await addAddressToMigrator(
-        gm,
-        DeployedContractEnum.SEASONS_GOVERNOR,
-        gsgAddress,
-    )
-    console.log('Seasons Governor added to migrator!')
     await addAddressToMigrator(
         gm,
         DeployedContractEnum.GENERATOR,
@@ -167,10 +137,8 @@ export default async function deployContracts(
     const output: DeployedContractAddressData = {
         VRF_ADDRESS: vrf,
         OAO_ADDRESS: oao,
-        TOKEN_ADDRESS: tokenAddress,
         COLLECTION_ADDRESS: collectionAddress,
-        SEASONS_ARCHIVE_ADDRESS: gsaAddress,
-        SEASONS_GOVERNOR_ADDRESS: gsgAddress,
+        KEYWORDS_VAULT_ADDRESS: keywordsVaultAddress,
         GENERATOR_ADDRESS: generatorAddress,
         COLLECTION_READ_PROXY_ADDRESS: collectionReadProxyAddress,
         MIGRATOR_ADDRESS: migratorAddress,
