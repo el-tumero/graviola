@@ -2,7 +2,6 @@
 pragma solidity ^0.8.24;
 
 import {GraviolaSeed} from "./GraviolaSeed.sol";
-import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {GraviolaCollection} from "./GraviolaCollection.sol";
 import {AIOracleCallbackReceiver} from "../OAO/AIOracleCallbackReceiver.sol";
 import {VRFV2PlusWrapperConsumerBase} from "@chainlink/contracts/src/v0.8/vrf/dev/VRFV2PlusWrapperConsumerBase.sol";
@@ -28,7 +27,6 @@ contract GraviolaGenerator is
     /// @dev Callback gas limit for the OAO request
     uint64 private constant OAO_CALLBACK_GAS_LIMIT = 300000;
 
-    IERC20 private token;
     GraviolaCollection private collection;
 
     event VRFRequestSent(address indexed initiator, uint256 generatorRequestId);
@@ -73,17 +71,15 @@ contract GraviolaGenerator is
     mapping(address => uint256[]) private userRequests; // maps user to array of requestIds
 
     constructor(
-        address tokenAddress,
-        address archiveAddress,
+        address keywordsVaultAddress,
         address collectionAddress,
         address aiOracleAddress,
         address wrapperAddress
     )
-        GraviolaSeed(archiveAddress)
+        GraviolaSeed(keywordsVaultAddress)
         VRFV2PlusWrapperConsumerBase(wrapperAddress)
         AIOracleCallbackReceiver(aiOracleAddress)
     {
-        token = IERC20(tokenAddress);
         collection = GraviolaCollection(collectionAddress);
     }
 
@@ -161,9 +157,8 @@ contract GraviolaGenerator is
             omega
         );
 
-        uint256 seasonId = archive.getCurrentSeasonId();
         bytes memory prompt = bytes(
-            string.concat(archive.getSeasonPromptBase(seasonId), result)
+            string.concat(vault.getPromptBase(), result)
         );
 
         uint256 tokenId = uint256(keccak256(prompt));

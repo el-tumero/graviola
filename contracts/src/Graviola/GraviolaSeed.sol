@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {IGraviolaSeasonsArchive} from "./seasons/archive/IGraviolaSeasonsArchive.sol";
+import {IGraviolaKeywordsVault} from "./IGraviolaKeywordsVault.sol";
 
 contract GraviolaSeed {
-    IGraviolaSeasonsArchive internal archive;
+    IGraviolaKeywordsVault internal vault;
 
     // How many words are drawed for prompt creation
     uint8 internal constant KEYWORDS_PER_TOKEN = 3;
     uint256 internal constant DEFAULT_OMEGA = 100;
 
     /// @notice Create GraviolaSeed module
-    /// @param archiveAddress GraviolaSeasonsArchive address
-    constructor(address archiveAddress) {
-        archive = IGraviolaSeasonsArchive(archiveAddress);
+    /// @param keywordsVaultAddress address of contract implementing IGraviolaKeywordsVault
+    constructor(address keywordsVaultAddress) {
+        vault = IGraviolaKeywordsVault(keywordsVaultAddress);
     }
 
     /// @notice Convert a fraction to basis points (BP)
@@ -64,7 +64,7 @@ contract GraviolaSeed {
                 abi.encodePacked(
                     result,
                     (i > 0 ? ", " : ""),
-                    archive.getKeywordCurrentSeason(wordId)
+                    vault.getKeyword(wordId)
                 )
             );
             i++;

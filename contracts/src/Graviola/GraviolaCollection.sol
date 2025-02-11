@@ -61,6 +61,10 @@ contract GraviolaCollection is
         schema = GraviolaSchema(schemaAddress);
     }
 
+    function setAIOracle(address aiOracleAddress) external onlyOwner {
+        aiOracle = IAIOracle(aiOracleAddress);
+    }
+
     function mint(uint256 tokenId, address to) external onlyGenerator {
         _safeMint(to, tokenId);
     }

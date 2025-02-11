@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.24;
+
+import {IGraviolaKeywordsVault} from "./IGraviolaKeywordsVault.sol";
+
+contract GraviolaKeywordsVaultBasic is IGraviolaKeywordsVault {
+    uint256 public constant NUMBER_OF_KEYWORDS = 100;
+
+    string private constant DEFAULT_PROMPT_BASE =
+        "Generate a minimalistic portrait of a fictional character. Use a solid color background. The main features of this character are: ";
+
+    string[NUMBER_OF_KEYWORDS] internal keywords = [
+        "human",
+        "android",
+        "robot",
+        "cyborg",
+        "droid",
+        "clone",
+        "replicant",
+        "simulant",
+        "machina",
+        "automa",
+        "cybernetic",
+        "bionic",
+        "golem",
+        "mechanoid",
+        "synthetic",
+        "hologram",
+        "artificer",
+        "servitor",
+        "doppelganger",
+        "mimic",
+        "automaton",
+        "construct",
+        "program",
+        "replica",
+        "model",
+        "drone",
+        "entity",
+        "avatar",
+        "system",
+        "framework",
+        "unit",
+        "figure",
+        "template",
+        "pattern",
+        "layout",
+        "format",
+        "config",
+        "blueprint",
+        "prototype",
+        "design",
+        "machine",
+        "device",
+        "engine",
+        "instrument",
+        "gadget",
+        "appliance",
+        "tool",
+        "apparatus",
+        "mechanism",
+        "gear",
+        "module",
+        "component",
+        "part",
+        "element",
+        "piece",
+        "subsystem",
+        "structure",
+        "architecture",
+        "network",
+        "grid",
+        "mesh",
+        "web",
+        "infrastructure",
+        "circuit",
+        "pathway",
+        "channel",
+        "conduit",
+        "track",
+        "route",
+        "course",
+        "line",
+        "fire",
+        "water",
+        "matrix",
+        "nexus",
+        "interface",
+        "controller",
+        "elf",
+        "goblin",
+        "gnome",
+        "fairy",
+        "troll",
+        "sprite",
+        "nymph",
+        "imp",
+        "dryad",
+        "satyr",
+        "hobbit",
+        "leprechaun",
+        "nomad",
+        "assassin",
+        "agent",
+        "mercenary",
+        "spy",
+        "hunter",
+        "berserker",
+        "mage",
+        "shaman",
+        "wizard",
+        "graviola"
+    ];
+
+    function getKeyword(uint256 wordId) external view returns (string memory) {
+        return keywords[wordId];
+    }
+
+    function getPromptBase() external pure returns (string memory) {
+        return DEFAULT_PROMPT_BASE;
+    }
+}
