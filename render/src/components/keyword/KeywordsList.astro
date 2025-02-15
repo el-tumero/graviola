@@ -18,7 +18,7 @@ const keywords = (await getKeywords()).reverse()
                         {camelToPascal(keyword.rarity)}
                     </span>
                 </span>
-                <Keyword slot="element" keyword={keyword} />
+                <Keyword slot="root" keyword={keyword} />
             </Tooltip>
         ))
     }
