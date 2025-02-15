@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import cl from "clsx"
 import { rarityBoxShadow } from "../../../utils/rarity"
 import { RarityName, type CardImageSize } from "@graviola/core"
-import goblin from "../../../assets/unknowngoblin.jpg"
+import goblin from "../../../assets/unknowngoblin.svg"
 
 interface Props {
     size?: CardImageSize

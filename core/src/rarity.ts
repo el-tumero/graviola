@@ -59,9 +59,9 @@ export const keywordsToScore = (keywords: Keyword[]): number => {
 }
 
 export const scoreToRarity = (score: number): Rarity => {
-    if (score < 3) return "common"
-    if (score < 10) return "uncommon"
-    if (score < 14) return "rare"
-    if (score < 19) return "veryRare"
+    if (score <= 3) return "common"
+    if (score <= 10) return "uncommon"
+    if (score <= 14) return "rare"
+    if (score <= 19) return "veryRare"
     return "legendary"
 }

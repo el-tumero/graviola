@@ -1,7 +1,8 @@
 ---
-import { rarityToTextColor, type Card } from "@graviola/core"
+import { rarityToTextColor, shortenCardId, type Card } from "@graviola/core"
 import camelToPascal from "../../utils/camelToPascal"
 import { rarityTextColor } from "../../utils/rarity"
+import TooltipCopy from "../common/tooltip/TooltipCopy.astro"
 
 interface Props {
     card: Card
@@ -14,9 +15,17 @@ const { card } = Astro.props
     class:list={[
         "flex flex-col w-full h-fit gap-1",
         "justify-start items-start",
+        "pt-2",
     ]}
 >
-    <p>id: {card.id}</p>
+    <TooltipCopy copyText={card.id}>
+        <span slot="root">
+            <p>id: {shortenCardId(card.id)}</p>
+        </span>
+        <div slot="text">
+            <p class="card-id">{card.id}</p>
+        </div>
+    </TooltipCopy>
     <p>
         Rarity:&nbsp;<span class={rarityTextColor[card.rarity]}
             >{camelToPascal(card.rarity, true)}</span
@@ -27,6 +36,7 @@ const { card } = Astro.props
     class:list={[
         "flex flex-wrap w-full h-fit",
         "gap-1 justify-start items-start",
+        "mt-auto",
     ]}
 >
     {

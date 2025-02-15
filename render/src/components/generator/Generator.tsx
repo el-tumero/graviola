@@ -126,7 +126,8 @@ const Generator: React.FC<Props> = () => {
                             "text-light-textSecondary dark:text-dark-textSecondary",
                             "uppercase",
                             "cursor-default",
-                            "bg-dark-bgLight",
+                            "bg-light-bgLight",
+                            "dark:bg-dark-bgLight",
                         )}
                     >
                         Please connect your wallet

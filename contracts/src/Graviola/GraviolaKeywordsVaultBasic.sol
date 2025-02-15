@@ -116,6 +116,14 @@ contract GraviolaKeywordsVaultBasic is IGraviolaKeywordsVault {
         return keywords[wordId];
     }
 
+    function getKeywords()
+        external
+        view
+        returns (string[NUMBER_OF_KEYWORDS] memory)
+    {
+        return keywords;
+    }
+
     function getPromptBase() external pure returns (string memory) {
         return DEFAULT_PROMPT_BASE;
     }

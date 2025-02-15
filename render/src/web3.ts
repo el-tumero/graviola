@@ -2,12 +2,12 @@ import { JsonRpcProvider } from "ethers"
 import type {
     GraviolaCollection,
     GraviolaCollectionReadProxy,
-    GraviolaSeasonsArchive,
+    GraviolaKeywordsVaultBasic,
 } from "@graviola/contracts/typechain"
 import {
     GraviolaCollection__factory,
     GraviolaCollectionReadProxy__factory,
-    GraviolaSeasonsArchive__factory,
+    GraviolaKeywordsVaultBasic__factory,
 } from "@graviola/contracts/typechain"
 import { addresses as target } from "@graviola/contracts/addresses"
 import type { Card, Keyword } from "@graviola/core"
@@ -35,9 +35,9 @@ export const getCollectionReadProxy = (): GraviolaCollectionReadProxy =>
         provider,
     )
 
-export const getArchiveContract = (): GraviolaSeasonsArchive =>
-    GraviolaSeasonsArchive__factory.connect(
-        addresses.SEASONS_ARCHIVE_ADDRESS,
+export const getVaultContract = (): GraviolaKeywordsVaultBasic =>
+    GraviolaKeywordsVaultBasic__factory.connect(
+        addresses.KEYWORDS_VAULT_ADDRESS,
         provider,
     )
 
@@ -72,8 +72,8 @@ export const getCards = async (
 }
 
 export const getKeywords = async (): Promise<Keyword[]> => {
-    const archive = getArchiveContract()
-    const keywords = await archive.getKeywordsCurrentSeason()
+    const vault = getVaultContract()
+    const keywords = await vault.getKeywords()
     return keywords.map((keyword, id) => ({
         name: keyword,
         rarity: wordIdToRarity(id),

@@ -93,8 +93,8 @@ const GeneratorButton: React.FC<Props> = ({
                       ]
                     : [
                           "cursor-default",
-                          "bg-dark-bgLight",
-                          "shadow-[0_8px_0_0_rgba(25,26,25,1)]",
+                          "dark:bg-dark-bgLight",
+                          "dark:shadow-[0_8px_0_0_rgba(25,26,25,1)]",
                           "animate-pulse",
                       ],
             )}
