@@ -27,14 +27,12 @@ const CardImage: React.FC<Props> = ({ size = "small" }) => {
                 transition: "box-shadow 0.75s ease-in-out",
             }}
             className={cl(
-                "flex",
+                "mx-auto my-0",
                 size === "small" && "w-36 h-36",
                 size === "medium" && "w-52 h-52",
                 size === "large" && "w-64 h-64",
-                "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
+                "p-1 rounded-xl border-4",
                 "border-light-border dark:border-dark-border select-none",
-                "shadow-card",
-                boxShadow,
             )}
         >
             <img src={goblin.src} className="w-full h-full rounded-lg" alt="" />

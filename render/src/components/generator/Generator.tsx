@@ -1,6 +1,6 @@
 import CardGenerate from "../card/generator/CardGenerate"
 import GeneratorButton from "./GeneratorButton"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import {
     GenerationPhase,
     GenerationStatus,
@@ -62,8 +62,6 @@ const Generator: React.FC<Props> = () => {
                         requestId,
                         GenerationStatus.OAO_RESPONSE,
                     )
-                    console.log("that phase")
-
                     const tokenId = await generator.getTokenId(requestId)
                     const properties =
                         await collectionReadProxy.getProperties(tokenId)
@@ -107,8 +105,8 @@ const Generator: React.FC<Props> = () => {
 
     return (
         <>
-            <div className="flex justify-center my-8">
-                <CardGenerate keywords={keywords} card={card} />
+            <div className="mt-4 mb-10">
+                <CardGenerate phase={phase} keywords={keywords} card={card} />
             </div>
             <div className="flex justify-center">
                 {user.address !== "0x" ? (
