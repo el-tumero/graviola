@@ -12,12 +12,27 @@ interface Props {
     phase: number
 }
 
+const animationPhase = (phase: number) => {
+    switch (phase) {
+        case GenerationPhase.NONE:
+            return "card-init"
+        case GenerationPhase.PREPARE_LOAD:
+        case GenerationPhase.GENERATE_LOAD:
+        case GenerationPhase.PREPARE_COMPLETE:
+            return "card-loading"
+        case GenerationPhase.GENERATE_COMPLETE:
+            return "card-init"
+        default:
+            return "card-init"
+    }
+}
+
 const CardGenerate: React.FC<Props> = ({ card, keywords, phase }) => {
     return (
         <div
             className={cl(
                 "card",
-                phase > GenerationPhase.NONE ? "card-loading" : "card-init",
+                animationPhase(phase),
                 "border border-light-border dark:border-dark-border",
                 "bg-stone-950",
                 // "dark:bg-dark-bgPrimary bg-light-bgPrimary", TODO: fix this
