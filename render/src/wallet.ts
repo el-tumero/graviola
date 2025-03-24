@@ -1,5 +1,7 @@
 import {
     GraviolaGenerator__factory,
+    GraviolaCollectionReadProxy__factory,
+    type GraviolaCollectionReadProxy,
     type GraviolaGenerator,
 } from "@graviola/contracts/typechain"
 import { addresses as target } from "@graviola/contracts/addresses"
@@ -39,6 +41,12 @@ export const removeProvider = () => {
 
 export const getGeneratorContract = (): GraviolaGenerator =>
     GraviolaGenerator__factory.connect(addresses.GENERATOR_ADDRESS, signer)
+
+export const getCollectionReadProxy = (): GraviolaCollectionReadProxy =>
+    GraviolaCollectionReadProxy__factory.connect(
+        addresses.COLLECTION_READ_PROXY_ADDRESS,
+        provider,
+    )
 
 export const getProvider = () => provider
 

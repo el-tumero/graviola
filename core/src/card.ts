@@ -25,7 +25,7 @@ export const metadataToCard = (tokenId: bigint, metadata: Metadata): Card => {
     const score = keywordsToScore(keywords)
 
     return {
-        id: "0x" + tokenId.toString(16).slice(0, 14) + "...",
+        id: "0x" + tokenId.toString(16),
         description: metadata.prompt,
         image: metadata.image,
         keywords,
@@ -41,3 +41,6 @@ export const propertiesToCard = (
 ): Card => {
     return metadataToCard(tokenId, parseProperties(properties))
 }
+
+export const shortenCardId = (id: string): string =>
+    id.slice(0, 7) + "..." + id.slice(-7)

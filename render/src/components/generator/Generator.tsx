@@ -1,11 +1,16 @@
 import CardGenerate from "../card/generator/CardGenerate"
 import GeneratorButton from "./GeneratorButton"
-import { useEffect, useRef, useState } from "react"
-import { GenerationPhase } from "./generator"
+import { useEffect, useState } from "react"
+import {
+    GenerationPhase,
+    GenerationStatus,
+    waitForStateChange,
+} from "./generator"
 import { useStore } from "@nanostores/react"
 import { $user } from "../../store/user"
 import cl from "clsx"
-import type { EventMessage, Card, Keyword } from "@graviola/core"
+import { propertiesToCard, type Card, type Keyword } from "@graviola/core"
+import { getCollectionReadProxy, getGeneratorContract } from "../../wallet"
 
 interface Props {}
 
@@ -13,52 +18,68 @@ const Generator: React.FC<Props> = () => {
     const [phase, setPhase] = useState<number>(GenerationPhase.NONE)
     const [keywords, setKeywords] = useState<Keyword[]>([])
     const user = useStore($user)
-    const ws = useRef<WebSocket | null>(null)
     const [requestId, setRequestId] = useState<string>("")
     const [card, setCard] = useState<Card | undefined>(undefined)
 
     useEffect(() => {
-        if (user.address === "0x") return
+        ;(async () => {
+            if (user.address === "0x") return
+            const generator = getGeneratorContract()
+            const requests = await generator.getUserGeneratorRequests(
+                user.address,
+            )
+            const lastRequest = requests[requests.length - 1]
+            const requestStatus = Number(
+                await generator.getGeneratorRequestStatus(lastRequest),
+            )
 
-        ws.current = new WebSocket("ws://localhost:8085")
-        ws.current.onopen = () => console.log("ws opened")
-        ws.current.onclose = () => console.log("ws closed")
-
-        const wsCurrent = ws.current
-
-        if (ws.current) {
-            ws.current.onmessage = (e) => {
-                const message: EventMessage = JSON.parse(e.data)
-                if (message.initiator !== user.address) return
-                console.log(message)
-
-                switch (message.eventName) {
-                    case "RequestVRFFulfilled": {
-                        setPhase(GenerationPhase.PREPARE_COMPLETE)
-                        setRequestId(message.requestId)
-                        break
-                    }
-
-                    case "RequestOAOFulfilled": {
-                        setPhase(GenerationPhase.GENERATE_COMPLETE)
-                        addCard(message.card)
-                        console.log("RequestOAOFulfilled", message)
-                        break
-                    }
-
-                    default: {
-                        break
-                    }
-                }
+            if (requestStatus !== GenerationStatus.OAO_RESPONSE) {
+                setRequestId(lastRequest.toString())
+                setPhase(requestStatus)
             }
-        }
-
-        return () => {
-            wsCurrent.close()
-        }
+        })()
     }, [user])
 
+    useEffect(() => {
+        ;(async () => {
+            if (requestId === "") return
+            const generator = getGeneratorContract()
+            switch (phase) {
+                case GenerationPhase.PREPARE_LOAD: {
+                    await waitForStateChange(
+                        generator,
+                        requestId,
+                        GenerationStatus.VRF_RESPONSE,
+                    )
+                    setPhase(GenerationPhase.PREPARE_COMPLETE)
+                    break
+                }
+
+                case GenerationPhase.GENERATE_LOAD: {
+                    const collectionReadProxy = getCollectionReadProxy()
+                    await waitForStateChange(
+                        generator,
+                        requestId,
+                        GenerationStatus.OAO_RESPONSE,
+                    )
+                    const tokenId = await generator.getTokenId(requestId)
+                    const properties =
+                        await collectionReadProxy.getProperties(tokenId)
+                    console.log(properties)
+                    await addCard(propertiesToCard(tokenId, properties))
+                    setPhase(GenerationPhase.GENERATE_COMPLETE)
+                    break
+                }
+
+                default: {
+                    break
+                }
+            }
+        })()
+    }, [phase, requestId])
+
     const addCard = async (card: Card) => {
+        console.log(card)
         setKeywords((keywords) => [...keywords, card.keywords[0]])
         await new Promise((r) => setTimeout(r, 1000))
         setKeywords((keywords) => [...keywords, card.keywords[1]])
@@ -84,14 +105,15 @@ const Generator: React.FC<Props> = () => {
 
     return (
         <>
-            <div className="flex justify-center my-8">
-                <CardGenerate keywords={keywords} card={card} />
+            <div className="mt-4 mb-10">
+                <CardGenerate phase={phase} keywords={keywords} card={card} />
             </div>
             <div className="flex justify-center">
                 {user.address !== "0x" ? (
                     <GeneratorButton
                         phase={phase}
                         requestId={requestId}
+                        setRequestId={setRequestId}
                         nextPhase={nextPhase}
                         prevPhase={prevPhase}
                     />
@@ -102,7 +124,8 @@ const Generator: React.FC<Props> = () => {
                             "text-light-textSecondary dark:text-dark-textSecondary",
                             "uppercase",
                             "cursor-default",
-                            "bg-dark-bgLight",
+                            "bg-light-bgLight",
+                            "dark:bg-dark-bgLight",
                         )}
                     >
                         Please connect your wallet

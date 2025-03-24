@@ -25,7 +25,7 @@ const CardImage: React.FC<Props> = ({
         <div
             style={style}
             className={cl(
-                "flex",
+                "mx-auto my-0",
                 size === "medium" && "w-36 h-36",
                 size === "medium" && "w-52 h-52",
                 size === "large" && "w-64 h-64",

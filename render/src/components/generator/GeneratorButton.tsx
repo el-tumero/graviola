@@ -6,6 +6,7 @@ import { getSigner, getGeneratorContract } from "../../wallet"
 interface Props {
     phase: number
     requestId: string
+    setRequestId: (requestId: string) => void
     nextPhase: () => void
     prevPhase: () => void
 }
@@ -13,6 +14,7 @@ interface Props {
 const GeneratorButton: React.FC<Props> = ({
     phase,
     requestId,
+    setRequestId,
     nextPhase,
     prevPhase,
 }) => {
@@ -22,7 +24,8 @@ const GeneratorButton: React.FC<Props> = ({
         phase == GenerationPhase.GENERATE_COMPLETE
 
     const handleClick = async () => {
-        if (!getSigner()) return
+        const signer = getSigner()
+        if (!signer) return
         const generator = getGeneratorContract()
 
         switch (phase) {
@@ -36,6 +39,12 @@ const GeneratorButton: React.FC<Props> = ({
                     })
                     const tx = await prepare.wait()
                     console.log(tx)
+
+                    const requests = await generator.getUserGeneratorRequests(
+                        await signer.getAddress(),
+                    )
+                    const lastRequest = requests[requests.length - 1]
+                    setRequestId(lastRequest.toString())
                 } catch (err) {
                     console.log(err)
                     prevPhase()
@@ -70,12 +79,12 @@ const GeneratorButton: React.FC<Props> = ({
         <button
             className={cl(
                 "px-5 py-2 text-lg rounded-xl",
-                "text-light-textSecondary dark:text-dark-textSecondary",
                 "uppercase",
 
                 enabled
                     ? [
                           "bg-accentDark",
+                          "text-light-bgLight",
                           "shadow-[0_8px_0_0_rgba(15,115,52,1)]",
                           "hover:shadow-[0_6px_0_0_rgba(15,115,52,1)]",
                           "hover:translate-y-[2px]",
@@ -84,8 +93,9 @@ const GeneratorButton: React.FC<Props> = ({
                       ]
                     : [
                           "cursor-default",
-                          "bg-dark-bgLight",
-                          "shadow-[0_8px_0_0_rgba(25,26,25,1)]",
+                          "dark:bg-dark-bgLight",
+                          "text-light-text dark:text-dark-text",
+                          "dark:shadow-[0_8px_0_0_rgba(25,26,25,1)]",
                           "animate-pulse",
                       ],
             )}

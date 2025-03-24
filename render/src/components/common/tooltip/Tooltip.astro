@@ -1,0 +1,15 @@
+---
+
+---
+
+<div class="relative inline-block group">
+    <slot name="root" />
+    <div
+        class="absolute left-1/2 transform -translate-x-1/2 -top-10
+                bg-dark-bgDark text-white text-xs px-3 py-2 rounded-lg shadow-lg
+                transition-opacity duration-300 opacity-0 group-hover:opacity-100
+                pointer-events-none whitespace-nowrap text-center"
+    >
+        <slot name="text" />
+    </div>
+</div>
