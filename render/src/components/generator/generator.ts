@@ -5,7 +5,6 @@ export const generationPhaseMessages = [
     "Waiting for generation seed...",
     "Generate",
     "Generating...",
-    "Generating...",
     "Completed",
 ]
 
@@ -14,8 +13,7 @@ export const GenerationPhase = {
     PREPARE_LOAD: 1,
     PREPARE_COMPLETE: 2,
     GENERATE_LOAD: 3,
-    GENERATE_KEYWORDS: 4,
-    GENERATE_COMPLETE: 5,
+    GENERATE_COMPLETE: 4,
 } as const
 
 export const GenerationStatus = {
@@ -37,6 +35,7 @@ export const waitForStateChange = (
         const timer = window.setInterval(async () => {
             const status = await generator.getGeneratorRequestStatus(requestId)
             console.log("Waiting for the request state to change")
+            console.log("[DEBUG] status: ", status)
             if (Number(status) === targetStatus) {
                 clearInterval(timer)
                 resolve()

@@ -10,11 +10,12 @@ const Wallet = () => {
 
     useEffect(() => {
         if (isConnected) {
-            $user.setKey("address", address || "0x")
-            setupProvider(walletProvider)
+            setupProvider(walletProvider).then(() => {
+                $user.setKey("address", address || "0x")
+            })
         } else {
-            $user.setKey("address", "0x")
             removeProvider()
+            $user.setKey("address", "0x")
         }
     }, [isConnected])
 

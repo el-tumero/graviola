@@ -55,8 +55,8 @@ contract GraviolaSchema {
         _addStringProperty(writer, "image", string(metadata[1]));
         _addStringProperty(writer, "prompt", string(metadata[0]));
         _addStringProperty(writer, "aigc_type", "image");
-        _addStringProperty(writer, "aigc_data", "null");
-        _addStringProperty(writer, "proof_type", "opML");
+        _addStringProperty(writer, "aigc_data", string(metadata[1]));
+        _addStringProperty(writer, "proof_type", "fraud");
         writer = writer.writeEndObject(); // }
 
         return writer.value;

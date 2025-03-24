@@ -20,23 +20,28 @@ const Generator: React.FC<Props> = () => {
     const user = useStore($user)
     const [requestId, setRequestId] = useState<string>("")
     const [card, setCard] = useState<Card | undefined>(undefined)
+    const [isLoaded, setIsLoaded] = useState<boolean>(false) // TODO: fix in future
 
     useEffect(() => {
         ;(async () => {
             if (user.address === "0x") return
             const generator = getGeneratorContract()
+
             const requests = await generator.getUserGeneratorRequests(
                 user.address,
             )
-            const lastRequest = requests[requests.length - 1]
-            const requestStatus = Number(
-                await generator.getGeneratorRequestStatus(lastRequest),
-            )
+            if (requests.length > 0) {
+                const lastRequest = requests[requests.length - 1]
+                const requestStatus = Number(
+                    await generator.getGeneratorRequestStatus(lastRequest),
+                )
 
-            if (requestStatus !== GenerationStatus.OAO_RESPONSE) {
-                setRequestId(lastRequest.toString())
-                setPhase(requestStatus)
+                if (requestStatus !== GenerationStatus.OAO_RESPONSE) {
+                    setRequestId(lastRequest.toString())
+                    setPhase(requestStatus)
+                }
             }
+            setIsLoaded(true)
         })()
     }, [user])
 
@@ -90,17 +95,11 @@ const Generator: React.FC<Props> = () => {
     }
 
     const nextPhase = () => {
-        setPhase((phase + 1) % Object.keys(GenerationPhase).length)
+        setPhase((phase) => phase + 1)
     }
 
     const prevPhase = () => {
-        if (phase === GenerationPhase.PREPARE_LOAD) {
-            setPhase(GenerationPhase.NONE)
-        }
-
-        if (phase === GenerationPhase.GENERATE_LOAD) {
-            setPhase(GenerationPhase.PREPARE_COMPLETE)
-        }
+        setPhase((phase) => phase - 1)
     }
 
     return (
@@ -109,7 +108,7 @@ const Generator: React.FC<Props> = () => {
                 <CardGenerate phase={phase} keywords={keywords} card={card} />
             </div>
             <div className="flex justify-center">
-                {user.address !== "0x" ? (
+                {user.address !== "0x" && isLoaded ? (
                     <GeneratorButton
                         phase={phase}
                         requestId={requestId}
