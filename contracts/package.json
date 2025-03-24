@@ -2,7 +2,7 @@
     "name": "@graviola/contracts",
     "version": "0.0.1",
     "license": "MIT",
-    "packageManager": "pnpm@9.13.2",
+    "packageManager": "pnpm@10.6.5",
     "exports": {
         "./addresses": {
             "default": "./src/addresses.ts"
