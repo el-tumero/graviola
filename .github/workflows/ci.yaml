@@ -2,7 +2,7 @@ name: CI
 on: workflow_dispatch
 jobs:
     build:
-        runs-on: ubuntu-22.04
+        runs-on: ubuntu-22.04-arm
         strategy:
             matrix:
                 node-version: [20]
