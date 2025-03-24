@@ -14,7 +14,13 @@ Runs script which deploys mock contracts (to hardhat network), generates typecha
 
 ### For Testnet
 
+Deploy contracts
+
 `pnpm deploy-contracts:testnet`
+
+Verify contracts
+
+`pnpm verify`
 
 #### Required .env keys
 

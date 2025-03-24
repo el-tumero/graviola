@@ -52,10 +52,3 @@ jobs:
                   COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
                   docker build --file $FILE_NAME -t $IMAGE_NAME:$COMMIT_SHA -t $IMAGE_NAME:latest .
                   docker push $IMAGE_NAME --all-tags
-            - name: Build & Push the Docker image (event)
-              run: |
-                  IMAGE_NAME=eltumero/graviola-event
-                  FILE_NAME=./docker/event.Dockerfile
-                  COMMIT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
-                  docker build --file $FILE_NAME -t $IMAGE_NAME:$COMMIT_SHA -t $IMAGE_NAME:latest .
-                  docker push $IMAGE_NAME --all-tags
