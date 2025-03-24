@@ -13,9 +13,7 @@ jobs:
             - name: Install pnpm
               uses: pnpm/action-setup@v4
               with:
-                  version: 10.6.5
-                  run_install: false
-
+                  run_install: true
             - name: Use Node.js ${{ matrix.node-version }}
               uses: actions/setup-node@v4
               with:
@@ -28,7 +26,7 @@ jobs:
             - name: Clean repo
               run: pnpm clean
             - name: Install production dependencies
-              run: pnpm install --prod --shamefully-hoist
+              run: pnpm install --prod
             - name: Upload a Build Artifact
               uses: actions/upload-artifact@v4
               with:
