@@ -1,10 +1,10 @@
+import { useState } from "react"
 import { cn } from "../../utils/cn"
 import { Moon, Sun } from "flowbite-react-icons/outline"
+import useTheme from "./useTheme"
 
-const NavElementModeIcon = () => {
-    const darkModeBrowser =
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
+const NavElementThemeIcon = () => {
+    const [theme, toogleTheme] = useTheme()
 
     return (
         <div
@@ -16,11 +16,11 @@ const NavElementModeIcon = () => {
                 "hover:bg-light-text/10 dark:hover:bg-dark-text/10",
                 "transition-colors duration-300",
             )}
-            onClick={() => {}}
+            onClick={toogleTheme}
         >
-            {darkModeBrowser ? <Sun size={24} /> : <Moon size={24} />}
+            {theme === "dark" ? <Sun size={24} /> : <Moon size={24} />}
         </div>
     )
 }
 
-export default NavElementModeIcon
+export default NavElementThemeIcon

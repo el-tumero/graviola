@@ -14,6 +14,20 @@ import "../styles/global.css"
         <meta name="generator" content={Astro.generator} />
         <script src="https://unpkg.com/htmx.org@2.0.3"></script>
         <title>Graviola</title>
+        <script is:inline>
+            if (!localStorage.getItem("theme")) {
+                if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                    localStorage.setItem("theme", "dark")
+                } else {
+                    localStorage.setItem("theme", "light")
+                }
+            }
+
+            document.documentElement.classList.toggle(
+                "dark",
+                localStorage.theme === "dark"
+            )
+        </script>
     </head>
 
     <body

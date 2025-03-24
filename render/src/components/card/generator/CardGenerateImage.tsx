@@ -32,10 +32,16 @@ const CardImage: React.FC<Props> = ({ size = "small" }) => {
                 size === "medium" && "w-52 h-52",
                 size === "large" && "w-64 h-64",
                 "p-1 rounded-xl border-4",
+                "bg-light-bgPrimary dark:bg-dark-bgDark",
                 "border-light-border dark:border-dark-border select-none",
             )}
         >
-            <img src={goblin.src} className="w-full h-full rounded-lg" alt="" />
+            <img
+                src={goblin.src}
+                draggable="false"
+                className="w-full h-full rounded-lg"
+                alt=""
+            />
         </div>
     )
 }

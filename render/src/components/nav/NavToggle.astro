@@ -27,7 +27,10 @@ import { Icon } from "astro-icon/components"
 
     navToggle?.addEventListener("click", () => {
         navList?.classList.toggle("max-lg:hidden")
+
         bars?.classList.toggle("max-lg:hidden")
+        bars?.classList.toggle("max-lg:inline")
+
         close?.classList.toggle("max-lg:hidden")
         close?.classList.toggle("max-lg:inline")
     })

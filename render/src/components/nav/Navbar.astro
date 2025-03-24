@@ -8,7 +8,7 @@ import NavList from "./NavList.astro"
 import NavToggle from "./NavToggle.astro"
 import { links } from "../../utils/links"
 import DevWallet from "./DevWallet"
-import NavElementModeIcon from "./NavElementModeIcon.tsx"
+import NavElementThemeIcon from "./NavElementThemeIcon.tsx"
 ---
 
 <nav
@@ -41,7 +41,7 @@ import NavElementModeIcon from "./NavElementModeIcon.tsx"
             <NavElementIcon icon="flowbite:github-solid" url={links.repo} />
             <NavElementIcon icon="flowbite:x-solid" url={links.x} />
             <NavElementIcon icon="flowbite:discord-solid" url={links.discord} />
-            <NavElementModeIcon client:only />
+            <NavElementThemeIcon client:only />
 
             {import.meta.env.CHAIN_NET === "local" && <DevWallet client:load />}
 

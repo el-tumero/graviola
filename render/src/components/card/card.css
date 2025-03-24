@@ -47,7 +47,22 @@
     background-color: #2f2f2f;
 }
 
+
+.card-init::after,
+.card-init::before {
+    background-color: var(--color-light-border);
+}
+
 .card-loading::before {
+    background-color: var(--color-light-border);
+}
+
+.dark .card-init::after,
+.dark .card-init::before {
+    background-color: #2f2f2f;
+}
+
+.dark .card-loading::before {
     background-color: #2f2f2f;
 }
 

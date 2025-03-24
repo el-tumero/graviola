@@ -79,12 +79,12 @@ const GeneratorButton: React.FC<Props> = ({
         <button
             className={cl(
                 "px-5 py-2 text-lg rounded-xl",
-                "text-light-textSecondary dark:text-dark-textSecondary",
                 "uppercase",
 
                 enabled
                     ? [
                           "bg-accentDark",
+                          "text-light-bgLight",
                           "shadow-[0_8px_0_0_rgba(15,115,52,1)]",
                           "hover:shadow-[0_6px_0_0_rgba(15,115,52,1)]",
                           "hover:translate-y-[2px]",
@@ -94,6 +94,7 @@ const GeneratorButton: React.FC<Props> = ({
                     : [
                           "cursor-default",
                           "dark:bg-dark-bgLight",
+                          "text-light-text dark:text-dark-text",
                           "dark:shadow-[0_8px_0_0_rgba(25,26,25,1)]",
                           "animate-pulse",
                       ],

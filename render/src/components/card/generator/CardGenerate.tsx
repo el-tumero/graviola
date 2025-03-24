@@ -34,8 +34,7 @@ const CardGenerate: React.FC<Props> = ({ card, keywords, phase }) => {
                 "card",
                 animationPhase(phase),
                 "border border-light-border dark:border-dark-border",
-                "bg-stone-950",
-                // "dark:bg-dark-bgPrimary bg-light-bgPrimary", TODO: fix this
+                "bg-light-bgDark dark:bg-stone-950",
             )}
         >
             {!card ? (
