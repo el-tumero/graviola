@@ -1,17 +1,21 @@
 import hardhat from 'hardhat'
-import { checkbox } from '@inquirer/prompts'
+import { checkbox, input } from '@inquirer/prompts'
 import addresses from '../addresses-testnet.json'
+
+type VerifyConfigEntry = {
+    address: string
+    constructorArguments: string[]
+}
+
+type VerifyConfig = Record<string, VerifyConfigEntry>
 
 async function main() {
     const answer = await checkbox({
         message: 'Select contracts to verify',
-        choices: [
-            { name: 'Token', value: verifyToken },
-            { name: 'SeasonsArchive', value: verifySeasonsArchive },
-            { name: 'SeasonsGovernor', value: verifySeasonsGovernor },
-            { name: 'Collection', value: verifyCollection },
-            { name: 'Generator', value: verifyGenerator },
-        ],
+        choices: Object.entries(config()).map(([contractName, entry]) => ({
+            name: contractName,
+            value: () => verify(contractName, entry),
+        })),
     })
 
     console.log('Verification process start...')
@@ -20,55 +24,49 @@ async function main() {
     }
 }
 
-const onwerAddress = '0x4EEf993E6C1E67c76512B18A13D57671E1f78c24'
-const migratorAddress = '0x2967831d920243582352Fce2db750137ef076A4e'
-
-async function verifyToken() {
-    console.log('Verifing Token...')
-    await hardhat.run('verify:verify', {
-        address: addresses.TOKEN_ADDRESS,
-        constructorArguments: [onwerAddress],
-    })
-}
-
-async function verifySeasonsArchive() {
-    console.log('Verifing SeasonsArchive...')
-    await hardhat.run('verify:verify', {
-        address: addresses.SEASONS_ARCHIVE_ADDRESS,
-        constructorArguments: [migratorAddress],
-    })
-}
-
-async function verifySeasonsGovernor() {
-    console.log('Verifing SeasonsGovernor...')
-    await hardhat.run('verify:verify', {
-        address: addresses.SEASONS_GOVERNOR_ADDRESS,
-        constructorArguments: [
-            addresses.SEASONS_ARCHIVE_ADDRESS,
-            addresses.TOKEN_ADDRESS,
-        ],
-    })
-}
-
-async function verifyCollection() {
-    console.log('Verifing Collection...')
-    await hardhat.run('verify:verify', {
+const config = (): VerifyConfig => ({
+    Collection: {
         address: addresses.COLLECTION_ADDRESS,
-        constructorArguments: [onwerAddress],
-    })
-}
-
-async function verifyGenerator() {
-    console.log('Verifing Generator...')
-    await hardhat.run('verify:verify', {
+        constructorArguments: [
+            addresses.MIGRATOR_ADDRESS,
+            addresses.OAO_ADDRESS,
+        ],
+    },
+    KeywordsVault: {
+        address: addresses.KEYWORDS_VAULT_ADDRESS,
+        constructorArguments: [],
+    },
+    Generator: {
         address: addresses.GENERATOR_ADDRESS,
         constructorArguments: [
-            addresses.TOKEN_ADDRESS,
-            addresses.SEASONS_ARCHIVE_ADDRESS,
+            addresses.KEYWORDS_VAULT_ADDRESS,
             addresses.COLLECTION_ADDRESS,
             addresses.OAO_ADDRESS,
             addresses.VRF_ADDRESS,
         ],
+    },
+    CollectionReadProxy: {
+        address: addresses.COLLECTION_READ_PROXY_ADDRESS,
+        constructorArguments: [
+            addresses.COLLECTION_ADDRESS,
+            addresses.SCHEMA_ADDRESS,
+        ],
+    },
+    Migrator: {
+        address: addresses.MIGRATOR_ADDRESS,
+        constructorArguments: [],
+    },
+    Schema: {
+        address: addresses.SCHEMA_ADDRESS,
+        constructorArguments: [],
+    },
+})
+
+const verify = async (contractName: string, entry: VerifyConfigEntry) => {
+    console.log(`Verifying ${contractName}...`)
+    await hardhat.run('verify:verify', {
+        address: entry.address,
+        constructorArguments: entry.constructorArguments,
     })
 }
 

@@ -35,7 +35,7 @@ const GeneratorButton: React.FC<Props> = ({
                     const fee = await generator.estimateServiceFee()
                     const prepare = await generator.prepare({
                         gasLimit: 1_000_000,
-                        value: fee + 1_000n,
+                        value: fee + fee / 10n,
                     })
                     const tx = await prepare.wait()
                     console.log(tx)
@@ -46,6 +46,7 @@ const GeneratorButton: React.FC<Props> = ({
                     const lastRequest = requests[requests.length - 1]
                     setRequestId(lastRequest.toString())
                 } catch (err) {
+                    alert(err)
                     console.log(err)
                     prevPhase()
                 }
@@ -64,6 +65,7 @@ const GeneratorButton: React.FC<Props> = ({
                     const tx = await generate.wait()
                     console.log(tx)
                 } catch (err) {
+                    alert(err)
                     console.log(err)
                     prevPhase()
                 }

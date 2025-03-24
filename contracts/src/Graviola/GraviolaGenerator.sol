@@ -150,6 +150,7 @@ contract GraviolaGenerator is
         if (fee > request.balance) {
             revert OAORequestInsufficientBalance();
         }
+        request.balance -= fee;
 
         // perform process of selecting random words
         (string memory result, bytes memory wordIds) = rollWords(
@@ -180,6 +181,7 @@ contract GraviolaGenerator is
         collection.addOaoRequestId(tokenId, requestId);
         request.status = GeneratorRequestStatus.OAO_WAIT;
 
+        payable(request.initiator).transfer(request.balance);
         emit OAORequestSent(request.initiator, generatorRequestId);
     }
 
@@ -237,12 +239,7 @@ contract GraviolaGenerator is
         return userRequests[user];
     }
 
-    function withdraw(uint256 requestId) external {
-        GeneratorRequest storage request = requests[requestId];
-        if (msg.sender != request.initiator) {
-            revert SenderNotInitiator();
-        }
-        requests[requestId].balance = 0;
-        payable(msg.sender).transfer(requests[requestId].balance);
+    function topUpRequest(uint256 requestId) external payable {
+        requests[requestId].balance += msg.value;
     }
 }

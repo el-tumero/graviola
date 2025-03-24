@@ -8,13 +8,22 @@ Solhint is configured to dump a report.txt file - please review it before commit
 
 ## Deploy scripts
 
-`yarn deploy:local`
+`pnpm deploy-contracts:local`
 
 Runs script which deploys mock contracts (to hardhat network), generates typechain types and adds contract addresses to addresses-local.json file.
 
 ### For Testnet
 
-# .env keys
+Deploy contracts
+
+`pnpm deploy-contracts:testnet`
+
+Verify contracts
+
+`pnpm verify`
+
+#### Required .env keys
 
 -   PRIVATE_KEY : string
 -   API_KEY_INFURA : string
+-   ARBISCAN_API_KEY: string

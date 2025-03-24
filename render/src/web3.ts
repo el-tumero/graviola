@@ -13,9 +13,9 @@ import { addresses as target } from "@graviola/contracts/addresses"
 import type { Card, Keyword } from "@graviola/core"
 import { propertiesToCard, wordIdToRarity } from "@graviola/core"
 import { reshape2d } from "./utils/reshape2d"
+import { getSecret } from "astro:env/server"
 
-let rpcUrl: string =
-    "https://dawn-delicate-breeze.arbitrum-sepolia.quiknode.pro/"
+let rpcUrl: string = getSecret("RPC_URL") as string
 
 let addresses = target.testnet
 

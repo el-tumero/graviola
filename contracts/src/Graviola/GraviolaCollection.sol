@@ -1,11 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import {ERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
-import {IERC165} from "@openzeppelin/contracts/utils/introspection/ERC165.sol";
+import {IERC165} from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import {IERC721Metadata} from "@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol";
 import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {ERC721Burnable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
@@ -14,20 +11,23 @@ import {GraviolaEnumerable} from "./GraviolaEnumerable.sol";
 import {GraviolaSchema} from "./GraviolaSchema.sol";
 import {GraviolaGenerator} from "./GraviolaGenerator.sol";
 import {IERC7007} from "../OAO/IERC7007.sol";
+import {IERC7007Enumerable} from "../OAO/IERC7007Enumerable.sol";
+import {IERC7007Updatable} from "../OAO/IERC7007Updatable.sol";
 import {IAIOracle} from "../OAO/IAIOracle.sol";
 
 contract GraviolaCollection is
-    ERC165,
     ERC721,
     ERC721Enumerable,
     ERC721Burnable,
     IERC7007,
+    IERC7007Updatable,
     Ownable,
     GraviolaMetadata,
     GraviolaEnumerable
 {
     error NotGenerator();
     error NonExistentToken(uint256 tokenId);
+    error OAORequestNotFinalized();
 
     GraviolaSchema public schema;
     GraviolaGenerator public generator;
@@ -121,6 +121,21 @@ contract GraviolaCollection is
             (keccak256(_readProperty(id, "image")) == keccak256(aigcData));
     }
 
+    function update(
+        bytes calldata prompt,
+        bytes calldata aigcData
+    ) external onlyGenerator {
+        uint256 id = tokenId[prompt];
+        if (ownerOf(id) == address(0)) {
+            revert NonExistentToken(id);
+        }
+        if (!aiOracle.isFinalized(oaoRequestIds[id])) {
+            revert OAORequestNotFinalized();
+        }
+        _addAigcData(id, prompt, aigcData);
+        emit Update(id, prompt, aigcData);
+    }
+
     function tokenURI(
         uint256 tokenId
     ) public view override returns (string memory) {
@@ -148,19 +163,13 @@ contract GraviolaCollection is
         super._increaseBalance(account, value);
     }
 
-    // TODO: check if is valid?
     function supportsInterface(
         bytes4 interfaceId
-    )
-        public
-        view
-        virtual
-        override(ERC165, ERC721, IERC165, ERC721Enumerable)
-        returns (bool)
-    {
+    ) public view override(ERC721, ERC721Enumerable, IERC165) returns (bool) {
         return
-            interfaceId == type(IERC721).interfaceId ||
-            interfaceId == type(IERC721Metadata).interfaceId ||
-            super.supportsInterface(interfaceId);
+            super.supportsInterface(interfaceId) ||
+            interfaceId == type(IERC7007).interfaceId ||
+            interfaceId == type(IERC7007Updatable).interfaceId ||
+            interfaceId == type(IERC7007Enumerable).interfaceId;
     }
 }
