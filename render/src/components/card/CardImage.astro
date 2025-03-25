@@ -26,7 +26,7 @@ const style = {
     style={style}
     class:list={[
         "flex",
-        size === "small" && "w-36 h-36",
+        size === "small" && "max-w-36 max-h-36",
         size === "medium" && "w-52 h-52",
         size === "large" && "w-64 h-64",
         "p-1 rounded-xl bg-light-bgDark dark:bg-dark-bgDark border",
@@ -37,7 +37,7 @@ const style = {
     ]}
 >
     <img
-        class={cn("w-full h-full rounded-lg")}
+        class={"rounded-lg"}
         crossorigin="anonymous"
         src={convertCidToUrl(image)}
         alt="Card image"

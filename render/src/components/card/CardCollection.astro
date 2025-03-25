@@ -16,10 +16,10 @@ const isLoadMoreButtonVisible = totalSupply > defaultCardsToDisplay
 
 <div
     class:list={[
-        "grid gap-4 w-full",
-        "max-sm:grid-cols-2",
-        "max-md:grid-cols-3 md:grid-cols-4",
-        "xl:grid-cols-6",
+        "grid gap-4",
+        "lg:grid-cols-6",
+        "grid-cols-[repeat(auto-fit,minmax(150px,1fr))]",
+        "overflow-hidden",
     ]}
     id="card-collection"
 >
