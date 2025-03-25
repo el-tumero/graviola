@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import cl from "clsx"
 import { rarityBoxShadow } from "../../../utils/rarity"
 import { RarityName, type CardImageSize } from "@graviola/core"
-import goblin from "../../../assets/unknowngoblin.svg"
+import goblin from "../../../assets/unknowngoblin.svg?url"
 
 interface Props {
     size?: CardImageSize
@@ -37,7 +37,7 @@ const CardImage: React.FC<Props> = ({ size = "small" }) => {
             )}
         >
             <img
-                src={goblin.src}
+                src={goblin}
                 draggable="false"
                 className="w-full h-full rounded-lg"
                 alt=""
