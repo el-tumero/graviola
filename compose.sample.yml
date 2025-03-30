@@ -1,0 +1,10 @@
+services:
+    render:
+        image: eltumero/graviola-render
+        environment:
+            - RPC_URL=your_rpc_url
+        ports:
+            - "80:4321"
+        deploy:
+            update_config:
+                order: start-first
